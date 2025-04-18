@@ -1504,6 +1504,12 @@ namespace emp {
         ++num_orgs;                   // Keep count of number of organisms
         on_placement_sig.Trigger(i);  // Trigger that organism has been placed.
       }
+    } else {
+      // Asynchronous systematics manager still needs to be informed an
+      // update has happened, but timing doesn't matter
+      for (Ptr<SystematicsBase<ORG>> s : systematics) {
+        s->Update();
+      }      
     }
 
     // 3. Handle any data files that need to be printed this update.

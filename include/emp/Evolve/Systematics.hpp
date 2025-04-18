@@ -150,7 +150,7 @@ namespace emp {
     using this_t = Taxon<ORG_INFO, DATA_STRUCT>;
     using info_t = ORG_INFO;
 
-    size_t id;                ///<  ID for this Taxon (Unique within this Systematics)
+    uint64_t id;                ///<  ID for this Taxon (Unique within this Systematics)
     const info_t info;        ///<  Details for the organisms associated within this taxanomic group.
     Ptr<this_t> parent;       ///<  Pointer to parent group (nullptr if injected)
     std::set<Ptr<this_t> > offspring; ///< Pointers to all immediate offspring taxa
@@ -167,7 +167,7 @@ namespace emp {
   public:
     using data_t = DATA_STRUCT;
 
-    Taxon(size_t _id, const info_t & _info, Ptr<this_t> _parent=nullptr)
+    Taxon(uint64_t _id, const info_t & _info, Ptr<this_t> _parent=nullptr)
      : id (_id), info(_info), parent(_parent)
      , num_orgs(0), tot_orgs(0), num_offspring(0), total_offspring(0)
      , depth(parent ? (parent->depth+1) : 0)
@@ -183,7 +183,7 @@ namespace emp {
     }
 
     /// Get a unique ID for this taxon; IDs are assigned sequentially, so newer taxa have higher IDs.
-    size_t GetID() const { return id; }
+    uint64_t GetID() const { return id; }
 
     /// Retrieve the tracked info associated with this Taxon.
     const info_t & GetInfo() const { return info; }
@@ -245,8 +245,10 @@ namespace emp {
     // Should this be protected or private or something?
     void AddTotalOffspring() {
       ++total_offspring;
-      if (parent) { // Keep going until we hit root
-        parent->AddTotalOffspring();
+      Ptr<this_t> temp_parent = parent;
+      while (temp_parent) { // Keep going until we hit root
+        temp_parent->total_offspring++;
+        temp_parent = temp_parent->parent;
       }
     }
 
@@ -283,8 +285,10 @@ namespace emp {
     /// all ancestors (gets called on a taxon's parent when that taxon goes extinct)
     void RemoveTotalOffspring() {
       --total_offspring;
-      if (parent) { // Keep going until we hit root
-        parent->RemoveTotalOffspring();
+      Ptr<this_t> temp_parent = parent;
+      while (temp_parent) { // Keep going until we hit root
+        temp_parent->total_offspring--;
+        temp_parent = temp_parent->parent;
       }
     }
   };
@@ -302,6 +306,7 @@ namespace emp {
     bool archive;             ///< Set to true if we are supposed to do any archiving of extinct taxa.
     bool store_position;      ///< Keep a vector mapping  positions to pointers
     bool track_synchronous;   ///< Does this systematics manager need to keep track of current and next positions?
+    bool collapse_unifurcations; ///< Should this systematics manager collapse unifurcations?
 
     // Stats about active taxa... (totals are across orgs, not taxa)
     size_t org_count;         ///< How many organisms are currently active?
@@ -309,7 +314,7 @@ namespace emp {
     size_t num_roots;         ///< How many distinct injected ancestors are currently in population?
     mutable int max_depth;    ///< Depth of deepest taxon. -1 means needs to be recalculated
 
-    size_t next_id;           ///< What ID value should the next new taxon have?
+    uint64_t next_id;           ///< What ID value should the next new taxon have?
     size_t curr_update;
 
     DataManager<double, data::Current, data::Info, data::Range, data::Stats, data::Pull> data_nodes;
@@ -318,6 +323,7 @@ namespace emp {
     SystematicsBase(bool _active=true, bool _anc=true, bool _all=false, bool _pos=true)
       : store_active(_active), store_ancestors(_anc), store_outside(_all)
       , archive(store_ancestors || store_outside), store_position(_pos), track_synchronous(false)
+      , collapse_unifurcations(false)
       , org_count(0), total_depth(0), num_roots(0), max_depth(0), next_id(0), curr_update(0) { ; }
 
     virtual ~SystematicsBase(){;}
@@ -343,6 +349,9 @@ namespace emp {
     /// Are we storing the positions of taxa?
     bool GetStorePosition() const { return store_position; }
 
+    /// Are we collapsing unifurcations?
+    bool GetCollapseUnifurcations() const {return collapse_unifurcations; }
+
     /// How many living organisms are currently being tracked?
     size_t GetTotalOrgs() const { return org_count; }
 
@@ -350,7 +359,7 @@ namespace emp {
     size_t GetNumRoots() const { return num_roots; }
 
     /// What ID will the next taxon have?
-    size_t GetNextID() const {return next_id;}
+    uint64_t GetNextID() const {return next_id;}
 
     /// What is the average phylogenetic depth of organisms in the population?
     double GetAveDepth() const { return ((double) total_depth) / (double) org_count; }
@@ -375,6 +384,9 @@ namespace emp {
 
     /// Are we storing the location of taxa?
     void SetStorePosition(bool new_val) { store_position = new_val; }
+
+    /// Are we collapsing unifurcations?
+    void SetCollapseUnifurcations(bool new_val) { collapse_unifurcations = new_val; }
 
     /// Sets the current update/time step
     void SetUpdate(size_t ud) {curr_update = ud;}
@@ -485,13 +497,13 @@ namespace emp {
     using parent_t::archive;
     using parent_t::store_position;
     using parent_t::track_synchronous;
+    using parent_t::collapse_unifurcations;
     using parent_t::org_count;
     using parent_t::total_depth;
     using parent_t::num_roots;
     using parent_t::next_id;
     using parent_t::curr_update;
     using parent_t::max_depth;
-
 
   public:
     using typename parent_t::data_ptr_t;
@@ -550,14 +562,15 @@ namespace emp {
     std::unordered_set< Ptr<taxon_t>, hash_t > ancestor_taxa; ///< A set of all dead, ancestral taxa.
     std::unordered_set< Ptr<taxon_t>, hash_t > outside_taxa;  ///< A set of all dead taxa w/o descendants.
 
-    Ptr<taxon_t> to_be_removed = nullptr; ///< Taxon to remove org from after next call to AddOrg
-    emp::WorldPosition removal_pos = {0, 0};   ///< Position of taxon to next be removed
+    emp::vector<Ptr<taxon_t>> to_be_removed = {}; ///< Taxon to remove org from after next call to AddOrg
+    emp::vector<emp::WorldPosition> removal_pos = {};   ///< Position of taxon to next be removed
 
     emp::vector<emp::vector<Ptr<taxon_t> > > taxon_locations; ///< Positions in this vector indicate taxon positions in world
 
     Signal<void(Ptr<taxon_t>, ORG & org)> on_new_sig; ///< Trigger when a new taxon is created
     Signal<void(Ptr<taxon_t>)> on_extinct_sig; ///< Trigger when a taxon goes extinct
     Signal<void(Ptr<taxon_t>)> on_prune_sig; ///< Trigger when any organism is pruned from tree
+    Signal<void(Ptr<taxon_t>)> on_collapse_unifurcation_sig; ///< Trigger when a unifurcation is collapsed    
 
     mutable Ptr<taxon_t> mrca;  ///< Most recent common ancestor in the population.
 
@@ -569,6 +582,12 @@ namespace emp {
 
     /// Called when there are no more living members of a taxon.  There may be descendants.
     void MarkExtinct(Ptr<taxon_t> taxon);
+
+    /// Called to remove taxa that are supposed to be removed on a delay
+    void ClearRemoveAfterReproQueue(WorldPosition skip = {WorldPosition::invalid_id, WorldPosition::invalid_id});
+
+    /// Called when a taxon has no living members and only a single offspring
+    void CollapseUnifurcation(Ptr<taxon_t> taxon);
 
     #ifndef DOXYGEN_SHOULD_SKIP_THIS
     /// Helper function for RemoveBefore
@@ -869,6 +888,11 @@ namespace emp {
     /// Trigger:  Taxon is about to be killed
     /// Argument: Pointer to taxon
     SignalKey OnPrune(std::function<void(Ptr<taxon_t>)> & fun) { return on_prune_sig.AddAction(fun); }
+
+    /// Provide a function for Systematics to call each time a unifurcation is collapsed.
+    /// Trigger:  Taxon is about to be collapsed
+    /// Argument: Pointer to taxon
+    SignalKey OnCollapseUnifurcation(std::function<void(Ptr<taxon_t>)> & fun) { return on_collapse_unifurcation_sig.AddAction(fun); }
 
     // ===== Functions for adding data nodes to systematics manager ====
 
@@ -1246,6 +1270,10 @@ namespace emp {
      * "Sound Colless-like balance indices for multifurcating trees" (Mir, 2018, PLoS One)*/
     double CollessLikeIndex() const {
       GetMRCA();
+      if (!mrca) {
+        std::cout << "Warning: trying to calculate CollessLike Index on empty tree" << std::endl;
+        return 0;
+      }
       return RecursiveCollessStep(mrca).total;
     }
 
@@ -1345,16 +1373,28 @@ namespace emp {
   // ======= Functions for manipulating systematics manager internals
 
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
+  void Systematics<ORG, ORG_INFO, DATA_STRUCT>::ClearRemoveAfterReproQueue(WorldPosition skip) {
+      if (to_be_removed.size()) {
+        for (emp::Ptr<taxon_t> tax : to_be_removed){
+          RemoveOrg(tax);
+        }
+        for (emp::WorldPosition pos : removal_pos) {
+          // Skip lets us skip newly-added org
+          if (pos.IsValid() && !(pos.GetIndex() == skip.GetIndex() && pos.GetPopID() == skip.GetPopID())) {
+            taxon_locations[pos.GetPopID()][pos.GetIndex()] = nullptr;
+          }
+        }
+        to_be_removed.clear();
+        removal_pos.clear();
+      }    
+  }
+
+  template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::Update() {
     if (track_synchronous) {
 
       // Clear pending removal
-      if (to_be_removed != nullptr) {
-        RemoveOrg(to_be_removed);
-        taxon_locations[removal_pos.GetPopID()][removal_pos.GetIndex()] = nullptr;
-        to_be_removed = nullptr;
-        removal_pos = {0, 0};
-      }
+      ClearRemoveAfterReproQueue();
 
       // Assumes that synchronous worlds have two populations, with 0
       // being currently alive and 1 being the one being created
@@ -1387,9 +1427,49 @@ namespace emp {
 
     // If the taxon is still active AND the is the current mrca AND now has only one offspring,
     // clear the MRCA for lazy re-evaluation later.
-    else if (taxon == mrca && taxon->GetNumOff() == 1) {
-      mrca = nullptr;
+    else if (taxon->GetNumOrgs() == 0 && taxon->GetNumOff() == 1) {
+      if (taxon == mrca) {
+        mrca = nullptr;
+      }
+      if (collapse_unifurcations) {
+        ancestor_taxa.erase(taxon);
+        CollapseUnifurcation(taxon);
+      }
     }
+
+  }
+
+  template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
+  void Systematics<ORG, ORG_INFO, DATA_STRUCT>::CollapseUnifurcation(Ptr<taxon_t> taxon) {
+    // Give user a chance to do something with taxon before collapsing
+    on_collapse_unifurcation_sig.Trigger(taxon);
+    
+    Ptr<taxon_t> parent = taxon->GetParent();
+
+    for (Ptr<taxon_t> offspring_taxon : taxon->GetOffspring()) {
+      offspring_taxon->parent = parent;
+      offspring_taxon->depth--;
+      if (parent) {
+        parent->offspring.insert(offspring_taxon);
+        parent->num_offspring++;
+      }
+    }
+
+    if (parent) {
+      // Update stats by merging appropriate ones
+      parent->tot_orgs += taxon->GetNumOrgs();
+      parent->destruction_time = std::max(parent->destruction_time, taxon->GetDestructionTime());
+      parent->origination_time = std::min(parent->origination_time, taxon->GetOriginationTime());      
+      parent->RemoveOffspring(taxon);
+      parent->RemoveTotalOffspring();
+      
+      // other stats:
+      // - depth is handled in offspring
+      // - num_orgs must be 0 for both taxa already
+      // - num_offspring handled above
+    }
+    taxon.Delete();      
+    return;
   }
 
   // Mark a taxon extinct if there are no more living members.  There may be descendants.
@@ -1397,6 +1477,10 @@ namespace emp {
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::MarkExtinct(Ptr<taxon_t> taxon) {
     emp_optional_throw(taxon, "Invalid taxon pointer");
     emp_optional_throw(taxon->GetNumOrgs() == 0, "Taxon already extinct");
+
+    if (taxon == mrca && taxon->GetNumOff() == 1) {
+      mrca = nullptr;
+    }
 
     // Track destruction time
     taxon->SetDestructionTime(curr_update);
@@ -1415,6 +1499,12 @@ namespace emp {
     }
 
     if (store_active) active_taxa.erase(taxon);
+
+    if (collapse_unifurcations && taxon->GetNumOff() == 1) {
+      CollapseUnifurcation(taxon);
+      return;
+    } 
+
     if (!archive) {   // If we don't archive taxa, delete them.
       for (Ptr<taxon_t> off_tax : taxon->GetOffspring()) {
         off_tax->NullifyParent();
@@ -1539,10 +1629,7 @@ namespace emp {
     cur_taxon->AddOrg();                    // Record the current organism in its taxon.
     total_depth += cur_taxon->GetDepth();   // Track the total depth (for averaging)
 
-    if (to_be_removed) {
-      RemoveOrg(to_be_removed);
-      to_be_removed = nullptr;
-    }
+    ClearRemoveAfterReproQueue(pos);
 
     most_recent = cur_taxon;
     return cur_taxon;                       // Return the taxon used.
@@ -1559,19 +1646,14 @@ namespace emp {
       return;
     }
 
-    RemoveOrgAfterRepro(taxon_locations[pos.GetPopID()][pos.GetIndex()]);
-    removal_pos = pos;
+    to_be_removed.push_back(taxon_locations[pos.GetPopID()][pos.GetIndex()]);
+    removal_pos.push_back(pos);
   }
 
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveOrgAfterRepro(Ptr<taxon_t> taxon) {
-    if (to_be_removed != nullptr) {
-      RemoveOrg(to_be_removed);
-      taxon_locations[removal_pos.GetPopID()][removal_pos.GetIndex()] = nullptr;
-      to_be_removed = nullptr;
-      removal_pos = {0, 0};
-    }
-    to_be_removed = taxon;
+    to_be_removed.push_back(taxon);
+    removal_pos.push_back(WorldPosition(WorldPosition::invalid_id, WorldPosition::invalid_id));
   }
 
 
@@ -2042,8 +2124,8 @@ namespace emp {
     double count = l1 + l2 + 2;
 
     if (branch_only) {
-      count -= std::count_if(lineage1.begin()+1, lineage1.begin() + l1, [](Ptr<taxon_t> x){ return x->GetNumOff() == 1; });
-      count -= std::count_if(lineage2.begin()+1, lineage2.begin() + l2, [](Ptr<taxon_t> x){ return x->GetNumOff() == 1; });
+      count -= std::count_if(lineage1.begin(), lineage1.begin() + l1, [](Ptr<taxon_t> x){ return x->GetNumOff() == 1; });
+      count -= std::count_if(lineage2.begin(), lineage2.begin() + l2, [](Ptr<taxon_t> x){ return x->GetNumOff() == 1; });
     }
 
     return count;
@@ -2216,6 +2298,12 @@ namespace emp {
 
     // Load files
     emp::File in_file(file_path);
+
+    if (in_file.HasError()) {
+      emp_optional_throw(false, "Error loading file from file_path: " + file_path + " " + in_file.GetError());
+      return;
+    }
+
     emp::vector<emp::String> header = in_file.ExtractRow();
 
     // Find column ids
@@ -2315,6 +2403,10 @@ namespace emp {
       if (num_orgs_pos != -1) {
         size_t num_orgs = emp::from_string<size_t>(row[num_orgs_pos]);
         tax->SetNumOrgs(num_orgs);
+        if (num_orgs > 0 && emp::Has(ancestor_taxa, tax)) {
+          active_taxa.insert(tax);
+          ancestor_taxa.erase(tax);
+        }
       }
       if (tot_orgs_pos != -1) {
         size_t tot_orgs = emp::from_string<size_t>(row[tot_orgs_pos]);

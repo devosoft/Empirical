@@ -74,7 +74,7 @@ namespace emp {
     using info_t = typename systematics_t::info_t;
     using hash_t = typename Ptr<taxon_t>::hash_t;
     using fun_calc_complexity_t = std::function<double(const SKEL_TYPE&)>;
-    using fun_calc_data_t = std::function<SKEL_TYPE(info_t &)>; // TODO: Allow other skeleton types
+    using fun_calc_data_t = std::function<SKEL_TYPE(Ptr<taxon_t> &)>; // TODO: Allow other skeleton types
 
     struct snapshot_info_t {
       Ptr<taxon_t> taxon = nullptr; // This is what the systematics manager has
@@ -133,8 +133,7 @@ namespace emp {
         int i = 0;
         for (auto tax : sys_active) {
           snapshots.back()[i].taxon = tax;
-          info_t info = tax->GetInfo();
-          snapshots.back()[i].skel.New(skeleton_fun(info));
+          snapshots.back()[i].skel.New(skeleton_fun(tax));
           snapshots.back()[i].count = tax->GetNumOrgs();
           i++;
         }
