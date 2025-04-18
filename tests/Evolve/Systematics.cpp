@@ -666,8 +666,8 @@ TEST_CASE("Test Data Struct", "[evo]") {
   auto tax2 = sys2->AddOrg(2, new_tax);
   tax2->GetData().RecordFitness(1);
 
-  sys->GetDataNode("deleterious_steps")->PullData();
-  CHECK(sys->GetDataNode("deleterious_steps")->GetMean() == Approx(.5));
+  sys2->GetDataNode("deleterious_steps")->PullData();
+  CHECK(sys2->GetDataNode("deleterious_steps")->GetMean() == Approx(.5));
 
 
   sys2.Delete();
@@ -1724,21 +1724,39 @@ TEST_CASE("Test LoadFromFile MPD Hang") {
 TEST_CASE("Collapse Unifurcations") {
   emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, false);
   sys.SetCollapseUnifurcations(true);
-  CHECK(sys.GetCollapseUnifurcations());
+  CHECK(sys.GetCollapseUnifurcations());  
+  int unifurcation_count = 0;
+  std::function<void(emp::Ptr<emp::Taxon<int>>)> unifurcation_fun = [&unifurcation_count](emp::Ptr<emp::Taxon<int>> tax){unifurcation_count++;};
+  sys.OnCollapseUnifurcation(unifurcation_fun);
   auto id1 = sys.AddOrg(3, nullptr);
+  sys.SetUpdate(1);
   auto id2 = sys.AddOrg(4, id1);
+  sys.SetUpdate(2);
   auto id3 = sys.AddOrg(5, id2);
+  sys.SetUpdate(3);
+  auto id4a = sys.AddOrg(6, id2);  
+  CHECK(unifurcation_count == 0);
+  CHECK(!sys.RemoveOrg(id4a));
+  CHECK(unifurcation_count == 0);  
+  CHECK(sys.GetNumOutside() == 1);
+  CHECK(sys.GetNumAncestors() == 0);
+  CHECK(sys.GetNumTaxa() == 4);
   CHECK(!sys.RemoveOrg(id2));
   CHECK(sys.GetNumAncestors() == 0);
-  CHECK(sys.GetNumTaxa() == 2);
+  CHECK(sys.GetNumTaxa() == 3);
   CHECK(id3->GetParent() == id1);
   CHECK(emp::Has(id1->GetOffspring(), id3));
   CHECK(!emp::Has(id1->GetOffspring(), id2));
   CHECK(id1->GetNumOff() == 1);
+  CHECK(id1->GetOriginationTime() == 0);
+  CHECK(id1->GetDestructionTime() == std::numeric_limits<double>::infinity());
+  CHECK(unifurcation_count == 1);
+  sys.SetUpdate(4);
   CHECK(!sys.RemoveOrg(id1));
+  CHECK(unifurcation_count == 2);
   CHECK(!id3->GetParent());
   CHECK(sys.GetNumAncestors() == 0);
-  CHECK(sys.GetNumTaxa() == 1);
+  CHECK(sys.GetNumTaxa() == 2);
   auto id4 = sys.AddOrg(6, id3);
   auto id5 = sys.AddOrg(7, id4);
   auto id6 = sys.AddOrg(8, id5);
