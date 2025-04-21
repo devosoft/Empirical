@@ -1,7 +1,7 @@
 /**
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2023-2024
+ *  date: 2023-2025
  */
 /**
  *  @file FlagManager.hpp
@@ -11,21 +11,22 @@
  *  The FlagManager class will take command line arguments (either in its constructor or with
  *  the AddFlags() function) and process them appropriately.
  *
- *  For setup, the user must run AddOption with the function to call.  Functions to call can take
- *  zero, one, or two Strings as arguments OR they can take a vector of Strings and the range of
- *  allowed arguments should be specified.  When Process() is run, the appropriate function will
- *  be called on each and any invalid arguments will trigger an error.
+ *  For setup, a FlagManager instance must be configured by calling AddOption once for each flag
+ *  option, providing a the function to call when the option is triggered.  The functions can
+ *  take zero, one, or two Strings as arguments OR they can take a vector of Strings and the
+ *  range of allowed arguments should be specified.
+ * 
+ *  When Process() is run, the appropriate function will be called on each and any invalid
+ *  arguments will trigger an error.
  *
- *  Flags are expected to begin with a '-' and non-flags are expected to NOT begin with a '-'.
+ *  Flags are expected to begin with a '--' followed by at least one non dash, non whitespace
+ *  character.  If a shortcut character is provided, it must be called with a single '-'.
  *
  *  If a single dash is followed by multiple characters, each will be processed independently.
  *  So, "-abc" will be the same as "-a -b -c".
  *
- *  Extra command line arguments will be saves as a vector of strings called "extras" and must
+ *  Extra command line arguments will be saved as a vector of strings called "extras" and must
  *  be processed manually.  They can be retrieved with GetExtras().
- *
- *
- *  @todo: Make variable numbers of flag arguments work.
  */
 
 #ifndef EMP_CONFIG_FLAGMANAGER_HPP_INCLUDE
@@ -108,6 +109,7 @@ namespace emp {
 
     FlagInfo & _AddOption(String name, std::function<void(const emp::vector<String> &)> fun,
                    size_t min_args=0, size_t max_args=npos, String desc="") {
+      emp_assert(name.starts_with("--"), name);
       flag_options[name] = FlagInfo{desc, min_args, max_args, fun};
       if (cur_group >= 0) flag_options[name].SetGroup(groups[cur_group].name);
       return flag_options[name];
