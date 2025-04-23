@@ -109,7 +109,10 @@ namespace emp {
 
     FlagInfo & _AddOption(String name, std::function<void(const emp::vector<String> &)> fun,
                    size_t min_args=0, size_t max_args=npos, String desc="") {
-      emp_assert(name.starts_with("--"), name);
+      emp_assert(name.size() > 0, "FlagManager cannot take an empty option name.");
+      emp_assert(!name.HasWhitespace(), "Option names cannot contain whitespace.");      
+      if (!name.HasPrefix("--")) name.insert(0, "--");
+      emp_assert(name[2] != '-', name, "Option names cannot begin with a single '-')");
       flag_options[name] = FlagInfo{desc, min_args, max_args, fun};
       if (cur_group >= 0) flag_options[name].SetGroup(groups[cur_group].name);
       return flag_options[name];
