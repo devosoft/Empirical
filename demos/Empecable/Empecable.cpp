@@ -37,35 +37,35 @@ private:
 public:
   Empecable(int argc, char * argv[]) : flags(argc, argv) {
     flags.AddGroup("Basic Operation");
-    flags.AddOption('h', "--help", [this](){ PrintHelp(); },
+    flags.AddOption('h', "help", [this](){ PrintHelp(); },
       "Get additional information about options.");
-    flags.AddOption('v', "--verbose", [this](){ SetVerbose(true); },
+    flags.AddOption('v', "verbose", [this](){ SetVerbose(true); },
       "Provide more detailed output");
         
     flags.AddGroup("Activating Fixes");
-    flags.AddOption('a', "--all", [this](){ SetAll(true); },
+    flags.AddOption('a', "all", [this](){ SetAll(true); },
       "Activate ALL fixes (except those explicitly excluded; see below)");
-    flags.AddOption('g', "--fix-guards", [this](){ SetUseGuards(true); },
+    flags.AddOption('g', "fix-guards", [this](){ SetUseGuards(true); },
       "Fix include guards to have correct names at beginning and end of file");
-    flags.AddOption('f', "--fix-front", [this](){ SetFixFrontMatter(true); },
+    flags.AddOption('f', "fix-front", [this](){ SetFixFrontMatter(true); },
       "Fix front-matter comments (copyright, description, etc.)");
-    flags.AddOption('i', "--fix-indents", [this](){ SetFixIndents(true); },
+    flags.AddOption('i', "fix-indents", [this](){ SetFixIndents(true); },
       "Fix indenting to be two chars, no tabs");
-    flags.AddOption('o', "--fix-order", [this](){ SetFixIncludes(true); },
+    flags.AddOption('o', "fix-order", [this](){ SetFixIncludes(true); },
       "Fix order of #includes to be grouped and alphabetical");
-    flags.AddOption('w', "--fix-whitespace", [this](){ SetFixSpaces(true); },
+    flags.AddOption('w', "fix-whitespace", [this](){ SetFixSpaces(true); },
       "Fix whitespace (remove spaces at end of lines)");
   
     flags.AddGroup("Disabling Fixes");
-    flags.AddOption('G', "--no-fix-guards", [this](){ SetUseGuards(false); },
+    flags.AddOption('G', "no-fix-guards", [this](){ SetUseGuards(false); },
       "Disable fixing of include guards");
-    flags.AddOption('F', "--no-fix-front", [this](){ SetFixFrontMatter(false); },
+    flags.AddOption('F', "no-fix-front", [this](){ SetFixFrontMatter(false); },
       "Disable fixing of front matter (copyright, description, etc.)");
-    flags.AddOption('I', "--no-fix-indents", [this](){ SetFixIndents(false); },
+    flags.AddOption('I', "no-fix-indents", [this](){ SetFixIndents(false); },
       "Disable fixing of indentations (2 char, no tabs)");
-    flags.AddOption('O', "--no-fix-order", [this](){ SetFixIncludes(false); },
+    flags.AddOption('O', "no-fix-order", [this](){ SetFixIncludes(false); },
       "Disable fixing of include order (grouped and alphabetical)");
-    flags.AddOption('W', "--no-fix-whitespace", [this](){ SetFixSpaces(false); },
+    flags.AddOption('W', "no-fix-whitespace", [this](){ SetFixSpaces(false); },
       "Disable fixing of whitespace (no spaces at end of lines)");
     
     flags.Process();
