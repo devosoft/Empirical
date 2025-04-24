@@ -71,6 +71,10 @@ public:
     flags.Process();
   
     auto filenames = flags.GetExtras();
+    if (filenames.size() == 0) {
+      std::cout << "No files listed." << std::endl;
+      PrintUsage();
+    }
     for (emp::String filename : filenames) {
       ProcessFile(filename);
     }    
@@ -92,13 +96,19 @@ public:
 
   Empecable & SetVerbose(bool _in) { verbose = _in; return *this; }
 
+  void PrintUsage() const {
+    std::cout << "Usage: " << flags[0] << " {options ...} files ..." << std::endl;
+  }
+
   void PrintVersion() const {
     std::cout << "File formatter version 0.1." << std::endl;
   }
 
   void PrintHelp() const {
     PrintVersion();
-    std::cout << "Usage: " << flags[0] << " [flags] [files]\n";
+    std::cout << '\n';
+    PrintUsage();
+    std::cout << '\n';
     flags.PrintOptions();
     exit(0);
   }
