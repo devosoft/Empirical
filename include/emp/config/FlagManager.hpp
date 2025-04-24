@@ -48,6 +48,7 @@ namespace emp {
     using fun_t = std::function<void(const emp::vector<String> &)>;
 
   private:
+    String name;    ///< Name used for this option.
     String desc;          ///< Name to type to trigger option.  E.g. "--help"
     size_t min_args = 0;  ///< Minumum number of arguments option needs to operate.
     size_t max_args = 0;  ///< Maximum number of arguments option can handle.
@@ -59,24 +60,25 @@ namespace emp {
   public:
     FlagInfo() = default;
     FlagInfo(const FlagInfo &) = default;
-    FlagInfo(String desc, size_t min_args, size_t max_args,
+    FlagInfo(String name, String desc, size_t min_args, size_t max_args,
              fun_t fun, char shortcut='\0')
-      : desc(desc), min_args(min_args), max_args(max_args), fun(fun), shortcut(shortcut)
+      : name(name), desc(desc), min_args(min_args), max_args(max_args), fun(fun), shortcut(shortcut)
     { }
 
     FlagInfo & operator=(const FlagInfo &) = default;
 
+    [[nodiscard]] const String & GetName() const { return name; }
     [[nodiscard]] const String & GetDesc() const { return desc; }
-    [[nodiscard]] size_t GetMinArgs() const { return min_args; };
-    [[nodiscard]] size_t GetMaxArgs() const { return max_args; };
-    [[nodiscard]] fun_t GetFun() const { return fun; };
-    [[nodiscard]] char GetShortcut() const { return shortcut; };
+    [[nodiscard]] size_t GetMinArgs() const { return min_args; }
+    [[nodiscard]] size_t GetMaxArgs() const { return max_args; }
+    [[nodiscard]] fun_t GetFun() const { return fun; }
+    [[nodiscard]] char GetShortcut() const { return shortcut; }
     [[nodiscard]] const String & GetGroup() const { return group; }
 
     FlagInfo & SetDesc(const String & in) { desc = in; return *this; }
-    FlagInfo & SetMinArgs(size_t in) { min_args = in; return *this; };
-    FlagInfo & SetMaxArgs(size_t in) { max_args = in; return *this; };
-    FlagInfo & SetFun(fun_t in) { fun = in; return *this; };
+    FlagInfo & SetMinArgs(size_t in) { min_args = in; return *this; }
+    FlagInfo & SetMaxArgs(size_t in) { max_args = in; return *this; }
+    FlagInfo & SetFun(fun_t in) { fun = in; return *this; }
     FlagInfo & SetShortcut(char in) { shortcut = in; return *this; }
     FlagInfo & SetGroup(String in) { group = in; return *this; }
 
@@ -113,7 +115,7 @@ namespace emp {
       emp_assert(!name.HasWhitespace(), "Option names cannot contain whitespace.");      
       if (!name.HasPrefix("--")) name.insert(0, "--");
       emp_assert(name[2] != '-', name, "Option names cannot begin with a single '-')");
-      flag_options[name] = FlagInfo{desc, min_args, max_args, fun};
+      flag_options[name] = FlagInfo{name, desc, min_args, max_args, fun};
       if (cur_group >= 0) flag_options[name].SetGroup(groups[cur_group].name);
       return flag_options[name];
     }
@@ -187,7 +189,7 @@ namespace emp {
     FlagInfo & AddOption(char shortcut, String name, FUN_T fun, String desc="") {
       notify::TestError(shortcuts.count(shortcut), "Already added shortcut for '", shortcut, "'");
       FlagInfo & option = AddOption(name, fun, desc);
-      shortcuts[shortcut] = name;
+      shortcuts[shortcut] = option.GetName();
       option.SetShortcut(shortcut);
       return option;
     }
