@@ -390,7 +390,8 @@ namespace emp {
     // Inherited functions from std::string:
     //  void push_back(char c);
 
-    String & insert(size_t index, const String & in) { std::string::insert(index, in); return *this; }
+    String & insert(size_t index, const String & in)
+      { std::string::insert(index, in); return *this; }
     String & insert(size_t index, const String & in, size_t pos, size_t count=npos)
       { std::string::insert(index, in, pos, count); return *this; }
     template <typename... ARG_Ts> String & insert(size_t index, ARG_Ts &&... args)
@@ -422,13 +423,20 @@ namespace emp {
     //  size_t copy(char * dest, size_t count, size_t pos=0) const
     //  void swap(String & other)
 
+    // Usage: replace(position, length, "new sub_string");
     template <typename... ARG_Ts> String & replace(ARG_Ts &&... args)
       { std::string::replace(std::forward<ARG_Ts>(args)...); return *this; }
 
     String & resize( size_t count, char c='\0') { std::string::resize(count, c); return *this; }
 
-    String & ReplaceChar(char from, char to, size_t start=0)
-      { for (size_t i=start; i < size(); ++i) if (Get(i) == from) Get(i) = to; return *this; }
+    // Replace all instance of one character with another, from starting point.
+    // Return true/false: was a change made?
+    bool ReplaceAll(char from, char to, size_t start=0);
+
+    // Replace all instance of one string with another, from starting point.
+    // Return true/false: was a change made?
+    bool ReplaceAll(emp::String from, emp::String to, size_t start=0);
+
     String & ReplaceRange(size_t start, size_t end, String value)
       { return replace(start, end-start, value); }
 
@@ -754,8 +762,10 @@ namespace emp {
 
     String & AppendSlugify(String in) { return Append(std::move(in.Slugify())); }
     String & SetSlugify(String in) { return *this = std::move(in.Slugify()); }
-    String & Slugify()
-      { return SetLower().RemovePunctuation().Compress().ReplaceChar(' ', '-'); }
+    String & Slugify() {
+      SetLower().RemovePunctuation().Compress().ReplaceAll(' ', '-');
+      return *this;
+    }
     [[nodiscard]] String AsSlugify() const { return MakeSlugify(*this); }
 
     template <typename CONTAINER_T>
@@ -880,7 +890,7 @@ namespace emp {
     return npos;
   }
 
-  // A version of string::find() with single chars that can skip over quotes.
+  // A version of string::find() with single chars that can skip over quotes/parens.
   size_t String::Find(char target, size_t start, const Syntax & syntax) const {
     // Make sure found_pos is not in a quote and/or parens; adjust as needed!
     for (size_t pos=start; pos < size(); ++pos) {
@@ -1300,6 +1310,24 @@ namespace emp {
     return result_map;
   }
 
+
+  // Replace all instance of one character with another, from starting point.
+  // Return true/false: was a change made?
+  bool String::ReplaceAll(char from, char to, size_t start) {
+    size_t pos = find(from, start);
+    if (pos == npos) return false;
+    do { Set(pos, to) } while ((pos = find(from, pos+1)) != npos);
+    return true;
+  }
+
+  // Replace all instance of one string with another, from starting point.
+  // Return true/false: was a change made?
+  bool String::ReplaceAll(emp::String from, emp::String to, size_t start) {
+    size_t pos = find(from, start);
+    if (pos == npos) return false;
+    do { replace(pos, from.size(), to) } while ((pos = find(from, pos+to.size())) != npos);
+    return true;
+  }
 
   /// Find any instances of ${X} and replace with dictionary lookup of X.
   template <typename MAP_T>
@@ -1837,7 +1865,8 @@ namespace emp {
 
   /// Make a string safe(r)
   String MakeSlugify(String in) {
-    return in.SetLower().RemovePunctuation().Compress().ReplaceChar(' ', '-');
+    in.SetLower().RemovePunctuation().Compress().ReplaceAll(' ', '-');
+    return in;
   }
 
   /// This function returns values from a container as a single string separated
