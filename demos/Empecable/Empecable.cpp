@@ -20,16 +20,30 @@
 #include "../../include/emp/tools/String.hpp"
 #include "../../include/emp/config/FlagManager.hpp"
 
+#include "Lexer.hpp"
+
+struct Checks {
+  bool copyright = true;         // Check copyright at the front.
+  bool no_end_spaces = true;     // Check the no lines end with spaces.
+  bool no_tabs = true;           // Check that no tabs are in code.
+  bool include_guards = true;    // Check that the file is protected by include guards.
+  bool pragma_once = true;       // Check that the file has a "#pragma once"
+  bool include_order = true;     // Check that the includes in the file are grouped correctly.
+
+  void SetAll(bool _in=true) {
+    copyright = _in;
+    no_end_spaces = _in;
+    no_tabs = _in;
+    include_guards = _in;
+    pragma_once = _in;
+    include_order = _in;
+  }
+};
+
 class Empecable {
 private:
-  // Which formatting fixed should we do?
-  bool fix_front_matter = false;   // Should we update the headers?
-  bool fix_indentation = false;    // Should we check indentation and change tabs to spaces?
-  bool fix_include_order = false;  // Should we group includes and alphabetize them?
-  bool fix_whitespace = false;     // Should whitespace at end be just a single newline?
-  bool use_include_guards = false; // Should we ensure proper include guards?
-
-  // Other flags
+  // Options used:
+  Checks checks;
   bool verbose = false;
 
   emp::FlagManager flags;
@@ -37,36 +51,28 @@ private:
 public:
   Empecable(int argc, char * argv[]) : flags(argc, argv) {
     flags.AddGroup("Basic Operation");
-    flags.AddOption('h', "help", [this](){ PrintHelp(); },
-      "Get additional information about options.");
-    flags.AddOption('v', "verbose", [this](){ SetVerbose(true); },
-      "Provide more detailed output");
-        
-    flags.AddGroup("Activating Fixes");
     flags.AddOption('a', "all", [this](){ SetAll(true); },
       "Activate ALL fixes (except those explicitly excluded; see below)");
-    flags.AddOption('g', "fix-guards", [this](){ SetUseGuards(true); },
-      "Fix include guards to have correct names at beginning and end of file");
-    flags.AddOption('f', "fix-front", [this](){ SetFixFrontMatter(true); },
-      "Fix front-matter comments (copyright, description, etc.)");
-    flags.AddOption('i', "fix-indents", [this](){ SetFixIndents(true); },
-      "Fix indenting to be two chars, no tabs");
-    flags.AddOption('o', "fix-order", [this](){ SetFixIncludes(true); },
-      "Fix order of #includes to be grouped and alphabetical");
-    flags.AddOption('w', "fix-whitespace", [this](){ SetFixSpaces(true); },
-      "Fix whitespace (remove spaces at end of lines)");
+    flags.AddOption('h', "help", [this](){ PrintHelp(); },
+      "Get additional information about options.");
+    flags.AddOption('v', "verbose", [this](){ verbose = true; },
+      "Provide more detailed output");
+        
+    flags.AddGroup("Activating Specific Fixes");
+    flags.AddOption("copyright", [this]{ checks.copyright = true; });
+    flags.AddOption("no_end_spaces", [this]{ checks.no_end_spaces = true; });
+    flags.AddOption("no_tabs", [this]{ checks.no_tabs = true; });
+    flags.AddOption("include_guards", [this]{ checks.include_guards = true; });
+    flags.AddOption("pragma_once", [this]{ checks.pragma_once = true; });
+    flags.AddOption("include_order", [this]{ checks.include_order = true; });
   
-    flags.AddGroup("Disabling Fixes");
-    flags.AddOption('G', "no-fix-guards", [this](){ SetUseGuards(false); },
-      "Disable fixing of include guards");
-    flags.AddOption('F', "no-fix-front", [this](){ SetFixFrontMatter(false); },
-      "Disable fixing of front matter (copyright, description, etc.)");
-    flags.AddOption('I', "no-fix-indents", [this](){ SetFixIndents(false); },
-      "Disable fixing of indentations (2 char, no tabs)");
-    flags.AddOption('O', "no-fix-order", [this](){ SetFixIncludes(false); },
-      "Disable fixing of include order (grouped and alphabetical)");
-    flags.AddOption('W', "no-fix-whitespace", [this](){ SetFixSpaces(false); },
-      "Disable fixing of whitespace (no spaces at end of lines)");
+    flags.AddGroup("Deactivate Specific Fixes");
+    flags.AddOption("no_copyright", [this]{ checks.copyright = false; });
+    flags.AddOption("no_no_end_spaces", [this]{ checks.no_end_spaces = false; });
+    flags.AddOption("no_no_tabs", [this]{ checks.no_tabs = false; });
+    flags.AddOption("no_include_guards", [this]{ checks.include_guards = false; });
+    flags.AddOption("no_pragma_once", [this]{ checks.pragma_once = false; });
+    flags.AddOption("no_include_order", [this]{ checks.include_order = false; });
     
     flags.Process();
   
@@ -81,18 +87,14 @@ public:
   }
 
   Empecable & SetAll(bool _in=true) {
-    fix_front_matter = _in;
-    fix_indentation = _in;
-    fix_include_order = _in;
-    fix_whitespace = _in;
-    use_include_guards = _in;
+    checks.copyright = _in;
+    checks.no_end_spaces = _in;
+    checks.no_tabs = _in;
+    checks.include_guards = _in;
+    checks.pragma_once = _in;
+    checks.include_order = _in;
     return *this;
   }
-  Empecable & SetFixFrontMatter(bool _in) { fix_front_matter = _in;       return *this; }
-  Empecable & SetFixIndents(bool _in)     { fix_indentation = _in;    return *this; }
-  Empecable & SetFixIncludes(bool _in)    { fix_include_order = _in;  return *this; }
-  Empecable & SetFixSpaces(bool _in)      { fix_whitespace = _in;     return *this; }
-  Empecable & SetUseGuards(bool _in)      { use_include_guards = _in; return *this; }
 
   Empecable & SetVerbose(bool _in) { verbose = _in; return *this; }
 
@@ -123,11 +125,8 @@ public:
     }
 
     bool modified = false;
-    if (fix_front_matter) modified |= Process_FixHeadings(file);
-    if (fix_indentation) modified |= Process_Indentation(file);
-    if (fix_include_order) modified |= Process_IncludeOrder(file);
-    if (fix_whitespace) modified |= Process_EndWhitespace(file);
-    if (use_include_guards) modified |= Process_IncludeGuards(file);
+
+    // DO PROCESSING HERE!
 
     return modified;
   }
@@ -138,20 +137,26 @@ public:
     return false;
   }
 
-  bool Process_Indentation(emp::File & file) {    
-    std::cout << "STUB: Fixing Indentation" << std::endl;
-    (void) file;
-    return false;
+  bool Process_Whitespace(emp::File & file) {    
+    // Check indentation; remove end spaces and all tabs
+    bool diff = false;
+
+    for (emp::String & line : file) {
+      // Fix any usage of the tab character; assume two-space indentation.
+      diff |= line.ReplaceAll("\t", "  ");
+
+      // Remove any spaces at the end of the line.
+      while (line.back() == ' ') {
+        diff = true;
+        line.pop_back();
+      }
+    }
+
+    return diff;
   }
 
   bool Process_IncludeOrder(emp::File & file) {    
     std::cout << "STUB: Fixing Order of Includes" << std::endl;
-    (void) file;
-    return false;
-  }
-
-  bool Process_EndWhitespace(emp::File & file) {    
-    std::cout << "STUB: Fixing Whitespace" << std::endl;
     (void) file;
     return false;
   }
