@@ -23,20 +23,24 @@
 #include "Lexer.hpp"
 
 struct Checks {
-  bool copyright = true;         // Check copyright at the front.
-  bool no_end_spaces = true;     // Check the no lines end with spaces.
-  bool no_tabs = true;           // Check that no tabs are in code.
-  bool include_guards = true;    // Check that the file is protected by include guards.
-  bool pragma_once = true;       // Check that the file has a "#pragma once"
-  bool include_order = true;     // Check that the includes in the file are grouped correctly.
+  // Important fixes; on by default.
+  bool require_copyright = true;      // Check Copyright at the front.
+  bool prevent_end_spaces = true;     // Check the no lines end with spaces.
+  bool disallow_tabs = true;          // Check that no tabs are in code.
+  bool require_include_guards = true; // Check that the file is protected by include guards.
+  bool require_pragma_once = true;    // Check that the file has a "#pragma once"
+  bool sort_include = true;           // Check that the includes in the file are grouped correctly.
+
+  // Warnings that you can turn on.
+  size_t warn_line_width = 0;     // Warn if a line is too long (zero = off)
 
   void SetAll(bool _in=true) {
-    copyright = _in;
-    no_end_spaces = _in;
-    no_tabs = _in;
-    include_guards = _in;
-    pragma_once = _in;
-    include_order = _in;
+    require_copyright = _in;
+    prevent_end_spaces = _in;
+    disallow_tabs = _in;
+    require_include_guards = _in;
+    require_pragma_once = _in;
+    sort_include = _in;
   }
 };
 
@@ -59,21 +63,25 @@ public:
       "Provide more detailed output");
         
     flags.AddGroup("Activating Specific Fixes");
-    flags.AddOption("copyright", [this]{ checks.copyright = true; });
-    flags.AddOption("no_end_spaces", [this]{ checks.no_end_spaces = true; });
-    flags.AddOption("no_tabs", [this]{ checks.no_tabs = true; });
-    flags.AddOption("include_guards", [this]{ checks.include_guards = true; });
-    flags.AddOption("pragma_once", [this]{ checks.pragma_once = true; });
-    flags.AddOption("include_order", [this]{ checks.include_order = true; });
+    flags.AddOption("require_copyright", [this](){ checks.require_copyright = true; });
+    flags.AddOption("prevent_end_spaces", [this](){ checks.prevent_end_spaces = true; });
+    flags.AddOption("disallow_tabs", [this](){ checks.disallow_tabs = true; });
+    flags.AddOption("require_include_guards", [this](){ checks.require_include_guards = true; });
+    flags.AddOption("require_pragma_once", [this](){ checks.require_pragma_once = true; });
+    flags.AddOption("sort_include", [this](){ checks.sort_include = true; });
   
     flags.AddGroup("Deactivate Specific Fixes");
-    flags.AddOption("no_copyright", [this]{ checks.copyright = false; });
-    flags.AddOption("no_no_end_spaces", [this]{ checks.no_end_spaces = false; });
-    flags.AddOption("no_no_tabs", [this]{ checks.no_tabs = false; });
-    flags.AddOption("no_include_guards", [this]{ checks.include_guards = false; });
-    flags.AddOption("no_pragma_once", [this]{ checks.pragma_once = false; });
-    flags.AddOption("no_include_order", [this]{ checks.include_order = false; });
+    flags.AddOption("no_require_copyright", [this](){ checks.require_copyright = false; });
+    flags.AddOption("no_prevent_end_spaces", [this](){ checks.prevent_end_spaces = false; });
+    flags.AddOption("no_disallow_tabs", [this](){ checks.disallow_tabs = false; });
+    flags.AddOption("no_sort_include_guards", [this](){ checks.require_include_guards = false; });
+    flags.AddOption("no_require_pragma_once", [this](){ checks.require_pragma_once = false; });
+    flags.AddOption("no_sort_include", [this](){ checks.sort_include = false; });
     
+    flags.AddGroup("Extra Warnings to Enable");
+    flags.AddOption('W', "max_line_width",
+      [this](emp::String max_w){ checks.warn_line_width = max_w.AsULL(); } );
+
     flags.Process();
   
     auto filenames = flags.GetExtras();
@@ -87,12 +95,12 @@ public:
   }
 
   Empecable & SetAll(bool _in=true) {
-    checks.copyright = _in;
-    checks.no_end_spaces = _in;
-    checks.no_tabs = _in;
-    checks.include_guards = _in;
-    checks.pragma_once = _in;
-    checks.include_order = _in;
+    checks.require_copyright = _in;
+    checks.prevent_end_spaces = _in;
+    checks.disallow_tabs = _in;
+    checks.require_include_guards = _in;
+    checks.require_pragma_once = _in;
+    checks.sort_include = _in;
     return *this;
   }
 
@@ -100,6 +108,7 @@ public:
 
   void PrintUsage() const {
     std::cout << "Usage: " << flags[0] << " {options ...} files ..." << std::endl;
+    std::cout << "Type `" << flags[0] << " -h` for more detailed help." << std::endl;
   }
 
   void PrintVersion() const {
