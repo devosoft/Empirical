@@ -1,0 +1,15 @@
+# This file will scan through a C++ file for spelling and whitespace issues.
+
+# Should we not check for code violations inside of literal strings? (grab them as a whole to avoid.)
+# LIT_STRING \"([^"\\\n]|(\\.))*\"
+
+# Tabs, and returns are not allowed, nor are spaces at the end of a line.
+ERR_WS [\t\r]
+ERR_END_LINE_WS " "+$
+WS " "+
+
+# Grab whole words when possible for spell checking
+WORD [a-zA-Z]+
+
+# Cluster everything else.
+OTHER [^a-zA-Z\t\r ]+

@@ -1,0 +1,12 @@
+# This file will scan through a C++ file for violations of preprocessor and appropriate comments.
+
+COMMENT_LINE "//".*
+COMMENT_BLOCK "/*"([^*]|(\*[^/]))*"*/"
+
+PRAGMA "#pragma ".*
+INCLUDE "#include ".*
+IFNDEF "#ifndef ".*
+DEFINE "#define ".*
+ENDIF "#endif ".*
+
+OTHER [^/#]+
