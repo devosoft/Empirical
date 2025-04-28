@@ -629,6 +629,7 @@ namespace emp {
     double AsDouble() const { return std::stod(*this); }
     int AsInt() const { return std::stoi(*this); }
     unsigned long long AsULL() const { return std::stoull(*this); }
+    bool AsBool() const { return !(*this == "0" || this->AsLower() == "false"); }
 
     String & AppendEscaped(char c, bool inc_visible=true) { *this += MakeEscaped(c, inc_visible); return *this; }
     String & SetEscaped(char c, bool inc_visible=true) { *this = MakeEscaped(c, inc_visible); return *this; }
@@ -663,12 +664,12 @@ namespace emp {
     String & AppendUpper(const String & in) { *this+=MakeUpper(in); return *this; }
     String & SetUpper(const String & in) { *this = MakeUpper(in); return *this; }
     String & SetUpper() { *this = MakeUpper(*this); return *this; }
-    [[nodiscard]] String AsUpper() { return MakeUpper(*this); }
+    [[nodiscard]] String AsUpper() const { return MakeUpper(*this); }
 
     String & AppendLower(const String & in) { *this+=MakeLower(in); return *this; }
     String & SetLower(const String & in) { *this = MakeLower(in); return *this; }
     String & SetLower() { *this = MakeLower(*this); return *this; }
-    [[nodiscard]] String AsLower() { return MakeLower(*this); }
+    [[nodiscard]] String AsLower() const { return MakeLower(*this); }
 
     String & AppendTitleCase(const String & in) { *this+=MakeTitleCase(in); return *this; }
     String & SetTitleCase(const String & in) { *this = MakeTitleCase(in); return *this; }
@@ -1316,7 +1317,7 @@ namespace emp {
   bool String::ReplaceAll(char from, char to, size_t start) {
     size_t pos = find(from, start);
     if (pos == npos) return false;
-    do { Set(pos, to) } while ((pos = find(from, pos+1)) != npos);
+    do { Set(pos, to); } while ((pos = find(from, pos+1)) != npos);
     return true;
   }
 
@@ -1325,7 +1326,7 @@ namespace emp {
   bool String::ReplaceAll(emp::String from, emp::String to, size_t start) {
     size_t pos = find(from, start);
     if (pos == npos) return false;
-    do { replace(pos, from.size(), to) } while ((pos = find(from, pos+to.size())) != npos);
+    do { replace(pos, from.size(), to); } while ((pos = find(from, pos+to.size())) != npos);
     return true;
   }
 
