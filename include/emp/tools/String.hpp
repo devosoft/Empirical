@@ -431,11 +431,11 @@ namespace emp {
 
     // Replace all instance of one character with another, from starting point.
     // Return true/false: was a change made?
-    bool ReplaceAll(char from, char to, size_t start=0);
+    size_t ReplaceAll(char from, char to, size_t start=0);
 
     // Replace all instance of one string with another, from starting point.
     // Return true/false: was a change made?
-    bool ReplaceAll(emp::String from, emp::String to, size_t start=0);
+    size_t ReplaceAll(emp::String from, emp::String to, size_t start=0);
 
     String & ReplaceRange(size_t start, size_t end, String value)
       { return replace(start, end-start, value); }
@@ -1314,20 +1314,24 @@ namespace emp {
 
   // Replace all instance of one character with another, from starting point.
   // Return true/false: was a change made?
-  bool String::ReplaceAll(char from, char to, size_t start) {
-    size_t pos = find(from, start);
-    if (pos == npos) return false;
-    do { Set(pos, to); } while ((pos = find(from, pos+1)) != npos);
-    return true;
+  size_t String::ReplaceAll(char from, char to, size_t start) {
+    size_t count = 0;
+    for (size_t pos = find(from, start); pos != npos; pos = find(from, pos+1)) {
+      Get(pos) = to;
+      ++count;
+    }
+    return count;
   }
 
   // Replace all instance of one string with another, from starting point.
   // Return true/false: was a change made?
-  bool String::ReplaceAll(emp::String from, emp::String to, size_t start) {
-    size_t pos = find(from, start);
-    if (pos == npos) return false;
-    do { replace(pos, from.size(), to); } while ((pos = find(from, pos+to.size())) != npos);
-    return true;
+  size_t String::ReplaceAll(emp::String from, emp::String to, size_t start) {
+    size_t count = 0;
+    for (size_t pos = find(from, start); pos != npos; pos = find(from, pos+to.size())) {
+      replace(pos, from.size(), to);
+      ++count;
+    }
+    return count;
   }
 
   /// Find any instances of ${X} and replace with dictionary lookup of X.
