@@ -1,0 +1,19 @@
+# This is an auto-generated Emplex configuration file.
+
+# Configuration settings (lines starting with ':' are config options)
+:out_filename WordLexer.hpp
+:lexer_name WordLexer
+:token_name WordToken
+:dfa_name WordDFA
+:inc_guards EMPLEX_WORD_LEXER_HPP_INCLUDE_
+:name_space emplex
+:use_token_lexemes 1
+:use_token_line_num 1
+:use_token_column 0
+
+# Token names and regular expressions
+ERR_WS [\t\r]
+ERR_END_LINE_WS " "+$
+WS " "+
+WORD [a-zA-Z]+
+OTHER [^a-zA-Z\t\r ]+
