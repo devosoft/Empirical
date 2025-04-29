@@ -113,6 +113,10 @@ private:
     for (emp::String word : out_words) file << word << '\n';
   }
 
+  bool TestWord(emp::String word) const {
+    return word.size() <= 2 || words.contains(word) || words.contains(word.AsLower());
+  }
+
 public:
   Empecable(int argc, char * argv[]) : flags(argc, argv) {
     SetupOptionFlags();
@@ -134,15 +138,7 @@ public:
     if (save_words) SaveWords();
   }
 
-  Empecable & SetAll(bool _in=true) {
-    checks.require_copyright = _in;
-    checks.prevent_end_spaces = _in;
-    checks.disallow_tabs = _in;
-    checks.require_include_guards = _in;
-    checks.require_pragma_once = _in;
-    checks.sort_include = _in;
-    return *this;
-  }
+  Empecable & SetAll(bool _in=true) { checks.SetAll(_in); return *this; }
 
   Empecable & SetVerbose(bool _in) { verbose = _in; return *this; }
 
@@ -165,57 +161,44 @@ public:
   }
 
   bool ProcessFile(emp::String filename) {
-    emp::File file(filename);
-
     std::cout << "File: " << filename << std::endl;
-    if (file.HasError()) {
-      std::cout << "ERROR: " << file.GetError();
+
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+      std::cout << "ERROR: '" << filename << "' failed to open.";
       return false;
     }
 
-    bool modified = false;
+    size_t issue_count = 0;
 
     // First check spelling and illegal character placement.
+    auto tokens = word_lexer.Tokenize(file);
 
-    // DO PROCESSING HERE!
-
-    return modified;
-  }
-
-  bool Process_FixHeadings(emp::File & file) {
-    std::cout << "STUB: Fixing Front Matter" << std::endl;
-    (void) file;
-    return false;
-  }
-
-  bool Process_Whitespace(emp::File & file) {    
-    // Check indentation; remove end spaces and all tabs
-    bool diff = false;
-
-    for (emp::String & line : file) {
-      // Fix any usage of the tab character; assume two-space indentation.
-      diff |= line.ReplaceAll("\t", "  ");
-
-      // Remove any spaces at the end of the line.
-      while (line.back() == ' ') {
-        diff = true;
-        line.pop_back();
+    for (const auto & token : tokens) {
+      switch (token.id) {
+        using namespace emplex;
+      case WordLexer::ID_WORD:
+        if (!TestWord(token.lexeme)) {
+          std::cerr << "LINE " << token.line_id << ": Unknown word '" << token.lexeme << "'.\n";
+          ++issue_count;
+        }
+        break;
+      case WordLexer::ID_ERR_END_LINE_WS:
+        std::cerr << "LINE " << token.line_id << ": Extra whitespace at end of line.\n";
+        ++issue_count;
+        break;
+      case WordLexer::ID_ERR_WS:
+        std::cerr << "LINE " << token.line_id << ": Illegal whitespace.\n";
+        ++issue_count;
+        break;
+      default:
+        break;
       }
     }
 
-    return diff;
-  }
+    std::cout << issue_count << " issues found." << std::endl;
 
-  bool Process_IncludeOrder(emp::File & file) {    
-    std::cout << "STUB: Fixing Order of Includes" << std::endl;
-    (void) file;
-    return false;
-  }
-
-  bool Process_IncludeGuards(emp::File & file) {    
-    std::cout << "STUB: Fixing Guards" << std::endl;
-    (void) file;
-    return false;
+    return issue_count;
   }
 };
 
