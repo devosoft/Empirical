@@ -119,7 +119,7 @@ namespace emplex {
     // -- Process State --
     std::vector<PPToken> tokens{}; // Set of tokens loaded so far.
     size_t token_id = 0;                 // Next token to process.
-    const PPToken eof_token{0, "_EOF_", 0, 0};
+    const PPToken eof_token{0, "_EOF_", 0};
   
   public:
     static constexpr int ID__EOF_ = 0;
@@ -249,7 +249,7 @@ namespace emplex {
     // Write an error message for invalid tokens and terminate the program.
     template <typename... Ts>
     void Error(Ts... message) {
-      std::cerr << "ERROR (at " << Peek().line_id << ":" << Peek().col_id <<  "): ";
+      std::cerr << "ERROR (at " << Peek().line_id <<  "): ";
       (std::cerr << ... << std::forward<Ts>(message)) << std::endl;
       exit(1);
     }
