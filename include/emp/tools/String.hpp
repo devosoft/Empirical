@@ -81,6 +81,7 @@ namespace emp {
   [[nodiscard]] inline String MakeCompressed(
     String in, const CharSet & chars=WhitespaceCharSet(), char compress_to=' ',
     bool trim_start=true, bool trim_end=true);
+  [[nodiscard]] inline String MakeFiltered(String in, const CharSet & chars);
   [[nodiscard]] inline String MakeRemoveChars(String in, const CharSet & chars);
   [[nodiscard]] inline String MakeSlugify(String in);
 
@@ -751,6 +752,15 @@ namespace emp {
     [[nodiscard]] String AsCompressed(const CharSet & chars=WhitespaceCharSet(), char compress_to=' ',
                                       bool trim_start=true, bool trim_end=true) const
       { return MakeCompressed(*this, chars, compress_to, trim_start, trim_end); }
+
+    String & AppendFiltered(const String & in, const CharSet & chars)
+      { return *this += MakeFiltered(in, chars); }
+    String & SetFiltered(const String & in, const CharSet & chars)
+      { return *this = MakeFiltered(in, chars); }
+    String & Filter(const CharSet & chars)
+      { return *this = MakeFiltered(*this, chars); }
+    [[nodiscard]] String AsFiltered(const CharSet & chars) const
+      { return MakeFiltered(*this, chars); }
 
     String & AppendRemoveChars(const String & in, const CharSet & chars)
       { return *this += MakeRemoveChars(in, chars); }
@@ -1855,6 +1865,16 @@ namespace emp {
     if (trim_end && pos && skip_next) pos--;   // Remove chars from end if needed.
     in.resize(pos);
 
+    return in;
+  }
+
+  /// Remove all characters not specified in CharSet.
+  String MakeFiltered(String in, const CharSet & chars) {
+    size_t cur_pos = 0;
+    for (const auto c : in) {
+      if (chars.Has(c)) in.Get(cur_pos++) = c;
+    }
+    in.resize(cur_pos);
     return in;
   }
 
