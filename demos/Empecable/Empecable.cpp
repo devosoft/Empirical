@@ -7,11 +7,13 @@
  * @brief Load a series of filenames and clean up each file.
  */
 
+#include <cstring>
 #include <fstream>
 #include <iostream>
 #include <map>
 #include <set>
 #include <string>
+#include <unordered_set>
 
 #include "../../include/emp/base/assert.hpp"
 #include "../../include/emp/base/vector.hpp"
@@ -20,7 +22,8 @@
 #include "../../include/emp/tools/String.hpp"
 #include "../../include/emp/config/FlagManager.hpp"
 
-#include "Lexer.hpp"
+#include "PPLexer.hpp"
+#include "WordLexer.hpp"
 
 struct Checks {
   // Important fixes; on by default.
@@ -52,8 +55,14 @@ private:
 
   emp::FlagManager flags;
 
-public:
-  Empecable(int argc, char * argv[]) : flags(argc, argv) {
+  emplex::PPLexer pp_lexer;
+  emplex::WordLexer word_lexer;
+
+  emp::String word_file = "word_list.txt";
+  std::unordered_set<emp::String> words; // Dictionary of legal words.
+  bool save_words = false;               // If words are added to the dictionary, save at end.
+
+  void SetupOptionFlags() {
     flags.AddGroup("Basic Operation");
     flags.AddOption('a', "all", [this](){ SetAll(true); },
       "Activate ALL fixes (except those explicitly excluded; see below)");
@@ -61,6 +70,8 @@ public:
       "Get additional information about options.");
     flags.AddOption('v', "verbose", [this](){ verbose = true; },
       "Provide more detailed output");
+    flags.AddOption('w', "word_file", [this](emp::String filename){ word_file = filename; },
+      "Specify the word file to use for spell checks.");
         
     flags.AddGroup("Activating Specific Fixes");
     flags.AddOption("require_copyright", [this](){ checks.require_copyright = true; });
@@ -78,11 +89,36 @@ public:
     flags.AddOption("no_require_pragma_once", [this](){ checks.require_pragma_once = false; });
     flags.AddOption("no_sort_include", [this](){ checks.sort_include = false; });
     
-    flags.AddGroup("Extra Warnings to Enable");
+    flags.AddGroup("Extra Warnings to Enable (off by default)");
     flags.AddOption('W', "max_line_width",
       [this](emp::String max_w){ checks.warn_line_width = max_w.AsULL(); } );
+  }
 
+  void LoadWords() {
+    if (words.size() == 0) {
+      std::ifstream file(word_file);
+      emp::String word;
+      while (std::getline(file, word)) {
+        words.insert(word.Filter(emp::IDCharSet()));
+      }
+    }
+  }
+
+  void SaveWords() {
+    emp::vector<emp::String> out_words;
+    out_words.reserve(words.size());
+    for (emp::String word : words) out_words.emplace_back(word);
+    std::sort(out_words.begin(), out_words.end());
+    std::ofstream file(word_file);
+    for (emp::String word : out_words) file << word << '\n';
+  }
+
+public:
+  Empecable(int argc, char * argv[]) : flags(argc, argv) {
+    SetupOptionFlags();
     flags.Process();
+
+    LoadWords();
   
     auto filenames = flags.GetExtras();
     if (filenames.size() == 0) {
@@ -92,6 +128,10 @@ public:
     for (emp::String filename : filenames) {
       ProcessFile(filename);
     }    
+  }
+
+  ~Empecable() {
+    if (save_words) SaveWords();
   }
 
   Empecable & SetAll(bool _in=true) {
@@ -134,6 +174,8 @@ public:
     }
 
     bool modified = false;
+
+    // First check spelling and illegal character placement.
 
     // DO PROCESSING HERE!
 
