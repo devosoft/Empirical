@@ -10,6 +10,7 @@
 
 #include <chrono>
 #include <format>
+#include <sstream>
 
 #include "emp/base/notify.hpp"
 #include "emp/base/vector.hpp"
@@ -216,7 +217,22 @@ private:
   }
 
   void SaveTable() {
-    emp::String out;
+    std::stringstream ss;
+    ss << "# This is an auto-generated Emplex configuration file.\n\n";
+
+    ss << "# Configuration settings (lines starting with ':' are config options)\n"
+       << ":out_filename " << out_filename << '\n'
+       << ":lexer_name " << lexer_name << '\n'
+       << ":token_name " << token_name << '\n'
+       << ":dfa_name " << dfa_name << '\n'
+       << ":inc_guards " << inc_guards << '\n'
+       << ":name_space " << name_space << '\n'
+       << ":use_token_lexemes " << use_token_lexemes << '\n'
+       << ":use_token_line_num " << use_token_line_num << '\n'
+       << ":use_token_column " << use_token_column << '\n'
+  
+
+    ss << "\n# Token names and regular expressions\n";
 
     for (const auto & t_info : token_info) {
       emp::String name = t_info.GetName();
@@ -224,11 +240,40 @@ private:
       bool ignore = t_info.GetIgnore();
       if (name.empty()) continue;  // Unnamed token types can be skipped.
 
-      if (ignore) out += "-";
-      out += name + ' ' + regex + '\n';
+      if (ignore) ss << "-";
+      ss << name << ' ' << regex << '\n';
     }
 
-    emp::DownloadFile("lexer.emplex", out);
+    emp::DownloadFile("lexer.emplex", ss.str());
+  }
+
+  void LoadTable(emp::File & file) {
+    file.RemoveIfBegins("#");  // Remove all lines that are comments
+    file.RemoveEmpty();        // Remove all blank lines
+    ClearTable();              // Remove all table fields
+
+    for (emp::String line : file) {
+      bool config = line.PopIf(':');
+      bool ignore = line.PopIf('-');
+      emp::String name = line.PopWord();  // First entry on a line is the token name.
+      emp::String setting = line.Trim();    // Regex is remainder, minus start & end whitespace.
+
+      if (config) {
+        if (name == "alert") emp::Alert(setting);  // For debugging
+        else if (name == "out_filename") out_filename = setting;
+        else if (name == "lexer_name") lexer_name = setting;
+        else if (name == "token_name") token_name = setting;
+        else if (name == "dfa_name") dfa_name = setting;
+        else if (name == "inc_guards") inc_guards = setting;
+        else if (name == "name_space") name_space = setting;
+        else if (name == "use_token_lexemes") use_token_lexemes = setting.AsBool();
+        else if (name == "use_token_line_num") use_token_line_num = setting.AsBool();
+        else if (name == "use_token_column") use_token_column = setting.AsBool();
+      } else { // Must be a token entry.
+        AddTableRow(name, setting, ignore);
+      }
+    }
+    doc.Div("token_div").Redraw();
   }
 
   template <typename... Ts>
@@ -743,23 +788,15 @@ private:
     }, "Reset", "reset_but").SetCSS(button_style)
     .SetTitle("Reset tokens back to the starting setup.");
 
-    token_div << UI::Button([this](){ SaveTable(); }, "Save Token Types")
+    token_div << UI::Button([this](){
+      SaveTable();
+    }, "Save Token Types")
       .SetCSS(button_style)
       .SetTitle("Save token names and regular expressions to a file.");
 
+    // Create a fake, hidden input for uploading a file to be triggered by the load button.
     token_div << UI::FileInput([this](emp::File file){
-      file.RemoveIfBegins("#");  // Remove all lines that are comments
-      file.RemoveEmpty();
-      ClearTable();
-
-      for (emp::String line : file) {
-        bool ignore = line.PopIf('-');
-        emp::String name = line.PopWord();  // First entry on a line is the token name.
-        emp::String regex = line.Trim();    // Regex is remainder, minus start & end whitespace.
-        AddTableRow(name, regex, ignore);
-      }
-      doc.Div("token_div").Redraw();
-
+      LoadTable(file);
     }, "load_input").SetCSS("display", "none");
 
     token_div << UI::Button([this](){
