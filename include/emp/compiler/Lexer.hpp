@@ -475,9 +475,9 @@ namespace emp {
     file.AddCode("// Struct to store information about a found Token")
         .AddCode("struct ", token_name, " {")
         .AddCode("  int id;                             // Type ID for token");
-    if (save_lexeme) file.AddCode("  std::string lexeme;                 // Sequence matched by token");
+    if (save_lexeme)  file.AddCode("  std::string lexeme;                 // Sequence matched by token");
     if (save_line_id) file.AddCode("  size_t line_id;                     // Line token started on");
-    if (save_col_id) file.AddCode("  size_t col_id;                      // Column token started on");
+    if (save_col_id)  file.AddCode("  size_t col_id;                      // Column token started on");
     file.AddCode("  operator int() const { return id; } // Auto-convert tokens to IDs")
         .AddCode("};")
         .AddCode("");
@@ -499,7 +499,12 @@ namespace emp {
         .AddCode("  // -- Process State --")
         .AddCode("  std::vector<", token_name, "> tokens{}; // Set of tokens loaded so far.")
         .AddCode("  size_t token_id = 0;                 // Next token to process.")
-        .AddCode("  const ", token_name, " eof_token{0, \"_EOF_\", 0, 0};")
+        .AddCode("  const ", token_name, " eof_token{0");
+    if (save_lexeme)  file.AppendCode(", \"_EOF_\"");
+    if (save_line_id) file.AppendCode(", 0");
+    if (save_col_id)  file.AppendCode(", 0");
+    file.AppendCode("};")
+
         .AddCode("")
         .AddCode("public:")
         .AddCode("  static constexpr int ID__EOF_ = 0;");
@@ -636,8 +641,15 @@ namespace emp {
         .AddCode("  // Write an error message for invalid tokens and terminate the program.")
         .AddCode("  template <typename... Ts>")
         .AddCode("  void Error(Ts... message) {")
-        .AddCode("    std::cerr << \"ERROR (at \" << Peek().line_id << \":\" << Peek().col_id <<  \"): \";")
-        .AddCode("    (std::cerr << ... << std::forward<Ts>(message)) << std::endl;")
+        .AddCode("    std::cerr << \"ERROR");
+    if (save_line_id) {
+      file.AppendCode(" (line \" << Peek().line_id ");
+      if (save_col_id) file.AppendCode("<< \":\" << Peek().col_id ");
+      file.AppendCode("<<  \")");
+    }
+    file.AppendCode(": \";");
+
+    file.AddCode("    (std::cerr << ... << std::forward<Ts>(message)) << std::endl;")
         .AddCode("    exit(1);")
         .AddCode("  }")
         .AddCode("")
