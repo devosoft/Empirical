@@ -318,7 +318,7 @@ namespace emp {
     [[nodiscard]] bool HasOneOf(CharSet char_set) const { return char_set.HasAny(*this); }
     [[nodiscard]] bool Has(char c) const { return Find(c) != npos; }
     [[nodiscard]] bool HasWhitespace() const { return WhitespaceCharSet().HasAny(*this); }
-    [[nodiscard]] bool HasNonwhitespace() const { return !WhitespaceCharSet().HasOnly(*this); }
+    [[nodiscard]] bool HasNonwhitespace() const { return !WhitespaceCharSet().Has(*this); }
     [[nodiscard]] bool HasUpper() const { return UpperCharSet().HasAny(*this); }
     [[nodiscard]] bool HasLower() const { return LowerCharSet().HasAny(*this); }
     [[nodiscard]] bool HasLetter() const { return LetterCharSet().HasAny(*this); }
@@ -489,25 +489,25 @@ namespace emp {
       { return Find(WhitespaceCharSet(), start, syntax); }
     [[nodiscard]] size_t FindNonWhitespace(size_t start=0, const Syntax & syntax=Syntax::None()) const
       { return Find(!WhitespaceCharSet(), start, syntax); }
-    [[nodiscard]] size_t FindUpperChar(size_t start=0, const Syntax & syntax=Syntax::None()) const
+    [[nodiscard]] size_t FindUpper(size_t start=0, const Syntax & syntax=Syntax::None()) const
       { return Find(UpperCharSet(), start, syntax); }
-    [[nodiscard]] size_t FindNonUpperChar(size_t start=0, const Syntax & syntax=Syntax::None()) const
+    [[nodiscard]] size_t FindNonUpper(size_t start=0, const Syntax & syntax=Syntax::None()) const
       { return Find(!UpperCharSet(), start, syntax); }
-    [[nodiscard]] size_t FindLowerChar(size_t start=0, const Syntax & syntax=Syntax::None()) const
+    [[nodiscard]] size_t FindLower(size_t start=0, const Syntax & syntax=Syntax::None()) const
       { return Find(LowerCharSet(), start, syntax); }
-    [[nodiscard]] size_t FindNonLowerChar(size_t start=0, const Syntax & syntax=Syntax::None()) const
+    [[nodiscard]] size_t FindNonLower(size_t start=0, const Syntax & syntax=Syntax::None()) const
       { return Find(!LowerCharSet(), start, syntax); }
-    [[nodiscard]] size_t FindLetterChar(size_t start=0, const Syntax & syntax=Syntax::None()) const
+    [[nodiscard]] size_t FindLetter(size_t start=0, const Syntax & syntax=Syntax::None()) const
       { return Find(LetterCharSet(), start, syntax); }
-    [[nodiscard]] size_t FindNonLetterChar(size_t start=0, const Syntax & syntax=Syntax::None()) const
+    [[nodiscard]] size_t FindNonLetter(size_t start=0, const Syntax & syntax=Syntax::None()) const
       { return Find(!LetterCharSet(), start, syntax); }
-    [[nodiscard]] size_t FindDigitChar(size_t start=0, const Syntax & syntax=Syntax::None()) const
+    [[nodiscard]] size_t FindDigit(size_t start=0, const Syntax & syntax=Syntax::None()) const
       { return Find(DigitCharSet(), start, syntax); }
-    [[nodiscard]] size_t FindNonDigitChar(size_t start=0, const Syntax & syntax=Syntax::None()) const
+    [[nodiscard]] size_t FindNonDigit(size_t start=0, const Syntax & syntax=Syntax::None()) const
       { return Find(!DigitCharSet(), start, syntax); }
-    [[nodiscard]] size_t FindAlphanumericChar(size_t start=0, const Syntax & syntax=Syntax::None()) const
+    [[nodiscard]] size_t FindAlphanumeric(size_t start=0, const Syntax & syntax=Syntax::None()) const
       { return Find(AlphanumericCharSet(), start, syntax); }
-    [[nodiscard]] size_t FindNonAlphanumericChar(size_t start=0, const Syntax & syntax=Syntax::None()) const
+    [[nodiscard]] size_t FindNonAlphanumeric(size_t start=0, const Syntax & syntax=Syntax::None()) const
       { return Find(!AlphanumericCharSet(), start, syntax); }
     [[nodiscard]] size_t FindIDChar(size_t start=0, const Syntax & syntax=Syntax::None()) const
       { return Find(IDCharSet(), start, syntax); }
