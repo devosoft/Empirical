@@ -229,8 +229,7 @@ private:
        << ":name_space " << name_space << '\n'
        << ":use_token_lexemes " << use_token_lexemes << '\n'
        << ":use_token_line_num " << use_token_line_num << '\n'
-       << ":use_token_column " << use_token_column << '\n'
-  
+       << ":use_token_column " << use_token_column << '\n';
 
     ss << "\n# Token names and regular expressions\n";
 
@@ -260,15 +259,16 @@ private:
 
       if (config) {
         if (name == "alert") emp::Alert(setting);  // For debugging
-        else if (name == "out_filename") out_filename = setting;
-        else if (name == "lexer_name") lexer_name = setting;
-        else if (name == "token_name") token_name = setting;
-        else if (name == "dfa_name") dfa_name = setting;
-        else if (name == "inc_guards") inc_guards = setting;
-        else if (name == "name_space") name_space = setting;
-        else if (name == "use_token_lexemes") use_token_lexemes = setting.AsBool();
-        else if (name == "use_token_line_num") use_token_line_num = setting.AsBool();
-        else if (name == "use_token_column") use_token_column = setting.AsBool();
+        else if (name == "out_filename") { out_filename = setting; doc.TextArea("set_filename").SetText(out_filename); }
+        else if (name == "lexer_name") { lexer_name = setting; doc.TextArea("set_lexer_class").SetText(lexer_name); }
+        else if (name == "token_name") { token_name = setting; doc.TextArea("set_token_class").SetText(token_name); }
+        else if (name == "dfa_name")   { dfa_name = setting; doc.TextArea("set_dfa_class").SetText(dfa_name); }
+        else if (name == "inc_guards") { inc_guards = setting; doc.TextArea("set_includes").SetText(inc_guards); }
+        else if (name == "name_space") { name_space = setting; doc.TextArea("set_namespace").SetText(name_space); }
+        else if (name == "use_token_lexemes") { use_token_lexemes = setting.AsBool(); doc.CheckBox("checkbox_lexemes").SetChecked(use_token_lexemes); }
+        else if (name == "use_token_line_num") { use_token_line_num = setting.AsBool(); doc.CheckBox("checkbox_line_nums").SetChecked(use_token_line_num); }
+        else if (name == "use_token_column") { use_token_column = setting.AsBool(); doc.CheckBox("checkbox_cols").SetChecked(use_token_column); }
+    
       } else { // Must be a token entry.
         AddTableRow(name, setting, ignore);
       }
@@ -733,13 +733,13 @@ private:
     }, "Home", "home_but").SetCSS(button_style).SetBackground("#0000AA").SetCSS("width", "159px");
     button_div << UI::Button([this](){
       UpdateIntro("cpp"); intro_div.Redraw(); 
-    }, "User Guide", "cpp_but").SetCSS(button_style); // .SetCSS("width", "170px");
+    }, "User Guide", "cpp_but").SetCSS(button_style).SetCSS("width", "159px");
     button_div << UI::Button([this](){
       UpdateIntro("lexer"); intro_div.Redraw(); 
-    }, "Lexical Analysis", "lexer_but").SetCSS(button_style); // .SetCSS("width", "170px");
+    }, "Lexical Analysis", "lexer_but").SetCSS(button_style).SetCSS("width", "159px");
     button_div << UI::Button([this](){
       UpdateIntro("regex"); intro_div.Redraw(); 
-    }, "Regular Expressions", "regex_but").SetCSS(button_style); // .SetCSS("width", "170px");
+    }, "Regular Expressions", "regex_but").SetCSS(button_style).SetCSS("width", "180px");
     button_div << UI::Button([this](){
       UpdateIntro("about"); intro_div.Redraw(); 
     }, "About", "about_but").SetCSS(button_style).SetCSS("width", "159px");
