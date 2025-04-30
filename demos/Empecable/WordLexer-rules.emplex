@@ -16,4 +16,4 @@ ERR_WS [\t\r]
 ERR_END_LINE_WS " "+$
 WS " "+
 WORD [a-zA-Z]+
-OTHER [^a-zA-Z\t\r ]+
+OTHER [^a-zA-Z\t\r\n ]+

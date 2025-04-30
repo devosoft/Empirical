@@ -19,4 +19,4 @@ INCLUDE "#include ".*
 IFNDEF "#ifndef ".*
 DEFINE "#define ".*
 ENDIF "#endif ".*
-OTHER [^/#]+
+OTHER [^/#\n]+
