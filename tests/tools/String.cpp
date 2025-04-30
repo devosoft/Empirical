@@ -299,9 +299,8 @@ TEST_CASE("Test String Conversion Functions", "[tools]")
   CHECK(special_string.AsEscaped() == escaped_string);
   CHECK(special_string.AsEscaped() == escaped_string);
 
-  emp::String base_string = "This is an okay string.\n  \tThis\nis   -MY-    very best string!!!!   ";
-
-  CHECK(emp::MakeSlugify(base_string) == "this-is-an-okay-string-this-is-my-very-best-string");
+  emp::String base_string = "This is an okay string.\n  \tThis\nis   -MY-    very best str1ng!!!!   ";
+  CHECK(emp::MakeSlugify(base_string) == "this-is-an-okay-string-this-is-my-very-best-str1ng");
 
   emp::String first_line = base_string.PopLine();
 
@@ -324,9 +323,9 @@ TEST_CASE("Test String Conversion Functions", "[tools]")
   CHECK(popped_str == "oka");
   CHECK(first_line == "string.");
 
-  CHECK(base_string.TrimFront() == "This\nis   -MY-    very best string!!!!   ");
-  CHECK(base_string.TrimBack() == "This\nis   -MY-    very best string!!!!");
-  CHECK(base_string.Compress() == "This is -MY- very best string!!!!");
+  CHECK(base_string.TrimFront() == "This\nis   -MY-    very best str1ng!!!!   ");
+  CHECK(base_string.TrimBack() == "This\nis   -MY-    very best str1ng!!!!");
+  CHECK(base_string.Compress() == "This is -MY- very best str1ng!!!!");
 }
 
 
