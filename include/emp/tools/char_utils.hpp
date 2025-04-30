@@ -28,6 +28,8 @@
 #ifndef EMP_TOOLS_CHAR_UTILS_HPP_INCLUDE
 #define EMP_TOOLS_CHAR_UTILS_HPP_INCLUDE
 
+#include <string>
+#include <string_view>
 
 #include "../base/array.hpp"
 #include "../base/assert.hpp"
@@ -48,15 +50,15 @@ namespace emp {
     CharSetBase() = default;
 
     CharSetBase(CHAR_T c) { char_set[static_cast<size_t>(c)] = true; }
-    CharSetBase(const std::string & in_chars) {
+    CharSetBase(std::string_view in_chars) {
       for (CHAR_T x : in_chars) char_set[static_cast<size_t>(x)] = true;
     }
-    CharSetBase(const char * in_chars) : CharSetBase(std::string(in_chars)) { }
+    CharSetBase(const char * in_chars) : CharSetBase(std::string_view(in_chars)) { }
     CharSetBase(const this_t &) = default;
 
     this_t & operator=(const this_t &) = default;
     this_t & operator=(char c) { Reset(); char_set[static_cast<size_t>(c)] = true; }
-    this_t & operator=(const std::string & in_chars) {
+    this_t & operator=(std::string_view in_chars) {
       for (CHAR_T x : in_chars) char_set[static_cast<size_t>(x)] = true;
     }
 
@@ -64,23 +66,23 @@ namespace emp {
 
     size_t GetMaxChar() const noexcept { return MAX_CHAR; }
     bool Has(CHAR_T index) const { return char_set[static_cast<size_t>(index)]; }
-    bool Has(const std::string & str) const {
+    bool Has(std::string_view str) const {
       for (CHAR_T c : str) if (!Has(c)) return false;
       return true;
     }
-    bool HasAny(const std::string & str) const {
+    bool HasAny(std::string_view str) const {
       for (CHAR_T c : str) if (Has(c)) return true;
       return false;
     }
-    bool HasOnly(const std::string & str) const {
+    [[deprecated("Use Has() instead")]] bool HasOnly(std::string_view str) const {
       for (CHAR_T c : str) if (!Has(c)) return false;
       return true;
     }
-    bool HasAt(const std::string & str, size_t pos) const {
+    bool HasAt(std::string_view str, size_t pos) const {
       return (pos < str.size()) && Has(str[pos]);
     }
 
-    size_t FindIn(const std::string & str, size_t pos=0) const {
+    size_t FindIn(std::string_view str, size_t pos=0) const {
       while (pos < str.size()) {
         if (Has(str[pos])) return pos;
         ++pos;
