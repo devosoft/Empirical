@@ -2,7 +2,7 @@
  * This file is part of Empirical, https://github.com/devosoft/Empirical
  * Copyright (C) 2024-2025 Michigan State University
  * MIT Software license; see doc/LICENSE.md
- * 
+ *
  * @file
  * @brief Load a series of filenames and clean up each file.
  */
@@ -20,6 +20,7 @@
 #include "../../include/emp/config/command_line.hpp"
 #include "../../include/emp/io/File.hpp"
 #include "../../include/emp/tools/String.hpp"
+#include "../../include/emp/tools/string_utils.hpp"
 #include "../../include/emp/config/FlagManager.hpp"
 
 #include "PPLexer.hpp"
@@ -52,6 +53,7 @@ private:
   // Options used:
   Checks checks;
   bool verbose = false;
+  bool interactive = false;
 
   emp::FlagManager flags;
 
@@ -68,11 +70,13 @@ private:
       "Activate ALL fixes (except those explicitly excluded; see below)");
     flags.AddOption('h', "help", [this](){ PrintHelp(); },
       "Get additional information about options.");
+    flags.AddOption('i', "interactive", [this](){ interactive = true; },
+      "Interactively fix file problems");
     flags.AddOption('v', "verbose", [this](){ verbose = true; },
       "Provide more detailed output");
     flags.AddOption('w', "word_file", [this](emp::String filename){ word_file = filename; },
       "Specify the word file to use for spell checks.");
-        
+
     flags.AddGroup("Activating Specific Fixes");
     flags.AddOption("require_copyright", [this](){ checks.require_copyright = true; });
     flags.AddOption("prevent_end_spaces", [this](){ checks.prevent_end_spaces = true; });
@@ -114,7 +118,36 @@ private:
   }
 
   bool TestWord(emp::String word) const {
-    return word.size() <= 2 || words.contains(word) || words.contains(word.AsLower());
+    // If a word is short (2 or fewer letters) or is in the dictionary (either directly or or as
+    // a lowercase word), mark it as valid.
+    if (word.size() <= 2 || words.contains(word) || words.contains(word.AsLower())) return true;
+
+    // Otherwise, we should see if we need to break up the word.  For example, "TestWord" should
+    // be allowed because both "Test" and "Word" are allowed.  If it were all lowercase, it should
+    // be written as "test_word", which would already have been split on the '_'.
+    size_t upper_pos = 0;
+    if (word.HasLower() && (upper_pos = word.FindUpper(1)) != emp::String::npos) {
+      return TestWord(word.PopFixed(upper_pos)) && TestWord(word);
+    }
+
+    return false;
+  }
+
+  // Print tokens to the screen with a particular token highlighted in read.
+  template <typename STREAM_T>
+  void PrintErrorToken(const STREAM_T & tokens, size_t id) {
+    size_t start = id;
+    size_t end = id+1;
+    // Rewind to beginning of line.
+    while (start > 0 && tokens[start-1].lexeme != "\n") --start;
+    // Fast forward to end of line.
+    while ((end < tokens.size() && tokens[end].lexeme != "\n")) ++end;
+
+    for (size_t cur_token = start; cur_token < end; ++cur_token) {
+      if (cur_token == id) std::cout << emp::ANSI_BrightRed() << emp::ANSI_Underline();
+      std::cout << tokens[cur_token].lexeme;
+      if (cur_token == id) std::cout << emp::ANSI_DefaultColor() << emp::ANSI_NoUnderline();
+    }
   }
 
 public:
@@ -161,7 +194,17 @@ public:
   }
 
   bool ProcessFile(emp::String filename) {
-    std::cout << "File: " << filename << std::endl;
+    // Interface options
+    // 'd' - Delete (or 'D' to Delete All)
+    // 'r' - Replace with (or 'R' to Replace All)
+    // 's' - Skip (or 'S' to Skip All)
+    // 'f' - Add to file dictionary
+    // 'p' - Add to project dictionary
+    // 'q' - Quit
+
+    std::cout << emp::ANSI_BrightCyan()
+              << "=== File: " << filename << " ==="
+              << emp::ANSI_DefaultColor() << '\n';
 
     std::ifstream file(filename);
     if (!file.is_open()) {
@@ -174,27 +217,44 @@ public:
     // First check spelling and illegal character placement.
     auto tokens = word_lexer.Tokenize(file);
 
-    for (const auto & token : tokens) {
+    // For each misspelled word, track the token ids associated with it.
+    std::map<emp::String, std::vector<size_t>> word_ids;
+
+    for (size_t token_id = 0; token_id < tokens.size(); ++token_id) {
+      const auto & token = tokens[token_id];
       switch (token.id) {
         using namespace emplex;
       case WordLexer::ID_WORD:
         if (!TestWord(token.lexeme)) {
-          std::cerr << "LINE " << token.line_id << ": Unknown word '" << token.lexeme << "'.\n";
+          word_ids[token.lexeme].push_back(token_id);
           ++issue_count;
         }
         break;
       case WordLexer::ID_ERR_END_LINE_WS:
-        std::cerr << "LINE " << token.line_id << ": Extra whitespace at end of line.\n";
+      std::cout << emp::ANSI_Yellow() << "Found: " << emp::ANSI_DefaultColor()
+                << "LINE " << token.line_id << ": Extra whitespace at end of line.\n";
         ++issue_count;
         break;
       case WordLexer::ID_ERR_WS:
-        std::cerr << "LINE " << token.line_id << ": Illegal whitespace.\n";
+        std::cout << emp::ANSI_Yellow() << "Found: " << emp::ANSI_DefaultColor()
+                  << "LINE " << token.line_id << ": Illegal whitespace.\n";
         ++issue_count;
         break;
       default:
         break;
       }
     }
+
+    for (auto & [word, ids] : word_ids) {
+      std::cout << emp::ANSI_Yellow() << "Found:" << emp::ANSI_DefaultColor() << " Unknown word '"
+        << emp::ANSI_Blue() << word << emp::ANSI_DefaultColor() << "' appears "
+        << ids.size() << " times, starting on line " << tokens[ids[0]].line_id << ".\n";
+      emp::String line_num = emp::MakeString(tokens[ids[0]].line_id).PadFront(' ', 5);
+      std::cout << emp::ANSI_Yellow() << line_num << ":" << emp::ANSI_DefaultColor();
+      PrintErrorToken(tokens, ids[0]);
+      std::cout << '\n';
+    }
+
 
     std::cout << issue_count << " issues found." << std::endl;
 
