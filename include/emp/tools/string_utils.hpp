@@ -76,7 +76,7 @@ namespace emp {
 
   /// Determine if there is whitespace anywhere in a string.
   inline bool has_whitespace(const std::string & str) { return WhitespaceCharSet().HasAny(str); }
-  inline bool has_nonwhitespace(const std::string & str) { return !WhitespaceCharSet().HasOnly(str); }
+  inline bool has_nonwhitespace(const std::string & str) { return !WhitespaceCharSet().Has(str); }
   inline bool has_upper_letter(const std::string & str) { return UpperCharSet().HasAny(str); }
   inline bool has_lower_letter(const std::string & str) { return LowerCharSet().HasAny(str); }
   inline bool has_letter(const std::string & str) { return LetterCharSet().HasAny(str); }
@@ -1294,7 +1294,6 @@ namespace emp {
   }
 
 
-  // Some ANSI helper functions.
   inline constexpr char ANSI_ESC() { return (char) 27; }
   inline std::string ANSI_Reset() { return "\033[0m"; }
   inline std::string ANSI_Bold() { return "\033[1m"; }
@@ -1311,6 +1310,7 @@ namespace emp {
   inline std::string ANSI_NoUnderline() { return "\033[24m"; }
   inline std::string ANSI_NoBlink() { return "\033[25m"; }
   inline std::string ANSI_NoReverse() { return "\033[27m"; }
+  inline std::string ANSI_NoStrike() { return "\033[29m"; }
 
   inline std::string ANSI_Black() { return "\033[30m"; }
   inline std::string ANSI_Red() { return "\033[31m"; }
@@ -1332,23 +1332,23 @@ namespace emp {
   inline std::string ANSI_WhiteBG() { return "\033[47m"; }
   inline std::string ANSI_DefaultBGColor() { return "\033[49m"; }
 
-  inline std::string ANSI_BrightBlack() { return "\033[30m"; }
-  inline std::string ANSI_BrightRed() { return "\033[31m"; }
-  inline std::string ANSI_BrightGreen() { return "\033[32m"; }
-  inline std::string ANSI_BrightYellow() { return "\033[33m"; }
-  inline std::string ANSI_BrightBlue() { return "\033[34m"; }
-  inline std::string ANSI_BrightMagenta() { return "\033[35m"; }
-  inline std::string ANSI_BrightCyan() { return "\033[36m"; }
-  inline std::string ANSI_BrightWhite() { return "\033[37m"; }
+  inline std::string ANSI_BrightBlack() { return "\033[90m"; }
+  inline std::string ANSI_BrightRed() { return "\033[91m"; }
+  inline std::string ANSI_BrightGreen() { return "\033[92m"; }
+  inline std::string ANSI_BrightYellow() { return "\033[93m"; }
+  inline std::string ANSI_BrightBlue() { return "\033[94m"; }
+  inline std::string ANSI_BrightMagenta() { return "\033[95m"; }
+  inline std::string ANSI_BrightCyan() { return "\033[96m"; }
+  inline std::string ANSI_BrightWhite() { return "\033[97m"; }
 
-  inline std::string ANSI_BrightBlackBG() { return "\033[40m"; }
-  inline std::string ANSI_BrightRedBG() { return "\033[41m"; }
-  inline std::string ANSI_BrightGreenBG() { return "\033[42m"; }
-  inline std::string ANSI_BrightYellowBG() { return "\033[43m"; }
-  inline std::string ANSI_BrightBlueBG() { return "\033[44m"; }
-  inline std::string ANSI_BrightMagentaBG() { return "\033[45m"; }
-  inline std::string ANSI_BrightCyanBG() { return "\033[46m"; }
-  inline std::string ANSI_BrightWhiteBG() { return "\033[47m"; }
+  inline std::string ANSI_BrightBlackBG() { return "\033[100m"; }
+  inline std::string ANSI_BrightRedBG() { return "\033[101m"; }
+  inline std::string ANSI_BrightGreenBG() { return "\033[102m"; }
+  inline std::string ANSI_BrightYellowBG() { return "\033[103m"; }
+  inline std::string ANSI_BrightBlueBG() { return "\033[104m"; }
+  inline std::string ANSI_BrightMagentaBG() { return "\033[105m"; }
+  inline std::string ANSI_BrightCyanBG() { return "\033[106m"; }
+  inline std::string ANSI_BrightWhiteBG() { return "\033[107m"; }
 
   /// Make a string appear bold when printed to the command line.
   inline std::string to_ansi_bold(const std::string & _in) {
