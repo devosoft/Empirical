@@ -35,6 +35,7 @@
 #include "../base/vector.hpp"
 #include "../meta/type_traits.hpp"  // emp::IsIterable()
 
+#include "ANSI.hpp"
 #include "char_utils.hpp"           // emp::CharSet (+ functions)
 #include "_StringSyntax.hpp"
 
@@ -622,11 +623,12 @@ namespace emp {
     // Most also have stand-alone Make* versions where the core implementation is found.
 
     template <typename... Ts>
-    String & Append(Ts... args) { return *this += MakeString(std::forward<Ts>(args)...);}
-    template <typename... Ts>
     String & Set(Ts... args) { return *this = MakeString(std::forward<Ts>(args)...); }
     template <typename T>
     T As() const { std::stringstream ss; ss << *this; T out; ss >> out; return out; }
+    template <typename... Ts>
+    String & Append(Ts... args) { return *this += MakeString(std::forward<Ts>(args)...);}
+
     double AsDouble() const { return std::stod(*this); }
     int AsInt() const { return std::stoi(*this); }
     unsigned long long AsULL() const { return std::stoull(*this); }
@@ -794,8 +796,208 @@ namespace emp {
       (ss << ... << String::_Convert(std::forward<Ts>(args), true));
       return ss.str();
     }
-  };
 
+    // <= ANSI manipulations =>
+    String AsANSIBold() const { return emp::ANSI::MakeBold(*this); }
+    String & SetANSIBold() { return *this = AsANSIBold(); }
+    String & AppendANSIBold(std::string_view sv)
+      { return *this += emp::ANSI::MakeBold(sv); }
+
+    String AsANSIFaint() const { return emp::ANSI::MakeFaint(*this); }
+    String & SetANSIFaint() { return *this = AsANSIFaint(); }
+    String & AppendANSIFaint(std::string_view sv)
+      { return *this += emp::ANSI::MakeFaint(sv); }
+
+    String AsANSIItalic() const { return emp::ANSI::MakeItalic(*this); }
+    String & SetANSIItalic() { return *this = AsANSIItalic(); }
+    String & AppendANSIItalic(std::string_view sv)
+      { return *this += emp::ANSI::MakeItalic(sv); }
+
+    String AsANSIUnderline() const { return emp::ANSI::MakeUnderline(*this); }
+    String & SetANSIUnderline() { return *this = AsANSIUnderline(); }
+    String & AppendANSIUnderline(std::string_view sv)
+      { return *this += emp::ANSI::MakeUnderline(sv); }
+
+    String AsANSISlowBlink() const { return emp::ANSI::MakeSlowBlink(*this); }
+    String & SetANSISlowBlink() { return *this = AsANSISlowBlink(); }
+    String & AppendANSISlowBlink(std::string_view sv)
+      { return *this += emp::ANSI::MakeSlowBlink(sv); }
+
+    String AsANSIBlink() const { return emp::ANSI::MakeBlink(*this); }
+    String & SetANSIBlink() { return *this = AsANSIBlink(); }
+    String & AppendANSIBlink(std::string_view sv)
+      { return *this += emp::ANSI::MakeBlink(sv); }
+
+    String AsANSIReverse() const { return emp::ANSI::MakeReverse(*this); }
+    String & SetANSIReverse() { return *this = AsANSIReverse(); }
+    String & AppendANSIReverse(std::string_view sv)
+      { return *this += emp::ANSI::MakeReverse(sv); }
+
+    String AsANSIStrike() const { return emp::ANSI::MakeStrike(*this); }
+    String & SetANSIStrike() { return *this = AsANSIStrike(); }
+    String & AppendANSIStrike(std::string_view sv)
+      { return *this += emp::ANSI::MakeStrike(sv); }
+
+    String AsANSIBlack() const { return emp::ANSI::MakeBlack(*this); }
+    String & SetANSIBlack() { return *this = AsANSIBlack(); }
+    String & AppendANSIBlack(std::string_view sv)
+      { return *this += emp::ANSI::MakeBlack(sv); }
+
+    String AsANSIRed() const { return emp::ANSI::MakeRed(*this); }
+    String & SetANSIRed() { return *this = AsANSIRed(); }
+    String & AppendANSIRed(std::string_view sv)
+      { return *this += emp::ANSI::MakeRed(sv); }
+
+    String AsANSIGreen() const { return emp::ANSI::MakeGreen(*this); }
+    String & SetANSIGreen() { return *this = AsANSIGreen(); }
+    String & AppendANSIGreen(std::string_view sv)
+      { return *this += emp::ANSI::MakeGreen(sv); }
+
+    String AsANSIYellow() const { return emp::ANSI::MakeYellow(*this); }
+    String & SetANSIYellow() { return *this = AsANSIYellow(); }
+    String & AppendANSIYellow(std::string_view sv)
+      { return *this += emp::ANSI::MakeYellow(sv); }
+
+    String AsANSIBlue() const { return emp::ANSI::MakeBlue(*this); }
+    String & SetANSIBlue() { return *this = AsANSIBlue(); }
+    String & AppendANSIBlue(std::string_view sv)
+      { return *this += emp::ANSI::MakeBlue(sv); }
+
+    String AsANSIMagenta() const { return emp::ANSI::MakeMagenta(*this); }
+    String & SetANSIMagenta() { return *this = AsANSIMagenta(); }
+    String & AppendANSIMagenta(std::string_view sv)
+      { return *this += emp::ANSI::MakeMagenta(sv); }
+
+    String AsANSICyan() const { return emp::ANSI::MakeCyan(*this); }
+    String & SetANSICyan() { return *this = AsANSICyan(); }
+    String & AppendANSICyan(std::string_view sv)
+      { return *this += emp::ANSI::MakeCyan(sv); }
+
+    String AsANSIWhite() const { return emp::ANSI::MakeWhite(*this); }
+    String & SetANSIWhite() { return *this = AsANSIWhite(); }
+    String & AppendANSIWhite(std::string_view sv)
+      { return *this += emp::ANSI::MakeWhite(sv); }
+
+    String AsANSIBrightBlack() const { return emp::ANSI::MakeBrightBlack(*this); }
+    String & SetANSIBrightBlack() { return *this = AsANSIBrightBlack(); }
+    String & AppendANSIBrightBlack(std::string_view sv)
+      { return *this += emp::ANSI::MakeBrightBlack(sv); }
+
+    String AsANSIBrightRed() const { return emp::ANSI::MakeBrightRed(*this); }
+    String & SetANSIBrightRed() { return *this = AsANSIBrightRed(); }
+    String & AppendANSIBrightRed(std::string_view sv)
+      { return *this += emp::ANSI::MakeBrightRed(sv); }
+
+    String AsANSIBrightGreen() const { return emp::ANSI::MakeBrightGreen(*this); }
+    String & SetANSIBrightGreen() { return *this = AsANSIBrightGreen(); }
+    String & AppendANSIBrightGreen(std::string_view sv)
+      { return *this += emp::ANSI::MakeBrightGreen(sv); }
+
+    String AsANSIBrightYellow() const { return emp::ANSI::MakeBrightYellow(*this); }
+    String & SetANSIBrightYellow() { return *this = AsANSIBrightYellow(); }
+    String & AppendANSIBrightYellow(std::string_view sv)
+      { return *this += emp::ANSI::MakeBrightYellow(sv); }
+
+    String AsANSIBrightBlue() const { return emp::ANSI::MakeBrightBlue(*this); }
+    String & SetANSIBrightBlue() { return *this = AsANSIBrightBlue(); }
+    String & AppendANSIBrightBlue(std::string_view sv)
+      { return *this += emp::ANSI::MakeBrightBlue(sv); }
+
+    String AsANSIBrightMagenta() const { return emp::ANSI::MakeBrightMagenta(*this); }
+    String & SetANSIBrightMagenta() { return *this = AsANSIBrightMagenta(); }
+    String & AppendANSIBrightMagenta(std::string_view sv)
+      { return *this += emp::ANSI::MakeBrightMagenta(sv); }
+
+    String AsANSIBrightCyan() const { return emp::ANSI::MakeBrightCyan(*this); }
+    String & SetANSIBrightCyan() { return *this = AsANSIBrightCyan(); }
+    String & AppendANSIBrightCyan(std::string_view sv)
+      { return *this += emp::ANSI::MakeBrightCyan(sv); }
+
+    String AsANSIBrightWhite() const { return emp::ANSI::MakeBrightWhite(*this); }
+    String & SetANSIBrightWhite() { return *this = AsANSIBrightWhite(); }
+    String & AppendANSIBrightWhite(std::string_view sv)
+      { return *this += emp::ANSI::MakeBrightWhite(sv); }
+
+    String AsANSIBlackBG() const { return emp::ANSI::MakeBlackBG(*this); }
+    String & SetANSIBlackBG() { return *this = AsANSIBlackBG(); }
+    String & AppendANSIBlackBG(std::string_view sv)
+      { return *this += emp::ANSI::MakeBlackBG(sv); }
+
+    String AsANSIRedBG() const { return emp::ANSI::MakeRedBG(*this); }
+    String & SetANSIRedBG() { return *this = AsANSIRedBG(); }
+    String & AppendANSIRedBG(std::string_view sv)
+      { return *this += emp::ANSI::MakeRedBG(sv); }
+
+    String AsANSIGreenBG() const { return emp::ANSI::MakeGreenBG(*this); }
+    String & SetANSIGreenBG() { return *this = AsANSIGreenBG(); }
+    String & AppendANSIGreenBG(std::string_view sv)
+      { return *this += emp::ANSI::MakeGreenBG(sv); }
+
+    String AsANSIYellowBG() const { return emp::ANSI::MakeYellowBG(*this); }
+    String & SetANSIYellowBG() { return *this = AsANSIYellowBG(); }
+    String & AppendANSIYellowBG(std::string_view sv)
+      { return *this += emp::ANSI::MakeYellowBG(sv); }
+
+    String AsANSIBlueBG() const { return emp::ANSI::MakeBlueBG(*this); }
+    String & SetANSIBlueBG() { return *this = AsANSIBlueBG(); }
+    String & AppendANSIBlueBG(std::string_view sv)
+      { return *this += emp::ANSI::MakeBlueBG(sv); }
+
+    String AsANSIMagentaBG() const { return emp::ANSI::MakeMagentaBG(*this); }
+    String & SetANSIMagentaBG() { return *this = AsANSIMagentaBG(); }
+    String & AppendANSIMagentaBG(std::string_view sv)
+      { return *this += emp::ANSI::MakeMagentaBG(sv); }
+
+    String AsANSICyanBG() const { return emp::ANSI::MakeCyanBG(*this); }
+    String & SetANSICyanBG() { return *this = AsANSICyanBG(); }
+    String & AppendANSICyanBG(std::string_view sv)
+      { return *this += emp::ANSI::MakeCyanBG(sv); }
+
+    String AsANSIWhiteBG() const { return emp::ANSI::MakeWhiteBG(*this); }
+    String & SetANSIWhiteBG() { return *this = AsANSIWhiteBG(); }
+    String & AppendANSIWhiteBG(std::string_view sv)
+      { return *this += emp::ANSI::MakeWhiteBG(sv); }
+
+    String AsANSIBrightBlackBG() const { return emp::ANSI::MakeBrightBlackBG(*this); }
+    String & SetANSIBrightBlackBG() { return *this = AsANSIBrightBlackBG(); }
+    String & AppendANSIBrightBlackBG(std::string_view sv)
+      { return *this += emp::ANSI::MakeBrightBlackBG(sv); }
+
+    String AsANSIBrightRedBG() const { return emp::ANSI::MakeBrightRedBG(*this); }
+    String & SetANSIBrightRedBG() { return *this = AsANSIBrightRedBG(); }
+    String & AppendANSIBrightRedBG(std::string_view sv)
+      { return *this += emp::ANSI::MakeBrightRedBG(sv); }
+
+    String AsANSIBrightGreenBG() const { return emp::ANSI::MakeBrightGreenBG(*this); }
+    String & SetANSIBrightGreenBG() { return *this = AsANSIBrightGreenBG(); }
+    String & AppendANSIBrightGreenBG(std::string_view sv)
+      { return *this += emp::ANSI::MakeBrightGreenBG(sv); }
+
+    String AsANSIBrightYellowBG() const { return emp::ANSI::MakeBrightYellowBG(*this); }
+    String & SetANSIBrightYellowBG() { return *this = AsANSIBrightYellowBG(); }
+    String & AppendANSIBrightYellowBG(std::string_view sv)
+      { return *this += emp::ANSI::MakeBrightYellowBG(sv); }
+
+    String AsANSIBrightBlueBG() const { return emp::ANSI::MakeBrightBlueBG(*this); }
+    String & SetANSIBrightBlueBG() { return *this = AsANSIBrightBlueBG(); }
+    String & AppendANSIBrightBlueBG(std::string_view sv)
+      { return *this += emp::ANSI::MakeBrightBlueBG(sv); }
+
+    String AsANSIBrightMagentaBG() const { return emp::ANSI::MakeBrightMagentaBG(*this); }
+    String & SetANSIBrightMagentaBG() { return *this = AsANSIBrightMagentaBG(); }
+    String & AppendANSIBrightMagentaBG(std::string_view sv)
+      { return *this += emp::ANSI::MakeBrightMagentaBG(sv); }
+
+    String AsANSIBrightCyanBG() const { return emp::ANSI::MakeBrightCyanBG(*this); }
+    String & SetANSIBrightCyanBG() { return *this = AsANSIBrightCyanBG(); }
+    String & AppendANSIBrightCyanBG(std::string_view sv)
+      { return *this += emp::ANSI::MakeBrightCyanBG(sv); }
+
+    String AsANSIBrightWhiteBG() const { return emp::ANSI::MakeBrightWhiteBG(*this); }
+    String & SetANSIBrightWhiteBG() { return *this = AsANSIBrightWhiteBG(); }
+    String & AppendANSIBrightWhiteBG(std::string_view sv)
+      { return *this += emp::ANSI::MakeBrightWhiteBG(sv); }
+  };
 
   ////////////////////////////////////////////////////////////////////////////
   //
