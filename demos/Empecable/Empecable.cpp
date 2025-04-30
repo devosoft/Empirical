@@ -84,7 +84,7 @@ private:
     flags.AddOption("require_include_guards", [this](){ checks.require_include_guards = true; });
     flags.AddOption("require_pragma_once", [this](){ checks.require_pragma_once = true; });
     flags.AddOption("sort_include", [this](){ checks.sort_include = true; });
-  
+
     flags.AddGroup("Deactivate Specific Fixes");
     flags.AddOption("no_require_copyright", [this](){ checks.require_copyright = false; });
     flags.AddOption("no_prevent_end_spaces", [this](){ checks.prevent_end_spaces = false; });
@@ -92,7 +92,7 @@ private:
     flags.AddOption("no_sort_include_guards", [this](){ checks.require_include_guards = false; });
     flags.AddOption("no_require_pragma_once", [this](){ checks.require_pragma_once = false; });
     flags.AddOption("no_sort_include", [this](){ checks.sort_include = false; });
-    
+
     flags.AddGroup("Extra Warnings to Enable (off by default)");
     flags.AddOption('W', "max_line_width",
       [this](emp::String max_w){ checks.warn_line_width = max_w.AsULL(); } );
@@ -135,19 +135,32 @@ private:
 
   // Print tokens to the screen with a particular token highlighted in read.
   template <typename STREAM_T>
-  void PrintErrorToken(const STREAM_T & tokens, size_t id) {
-    size_t start = id;
-    size_t end = id+1;
+  void ReportError(emp::String error, const STREAM_T & tokens, size_t token_id) {
+    namespace ANSI = emp::ANSI;
+
+    // Report the actual error.
+    std::cout << ANSI::MakeBold(ANSI::MakeYellow("Found: ")) << error << '\n';
+
+    // Determine the set of tokens to print.
+    size_t start = token_id;
+    size_t end = token_id+1;
     // Rewind to beginning of line.
     while (start > 0 && tokens[start-1].lexeme != "\n") --start;
     // Fast forward to end of line.
     while ((end < tokens.size() && tokens[end].lexeme != "\n")) ++end;
 
-    for (size_t cur_token = start; cur_token < end; ++cur_token) {
-      if (cur_token == id) std::cout << emp::ANSI_BrightRed() << emp::ANSI_Underline();
-      std::cout << tokens[cur_token].lexeme;
-      if (cur_token == id) std::cout << emp::ANSI_DefaultColor() << emp::ANSI_NoUnderline();
+    // Format and print the line number.
+    emp::String line_num = emp::MakeString(tokens[token_id].line_id).PadFront(' ', 5)+':';
+    // std::cout << line_num.AsANSIYellow();
+    std::cout << line_num.AsANSIBrightWhite().AsANSIBold();
+
+    // Print the series of tokens on this line, highlighting the problem.
+    for (size_t i = start; i < end; ++i) {
+      if (i == token_id) {
+        std::cout << ANSI::MakeBold(ANSI::MakeUnderline(ANSI::MakeRed(tokens[i].lexeme)));
+      } else std::cout << tokens[i].lexeme;
     }
+    std::cout << '\n';
   }
 
 public:
@@ -156,7 +169,7 @@ public:
     flags.Process();
 
     LoadWords();
-  
+
     auto filenames = flags.GetExtras();
     if (filenames.size() == 0) {
       std::cout << "No files listed." << std::endl;
@@ -164,7 +177,7 @@ public:
     }
     for (emp::String filename : filenames) {
       ProcessFile(filename);
-    }    
+    }
   }
 
   ~Empecable() {
@@ -198,13 +211,11 @@ public:
     // 'd' - Delete (or 'D' to Delete All)
     // 'r' - Replace with (or 'R' to Replace All)
     // 's' - Skip (or 'S' to Skip All)
-    // 'f' - Add to file dictionary
-    // 'p' - Add to project dictionary
+    // 'f' - Add word to file dictionary (or 'F' to add all lowercase version of word)
+    // 'p' - Add word to project dictionary (or 'P' to add all lowercase version of word)
     // 'q' - Quit
 
-    std::cout << emp::ANSI_BrightCyan()
-              << "=== File: " << filename << " ==="
-              << emp::ANSI_DefaultColor() << '\n';
+    std::cout << "=== File: " << filename.AsANSIBrightCyan() << " ===\n";
 
     std::ifstream file(filename);
     if (!file.is_open()) {
@@ -219,6 +230,7 @@ public:
 
     // For each misspelled word, track the token ids associated with it.
     std::map<emp::String, std::vector<size_t>> word_ids;
+    emp::String error = "";
 
     for (size_t token_id = 0; token_id < tokens.size(); ++token_id) {
       const auto & token = tokens[token_id];
@@ -227,17 +239,17 @@ public:
       case WordLexer::ID_WORD:
         if (!TestWord(token.lexeme)) {
           word_ids[token.lexeme].push_back(token_id);
-          ++issue_count;
+          ++issue_count;  
         }
         break;
-      case WordLexer::ID_ERR_END_LINE_WS:
-      std::cout << emp::ANSI_Yellow() << "Found: " << emp::ANSI_DefaultColor()
-                << "LINE " << token.line_id << ": Extra whitespace at end of line.\n";
+      case WordLexer::ID_ERR_END_LINE_WS:        
+        error = emp::MakeString("Extra whitespace at end of line:");
+        ReportError(error, tokens, token_id);
         ++issue_count;
         break;
       case WordLexer::ID_ERR_WS:
-        std::cout << emp::ANSI_Yellow() << "Found: " << emp::ANSI_DefaultColor()
-                  << "LINE " << token.line_id << ": Illegal whitespace.\n";
+        std::cout << emp::ANSI::MakeYellow("Found:")
+                  << " LINE " << token.line_id << ": Illegal whitespace.\n";
         ++issue_count;
         break;
       default:
@@ -246,15 +258,10 @@ public:
     }
 
     for (auto & [word, ids] : word_ids) {
-      std::cout << emp::ANSI_Yellow() << "Found:" << emp::ANSI_DefaultColor() << " Unknown word '"
-        << emp::ANSI_Blue() << word << emp::ANSI_DefaultColor() << "' appears "
-        << ids.size() << " times, starting on line " << tokens[ids[0]].line_id << ".\n";
-      emp::String line_num = emp::MakeString(tokens[ids[0]].line_id).PadFront(' ', 5);
-      std::cout << emp::ANSI_Yellow() << line_num << ":" << emp::ANSI_DefaultColor();
-      PrintErrorToken(tokens, ids[0]);
-      std::cout << '\n';
+      error = emp::MakeString("Unknown word '", word.AsANSICyan(),
+        "' appears ", ids.size(), " times; first occurrence:");
+      ReportError(error, tokens, ids[0]);
     }
-
 
     std::cout << issue_count << " issues found." << std::endl;
 
