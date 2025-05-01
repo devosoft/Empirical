@@ -1,0 +1,38 @@
+# This is an auto-generated Emplex configuration file.
+
+# Configuration settings (lines starting with ':' are config options)
+:out_filename Lexer.hpp
+:lexer_name Lexer
+:token_name Token
+:dfa_name DFA
+:inc_guards EMPLEX_LEXER_HPP_INCLUDE_
+:name_space emplex
+:use_token_lexemes 1
+:use_token_line_num 1
+:use_token_column 0
+
+# Special tokens that represent direct errors.
+ERR_WS [\r\t]
+ERR_END_LINE_WS " "+$
+
+# Currently, words may optionally begin with a capital letter, but body must be lowercase.
+# This pattern will automatically split GetValue into "Get" and "Value".  The lack of `_`
+# in the pattern will also ensure that test_variable is split into "test" and "variable".
+# TODO: Allow for ALL CAPS inside of a Pascal-case identifier, like GetASCIIValue.
+WORD [A-Z]?[a-z]*
+
+# Separate out important types of whitespace.
+WS " "+
+END_LINE \n
+
+# Identify start and end of comments (note: COMMENT_LINE "en"ds at END_LINE).
+COMMENT_LINE "//"
+COMMENT_START "/*"
+COMMENT_END "*/"
+
+# Identify preprocessor commands.  Must end in a non-space and cannot have illegal characters.
+PRAGMA "#pragma "[\n\r\t]*[^ \n\r\t]
+INCLUDE "#include "[\n\r\t]*[^ \n\r\t]
+IFNDEF "#ifndef "[\n\r\t]*[^ \n\r\t]
+DEFINE "#define "[\n\r\t]*[^ \n\r\t]
+ENDIF "#endif "[\n\r\t]*[^ \n\r\t]
