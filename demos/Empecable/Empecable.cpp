@@ -61,8 +61,22 @@ private:
   emplex::WordLexer word_lexer;
 
   emp::String word_file = "word_list.txt";
-  std::unordered_set<emp::String> words; // Dictionary of legal words.
-  bool save_words = false;               // If words are added to the dictionary, save at end.
+  using word_set_t = std::unordered_set<emp::String>;
+  word_set_t words;                // Dictionary of legal words.
+  word_set_t new_local_words;      // New words to add to just in this file.
+  word_set_t new_global_words;     // New words to add to .Empecable file.
+  size_t issue_count = 0;          // Number of issues detected in current file.
+
+  // Collect issues
+
+
+
+  // === HELPER FUNCTIONS ===
+
+  template <typename... Ts>
+  void PrintBoldRed(Ts &&... args) {
+    std::cout << emp::MakeString(args...).AsANSIRed().AsANSIBold();
+  }
 
   void SetupOptionFlags() {
     flags.AddGroup("Basic Operation");
@@ -108,14 +122,33 @@ private:
     }
   }
 
-  void SaveWords() {
+  void SaveGlobalWords() {
+    if (new_global_words.size() == 0) return;
+
+    // Move the words to a vector and sort them.
     emp::vector<emp::String> out_words;
     out_words.reserve(words.size());
     for (emp::String word : words) out_words.emplace_back(word);
     std::sort(out_words.begin(), out_words.end());
+
+    // Print the new file
     std::ofstream file(word_file);
     for (emp::String word : out_words) file << word << '\n';
   }
+
+  void AddGlobalWord(emp::String word) {
+    emp_assert(!emp::Has(new_global_words, word), word);
+    new_global_words.insert(word);
+  }
+
+  void AddLocalWord(emp::String word) {
+    emp_assert(!emp::Has(new_local_words, word), word);
+    new_local_words.insert(word);
+  }
+
+  // 'd' - Delete (or 'D' to Delete All)
+  // 'r' - Replace with (or 'R' to Replace All)
+
 
   bool TestWord(emp::String word) const {
     // If a word is short (2 or fewer letters) or is in the dictionary (either directly or or as
@@ -156,9 +189,8 @@ private:
 
     // Print the series of tokens on this line, highlighting the problem.
     for (size_t i = start; i < end; ++i) {
-      if (i == token_id) {
-        std::cout << ANSI::MakeBold(ANSI::MakeUnderline(ANSI::MakeRed(tokens[i].lexeme)));
-      } else std::cout << tokens[i].lexeme;
+      if (i == token_id) PrintBoldRed(tokens[i].lexeme).AsANSIUnderline();
+      else std::cout << tokens[i].lexeme;
     }
     std::cout << '\n';
   }
@@ -181,7 +213,7 @@ public:
   }
 
   ~Empecable() {
-    if (save_words) SaveWords();
+    SaveGlobalWords();
   }
 
   Empecable & SetAll(bool _in=true) { checks.SetAll(_in); return *this; }
@@ -214,16 +246,16 @@ public:
     // 'f' - Add word to file dictionary (or 'F' to add all lowercase version of word)
     // 'p' - Add word to project dictionary (or 'P' to add all lowercase version of word)
     // 'q' - Quit
+    // 'h' - Help
 
     std::cout << "=== File: " << filename.AsANSIBrightCyan() << " ===\n";
+    issue_count = 0;    // Reset issues for new file.
 
     std::ifstream file(filename);
     if (!file.is_open()) {
-      std::cout << "ERROR: '" << filename << "' failed to open.";
+      PrintBoldRed("ERROR: '", filename, "' failed to open.\n");
       return false;
     }
-
-    size_t issue_count = 0;
 
     // First check spelling and illegal character placement.
     auto tokens = word_lexer.Tokenize(file);
@@ -248,8 +280,8 @@ public:
         ++issue_count;
         break;
       case WordLexer::ID_ERR_WS:
-        std::cout << emp::ANSI::MakeYellow("Found:")
-                  << " LINE " << token.line_id << ": Illegal whitespace.\n";
+        error = emp::MakeString("Illegal whitespace:");
+        ReportError(error, tokens, token_id);
         ++issue_count;
         break;
       default:
