@@ -56,7 +56,9 @@ private:
 
   emp::FlagManager flags;
 
+  // Lexer information.
   emplex::Lexer lexer;
+  emp::vector<emplex::Token> tokens;
 
   emp::String word_file = "word_list.txt";
   using word_set_t = std::unordered_set<emp::String>;
@@ -148,38 +150,43 @@ private:
   // 'r' - Replace with (or 'R' to Replace All)
 
 
-  bool TestWord(emp::String word) const {
+  bool TestWordToken(size_t token_pos) {
+    emp::String word(tokens[token_pos].lexeme);
+    
     // If a word is short (2 or fewer letters) or is in the dictionary (either directly or or as
     // a lowercase word), mark it as valid.
     if (word.size() <= 2 || words.contains(word) || words.contains(word.AsLower())) return true;
+
+    // We have an unknown word.
+    ReportError(emp::MakeString("Unknown word '", word.AsANSICyan(), "'"), token_pos);
+    ++issue_count;  
 
     return false;
   }
 
   // Print tokens to the screen with a particular token highlighted in read.
-  template <typename STREAM_T>
-  void ReportError(emp::String error, const STREAM_T & tokens, size_t token_id) {
+  void ReportError(emp::String error, size_t token_pos) {
     namespace ANSI = emp::ANSI;
 
     // Report the actual error.
     std::cout << ANSI::MakeBold(ANSI::MakeYellow("Found: ")) << error << '\n';
 
     // Determine the set of tokens to print.
-    size_t start = token_id;
-    size_t end = token_id+1;
+    size_t start = token_pos;
+    size_t end = token_pos+1;
     // Rewind to beginning of line.
     while (start > 0 && tokens[start-1].lexeme != "\n") --start;
     // Fast forward to end of line.
     while ((end < tokens.size() && tokens[end].lexeme != "\n")) ++end;
 
     // Format and print the line number.
-    emp::String line_num = emp::MakeString(tokens[token_id].line_id).PadFront(' ', 5)+':';
+    emp::String line_num = emp::MakeString(tokens[token_pos].line_id).PadFront(' ', 5)+':';
     // std::cout << line_num.AsANSIYellow();
     std::cout << line_num.AsANSIBrightWhite().AsANSIBold();
 
     // Print the series of tokens on this line, highlighting the problem.
     for (size_t i = start; i < end; ++i) {
-      if (i == token_id) std::cout << ToBoldRed(tokens[i].lexeme).AsANSIUnderline();
+      if (i == token_pos) std::cout << ToBoldRed(tokens[i].lexeme).AsANSIUnderline();
       else std::cout << tokens[i].lexeme;
     }
     std::cout << '\n';
@@ -228,48 +235,49 @@ public:
     exit(0);
   }
 
-  bool ProcessFile(emp::String filename) {
-    // Interface options
-    // 'd' - Delete (or 'D' to Delete All)
-    // 'r' - Replace with (or 'R' to Replace All)
-    // 's' - Skip (or 'S' to Skip All)
-    // 'f' - Add word to file dictionary (or 'F' to add all lowercase version of word)
-    // 'p' - Add word to project dictionary (or 'P' to add all lowercase version of word)
-    // 'q' - Quit
-    // 'h' - Help
-
-    std::cout << "=== File: " << filename.AsANSIBrightCyan() << " ===\n";
-    issue_count = 0;    // Reset issues for new file.
-
+  bool LoadFile(emp::String filename) {
     std::ifstream file(filename);
     if (!file.is_open()) {
       std::cout << ToBoldRed("ERROR: '", filename, "' failed to open.\n");
       return false;
     }
+    tokens = lexer.Tokenize(file);
+    issue_count = 0;    // Reset issues for new file.
 
-    // First check spelling and illegal character placement.
-    auto tokens = lexer.Tokenize(file);
+    return true;
+  }
+
+  bool ProcessFile(emp::String filename) {
+    // Interface options
+    // 'd' - Delete (or 'D' to Delete All)
+    // 'r' - Replace with (or 'R' to Replace All)
+    // 's' - Skip (or 'S' to Skip All)
+    // 'f' - Add lowercase word to file dictionary (or 'F' to preserve current case)
+    // 'p' - Add lowercase word to project dictionary (or 'P' to preserve current case)
+    // 'q' - Quit
+    // 'h' - Help
+    // 'z' - Undo
+
+    std::cout << "=== File: " << filename.AsANSIBrightCyan() << " ===\n";
+
+    if (!LoadFile(filename)) return false;
 
     // For each misspelled word, track the token ids associated with it.
     std::map<emp::String, std::vector<size_t>> word_ids;
-    emp::String error = "";
 
-    for (size_t token_id = 0; token_id < tokens.size(); ++token_id) {
-      const auto & token = tokens[token_id];
+    for (size_t token_pos = 0; token_pos < tokens.size(); ++token_pos) {
+      const auto & token = tokens[token_pos];
       switch (token.id) {
         using namespace emplex;
       case Lexer::ID_WORD:
-        if (!TestWord(token.lexeme)) {
-          word_ids[token.lexeme].push_back(token_id);
-          ++issue_count;  
-        }
+        TestWordToken(token_pos);
         break;
       case Lexer::ID_ERR_END_LINE_WS:        
-        ReportError("Extra whitespace at end of line:", tokens, token_id);
+        ReportError("Extra whitespace at end of line:", token_pos);
         ++issue_count;
         break;
       case Lexer::ID_ERR_WS:
-        ReportError("Illegal whitespace:", tokens, token_id);
+        ReportError("Illegal whitespace:", token_pos);
         ++issue_count;
         break;
       default:
@@ -277,13 +285,7 @@ public:
       }
     }
 
-    for (auto & [word, ids] : word_ids) {
-      error = emp::MakeString("Unknown word '", word.AsANSICyan(),
-        "' appears ", ids.size(), " times; first occurrence:");
-      ReportError(error, tokens, ids[0]);
-    }
-
-    std::cout << issue_count << " issues found." << std::endl;
+    std::cout << '\n' << ToBoldRed("=== ", issue_count, " issues found ===") << std::endl;
 
     return issue_count;
   }
