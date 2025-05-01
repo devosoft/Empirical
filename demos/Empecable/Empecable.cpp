@@ -23,8 +23,7 @@
 #include "../../include/emp/tools/string_utils.hpp"
 #include "../../include/emp/config/FlagManager.hpp"
 
-#include "PPLexer.hpp"
-#include "WordLexer.hpp"
+#include "Lexer.hpp"
 
 struct Checks {
   // Important fixes; on by default.
@@ -57,8 +56,7 @@ private:
 
   emp::FlagManager flags;
 
-  emplex::PPLexer pp_lexer;
-  emplex::WordLexer word_lexer;
+  emplex::Lexer lexer;
 
   emp::String word_file = "word_list.txt";
   using word_set_t = std::unordered_set<emp::String>;
@@ -74,8 +72,8 @@ private:
   // === HELPER FUNCTIONS ===
 
   template <typename... Ts>
-  void PrintBoldRed(Ts &&... args) {
-    std::cout << emp::MakeString(args...).AsANSIRed().AsANSIBold();
+  emp::String ToBoldRed(Ts &&... args) {
+    return emp::MakeString(args...).AsANSIRed().AsANSIBold();
   }
 
   void SetupOptionFlags() {
@@ -155,14 +153,6 @@ private:
     // a lowercase word), mark it as valid.
     if (word.size() <= 2 || words.contains(word) || words.contains(word.AsLower())) return true;
 
-    // Otherwise, we should see if we need to break up the word.  For example, "TestWord" should
-    // be allowed because both "Test" and "Word" are allowed.  If it were all lowercase, it should
-    // be written as "test_word", which would already have been split on the '_'.
-    size_t upper_pos = 0;
-    if (word.HasLower() && (upper_pos = word.FindUpper(1)) != emp::String::npos) {
-      return TestWord(word.PopFixed(upper_pos)) && TestWord(word);
-    }
-
     return false;
   }
 
@@ -189,7 +179,7 @@ private:
 
     // Print the series of tokens on this line, highlighting the problem.
     for (size_t i = start; i < end; ++i) {
-      if (i == token_id) PrintBoldRed(tokens[i].lexeme).AsANSIUnderline();
+      if (i == token_id) std::cout << ToBoldRed(tokens[i].lexeme).AsANSIUnderline();
       else std::cout << tokens[i].lexeme;
     }
     std::cout << '\n';
@@ -253,12 +243,12 @@ public:
 
     std::ifstream file(filename);
     if (!file.is_open()) {
-      PrintBoldRed("ERROR: '", filename, "' failed to open.\n");
+      std::cout << ToBoldRed("ERROR: '", filename, "' failed to open.\n");
       return false;
     }
 
     // First check spelling and illegal character placement.
-    auto tokens = word_lexer.Tokenize(file);
+    auto tokens = lexer.Tokenize(file);
 
     // For each misspelled word, track the token ids associated with it.
     std::map<emp::String, std::vector<size_t>> word_ids;
@@ -268,20 +258,18 @@ public:
       const auto & token = tokens[token_id];
       switch (token.id) {
         using namespace emplex;
-      case WordLexer::ID_WORD:
+      case Lexer::ID_WORD:
         if (!TestWord(token.lexeme)) {
           word_ids[token.lexeme].push_back(token_id);
           ++issue_count;  
         }
         break;
-      case WordLexer::ID_ERR_END_LINE_WS:        
-        error = emp::MakeString("Extra whitespace at end of line:");
-        ReportError(error, tokens, token_id);
+      case Lexer::ID_ERR_END_LINE_WS:        
+        ReportError("Extra whitespace at end of line:", tokens, token_id);
         ++issue_count;
         break;
-      case WordLexer::ID_ERR_WS:
-        error = emp::MakeString("Illegal whitespace:");
-        ReportError(error, tokens, token_id);
+      case Lexer::ID_ERR_WS:
+        ReportError("Illegal whitespace:", tokens, token_id);
         ++issue_count;
         break;
       default:
