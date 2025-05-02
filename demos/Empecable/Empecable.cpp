@@ -18,10 +18,11 @@
 #include "../../include/emp/base/assert.hpp"
 #include "../../include/emp/base/vector.hpp"
 #include "../../include/emp/config/command_line.hpp"
+#include "../../include/emp/config/FlagManager.hpp"
 #include "../../include/emp/io/File.hpp"
+#include "../../include/emp/io/io_utils.hpp"
 #include "../../include/emp/tools/String.hpp"
 #include "../../include/emp/tools/string_utils.hpp"
-#include "../../include/emp/config/FlagManager.hpp"
 
 #include "Lexer.hpp"
 
@@ -65,6 +66,10 @@ private:
   word_set_t words;                // Dictionary of legal words.
   word_set_t new_local_words;      // New words to add to just in this file.
   word_set_t new_global_words;     // New words to add to .Empecable file.
+  word_set_t skip_words;           // Words to skip over for now.
+
+  // Track replacements to use.
+  std::unordered_map<emp::String, emp::String> replacement_map;
   size_t issue_count = 0;          // Number of issues detected in current file.
 
   // Collect issues
@@ -136,34 +141,6 @@ private:
     for (emp::String word : out_words) file << word << '\n';
   }
 
-  void AddGlobalWord(emp::String word) {
-    emp_assert(!emp::Has(new_global_words, word), word);
-    new_global_words.insert(word);
-  }
-
-  void AddLocalWord(emp::String word) {
-    emp_assert(!emp::Has(new_local_words, word), word);
-    new_local_words.insert(word);
-  }
-
-  // 'd' - Delete (or 'D' to Delete All)
-  // 'r' - Replace with (or 'R' to Replace All)
-
-
-  bool TestWordToken(size_t token_pos) {
-    emp::String word(tokens[token_pos].lexeme);
-    
-    // If a word is short (2 or fewer letters) or is in the dictionary (either directly or or as
-    // a lowercase word), mark it as valid.
-    if (word.size() <= 2 || words.contains(word) || words.contains(word.AsLower())) return true;
-
-    // We have an unknown word.
-    ReportError(emp::MakeString("Unknown word '", word.AsANSICyan(), "'"), token_pos);
-    ++issue_count;  
-
-    return false;
-  }
-
   // Print tokens to the screen with a particular token highlighted in read.
   void ReportError(emp::String error, size_t token_pos) {
     namespace ANSI = emp::ANSI;
@@ -190,6 +167,112 @@ private:
       else std::cout << tokens[i].lexeme;
     }
     std::cout << '\n';
+  }
+
+  void AddGlobalWord(emp::String word) {
+    emp_assert(!emp::Has(new_global_words, word), word);
+    std::cout << "Added '" << word.AsANSICyan() << "' to project dictionary." << std::endl;
+    new_global_words.insert(word);
+  }
+
+  void AddLocalWord(emp::String word) {
+    emp_assert(!emp::Has(new_local_words, word), word);
+    std::cout << "Added '" << word.AsANSICyan() << "' to file dictionary." << std::endl;
+    new_local_words.insert(word);
+  }
+
+  void DoReplace(size_t token_pos, bool change_all) {
+    emp::String word = tokens[token_pos].lexeme;
+
+    std::cout << "Enter replacement word: ";
+    emp::String new_word;
+    std::cin >> new_word;
+
+    // Make change to THIS token.
+    tokens[token_pos].lexeme = new_word;
+
+    // Record change for future tokens.
+    if (change_all) replacement_map[word] = new_word;
+
+    std::cout << "Replacing ";
+    if (change_all) std::cout << " all instances of ";
+    std::cout << "'" << word.AsANSICyan() << "' with '" << new_word.AsANSICyan() << ".";
+  }
+
+  // Interface options for consistency.
+  // 'd' - Delete (or 'D' to Delete All)
+  // 'r' - Replace with (or 'R' to Replace All)
+  // 'i' - Ignore (or 'I' to Ignore All)
+  // 'p' - Add lowercase word to project dictionary (or 'P' to preserve current case)
+  // 'f' - Add lowercase word to file dictionary (or 'F' to preserve current case)
+  // 'h' - Help
+  // 'q' - Quit without saving (or 'Q' to quit and save)
+  // 's' - Save current updated file
+  // 'z' - Undo
+  // 'y' or 'n' - Answer a specific question.
+
+  template <typename... Ts>
+  void Print(Ts &&... args) { std::cout << emp::MakeString(args...); }
+
+  emp::String ToOption(emp::String key) {
+    return emp::MakeString('\'', key.AsANSIMagenta(), '\'');
+  }
+
+  bool TestWordToken(size_t token_pos) {
+    emp::String word(tokens[token_pos].lexeme);
+    
+    // If a word is short (2 or fewer letters) or is in the dictionary (either directly or or as
+    // a lowercase word), mark it as valid.
+    if (word.size() <= 2 || words.contains(word) || words.contains(word.AsLower())) return true;
+
+    // We have an unknown word.
+    ReportError(emp::MakeString("Unknown word '", word.AsANSICyan(), "'"), token_pos);
+    ++issue_count;  
+
+    if (interactive) {
+      Print(ToOption("p"), " - Add '", word.AsLower().AsANSICyan(), "' to PROJECT dictionary");
+      if (word.HasUpper()) {
+        Print(" or ", ToOption("P"), " for case-sensitive '", word.AsANSICyan(), "'");
+      }
+      std::cout << "\n";
+
+      Print(ToOption("f"), " - Add '", word.AsLower().AsANSICyan(), "' to FILE dictionary");
+      if (word.HasUpper()) {
+        Print("    or ", ToOption("F"), " for case-sensitive '", word.AsANSICyan(), "'");
+      }
+      std::cout << "\n";
+
+      Print(ToOption("r"), " - Replace this '", word.AsANSICyan(), "'  or ",
+            ToOption("R"), " to replace ALL instances\n");
+      Print(ToOption("i"), " - Ignore this '", word.AsANSICyan(), "'     or ",
+            ToOption("I"), " to ignore ALL instances\n");
+
+      bool done = false;
+      while (!done) {
+        char key = emp::GetIOChar();
+        switch (key) {
+          case 'p': AddGlobalWord(word.AsLower()); done = true; break;
+          case 'P': AddGlobalWord(word);           done = true; break;
+          case 'f': AddLocalWord(word.AsLower());  done = true; break;
+          case 'F': AddLocalWord(word);            done = true; break;
+          case 'r': DoReplace(token_pos, false);   done = true; break;
+          case 'R': DoReplace(token_pos, true);    done = true; break;
+          case 'i':
+            std::cout << "Skipping '" << word.AsANSICyan() << "'!" << std::endl;
+            done = true;
+            break;
+          case 'I':
+            std::cout << "Ignoring all instances of '" << word.AsANSICyan() << "'!" << std::endl;
+            skip_words.insert(word);
+            done = true;
+            break;
+          default:
+            std::cout << "Unknown key " << ToBoldRed("'", key, "'") << std::endl;
+        }
+      }
+    }
+
+    return false;
   }
 
 public:
@@ -248,16 +331,6 @@ public:
   }
 
   bool ProcessFile(emp::String filename) {
-    // Interface options
-    // 'd' - Delete (or 'D' to Delete All)
-    // 'r' - Replace with (or 'R' to Replace All)
-    // 's' - Skip (or 'S' to Skip All)
-    // 'f' - Add lowercase word to file dictionary (or 'F' to preserve current case)
-    // 'p' - Add lowercase word to project dictionary (or 'P' to preserve current case)
-    // 'q' - Quit
-    // 'h' - Help
-    // 'z' - Undo
-
     std::cout << "=== File: " << filename.AsANSIBrightCyan() << " ===\n";
 
     if (!LoadFile(filename)) return false;
