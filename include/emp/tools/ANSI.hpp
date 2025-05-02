@@ -18,67 +18,63 @@
 namespace emp {
 
   namespace ANSI {
-    static constexpr size_t Reset = 0;
-    static constexpr size_t Bold = 1;
-    static constexpr size_t Faint = 2;
-    static constexpr size_t Italic = 3;
-    static constexpr size_t Underline = 4;
-    static constexpr size_t SlowBlink = 5;
-    static constexpr size_t Blink = 6;
-    static constexpr size_t Reverse = 7;
-    static constexpr size_t Strike = 9;
+    static constexpr char Reset[] = "\033[0m";
+    static constexpr char Bold[] = "\033[1m";
+    static constexpr char Faint[] = "\033[2m";
+    static constexpr char Italic[] = "\033[3m";
+    static constexpr char Underline[] = "\033[4m";
+    static constexpr char SlowBlink[] = "\033[5m";
+    static constexpr char Blink[] = "\033[6m";
+    static constexpr char Reverse[] = "\033[7m";
+    static constexpr char Strike[] = "\033[9m";
 
-    static constexpr size_t NoBold = 22;      // Normal intensity; also not faint.
-    static constexpr size_t NoItalic = 23;
-    static constexpr size_t NoUnderline = 24;
-    static constexpr size_t NoBlink = 25;
-    static constexpr size_t NoReverse = 27;
-    static constexpr size_t NoStrike = 29;
+    static constexpr char NoBold[] = "\033[22m";      // Normal intensity; also not faint.
+    static constexpr char NoItalic[] = "\033[23m";
+    static constexpr char NoUnderline[] = "\033[24m";
+    static constexpr char NoBlink[] = "\033[25m";
+    static constexpr char NoReverse[] = "\033[27m";
+    static constexpr char NoStrike[] = "\033[29m";
 
-    static constexpr size_t Black = 30;
-    static constexpr size_t Red = 31;
-    static constexpr size_t Green = 32;
-    static constexpr size_t Yellow = 33;
-    static constexpr size_t Blue = 34;
-    static constexpr size_t Magenta = 35;
-    static constexpr size_t Cyan = 36;
-    static constexpr size_t White = 37;
-    static constexpr size_t DefaultColor = 39;
+    static constexpr char Black[] = "\033[30m";
+    static constexpr char Red[] = "\033[31m";
+    static constexpr char Green[] = "\033[32m";
+    static constexpr char Yellow[] = "\033[33m";
+    static constexpr char Blue[] = "\033[34m";
+    static constexpr char Magenta[] = "\033[35m";
+    static constexpr char Cyan[] = "\033[36m";
+    static constexpr char White[] = "\033[37m";
+    static constexpr char DefaultColor[] = "\033[39m";
 
-    static constexpr size_t BlackBG = 40;
-    static constexpr size_t RedBG = 41;
-    static constexpr size_t GreenBG = 42;
-    static constexpr size_t YellowBG = 43;
-    static constexpr size_t BlueBG = 44;
-    static constexpr size_t MagentaBG = 45;
-    static constexpr size_t CyanBG = 46;
-    static constexpr size_t WhiteBG = 47;
-    static constexpr size_t DefaultBGColor = 49;
+    static constexpr char BlackBG[] = "\033[40m";
+    static constexpr char RedBG[] = "\033[41m";
+    static constexpr char GreenBG[] = "\033[42m";
+    static constexpr char YellowBG[] = "\033[43m";
+    static constexpr char BlueBG[] = "\033[44m";
+    static constexpr char MagentaBG[] = "\033[45m";
+    static constexpr char CyanBG[] = "\033[46m";
+    static constexpr char WhiteBG[] = "\033[47m";
+    static constexpr char DefaultBGColor[] = "\033[49m";
 
-    static constexpr size_t BrightBlack = 90;
-    static constexpr size_t BrightRed = 91;
-    static constexpr size_t BrightGreen = 92;
-    static constexpr size_t BrightYellow = 93;
-    static constexpr size_t BrightBlue = 94;
-    static constexpr size_t BrightMagenta = 95;
-    static constexpr size_t BrightCyan = 96;
-    static constexpr size_t BrightWhite = 97;
+    static constexpr char BrightBlack[] = "\033[90m";
+    static constexpr char BrightRed[] = "\033[91m";
+    static constexpr char BrightGreen[] = "\033[92m";
+    static constexpr char BrightYellow[] = "\033[93m";
+    static constexpr char BrightBlue[] = "\033[94m";
+    static constexpr char BrightMagenta[] = "\033[95m";
+    static constexpr char BrightCyan[] = "\033[96m";
+    static constexpr char BrightWhite[] = "\033[97m";
 
-    static constexpr size_t BrightBlackBG = 100;
-    static constexpr size_t BrightRedBG = 101;
-    static constexpr size_t BrightGreenBG = 102;
-    static constexpr size_t BrightYellowBG = 103;
-    static constexpr size_t BrightBlueBG = 104;
-    static constexpr size_t BrightMagentaBG = 105;
-    static constexpr size_t BrightCyanBG = 106;
-    static constexpr size_t BrightWhiteBG = 107;
+    static constexpr char BrightBlackBG[] = "\033[100m";
+    static constexpr char BrightRedBG[] = "\033[101m";
+    static constexpr char BrightGreenBG[] = "\033[102m";
+    static constexpr char BrightYellowBG[] = "\033[103m";
+    static constexpr char BrightBlueBG[] = "\033[104m";
+    static constexpr char BrightMagentaBG[] = "\033[105m";
+    static constexpr char BrightCyanBG[] = "\033[106m";
+    static constexpr char BrightWhiteBG[] = "\033[107m";
 
-    inline std::string Tag(size_t id) {
-      return std::string("\033[") + std::to_string(id) + 'm';
-    }
-
-    inline std::string Apply(size_t start_id, std::string_view sv, size_t end_id) {
-      return Tag(start_id).append(sv) + Tag(end_id);
+    inline std::string Apply(const char * start, std::string_view sv, const char * end) {
+      return std::string(start).append(sv).append(end);
     }
 
     std::string MakeBold(std::string_view sv) { return Apply(Bold, sv, NoBold); }
@@ -90,8 +86,8 @@ namespace emp {
     std::string MakeReverse(std::string_view sv) { return Apply(Reverse, sv, NoReverse); }
     std::string MakeStrike(std::string_view sv) { return Apply(Strike, sv, NoStrike); }
 
-    std::string MakeColor(std::string_view sv, size_t color_id) {
-      return Apply(color_id, sv, DefaultColor);
+    std::string MakeColor(std::string_view sv, const char * color) {
+      return Apply(color, sv, DefaultColor);
     }
     std::string MakeBlack(std::string_view sv) { return MakeColor(sv, Black); }
     std::string MakeRed(std::string_view sv) { return MakeColor(sv, Red); }
@@ -111,7 +107,7 @@ namespace emp {
     std::string MakeBrightCyan(std::string_view sv) { return MakeColor(sv, BrightCyan); }
     std::string MakeBrightWhite(std::string_view sv) { return MakeColor(sv, BrightWhite); }
 
-    std::string MakeBGColor(std::string_view sv, size_t color_id) {
+    std::string MakeBGColor(std::string_view sv, const char * color_id) {
       return Apply(color_id, sv, DefaultBGColor);
     }
     std::string MakeBlackBG(std::string_view sv) { return MakeBGColor(sv, BlackBG); }
@@ -131,7 +127,7 @@ namespace emp {
     std::string MakeBrightMagentaBG(std::string_view sv) { return MakeBGColor(sv, BrightMagentaBG); }
     std::string MakeBrightCyanBG(std::string_view sv) { return MakeBGColor(sv, BrightCyanBG); }
     std::string MakeBrightWhiteBG(std::string_view sv) { return MakeBGColor(sv, BrightWhiteBG); }
-  };
+  }
 
 }
 
