@@ -63,17 +63,16 @@ private:
 
   emp::String word_file = "word_list.txt";
   using word_set_t = std::unordered_set<emp::String>;
-  word_set_t words;                // Dictionary of legal words.
-  word_set_t new_local_words;      // New words to add to just in this file.
-  word_set_t new_global_words;     // New words to add to .Empecable file.
-  word_set_t skip_words;           // Words to skip over for now.
+  using word_map_t = std::unordered_map<emp::String, emp::String>;
+  word_set_t project_words;   // Dictionary of legal words for this project.
+  word_set_t file_words;      // Addition legal words in only this file.
+  word_set_t skip_words;      // Words to skip over for now.
+  word_map_t replacement_map; // Track replacement words to use.
+  size_t issue_count = 0;     // Number of issues detected in current file.
 
-  // Track replacements to use.
-  std::unordered_map<emp::String, emp::String> replacement_map;
-  size_t issue_count = 0;          // Number of issues detected in current file.
-
-  // Collect issues
-
+  // Track changes that need to be saved.
+  bool file_changed = false;
+  bool project_changed = false;
 
 
   // === HELPER FUNCTIONS ===
@@ -118,22 +117,22 @@ private:
   }
 
   void LoadWords() {
-    if (words.size() == 0) {
+    if (project_words.size() == 0) {
       std::ifstream file(word_file);
       emp::String word;
       while (std::getline(file, word)) {
-        words.insert(word.Filter(emp::IDCharSet()));
+        project_words.insert(word.Filter(emp::IDCharSet()));
       }
     }
   }
 
-  void SaveGlobalWords() {
-    if (new_global_words.size() == 0) return;
+  void SaveProjectConfig() {
+    if (!file_changed) return;
 
-    // Move the words to a vector and sort them.
+    // Move the project_words to a vector and sort them.
     emp::vector<emp::String> out_words;
-    out_words.reserve(words.size());
-    for (emp::String word : words) out_words.emplace_back(word);
+    out_words.reserve(project_words.size());
+    for (emp::String word : project_words) out_words.emplace_back(word);
     std::sort(out_words.begin(), out_words.end());
 
     // Print the new file
@@ -169,16 +168,18 @@ private:
     std::cout << '\n';
   }
 
-  void AddGlobalWord(emp::String word) {
-    emp_assert(!emp::Has(new_global_words, word), word);
+  void AddProjectWord(emp::String word) {
+    emp_assert(!emp::Has(project_words, word), word);
     std::cout << "Added '" << word.AsANSICyan() << "' to project dictionary." << std::endl;
-    new_global_words.insert(word);
+    project_words.insert(word);
+    project_changed = true;
   }
 
-  void AddLocalWord(emp::String word) {
-    emp_assert(!emp::Has(new_local_words, word), word);
+  void AddFileWord(emp::String word) {
+    emp_assert(!emp::Has(file_words, word), word);
     std::cout << "Added '" << word.AsANSICyan() << "' to file dictionary." << std::endl;
-    new_local_words.insert(word);
+    file_words.insert(word);
+    file_changed = true;
   }
 
   void DoReplace(size_t token_pos, bool change_all) {
@@ -197,6 +198,8 @@ private:
     std::cout << "Replacing ";
     if (change_all) std::cout << " all instances of ";
     std::cout << "'" << word.AsANSICyan() << "' with '" << new_word.AsANSICyan() << ".";
+
+    file_changed = true;
   }
 
   // Interface options for consistency.
@@ -223,7 +226,9 @@ private:
     
     // If a word is short (2 or fewer letters) or is in the dictionary (either directly or or as
     // a lowercase word), mark it as valid.
-    if (word.size() <= 2 || words.contains(word) || words.contains(word.AsLower())) return true;
+    if (word.size() <= 2 ||
+        project_words.contains(word) ||
+        project_words.contains(word.AsLower())) return true;
 
     // We have an unknown word.
     ReportError(emp::MakeString("Unknown word '", word.AsANSICyan(), "'"), token_pos);
@@ -244,19 +249,19 @@ private:
 
       Print(ToOption("r"), " - Replace this '", word.AsANSICyan(), "'  or ",
             ToOption("R"), " to replace ALL instances\n");
-      Print(ToOption("i"), " - Ignore this '", word.AsANSICyan(), "'     or ",
+      Print(ToOption("i"), " - Ignore this '", word.AsANSICyan(), "'   or ",
             ToOption("I"), " to ignore ALL instances\n");
 
       bool done = false;
       while (!done) {
         char key = emp::GetIOChar();
         switch (key) {
-          case 'p': AddGlobalWord(word.AsLower()); done = true; break;
-          case 'P': AddGlobalWord(word);           done = true; break;
-          case 'f': AddLocalWord(word.AsLower());  done = true; break;
-          case 'F': AddLocalWord(word);            done = true; break;
-          case 'r': DoReplace(token_pos, false);   done = true; break;
-          case 'R': DoReplace(token_pos, true);    done = true; break;
+          case 'p': AddProjectWord(word.AsLower()); done = true; break;
+          case 'P': AddProjectWord(word);           done = true; break;
+          case 'f': AddFileWord(word.AsLower());    done = true; break;
+          case 'F': AddFileWord(word);              done = true; break;
+          case 'r': DoReplace(token_pos, false);    done = true; break;
+          case 'R': DoReplace(token_pos, true);     done = true; break;
           case 'i':
             std::cout << "Skipping '" << word.AsANSICyan() << "'!" << std::endl;
             done = true;
@@ -293,7 +298,7 @@ public:
   }
 
   ~Empecable() {
-    SaveGlobalWords();
+    SaveProjectConfig();
   }
 
   Empecable & SetAll(bool _in=true) { checks.SetAll(_in); return *this; }
