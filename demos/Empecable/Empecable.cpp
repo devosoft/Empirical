@@ -5,12 +5,34 @@
  *
  * @file
  * @brief Load a series of filenames and clean up each file.
+ *
+ * Features:
+ * - Check spelling for the code files.
+ * - Remove illegal characters including \r, \t, and end-of-line spaces
+ * - Ensure the file ends in a newline
+ * - Ensure that 2 spaces are used for indent levels (esp. after `{` at eol?})
+ * - Group and track include files
+ * - Ensure include guards or #pragma once (or both) exist.
+ * - Ensure no merge conflict markers are in the file (and help with merge?)
+ * - Track any special features about files or projects including custom spelling.
+ * - Fully configure actions with a Empecable.cfg file.
+ * - Find the .Empirical/ directory for configurations (or create one if it doesn't exist)
+ * 
+ * Possible add-on features to develop?
+ * - Produce a levelization map
+ * - Dynamic control over boilerplate (for easy scaling to other projects)
+ * - Guided shifting of boilerplate to a new format
+ * - Spacing must always shift by 0 or 2 OR somehow align with previous line?
+ * - Make sure include files have corresponding test files.
+ * - Make sure test files are not empty (or effectively empty)
  */
 
 #include <cstring>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <optional>
 #include <set>
 #include <string>
 #include <unordered_set>
@@ -25,6 +47,8 @@
 #include "../../include/emp/tools/string_utils.hpp"
 
 #include "Lexer.hpp"
+
+namespace fs = std::filesystem;
 
 struct Checks {
   // Important fixes; on by default.
@@ -126,6 +150,14 @@ private:
     }
   }
 
+  void SaveFile(emp::String filename) {
+    std::ofstream file(filename);
+    for (auto & token : tokens) {
+      file << token.lexeme;
+    }
+    file.close();
+  }
+
   void SaveProjectConfig() {
     if (!file_changed) return;
 
@@ -197,7 +229,7 @@ private:
 
     std::cout << "Replacing ";
     if (change_all) std::cout << " all instances of ";
-    std::cout << "'" << word.AsANSICyan() << "' with '" << new_word.AsANSICyan() << ".";
+    std::cout << "'" << word.AsANSICyan() << "' with '" << new_word.AsANSICyan() << "'.\n";
 
     file_changed = true;
   }
@@ -210,7 +242,7 @@ private:
   // 'f' - Add lowercase word to file dictionary (or 'F' to preserve current case)
   // 'h' - Help
   // 'q' - Quit without saving (or 'Q' to quit and save)
-  // 's' - Save current updated file
+  // 's' - Save current updated file (or 'S' to "Save As")
   // 'z' - Undo
   // 'y' or 'n' - Answer a specific question.
 
@@ -232,24 +264,23 @@ private:
 
     // We have an unknown word.
     ReportError(emp::MakeString("Unknown word '", word.AsANSICyan(), "'"), token_pos);
-    ++issue_count;  
 
     if (interactive) {
-      Print(ToOption("p"), " - Add '", word.AsLower().AsANSICyan(), "' to PROJECT dictionary");
+      Print(ToOption("p"), " - Add '", word.AsLower().AsANSICyan(), "' to main PROJECT dictionary");
       if (word.HasUpper()) {
         Print(" or ", ToOption("P"), " for case-sensitive '", word.AsANSICyan(), "'");
       }
       std::cout << "\n";
 
-      Print(ToOption("f"), " - Add '", word.AsLower().AsANSICyan(), "' to FILE dictionary");
+      Print(ToOption("f"), " - Add '", word.AsLower().AsANSICyan(), "' to this FILE's dictionary");
       if (word.HasUpper()) {
-        Print("    or ", ToOption("F"), " for case-sensitive '", word.AsANSICyan(), "'");
+        Print("  or ", ToOption("F"), " for case-sensitive '", word.AsANSICyan(), "'");
       }
       std::cout << "\n";
 
-      Print(ToOption("r"), " - Replace this '", word.AsANSICyan(), "'  or ",
+      Print(ToOption("r"), " - Replace this instance of '", word.AsANSICyan(), "' or ",
             ToOption("R"), " to replace ALL instances\n");
-      Print(ToOption("i"), " - Ignore this '", word.AsANSICyan(), "'   or ",
+      Print(ToOption("i"), " - Ignore this instance of '", word.AsANSICyan(), "'  or ",
             ToOption("I"), " to ignore ALL instances\n");
 
       bool done = false;
@@ -270,6 +301,13 @@ private:
             std::cout << "Ignoring all instances of '" << word.AsANSICyan() << "'!" << std::endl;
             skip_words.insert(word);
             done = true;
+            break;
+          case 'q':
+            std::cout << "Quitting!" << std::endl;
+            exit(0);
+            break;
+          case 's':
+            SaveFile("test.out");
             break;
           default:
             std::cout << "Unknown key " << ToBoldRed("'", key, "'") << std::endl;
@@ -345,21 +383,26 @@ public:
 
     for (size_t token_pos = 0; token_pos < tokens.size(); ++token_pos) {
       const auto & token = tokens[token_pos];
+      bool found_issue = false;
       switch (token.id) {
         using namespace emplex;
       case Lexer::ID_WORD:
-        TestWordToken(token_pos);
+        found_issue = !TestWordToken(token_pos);
         break;
       case Lexer::ID_ERR_END_LINE_WS:        
         ReportError("Extra whitespace at end of line:", token_pos);
-        ++issue_count;
+        found_issue = true;
         break;
       case Lexer::ID_ERR_WS:
         ReportError("Illegal whitespace:", token_pos);
-        ++issue_count;
+        found_issue = true;
         break;
       default:
         break;
+      }
+      if (found_issue) {
+        std::cout << "-------------------------------------------------------------------------------\n";
+        ++issue_count;
       }
     }
 
