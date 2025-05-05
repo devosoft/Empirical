@@ -87,7 +87,8 @@ private:
   emplex::Lexer lexer;
   emp::vector<emplex::Token> tokens;
 
-  emp::String word_file = "word_list.txt";
+  fs::path word_file = "word_list.txt";
+  std::optional<fs::path> emp_dir = std::nullopt; // Put emp_dir here if one is found.
   using word_set_t = std::unordered_set<emp::String>;
   using word_map_t = std::unordered_map<emp::String, emp::String>;
   word_set_t project_words;   // Dictionary of legal words for this project.
@@ -118,7 +119,7 @@ private:
       "Interactively fix file problems");
     flags.AddOption('v', "verbose", [this](){ verbose = true; },
       "Provide more detailed output");
-    flags.AddOption('w', "word_file", [this](emp::String filename){ word_file = filename; },
+    flags.AddOption('w', "word_file", [this](emp::String filename){ word_file = filename.str(); },
       "Specify the word file to use for spell checks.");
 
     flags.AddGroup("Activating Specific Fixes");
@@ -173,6 +174,7 @@ private:
       case '0':
         out_path /= ".Empirical";
         std::cout << "Creating directory: " << out_path << std::endl;
+        std::filesystem::create_directory(out_path);
         done = true;
         break;
       case 'q':
@@ -189,19 +191,32 @@ private:
   }
 
   void LoadWords() {
-    // Find the .Empirical/ folder that should have config files in it. 
-    fs::path common_path = emp::FindCommonPath(filepaths);
-    std::optional<fs::path> emp_dir = emp::FindFolderInPath(".Empirical", common_path);
-
-    // If the emp_dir does not exist, create one.
-    if (!emp_dir) emp_dir = MakeEmpiricalDir(common_path);
-
-    // Load in the base set of words to compare.
+    // Try loading the default word_file.
     std::ifstream file(word_file);
-    if (!file) {
-      std::cerr << ToBoldRed("Error:") << " Unable to open file '" << word_file << "'.\n";
-      exit(1);
+
+    // If word_file fails to load, look for (or make) a .Empirical/ directory.
+    if (!file) {     
+      // Find the .Empirical/ folder that should have config files in it. 
+      fs::path common_path = emp::FindCommonPath(filepaths);
+      emp_dir = emp::FindFolderInPath(".Empirical", common_path);
+
+      // If the emp_dir does not exist, create one.
+      if (!emp_dir) emp_dir = MakeEmpiricalDir(common_path);
+
+      // Try again to load in the base set of words to compare, this time from .Empirical
+      word_file = *emp_dir / word_file;
+      file.open(word_file);
+
+      // If we have still failed, report the error and abort.
+      if (!file) {
+        std::cerr << ToBoldRed("Error:") << " Unable to open file '" << word_file << "'.\n";
+        exit(1);
+      }
     }
+
+    std::cout << "Loaded word file: '" << emp::ANSI::MakeGreen(word_file.string()) << "'.\n";
+
+    // Now that we have the file set up, actually load the words!
     emp::String word;
     while (std::getline(file, word)) {
       project_words.insert(word.Filter(emp::IDCharSet()));
