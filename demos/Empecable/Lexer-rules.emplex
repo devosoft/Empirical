@@ -18,8 +18,9 @@ ERR_END_LINE_WS " "+$
 # Currently, words may optionally begin with a capital letter, but body must be lowercase.
 # This pattern will automatically split GetValue into "Get" and "Value".  The lack of `_`
 # in the pattern will also ensure that test_variable is split into "test" and "variable".
-# TODO: Allow for ALL CAPS inside of a Pascal-case identifier, like GetASCIIValue.
-WORD [A-Z]?[a-z]*
+# It also allows an apostrophe that is not the first or last letter.
+# TODO: Allow for ALL CAPS, including inside of a Pascal-case identifier, like GetASCIIValue.
+WORD [A-Za-z](\'?[a-z])*
 
 # Separate out important types of whitespace.
 WS " "+
@@ -30,9 +31,13 @@ COMMENT_LINE "//"
 COMMENT_START "/*"
 COMMENT_END "*/"
 
-# Identify preprocessor commands.  Must end in a non-space and cannot have illegal characters.
-PRAGMA "#pragma "[\n\r\t]*[^ \n\r\t]
-INCLUDE "#include "[\n\r\t]*[^ \n\r\t]
-IFNDEF "#ifndef "[\n\r\t]*[^ \n\r\t]
-DEFINE "#define "[\n\r\t]*[^ \n\r\t]
-ENDIF "#endif "[\n\r\t]*[^ \n\r\t]
+# Special pragma to collect file-specific words
+EMP_PRAGMA "#pragma Empecable_words "[^\n\r\t]*[^ \n\r\t]
+
+# Identify preprocessor commands.
+# All on one line, ending in a non-space and cannot have illegal characters.
+PRAGMA "#pragma "[^\n\r\t]*[^ \n\r\t]
+INCLUDE "#include "[^\n\r\t]*[^ \n\r\t]
+IFNDEF "#ifndef "[^\n\r\t]*[^ \n\r\t]
+DEFINE "#define "[^\n\r\t]*[^ \n\r\t]
+ENDIF "#endif "[^\n\r\t]*[^ \n\r\t]
