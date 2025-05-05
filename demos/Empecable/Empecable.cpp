@@ -79,7 +79,9 @@ private:
   bool verbose = false;
   bool interactive = false;
 
-  emp::FlagManager flags;
+  emp::FlagManager flags;             // Tracker for command-line flags that were set.
+  emp::vector<emp::String> filenames; // Set of files to process.
+  emp::vector<fs::path> filepaths;    // Set of full paths for each file.
 
   // Lexer information.
   emplex::Lexer lexer;
@@ -140,13 +142,69 @@ private:
       [this](emp::String max_w){ checks.warn_line_width = max_w.AsULL(); } );
   }
 
-  void LoadWords() {
-    if (project_words.size() == 0) {
-      std::ifstream file(word_file);
-      emp::String word;
-      while (std::getline(file, word)) {
-        project_words.insert(word.Filter(emp::IDCharSet()));
+  fs::path MakeEmpiricalDir(fs::path common_path) {
+    fs::path option_path = common_path;
+    if (!fs::is_directory(option_path)) option_path = option_path.parent_path();
+    std::cout <<
+      "No .Empirical/ folder could be found in any parent directory.\n"
+      "Where should it be created?\n";
+    size_t opt_id = 0;
+    while (!option_path.empty() && opt_id < 10 && emp::CanWriteToDirectory(option_path)) {
+      std::cout << ToOption(std::to_string(opt_id)) << " - " << option_path << "\n";
+      ++opt_id;
+      if (option_path == option_path.parent_path()) break;
+      option_path = option_path.parent_path();
+    }
+    Print(ToOption("q"), " - Quit.\n");
+    bool done = false;
+    fs::path out_path = common_path;
+    while (!done) {
+      char key = emp::GetIOChar();
+      switch (key) {
+      case '9': if (opt_id <= 9) break; out_path = out_path.parent_path(); [[fallthrough]];
+      case '8': if (opt_id <= 8) break; out_path = out_path.parent_path(); [[fallthrough]];
+      case '7': if (opt_id <= 7) break; out_path = out_path.parent_path(); [[fallthrough]];
+      case '6': if (opt_id <= 6) break; out_path = out_path.parent_path(); [[fallthrough]];
+      case '5': if (opt_id <= 5) break; out_path = out_path.parent_path(); [[fallthrough]];
+      case '4': if (opt_id <= 4) break; out_path = out_path.parent_path(); [[fallthrough]];
+      case '3': if (opt_id <= 3) break; out_path = out_path.parent_path(); [[fallthrough]];
+      case '2': if (opt_id <= 2) break; out_path = out_path.parent_path(); [[fallthrough]];
+      case '1': if (opt_id <= 1) break; out_path = out_path.parent_path(); [[fallthrough]];
+      case '0':
+        out_path /= ".Empirical";
+        std::cout << "Creating directory: " << out_path << std::endl;
+        done = true;
+        break;
+      case 'q':
+        std::cout << "Quitting!" << std::endl;
+        exit(0);
+        break;
+      default:
+        void(0);
       }
+      if (!done) std::cout << "Unknown option " << ToBoldRed("'", key, "'") << std::endl;
+
+    }
+    return out_path;
+  }
+
+  void LoadWords() {
+    // Find the .Empirical/ folder that should have config files in it. 
+    fs::path common_path = emp::FindCommonPath(filepaths);
+    std::optional<fs::path> emp_dir = emp::FindFolderInPath(".Empirical", common_path);
+
+    // If the emp_dir does not exist, create one.
+    if (!emp_dir) emp_dir = MakeEmpiricalDir(common_path);
+
+    // Load in the base set of words to compare.
+    std::ifstream file(word_file);
+    if (!file) {
+      std::cerr << ToBoldRed("Error:") << " Unable to open file '" << word_file << "'.\n";
+      exit(1);
+    }
+    emp::String word;
+    while (std::getline(file, word)) {
+      project_words.insert(word.Filter(emp::IDCharSet()));
     }
   }
 
@@ -323,13 +381,33 @@ public:
     SetupOptionFlags();
     flags.Process();
 
-    LoadWords();
-
-    auto filenames = flags.GetExtras();
+    // Collect the filenames
+    filenames = flags.GetExtras();
     if (filenames.size() == 0) {
       std::cout << "No files listed." << std::endl;
       PrintUsage();
+      exit(0);
     }
+
+    // Validate the files and convert to full paths.
+    size_t err_count = 0;
+    for (const std::string & name : filenames) {
+      fs::path p = fs::absolute(name);
+      if (fs::exists(p) && fs::is_regular_file(p)) {
+        p = fs::canonical(name);
+        filepaths.push_back(p);
+      } else {
+        std::cerr << ToBoldRed("Error:") << " file does not exist or is not a regular file: " << name << "\n";
+        ++err_count;
+      }
+    }
+    if (err_count) {
+      std::cerr << err_count << " errors occurred. Exiting.\n";
+      exit(1);
+    }
+
+    LoadWords();
+
     for (emp::String filename : filenames) {
       ProcessFile(filename);
     }
