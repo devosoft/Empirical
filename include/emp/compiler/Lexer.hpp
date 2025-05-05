@@ -10,11 +10,13 @@
  *
  *  Build a lexer that can convert input strings or streams into a series of provided tokens.
  *
- *  Use AddToken(name, regex) to list out the relevant tokens.
+ *  Use AddToken(name, regex) to provide the relevant tokens.
  *   'name' is the unique name for this token.
  *   'regex' is the regular expression that describes this token.
  *  It will return a unique ID associated with this token that will be used in output Token
- *  objects later.
+ *  objects later.  You may provide additional arguments to indicate of the lexeme should be
+ *  saved in a token, whether the token should be saved at all (unsaved token types are
+ *  simply left out of the output), and a more detailed description.
  *
  *  IgnoreToken(name, regex) uses the same arguments, but is used for tokens that
  *  should be skipped over during lexical analysis
@@ -286,7 +288,7 @@ namespace emp {
     }
 
     // If we did not find any options, advance best_pos to return a single error char.
-    if (best_pos == start_pos) { best_stop = in[start_pos]; best_pos++; }
+    if (best_pos == start_pos) { best_stop = in[start_pos]; ++best_pos; }
 
     // If best_pos < cur_pos, rewind the input stream.
     if (best_pos < cur_pos) cur_pos = best_pos;
@@ -522,7 +524,7 @@ namespace emp {
         .AddCode("    case 0: return \"_EOF_\";");
     for (size_t i = token_set.size(); i > 0; --i) {
       const auto & token = token_set[i-1];
-      file.AddCode("    case ", token.id, ": return ", token.name.AsLiteral(), ";");
+      file.AddCode("    case ID_", token.name, ": return ", token.name.AsLiteral(), ";");
     }
     file.AddCode("    default:")
         .AddCode("      // If ID is a visible character print it, otherwise provide ID.")
@@ -593,7 +595,7 @@ namespace emp {
         .AddCode("    }")
         .AddCode("")
         .AddCode("    // If we did not find any options, peel off just one character and use it as id.")
-        .AddCode("    if (best_pos == start_pos) { best_stop=in[start_pos]; best_pos++;}")
+        .AddCode("    if (best_pos == start_pos) { best_stop=in[start_pos]; ++best_pos;}")
         .AddCode("")
         .AddCode("    lexeme = in.substr(start_pos, best_pos-start_pos);")
         .AddCode("    start_pos += std::ssize(lexeme);")
