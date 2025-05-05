@@ -14,6 +14,7 @@
 #define EMP_IO_IO_UTILS_HPP_INCLUDE
 
 #include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <optional>
 #include <string>
@@ -62,7 +63,7 @@ namespace emp {
   // Take a provided path and split it up into each directory (possibly ending in a filename.)
   split_path_t SplitPath(const std_fs::path & in_path) {
     split_path_t components;
-    for (const auto& part : in_path) components.push_back(part);
+    for (const auto & part : in_path) components.push_back(part);
     return components;
   };
 
@@ -74,15 +75,17 @@ namespace emp {
   }
 
   // Find the target folder found along a given file path (for example, .git/ or .vscode/)
-  std::optional<std_fs::path> FindFolderInPath(std::string folder_name, std_fs::path test_path) {
+  [[nodiscard]] std::optional<std_fs::path> FindFolderInPath(std::string folder_name, std_fs::path test_path) {
     emp_assert(std_fs::exists(test_path), test_path);
     if (!std_fs::is_directory(test_path)) test_path = test_path.parent_path();
-    while (!test_path.empty()) {
+    while (!test_path.empty() && test_path != "/") {
       std_fs::path candidate = test_path / folder_name;
       if (std_fs::exists(candidate) && std_fs::is_directory(candidate)) {
         return candidate;
       }
-      test_path = test_path.parent_path();
+      std_fs::path parent_path = test_path.parent_path();
+      if (parent_path == test_path) break; // If we are no longer descending, stop!
+      test_path = parent_path;
     }
     return std::nullopt;  // Not found
   }
@@ -90,12 +93,13 @@ namespace emp {
   // Given two split-up paths, reduce the first to the common path.
   void ReduceToCommonPath(split_path_t & path1, const split_path_t & path2) {
     size_t match_size = 0;
-    while (match_size < path1.size() && match_size < path2.size() &&
+    while (match_size < path1.size() &&
+           match_size < path2.size() &&
            path1[match_size] == path2[match_size]) ++match_size;
     path1.resize(match_size);
   }
 
-  // Given a collection of files, find the portion of their path that they all share.
+  // Given a collection of file paths, find the portion that they all share.
   template <typename CONTAINER_T>
   [[nodiscard]] std_fs::path FindCommonPath(const CONTAINER_T & filenames) {
     if (filenames.empty()) return {};
@@ -106,12 +110,22 @@ namespace emp {
   
     // Step through each of the other paths, narrowing down the common components.
     while (++it != filenames.end()) {
-      ReduceToCommonPath(common, SplitPath(paths[i]));
+      ReduceToCommonPath(common, SplitPath(*it));
     }
   
     // Reassemble the common path.
     return JoinPath(common);
   } 
+
+  bool CanWriteToDirectory(const std_fs::path & dir,
+                           std::string test_name=".Empirical_test_delete_me") {
+    std::filesystem::path test_file = dir / test_name;
+    std::ofstream ofs(test_file);
+    if (!ofs) return false; // Failed to create file.
+    ofs.close();
+    std::filesystem::remove(test_file);
+    return true;
+  }
 }
 
 #endif // #ifndef EMP_IO_IO_UTILS_HPP_INCLUDE
