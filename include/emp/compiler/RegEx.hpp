@@ -11,18 +11,27 @@
  *  A fully (well, mostly) functional regular expression processor.
  *
  *  Special chars:
- *   '|'          - or
- *   '*'          - zero or more of previous
- *   '+'          - one or more of previous
- *   '?'          - previous is optional
- *   '.'          - Match any character except \n
+ *   |       - or
+ *   *       - zero or more of previous
+ *   +       - one or more of previous
+ *   ?       - previous is optional
+ *   ^       - match the beginning of the line (no chars)
+ *   $       - match the end of the line (no chars)
+ *   .       - match any character except \n
+ *   \d      - match any digit (\D for anything EXCEPT a digit)
+ *   \l      - match any letter (\L for anything EXCEPT a letter)
+ *   \s      - match any whiteSpace (\S for anything EXCEPT whitespace)
+ *   \w      - match any identifier (word) char (\W for anything EXCEPT an identifier char)
  *
  *  Plus the following group contents (and change may translation rules)
- *   '(' and ')'  - group contents
- *   '"'          - Ignore special characters in contents (quotes still need to be escaped)
- *   '[' and ']'  - character set -- choose ONE character
- *                  '^' as first char negates contents
- *                  '-' indicates range UNLESS first or last.
+ *   (...)   - group contents
+ *   "..."   - ignore special characters in contents (internal quotes must be escaped)
+ *   [...]   - character set -- choose ONE character from the set.
+ *                '^' as first char negates contents
+ *                '-' indicates range UNLESS first or last.
+ *   {n}     - match the previous entry exactly n times.
+ *   {n,}    - match the previous entry at least n times.
+ *   {m,n}   - match the previous entry at least m, but no more than n times
  *
  *  Additional overloads for functions in lexer_utils.h:
  *
@@ -30,7 +39,6 @@
  *    static DFA to_DFA(const RegEx & regex);
  *
  *
- *  @todo Implement  ^ and $ (beginning and end of line)
  *  @todo Implement / to separate a regex from another regex that must follow it
  *  @todo Consider a separator (maybe backtick?) to divide up a regex expression;
  *        the result can be returned by each section as a vector of strings.
