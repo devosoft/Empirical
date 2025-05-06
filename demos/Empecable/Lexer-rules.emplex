@@ -32,7 +32,7 @@ COMMENT_START "/*"
 COMMENT_END "*/"
 
 # Special metadata to collect file-specific words
-EMP_META_WORDS "// empecable_words: "[^\n\r\t]*[^ \n\r\t]
+EMP_META_WORDS ^"// empecable_words: "[^\n\r\t]*[^ \n\r\t]
 
 # Identify preprocessor commands.
 # All on one line, ending in a non-space and cannot have illegal characters.
