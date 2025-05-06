@@ -22,6 +22,16 @@ emp::String ToOption(emp::String key) {
   return emp::MakeString('\'', key.AsANSIMagenta(), '\'');
 }
 
+// Each character in the string provided will be converted into a distinct option.
+emp::String ToOptionSet(emp::String keys) {
+  emp::String out;
+  for (size_t i = 0; i < keys.size(); ++i) {
+    if (i) out += '/';
+    out += emp::ANSI::MakeMagenta(std::string(1,keys[i]));
+  }
+  return out;
+}
+
 emp::String ToFilename(fs::path filename) {
   return emp::ANSI::MakeGreen(filename.string());
 }
@@ -44,4 +54,3 @@ inline void InternalError(Ts &&... args) {
   std::cerr << ToBoldRed("Internal Empecable Error: ") << emp::MakeString(args...) << std::endl;
   exit(1);
 }
-
