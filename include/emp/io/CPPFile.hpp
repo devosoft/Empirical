@@ -119,14 +119,13 @@ namespace emp {
         os << '\n';
       }
 
-      if (name_space.size()) {
-        os << "namespace " << name_space << " {\n";
-        for (const auto & line : code) os << "  " << line << '\n';
-        os << "} // End of namespace " << name_space << "\n";
+      if (name_space.size()) os << "namespace " << name_space << " {\n";
+      for (const auto & line : code) {
+        if (line.HasNonwhitespace()) os << "  " << line;
+        os << '\n';
       }
-      else {
-        for (const auto & line : code) os << line << '\n';
-      }
+      if (name_space.size()) os << "} // End of namespace " << name_space << "\n";
+
 
       if (include_guard.size()) {
         os << "#endif // #ifndef " << include_guard << "\n";
