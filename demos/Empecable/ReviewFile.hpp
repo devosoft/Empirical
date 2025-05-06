@@ -80,6 +80,11 @@ public:
   int GetTokenID(size_t pos) const { return tokens[pos].id; }
   size_t NumTokens() const { return tokens.size(); }
 
+  void ClearLexeme(size_t pos) {
+    tokens[pos].lexeme.clear();
+    save_required = true;
+  }
+
   void SetLexeme(size_t pos, emp::String new_word) {
     tokens[pos].lexeme = new_word;
     save_required = true;
@@ -122,13 +127,13 @@ public:
 
     // Scan through file for Empecable instructions.
     for (auto & token : tokens) {
-      if (token.id == emplex::Lexer::ID_EMP_PRAGMA) {
+      if (token.id == emplex::Lexer::ID_EMP_META_WORDS) {
         const emp::String line = token.lexeme;
         token.lexeme = ""; // Clear out this lexeme; we will reconstruct it when saving.
 
         size_t pos = 0;
-        if (line.ScanWord(pos) != "#pragma") InternalError("Empeciable #praga mismatch.");
-        if (line.ScanWord(pos) != "Empecable_words") InternalError("Empeciable #praga mismatch.");
+        if (line.ScanWord(pos) != "//") InternalError("Meta-data mismatch.");
+        if (line.ScanWord(pos) != "empecable_words:") InternalError("Meta-data mismatch.");
         while (pos < line.size()) {
           words.insert(line.ScanWord(pos));
         }
@@ -149,7 +154,7 @@ public:
       file << token.lexeme;
     }
 
-    // Attach a pragma to the end of the file if there are local words to save.
+    // Attach a comment to the end of the file if there are local words to save.
     if (words.size()) {
       // Don't let cruft build up at the end of the file.
       while (tokens.back().id == emplex::Lexer::ID_END_LINE ||
@@ -157,8 +162,8 @@ public:
         tokens.pop_back();
       }
 
-      file << "\n\n// Special pragmas below for local control over the Empecable file checker.\n"
-           << "#pragma Empecable_words";
+      file << "\n\n// Special info below for local control over the Empecable file checker.\n"
+           << "// empecable_words:";
       for (emp::String word : words) file << " " << word;
       file << '\n';
     }
