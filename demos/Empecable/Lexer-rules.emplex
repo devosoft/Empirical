@@ -31,13 +31,14 @@ COMMENT_LINE "//"
 COMMENT_START "/*"
 COMMENT_END "*/"
 
-# Special pragma to collect file-specific words
-EMP_PRAGMA "#pragma Empecable_words "[^\n\r\t]*[^ \n\r\t]
+# Special metadata to collect file-specific words
+EMP_META_WORDS "// empecable_words: "[^\n\r\t]*[^ \n\r\t]
 
 # Identify preprocessor commands.
 # All on one line, ending in a non-space and cannot have illegal characters.
 PRAGMA "#pragma "[^\n\r\t]*[^ \n\r\t]
 INCLUDE "#include "[^\n\r\t]*[^ \n\r\t]
+IFDEF "#ifdef "[^\n\r\t]*[^ \n\r\t]
 IFNDEF "#ifndef "[^\n\r\t]*[^ \n\r\t]
 DEFINE "#define "[^\n\r\t]*[^ \n\r\t]
-ENDIF "#endif "[^\n\r\t]*[^ \n\r\t]
+ENDIF "#endif"[^\n\r\t]*[^ \n\r\t]
