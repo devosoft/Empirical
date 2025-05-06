@@ -25,6 +25,18 @@
  * - Spacing must always shift by 0 or 2 OR somehow align with previous line?
  * - Make sure include files have corresponding test files.
  * - Make sure test files are not empty (or effectively empty)
+ *
+ * Master list of interface options for consistency.
+ *  'd' - Delete (or 'D' to Delete All)
+ *  'r' - Replace with (or 'R' to Replace All)
+ *  'i' - Ignore (or 'I' to Ignore All)
+ *  'p' - Add lowercase word to project dictionary (or 'P' to preserve current case)
+ *  'f' - Add lowercase word to file dictionary (or 'F' to preserve current case)
+ *  'h' - Help
+ *  'q' - Quit without saving (or 'Q' to quit and save)
+ *  's' - Save current updated file (or 'S' to "Save As")
+ *  'z' - Undo
+ *  'y' or 'n' - Answer a specific question.
  */
 
 #include <cstring>
@@ -46,9 +58,9 @@
 #include "../../include/emp/tools/String.hpp"
 #include "../../include/emp/tools/string_utils.hpp"
 
+#include "helpers.hpp"
 #include "Lexer.hpp"
-
-namespace fs = std::filesystem;
+#include "ReviewFile.hpp"
 
 struct Checks {
   // Important fixes; on by default.
@@ -79,36 +91,35 @@ private:
   bool verbose = false;
   bool interactive = false;
 
-  emp::FlagManager flags;             // Tracker for command-line flags that were set.
-  emp::vector<emp::String> filenames; // Set of files to process.
-  emp::vector<fs::path> filepaths;    // Set of full paths for each file.
-  size_t active_file = static_cast<size_t>(-1);  // Which file are we working with?
+  emp::FlagManager flags;         // Tracker for command-line flags that were set.
+  emp::vector<ReviewFile> files;  // Files to be reviewed.
+  size_t active_file = 0;         // Which file are we working with?
 
   // Lexer information.
   emplex::Lexer lexer;
-  emp::vector<emplex::Token> tokens;
 
   fs::path word_file = "word_list.txt";
   std::optional<fs::path> emp_dir = std::nullopt; // Put emp_dir here if one is found.
+
   using word_set_t = std::unordered_set<emp::String>;
   using word_map_t = std::unordered_map<emp::String, emp::String>;
   word_set_t project_words;   // Dictionary of legal words for this project.
-  word_set_t file_words;      // Addition legal words in only this file.
   word_set_t skip_words;      // Words to skip over for now.
   word_map_t replacement_map; // Track replacement words to use.
-  size_t issue_count = 0;     // Number of issues detected in current file.
 
-  // Track changes that need to be saved.
-  bool cpp_file_changed = false;
-  bool project_changed = false;
+  bool project_changed = false; // Have there been any project-level changes requiring save?
 
 
   // === HELPER FUNCTIONS ===
 
-  template <typename... Ts>
-  emp::String ToBoldRed(Ts &&... args) {
-    return emp::MakeString(args...).AsANSIRed().AsANSIBold();
-  }
+  ReviewFile & File() { return files[active_file]; }
+  const ReviewFile & File() const { return files[active_file]; }
+
+  emplex::Token GetToken(size_t pos) const { return File().GetToken(pos); }
+  emp::String GetLexeme(size_t pos) const { return File().GetLexeme(pos); } 
+
+  void SetLexeme(size_t pos, emp::String new_word) { File().SetLexeme(pos, new_word); }
+
 
   void SetupOptionFlags() {
     flags.AddGroup("Basic Operation");
@@ -149,14 +160,14 @@ private:
   bool TestDefaultKeyOptions(char key) {
     switch (key) {
     case 'h':
-      std::cout << "Help info should go here..." << std::endl;
+      PrintLn("Help info should go here...");
       return true;
     case 'q':
-      std::cout << "Quitting!" << std::endl;
+      PrintLn("Quitting!");
       exit(0);
     case 's':
-      if (active_file < filenames.size()) SaveFile();
-      else std::cout << "No active file to save." << std::endl;
+      if (active_file < files.size()) File().Save();
+      else PrintLn("No active file to save.");
       SaveProjectConfig();
       return true;
     }
@@ -166,12 +177,11 @@ private:
   fs::path MakeEmpiricalDir(fs::path common_path) {
     fs::path option_path = common_path;
     if (!fs::is_directory(option_path)) option_path = option_path.parent_path();
-    std::cout <<
-      "No .Empirical/ folder could be found in any parent directory.\n"
-      "Where should it be created?\n";
+    PrintLn("No .Empirical/ folder could be found in any parent directory.");
+    PrintLn("Where should it be created?");
     size_t opt_id = 0;
     while (!option_path.empty() && opt_id < 10 && emp::CanWriteToDirectory(option_path)) {
-      std::cout << ToOption(std::to_string(opt_id)) << " - " << option_path << "\n";
+      PrintLn(ToOption(std::to_string(opt_id)), " - ", option_path);
       ++opt_id;
       if (option_path == option_path.parent_path()) break;
       option_path = option_path.parent_path();
@@ -194,7 +204,7 @@ private:
       case '1': if (opt_id <= 1) break; out_path = out_path.parent_path(); [[fallthrough]];
       case '0':
         out_path /= ".Empirical";
-        std::cout << "Creating directory: " << out_path << std::endl;
+        PrintLn("Creating directory: ", out_path);
         std::filesystem::create_directory(out_path);
         done = true;
         break;
@@ -202,11 +212,32 @@ private:
         used = TestDefaultKeyOptions(key);
       }
       if (!done && !used) {
-        std::cout << "Unknown option " << ToBoldRed("'", key, "'") << std::endl;
+        PrintLn("Unknown option ", ToBoldRed("'", key, "'"));
       }
 
     }
     return out_path;
+  }
+
+  // Find the sub-path that all files have in common.
+  fs::path FindCommonPath() {
+    if (files.size() == 0) return {};
+
+    fs::path common_path = files[0].GetPath();
+    for (size_t i=1; i < files.size(); ++i) {
+      common_path = emp::FindCommonPath(common_path, files[i].GetPath());
+    }
+
+    return common_path;
+  }
+
+  // Find the .Empirical directory for config files.
+  void SetEMPDir() {
+      fs::path common_path = FindCommonPath();
+      emp_dir = emp::FindFolderInPath(".Empirical", common_path);
+
+      // If the emp_dir does not exist, create one.
+      if (!emp_dir) emp_dir = MakeEmpiricalDir(common_path);
   }
 
   void LoadWords() {
@@ -215,14 +246,7 @@ private:
 
     // If word_file fails to load, look for (or make) a .Empirical/ directory.
     if (!file) {     
-      // Find the .Empirical/ folder that should have config files in it. 
-      fs::path common_path = emp::FindCommonPath(filepaths);
-      emp_dir = emp::FindFolderInPath(".Empirical", common_path);
-
-      // If the emp_dir does not exist, create one.
-      if (!emp_dir) emp_dir = MakeEmpiricalDir(common_path);
-
-      // Try again to load in the base set of words to compare, this time from .Empirical
+      SetEMPDir();
       word_file = *emp_dir / word_file;
       file.open(word_file);
 
@@ -233,37 +257,21 @@ private:
       }
     }
 
-    std::cout << "Loaded word file: '" << emp::ANSI::MakeGreen(word_file.string()) << "'.\n";
+    PrintLn("Loaded word file: '", ToFilename(word_file), "'.");
 
     // Now that we have the file set up, actually load the words!
     emp::String word;
     while (std::getline(file, word)) {
-      project_words.insert(word.Filter(emp::IDCharSet()));
+      project_words.insert(word);
     }
-  }
-
-  void SaveFile() {
-    emp::String filename = filenames[active_file];
-    if (!cpp_file_changed) {
-      std::cout << "No changes need to be saved in '" << emp::ANSI::MakeGreen(filename)
-                << "'." << std::endl;
-      return;
-    }
-    std::cout << "Saving '" << emp::ANSI::MakeGreen(filename) << "'." << std::endl;
-    std::ofstream file(filename);
-    for (auto & token : tokens) {
-      file << token.lexeme;
-    }
-    file.close();
   }
 
   void SaveProjectConfig() {
     if (!project_changed) {
-      std::cout << "No changes need to be saved in '" << emp::ANSI::MakeGreen(word_file.string())
-                << "'." << std::endl;
+      PrintLn("No changes need to be saved in '", ToFilename(word_file), "'.");
       return;
     }
-    std::cout << "Saving '" << emp::ANSI::MakeGreen(word_file.string()) << "'." << std::endl;
+    PrintLn("Saving '", ToFilename(word_file), "'.");
 
     // Move the project_words to a vector and sort them.
     emp::vector<emp::String> out_words;
@@ -276,129 +284,76 @@ private:
     for (emp::String word : out_words) file << word << '\n';
   }
 
-  // Print tokens to the screen with a particular token highlighted in read.
-  void ReportError(emp::String error, size_t token_pos) {
-    namespace ANSI = emp::ANSI;
-
-    // Report the actual error.
-    std::cout << ANSI::MakeBold(ANSI::MakeYellow("Found: ")) << error << '\n';
-
-    // Determine the set of tokens to print.
-    size_t start = token_pos;
-    size_t end = token_pos+1;
-    // Rewind to beginning of line.
-    while (start > 0 && tokens[start-1].lexeme != "\n") --start;
-    // Fast forward to end of line.
-    while ((end < tokens.size() && tokens[end].lexeme != "\n")) ++end;
-
-    // Format and print the line number.
-    emp::String line_num = emp::MakeString(tokens[token_pos].line_id).PadFront(' ', 5)+':';
-    // std::cout << line_num.AsANSIYellow();
-    std::cout << line_num.AsANSIBrightWhite().AsANSIBold();
-
-    // Print the series of tokens on this line, highlighting the problem.
-    for (size_t i = start; i < end; ++i) {
-      if (i == token_pos) std::cout << ToBoldRed(tokens[i].lexeme).AsANSIUnderline();
-      else std::cout << tokens[i].lexeme;
-    }
-    std::cout << '\n';
-  }
-
   void AddProjectWord(emp::String word) {
     emp_assert(!emp::Has(project_words, word), word);
-    std::cout << "Added '" << word.AsANSICyan() << "' to project dictionary." << std::endl;
+    PrintLn("Added '", word.AsANSICyan(), "' to project dictionary.");
     project_words.insert(word);
     project_changed = true;
   }
 
-  void AddFileWord(emp::String word) {
-    emp_assert(!emp::Has(file_words, word), word);
-    std::cout << "Added '" << word.AsANSICyan() << "' to file dictionary." << std::endl;
-    file_words.insert(word);
-    cpp_file_changed = true;
-  }
-
   void DoReplace(size_t token_pos) {
-    const emp::String old_word = tokens[token_pos].lexeme;
+    const emp::String old_word = GetLexeme(token_pos);;
     const emp::String new_word = replacement_map[old_word];
-    tokens[token_pos].lexeme = new_word;
+    SetLexeme(token_pos, new_word);
     if (verbose || interactive) {
-      std::cout << "Replacing '" << old_word.AsANSICyan()
-                  << "' with '" << new_word.AsANSICyan() << "'.\n";
+      PrintLn("Replacing '", old_word.AsANSICyan(), "' with '", new_word.AsANSICyan(), "'.");
     }
   }  
 
-  void QueryReplace(size_t token_pos, bol change_all) {
-    emp::String word = tokens[token_pos].lexeme;
+  void QueryReplace(size_t token_pos, bool change_all) {
+    emp::String word = GetLexeme(token_pos);
 
-    std::cout << "Enter replacement word: ";
+    Print("Enter replacement word: ");
     emp::String new_word;
     std::cin >> new_word;
 
     // Make change to THIS token.
-    tokens[token_pos].lexeme = new_word;
+    SetLexeme(token_pos, new_word);
 
     // Record change for future tokens.
     if (change_all) replacement_map[word] = new_word;
 
-    std::cout << "Replacing ";
-    if (change_all) std::cout << " all instances of ";
-    std::cout << "'" << word.AsANSICyan() << "' with '" << new_word.AsANSICyan() << "'.\n";
-
-    cpp_file_changed = true;
-  }
-
-  // Interface options for consistency.
-  // 'd' - Delete (or 'D' to Delete All)
-  // 'r' - Replace with (or 'R' to Replace All)
-  // 'i' - Ignore (or 'I' to Ignore All)
-  // 'p' - Add lowercase word to project dictionary (or 'P' to preserve current case)
-  // 'f' - Add lowercase word to file dictionary (or 'F' to preserve current case)
-  // 'h' - Help
-  // 'q' - Quit without saving (or 'Q' to quit and save)
-  // 's' - Save current updated file (or 'S' to "Save As")
-  // 'z' - Undo
-  // 'y' or 'n' - Answer a specific question.
-
-  template <typename... Ts>
-  void Print(Ts &&... args) { std::cout << emp::MakeString(args...); }
-
-  emp::String ToOption(emp::String key) {
-    return emp::MakeString('\'', key.AsANSIMagenta(), '\'');
+    Print("Replacing ");
+    if (change_all) Print(" all instances of ");
+    PrintLn("'", word.AsANSICyan(), "' with '", new_word.AsANSICyan(), "'.");
   }
 
   bool TestWordToken(size_t token_pos) {
-    emp::String word(tokens[token_pos].lexeme);
-    emp::String lower_word = word.AsLower();
+    emp::String word(GetLexeme(token_pos));
     
-    // If a word is short (2 or fewer letters) or is in the dictionary (either directly or or as
-    // a lowercase word), mark it as valid.
-    if (word.size() <= 2 ||
-        project_words.contains(word) ||
-        project_words.contains(lower_word) ||
-        file_words.contains(word) ||
-        file_words.contains(lower_word) ||
-        skip_words.contains(word) ||
-        skip_words.contains(lower_word)) return true;
+    // If we have a valid word, return true.
+    if (word.size() <= 2 ||                       // Allow all short (1 or 2 char) words
+        project_words.contains(word) ||           // Check the white list for project
+        File().HasWord(word) ||                   // Check the file-specific white list
+        skip_words.contains(word)) return true;   // Check words to skip.
+
+    // If this word has uppercase, also check the lowercase version.
+    if (word.HasUpper()) {
+      emp::String lower_word = word.AsLower();
+      if (project_words.contains(lower_word) ||
+          File().HasWord(lower_word) ||
+          skip_words.contains(lower_word)) return true;
+    }
 
     // See if we already have a replacement set up for this word.
     if (replacement_map.contains(word)) DoReplace(token_pos);
 
     // We have an unknown word.
-    ReportError(emp::MakeString("Unknown word '", word.AsANSICyan(), "'"), token_pos);
+    File().ReportIssue(emp::MakeString("Unknown word '", word.AsANSICyan(), "'"), token_pos);
 
     if (interactive) {
+      emp::String lower_word = word.AsLower();
       Print(ToOption("p"), " - Add '", lower_word.AsANSICyan(), "' to main PROJECT dictionary");
       if (word.HasUpper()) {
         Print(" or ", ToOption("P"), " for case-sensitive '", word.AsANSICyan(), "'");
       }
-      std::cout << "\n";
+      PrintLn();
 
       Print(ToOption("f"), " - Add '", lower_word.AsANSICyan(), "' to this FILE's dictionary");
       if (word.HasUpper()) {
         Print("  or ", ToOption("F"), " for case-sensitive '", word.AsANSICyan(), "'");
       }
-      std::cout << "\n";
+      PrintLn();
 
       Print(ToOption("r"), " - Replace this instance of '", word.AsANSICyan(), "' or ",
             ToOption("R"), " to replace ALL instances\n");
@@ -411,24 +366,22 @@ private:
         switch (key) {
           case 'p': AddProjectWord(lower_word);     done = true; break;
           case 'P': AddProjectWord(word);           done = true; break;
-          case 'f': AddFileWord(lower_word);        done = true; break;
-          case 'F': AddFileWord(word);              done = true; break;
+          case 'f': File().AddWord(lower_word);     done = true; break;
+          case 'F': File().AddWord(word);           done = true; break;
           case 'r': QueryReplace(token_pos, false); done = true; break;
           case 'R': QueryReplace(token_pos, true);  done = true; break;
           case 'i':
-            std::cout << "Skipping '" << word.AsANSICyan() << "'!" << std::endl;
+            PrintLn("Skipping '", word.AsANSICyan(), "'!");
             done = true;
             break;
           case 'I':
-            std::cout << "Ignoring all instances of '" << word.AsANSICyan() << "'!" << std::endl;
+            PrintLn("Ignoring all instances of '", word.AsANSICyan(), "'!");
             skip_words.insert(word);
             done = true;
             break;
           default:
             bool used = TestDefaultKeyOptions(key);
-            if (!used) {
-              std::cout << "Unknown key " << ToBoldRed("'", key, "'") << std::endl;
-            }
+            if (!used) PrintLn("Unknown key ", ToBoldRed("'", key, "'"));
         }
       }
     }
@@ -442,37 +395,31 @@ public:
     flags.Process();
 
     // Collect the filenames
-    filenames = flags.GetExtras();
+    emp::vector<emp::String> filenames = flags.GetExtras();
     if (filenames.size() == 0) {
-      std::cout << "No files listed." << std::endl;
+      PrintLn("No files listed.");
       PrintUsage();
       exit(0);
     }
 
-    // Validate the files and convert to full paths.
+    // Validate the filenames, set up full paths, and save as ReviewFile objects.
     size_t err_count = 0;
     for (const std::string & name : filenames) {
-      fs::path p = fs::absolute(name);
-      if (fs::exists(p) && fs::is_regular_file(p)) {
-        p = fs::canonical(name);
-        filepaths.push_back(p);
-      } else {
-        std::cerr << ToBoldRed("Error:") << " file does not exist or is not a regular file: " << name << "\n";
-        ++err_count;
-      }
+      files.emplace_back(name);
+      if (!files.back().IsValid()) ++err_count;
     }
     if (err_count) {
-      std::cerr << err_count << " errors occurred. Exiting.\n";
+      std::cerr << err_count << " errors opening files. Exiting.\n";
       exit(1);
     }
 
     LoadWords();
 
+    // Step through all of the files.
     for (active_file = 0; active_file < filenames.size(); ++active_file) {
       ProcessFile();
-      std::cout << "Finished '" << emp::ANSI::MakeGreen(filenames[active_file])
-                << "'. Saving." << std::endl;
-      SaveFile();
+      PrintLn("Finished '", ToFilename(File().GetName()), "'. Saving.");
+      File().Save();
       SaveProjectConfig();
     }
 
@@ -487,71 +434,54 @@ public:
   Empecable & SetVerbose(bool _in) { verbose = _in; return *this; }
 
   void PrintUsage() const {
-    std::cout << "Usage: " << flags[0] << " {options ...} files ..." << std::endl;
-    std::cout << "Type `" << flags[0] << " -h` for more detailed help." << std::endl;
+    PrintLn("Usage: ", flags[0], " {options ...} files ...");
+    PrintLn("Type `", flags[0], " -h` for more detailed help.");
   }
 
   void PrintVersion() const {
-    std::cout << "File formatter version 0.1." << std::endl;
+    PrintLn("File formatter version 0.1.");
   }
 
   void PrintHelp() const {
     PrintVersion();
-    std::cout << '\n';
+    PrintLn();
     PrintUsage();
-    std::cout << '\n';
+    PrintLn();
     flags.PrintOptions();
     exit(0);
   }
 
-  bool LoadFile(emp::String filename) {
-    std::ifstream file(filename);
-    if (!file.is_open()) {
-      std::cout << ToBoldRed("ERROR: '", filename, "' failed to open.\n");
-      return false;
-    }
-    tokens = lexer.Tokenize(file);
-    issue_count = 0;    // Reset issues for new file.
+  void ProcessFile() {
+    PrintLn("=== File: ", File().GetName().AsANSIBrightCyan(), " ==n");
 
-    return true;
-  }
+    if (!File().Load(lexer)) return; // File failed to load.
 
-  bool ProcessFile() {
-    emp::String filename = filenames[active_file];
-    std::cout << "=== File: " << filename.AsANSIBrightCyan() << " ===\n";
-
-    if (!LoadFile(filename)) return false;
-
-    cpp_file_changed = false; // New file, so no changes!
-    
-    for (size_t token_pos = 0; token_pos < tokens.size(); ++token_pos) {
-      const auto & token = tokens[token_pos];
+    for (size_t token_pos = 0; token_pos < File().NumTokens(); ++token_pos) {
       bool found_issue = false;
-      switch (token.id) {
+      switch (File().GetTokenID(token_pos)) {
         using namespace emplex;
       case Lexer::ID_WORD:
         found_issue = !TestWordToken(token_pos);
         break;
       case Lexer::ID_ERR_END_LINE_WS:        
-        ReportError("Extra whitespace at end of line:", token_pos);
+        File().ReportIssue("Extra whitespace at end of line:", token_pos);
         found_issue = true;
         break;
       case Lexer::ID_ERR_WS:
-        ReportError("Illegal whitespace:", token_pos);
+        File().ReportIssue("Illegal whitespace:", token_pos);
         found_issue = true;
         break;
       default:
         break;
       }
+
+      // Skip a line between issues.
       if (found_issue) {
-        std::cout << "-------------------------------------------------------------------------------\n";
-        ++issue_count;
+        PrintLn("-------------------------------------------------------------------------------");
       }
     }
 
-    std::cout << '\n' << ToBoldRed("=== ", issue_count, " issues found ===") << std::endl;
-
-    return issue_count;
+    PrintLn('\n', ToBoldRed("=== ", File().GetNumIssues(), " issues found ==="));
   }
 };
 
@@ -559,3 +489,5 @@ int main(int argc, char * argv[])
 {
   class Empecable formatter(argc, argv);
 }
+
+#pragma Empecable_words formatter eol esp
