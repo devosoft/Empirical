@@ -792,9 +792,12 @@ namespace emp {
 
     template <typename... Ts>
     [[nodiscard]] static String Make(Ts... args) {
-      std::stringstream ss;
-      (ss << ... << String::_Convert(std::forward<Ts>(args), true));
-      return ss.str();
+      if constexpr (sizeof...(args) == 0) { return {}; }
+      else {
+        std::stringstream ss;
+        (ss << ... << String::_Convert(std::forward<Ts>(args), true));
+        return ss.str();
+      }
     }
 
     // <= ANSI manipulations =>
