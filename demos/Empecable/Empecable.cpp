@@ -118,9 +118,6 @@ private:
   emplex::Token GetToken(size_t pos) const { return File().GetToken(pos); }
   emp::String GetLexeme(size_t pos) const { return File().GetLexeme(pos); } 
 
-  void SetLexeme(size_t pos, emp::String new_word) { File().SetLexeme(pos, new_word); }
-
-
   void SetupOptionFlags() {
     flags.AddGroup("Basic Operation");
     flags.AddOption('a', "all", [this](){ SetAll(true); },
@@ -172,6 +169,22 @@ private:
       return true;
     }
     return false; // Key not used.
+  }
+
+  bool AskYesNo(emp::String question) {
+    PrintLn(question, " (", ToOptionSet("yn"), ")");
+    std::cout.flush();
+    char key = emp::GetIOChar();
+    while (true) {
+      switch (key) {
+      case 'y': case 'Y': return true;
+      case 'n': case 'N': return false;
+      default:
+        if (!TestDefaultKeyOptions(key)) {
+          PrintLn("Unknown option ", ToBoldRed("'", key, "'"));
+        }
+      }
+    }
   }
 
   fs::path MakeEmpiricalDir(fs::path common_path) {
@@ -292,9 +305,9 @@ private:
   }
 
   void DoReplace(size_t token_pos) {
-    const emp::String old_word = GetLexeme(token_pos);;
+    const emp::String old_word = GetLexeme(token_pos);
     const emp::String new_word = replacement_map[old_word];
-    SetLexeme(token_pos, new_word);
+    File().SetLexeme(token_pos, new_word);
     if (verbose || interactive) {
       PrintLn("Replacing '", old_word.AsANSICyan(), "' with '", new_word.AsANSICyan(), "'.");
     }
@@ -308,7 +321,7 @@ private:
     std::cin >> new_word;
 
     // Make change to THIS token.
-    SetLexeme(token_pos, new_word);
+    File().SetLexeme(token_pos, new_word);
 
     // Record change for future tokens.
     if (change_all) replacement_map[word] = new_word;
@@ -418,16 +431,14 @@ public:
     // Step through all of the files.
     for (active_file = 0; active_file < filenames.size(); ++active_file) {
       ProcessFile();
-      PrintLn("Finished '", ToFilename(File().GetName()), "'. Saving.");
+      PrintLn("Finished '", ToFilename(File().GetName()), "'. Saving.\n");
       File().Save();
-      SaveProjectConfig();
     }
-
-  }
-
-  ~Empecable() {
     SaveProjectConfig();
+
   }
+
+  ~Empecable() { }
 
   Empecable & SetAll(bool _in=true) { checks.SetAll(_in); return *this; }
 
@@ -465,10 +476,12 @@ public:
         break;
       case Lexer::ID_ERR_END_LINE_WS:        
         File().ReportIssue("Extra whitespace at end of line:", token_pos);
+        if (AskYesNo("Remove? ")) File().ClearLexeme(token_pos);
         found_issue = true;
         break;
       case Lexer::ID_ERR_WS:
         File().ReportIssue("Illegal whitespace:", token_pos);
+        if (AskYesNo("Remove? ")) File().ClearLexeme(token_pos);
         found_issue = true;
         break;
       default:
@@ -489,5 +502,3 @@ int main(int argc, char * argv[])
 {
   class Empecable formatter(argc, argv);
 }
-
-#pragma Empecable_words formatter eol esp
