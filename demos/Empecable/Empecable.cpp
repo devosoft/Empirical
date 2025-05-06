@@ -17,7 +17,7 @@
  * - Track any special features about files or projects including custom spelling.
  * - Fully configure actions with a Empecable.cfg file.
  * - Find the .Empirical/ directory for configurations (or create one if it doesn't exist)
- * 
+ *
  * Possible add-on features to develop?
  * - Produce a levelization map
  * - Dynamic control over boilerplate (for easy scaling to other projects)
@@ -27,13 +27,13 @@
  * - Make sure test files are not empty (or effectively empty)
  *
  * Master list of interface options for consistency.
+ *  'a' - Add lowercase word to project dictionary (or 'A' to preserve current case)
  *  'd' - Delete (or 'D' to Delete All)
  *  'r' - Replace with (or 'R' to Replace All)
  *  'i' - Ignore (or 'I' to Ignore All)
- *  'p' - Add lowercase word to project dictionary (or 'P' to preserve current case)
  *  'f' - Add lowercase word to file dictionary (or 'F' to preserve current case)
  *  'h' - Help
- *  'q' - Quit without saving (or 'Q' to quit and save)
+ *  'q'/'x' - Quit without saving (or 'Q' to quit and save)
  *  's' - Save current updated file (or 'S' to "Save As")
  *  'z' - Undo
  *  'y' or 'n' - Answer a specific question.
@@ -55,6 +55,7 @@
 #include "../../include/emp/config/FlagManager.hpp"
 #include "../../include/emp/io/File.hpp"
 #include "../../include/emp/io/io_utils.hpp"
+#include "../../include/emp/math/sequence_utils.hpp"
 #include "../../include/emp/tools/String.hpp"
 #include "../../include/emp/tools/string_utils.hpp"
 
@@ -116,7 +117,7 @@ private:
   const ReviewFile & File() const { return files[active_file]; }
 
   emplex::Token GetToken(size_t pos) const { return File().GetToken(pos); }
-  emp::String GetLexeme(size_t pos) const { return File().GetLexeme(pos); } 
+  emp::String GetLexeme(size_t pos) const { return File().GetLexeme(pos); }
 
   void SetupOptionFlags() {
     flags.AddGroup("Basic Operation");
@@ -160,6 +161,7 @@ private:
       PrintLn("Help info should go here...");
       return true;
     case 'q':
+    case 'x':
       PrintLn("Quitting!");
       exit(0);
     case 's':
@@ -258,7 +260,7 @@ private:
     std::ifstream file(word_file);
 
     // If word_file fails to load, look for (or make) a .Empirical/ directory.
-    if (!file) {     
+    if (!file) {
       SetEMPDir();
       word_file = *emp_dir / word_file;
       file.open(word_file);
@@ -304,14 +306,20 @@ private:
     project_changed = true;
   }
 
-  void DoReplace(size_t token_pos) {
+  void DoReplace(size_t token_pos, emp::String new_word) {
     const emp::String old_word = GetLexeme(token_pos);
-    const emp::String new_word = replacement_map[old_word];
     File().SetLexeme(token_pos, new_word);
     if (verbose || interactive) {
       PrintLn("Replacing '", old_word.AsANSICyan(), "' with '", new_word.AsANSICyan(), "'.");
     }
-  }  
+  }
+
+  // DoReplace with no replacement word uses the replacement_map.
+  void DoReplace(size_t token_pos) {
+    const emp::String old_word = GetLexeme(token_pos);
+    emp_assert(replacement_map.contains(old_word));
+    DoReplace(token_pos, replacement_map[old_word]);
+  }
 
   void QueryReplace(size_t token_pos, bool change_all) {
     emp::String word = GetLexeme(token_pos);
@@ -331,9 +339,47 @@ private:
     PrintLn("'", word.AsANSICyan(), "' with '", new_word.AsANSICyan(), "'.");
   }
 
+  // Search through available dictionaries to try to find misspellings.
+  emp::vector<emp::String> FindWordMatches(emp::String target_word, size_t max_size=5) {
+    constexpr int max_word_diff = 3;
+    constexpr size_t reduce_threshold = 1024;
+    const int target_size = target_word.ssize();
+
+    emp_assert(max_size > 0);
+    emp_assert(max_size < reduce_threshold);
+
+    std::vector<std::pair<int, std::string>> scored;
+    const emp::String lower_word = target_word.AsLower();
+
+    for (const emp::String & word : project_words) {
+      // Don't consider words that are too different in length.
+      if (std::abs(word.ssize() - target_size) >= max_word_diff) continue;
+
+      int dist = (int) emp::calc_edit_distance(word.AsLower(), lower_word);
+      if (dist <= max_word_diff) {
+        scored.emplace_back(dist, word);
+        if (scored.size() >= reduce_threshold) {
+          std::sort(scored.begin(), scored.end());
+          scored.resize(max_size);
+        }
+      }
+    }
+
+    std::sort(scored.begin(), scored.end());
+    if (scored.size() > max_size) scored.resize(max_size);
+    
+    std::vector<emp::String> matches;
+    matches.reserve(scored.size());
+    for (auto [score, word] : scored) {
+      matches.push_back(word);
+    }
+
+    return matches;    
+  }
+
   bool TestWordToken(size_t token_pos) {
     emp::String word(GetLexeme(token_pos));
-    
+
     // If we have a valid word, return true.
     if (word.size() <= 2 ||                       // Allow all short (1 or 2 char) words
         project_words.contains(word) ||           // Check the white list for project
@@ -356,29 +402,35 @@ private:
 
     if (interactive) {
       emp::String lower_word = word.AsLower();
-      Print(ToOption("p"), " - Add '", lower_word.AsANSICyan(), "' to main PROJECT dictionary");
+      Print(ToOption("a"), " - Add '", lower_word.AsANSICyan(), "' to main PROJECT dictionary");
       if (word.HasUpper()) {
-        Print(" or ", ToOption("P"), " for case-sensitive '", word.AsANSICyan(), "'");
+        Print(" or ", ToOption("A"), " to add case-sensitive '", word.AsANSICyan(), "'");
       }
       PrintLn();
 
       Print(ToOption("f"), " - Add '", lower_word.AsANSICyan(), "' to this FILE's dictionary");
       if (word.HasUpper()) {
-        Print("  or ", ToOption("F"), " for case-sensitive '", word.AsANSICyan(), "'");
+        Print("  or ", ToOption("F"), " to add case-sensitive '", word.AsANSICyan(), "'");
       }
       PrintLn();
 
-      Print(ToOption("r"), " - Replace this instance of '", word.AsANSICyan(), "' or ",
-            ToOption("R"), " to replace ALL instances\n");
-      Print(ToOption("i"), " - Ignore this instance of '", word.AsANSICyan(), "'  or ",
-            ToOption("I"), " to ignore ALL instances\n");
+      PrintLn(ToOption("i"), " - Ignore this instance of '", word.AsANSICyan(), "'  or ",
+              ToOption("I"), " to ignore ALL instances");
+
+      emp::vector<emp::String> matches = FindWordMatches(word);
+      for (size_t i = 0; i < matches.size(); ++i) {
+        PrintLn(ToOption(std::to_string(i)), " - Replace with '", matches[i].AsANSICyan(), "'");
+      }
+      if (matches.size() == 0) PrintLn("(no replacement suggestions found)");
+      PrintLn(ToOption("r"), " - Provide replacement for this instance of '", word.AsANSICyan(), "' or ",
+              ToOption("R"), " for ALL instances");
 
       bool done = false;
       while (!done) {
         char key = emp::GetIOChar();
         switch (key) {
-          case 'p': AddProjectWord(lower_word);     done = true; break;
-          case 'P': AddProjectWord(word);           done = true; break;
+          case 'a': AddProjectWord(lower_word);     done = true; break;
+          case 'A': AddProjectWord(word);           done = true; break;
           case 'f': File().AddWord(lower_word);     done = true; break;
           case 'F': File().AddWord(word);           done = true; break;
           case 'r': QueryReplace(token_pos, false); done = true; break;
@@ -392,6 +444,36 @@ private:
             skip_words.insert(word);
             done = true;
             break;
+          case '4':
+            if (matches.size() > 4) {
+              DoReplace(token_pos, matches[4]);
+              done = true;
+              break;
+            } [[fallthrough]];
+          case '3':
+            if (matches.size() > 3) {
+              DoReplace(token_pos, matches[3]);
+              done = true;
+              break;
+            } [[fallthrough]];
+          case '2':
+            if (matches.size() > 2) {
+              DoReplace(token_pos, matches[2]);
+              done = true;
+              break;
+            } [[fallthrough]];
+          case '1':
+            if (matches.size() > 1) {
+              DoReplace(token_pos, matches[1]);
+              done = true;
+              break;
+            } [[fallthrough]];
+          case '0':
+            if (matches.size() > 0) {
+              DoReplace(token_pos, matches[0]);
+              done = true;
+              break;
+            } [[fallthrough]];
           default:
             bool used = TestDefaultKeyOptions(key);
             if (!used) PrintLn("Unknown key ", ToBoldRed("'", key, "'"));
@@ -474,14 +556,14 @@ public:
       case Lexer::ID_WORD:
         found_issue = !TestWordToken(token_pos);
         break;
-      case Lexer::ID_ERR_END_LINE_WS:        
+      case Lexer::ID_ERR_END_LINE_WS:
         File().ReportIssue("Extra whitespace at end of line:", token_pos);
-        if (AskYesNo("Remove? ")) File().ClearLexeme(token_pos);
+        if (interactive && AskYesNo("Remove? ")) File().ClearLexeme(token_pos);
         found_issue = true;
         break;
       case Lexer::ID_ERR_WS:
         File().ReportIssue("Illegal whitespace:", token_pos);
-        if (AskYesNo("Remove? ")) File().ClearLexeme(token_pos);
+        if (interactive && AskYesNo("Remove? ")) File().ClearLexeme(token_pos);
         found_issue = true;
         break;
       default:
@@ -502,3 +584,7 @@ int main(int argc, char * argv[])
 {
   class Empecable formatter(argc, argv);
 }
+
+
+// Special info below for local control over the Empecable file checker.
+// empecable_words: formatter eol esp
