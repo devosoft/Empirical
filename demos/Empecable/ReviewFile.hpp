@@ -89,7 +89,7 @@ public:
   void SetLexeme(size_t pos, emp::String new_word) {
     tokens[pos].lexeme = new_word;
     save_required = true;
-  } 
+  }
 
   // Find the spot after previous newline char or beginning of file.
   size_t FindPos_LineStart(size_t token_pos) const {

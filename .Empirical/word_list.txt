@@ -420,6 +420,7 @@ accessing
 accession
 accessions
 accessories
+accessors
 accessory
 accident
 accidental
@@ -9546,6 +9547,7 @@ calamities
 calamitous
 calamitously
 calamity
+calc
 calcareous
 calciferous
 calcification
@@ -9785,6 +9787,7 @@ cams
 camshaft
 camshafts
 can
+can't
 canal
 canalization
 canalizations
@@ -13215,6 +13218,7 @@ coke
 coked
 cokes
 coking
+col
 cola
 colander
 colanders
@@ -14745,6 +14749,7 @@ constellation
 constellations
 consternation
 consternations
+constexpr
 constipate
 constipated
 constipates
@@ -16705,6 +16710,7 @@ cruelties
 cruelty
 cruet
 cruets
+cruft
 cruise
 cruised
 cruiser
@@ -19361,6 +19367,7 @@ determines
 determining
 determinism
 determinisms
+deterministic
 deterred
 deterrence
 deterrences
@@ -19726,6 +19733,7 @@ dieting
 dietitian
 dietitians
 diets
+diff
 differ
 differed
 difference
@@ -20948,6 +20956,7 @@ dissuading
 dissuasion
 dissuasions
 dissuasive
+dist
 distaff
 distaffs
 distal
@@ -21433,6 +21442,7 @@ domino
 dominoes
 dominos
 don
+don't
 dona
 donas
 donate
@@ -24216,6 +24226,8 @@ envyingly
 enzymatic
 enzyme
 enzymes
+eof
+eol
 eolian
 eon
 eons
@@ -37087,6 +37099,7 @@ inlaying
 inlays
 inlet
 inlets
+inline
 inmate
 inmates
 inmost
@@ -38437,6 +38450,7 @@ isotherms
 isotope
 isotopes
 isotopic
+isprint
 issuance
 issuances
 issue
@@ -38449,6 +38463,8 @@ isthmi
 isthmian
 isthmus
 isthmuses
+istream
+istreambuf
 it
 italic
 italicization
@@ -38482,6 +38498,7 @@ iterating
 iteration
 iterations
 iterative
+iterator
 itinerant
 itinerants
 itineraries
@@ -44098,6 +44115,7 @@ mestizo
 mestizoes
 mestizos
 met
+meta
 metabolic
 metabolically
 metabolism
@@ -47247,6 +47265,7 @@ newer
 newest
 newfangled
 newline
+newlines
 newly
 newlywed
 newlyweds
@@ -48170,6 +48189,7 @@ nows
 noxious
 nozzle
 nozzles
+npos
 nth
 nu
 nuance
@@ -59334,6 +59354,7 @@ regenerations
 regenerative
 regent
 regents
+regex
 reggae
 reggaes
 regicide
@@ -60534,6 +60555,7 @@ resistless
 resistor
 resistors
 resists
+resize
 resold
 resole
 resoled
@@ -61241,6 +61263,7 @@ rezone
 rezoned
 rezones
 rezoning
+rfind
 rhapsodic
 rhapsodical
 rhapsodies
@@ -66020,6 +66043,7 @@ sizable
 size
 sizeable
 sized
+sizeof
 sizes
 sizing
 sizings
@@ -68772,6 +68796,7 @@ squishy
 sriracha
 srirachas
 ssh
+ssize
 stab
 stabbed
 stabber
@@ -70435,6 +70460,7 @@ substitutes
 substituting
 substitution
 substitutions
+substr
 substrata
 substrate
 substrates
@@ -71601,6 +71627,7 @@ sylphic
 sylphlike
 sylphs
 sylvan
+sym
 symbioses
 symbiosis
 symbiotic
@@ -71642,6 +71669,7 @@ symptom
 symptomatic
 symptomatically
 symptoms
+syms
 synagog
 synagogal
 synagogs
@@ -73904,6 +73932,7 @@ token
 tokenism
 tokenisms
 tokenize
+tokenizing
 tokens
 tokes
 toking
@@ -79926,6 +79955,7 @@ waywardly
 waywardness
 waywardnesses
 we
+we've
 weak
 weaken
 weakened

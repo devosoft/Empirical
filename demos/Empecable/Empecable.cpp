@@ -367,14 +367,14 @@ private:
 
     std::sort(scored.begin(), scored.end());
     if (scored.size() > max_size) scored.resize(max_size);
-    
+
     std::vector<emp::String> matches;
     matches.reserve(scored.size());
     for (auto [score, word] : scored) {
       matches.push_back(word);
     }
 
-    return matches;    
+    return matches;
   }
 
   bool TestWordToken(size_t token_pos) {
@@ -444,21 +444,9 @@ private:
             skip_words.insert(word);
             done = true;
             break;
-          case '4':
-            if (matches.size() > 4) {
-              DoReplace(token_pos, matches[4]);
-              done = true;
-              break;
-            } [[fallthrough]];
-          case '3':
-            if (matches.size() > 3) {
-              DoReplace(token_pos, matches[3]);
-              done = true;
-              break;
-            } [[fallthrough]];
-          case '2':
-            if (matches.size() > 2) {
-              DoReplace(token_pos, matches[2]);
+          case '0':
+            if (matches.size() > 0) {
+              DoReplace(token_pos, matches[0]);
               done = true;
               break;
             } [[fallthrough]];
@@ -468,9 +456,21 @@ private:
               done = true;
               break;
             } [[fallthrough]];
-          case '0':
-            if (matches.size() > 0) {
-              DoReplace(token_pos, matches[0]);
+          case '2':
+            if (matches.size() > 2) {
+              DoReplace(token_pos, matches[2]);
+              done = true;
+              break;
+            } [[fallthrough]];
+          case '3':
+            if (matches.size() > 3) {
+              DoReplace(token_pos, matches[3]);
+              done = true;
+              break;
+            } [[fallthrough]];
+          case '4':
+            if (matches.size() > 4) {
+              DoReplace(token_pos, matches[4]);
               done = true;
               break;
             } [[fallthrough]];
@@ -587,4 +587,8 @@ int main(int argc, char * argv[])
 
 
 // Special info below for local control over the Empecable file checker.
-// empecable_words: formatter eol esp
+
+
+
+// Special info below for local control over the Empecable file checker.
+// empecable_words: esp eol formatter
