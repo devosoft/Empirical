@@ -318,7 +318,17 @@ private:
     cpp_file_changed = true;
   }
 
-  void DoReplace(size_t token_pos, bool change_all) {
+  void DoReplace(size_t token_pos) {
+    const emp::String old_word = tokens[token_pos].lexeme;
+    const emp::String new_word = replacement_map[old_word];
+    tokens[token_pos].lexeme = new_word;
+    if (verbose || interactive) {
+      std::cout << "Replacing '" << old_word.AsANSICyan()
+                  << "' with '" << new_word.AsANSICyan() << "'.\n";
+    }
+  }  
+
+  void QueryReplace(size_t token_pos, bol change_all) {
     emp::String word = tokens[token_pos].lexeme;
 
     std::cout << "Enter replacement word: ";
@@ -371,6 +381,9 @@ private:
         skip_words.contains(word) ||
         skip_words.contains(lower_word)) return true;
 
+    // See if we already have a replacement set up for this word.
+    if (replacement_map.contains(word)) DoReplace(token_pos);
+
     // We have an unknown word.
     ReportError(emp::MakeString("Unknown word '", word.AsANSICyan(), "'"), token_pos);
 
@@ -396,12 +409,12 @@ private:
       while (!done) {
         char key = emp::GetIOChar();
         switch (key) {
-          case 'p': AddProjectWord(lower_word);   done = true; break;
-          case 'P': AddProjectWord(word);         done = true; break;
-          case 'f': AddFileWord(lower_word);      done = true; break;
-          case 'F': AddFileWord(word);            done = true; break;
-          case 'r': DoReplace(token_pos, false);  done = true; break;
-          case 'R': DoReplace(token_pos, true);   done = true; break;
+          case 'p': AddProjectWord(lower_word);     done = true; break;
+          case 'P': AddProjectWord(word);           done = true; break;
+          case 'f': AddFileWord(lower_word);        done = true; break;
+          case 'F': AddFileWord(word);              done = true; break;
+          case 'r': QueryReplace(token_pos, false); done = true; break;
+          case 'R': QueryReplace(token_pos, true);  done = true; break;
           case 'i':
             std::cout << "Skipping '" << word.AsANSICyan() << "'!" << std::endl;
             done = true;
