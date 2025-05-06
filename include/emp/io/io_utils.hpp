@@ -99,6 +99,23 @@ namespace emp {
     path1.resize(match_size);
   }
 
+  // Take a provided path and split it up into each directory (possibly ending in a filename.)
+  std_fs::path FindCommonPath(std_fs::path path1, std_fs::path path2) {
+    if (path1 == path2) return path1;
+
+    auto p1_it = path1.begin();
+    auto p2_it = path2.begin();
+    std_fs::path result;
+  
+    while (p1_it != path1.end() && p2_it != path2.end() && *p1_it == *p2_it) {
+      result /= *p1_it;
+      ++p1_it;
+      ++p2_it;
+    }
+  
+    return result;
+  };
+
   // Given a collection of file paths, find the portion that they all share.
   template <typename CONTAINER_T>
   [[nodiscard]] std_fs::path FindCommonPath(const CONTAINER_T & filenames) {
