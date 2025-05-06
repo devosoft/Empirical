@@ -144,6 +144,7 @@ namespace emp {
     String(const char * _str, size_t count) : std::string(_str, count) { }
     template< class InputIt >
     String(InputIt first, InputIt last) : std::string(first, last) { }
+    String(std::string_view _in_view) : std::string(_in_view) { }
     String(std::nullptr_t) = delete;
 
     // ------ New constructors ------
