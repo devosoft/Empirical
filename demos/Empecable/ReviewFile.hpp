@@ -28,6 +28,7 @@
 #include "../../include/emp/tools/String.hpp"
 // #include "../../include/emp/tools/string_utils.hpp"
 
+#include "helpers.hpp"
 #include "Lexer.hpp"
 
 namespace fs = std::filesystem;
@@ -132,8 +133,13 @@ public:
         token.lexeme = ""; // Clear out this lexeme; we will reconstruct it when saving.
 
         size_t pos = 0;
-        if (line.ScanWord(pos) != "//") InternalError("Meta-data mismatch.");
-        if (line.ScanWord(pos) != "empecable_words:") InternalError("Meta-data mismatch.");
+        if (line.ScanWord(pos) != "//") {
+          InternalError(token, "Meta-data mismatch; expected: \"//\"");
+        }
+        if (line.ScanWord(pos) != "empecable_words:") {
+          pos = 0; line.ScanWord(pos);
+          InternalError(token, "Meta-data mismatch; expected: \"empecable_words:\"\n");
+        }
         while (pos < line.size()) {
           words.insert(line.ScanWord(pos));
         }

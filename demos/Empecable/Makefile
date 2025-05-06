@@ -1,6 +1,7 @@
 # Project-specific settings
 PROJECT := Empecable
 EMP_DIR := ../../include
+HEADERS := helpers.hpp Lexer.hpp ReviewFile.hpp
 
 # Flags to use regardless of compiler
 CFLAGS_all := -Wall -Wextra -Wno-unused-function -std=c++20 -I$(EMP_DIR)/
@@ -16,7 +17,7 @@ native: $(PROJECT)
 debug:	CFLAGS_nat := $(CFLAGS_nat_debug)
 debug:	$(PROJECT)
 
-$(PROJECT):	$(PROJECT).cpp
+$(PROJECT):	$(PROJECT).cpp $(HEADERS)
 	$(CXX_nat) $(CFLAGS_nat) $(PROJECT).cpp -o $(PROJECT)
 
 clean:

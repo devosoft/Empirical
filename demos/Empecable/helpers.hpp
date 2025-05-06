@@ -13,6 +13,8 @@
 
 #include "../../include/emp/tools/String.hpp"
 
+#include "Lexer.hpp"
+
 namespace fs = std::filesystem;
 
 
@@ -50,7 +52,8 @@ template <typename... Ts>
 inline void PrintLn(Ts &&... args) { std::cout << emp::MakeString(args...) << std::endl; }
 
 template <typename... Ts>
-inline void InternalError(Ts &&... args) {
-  std::cerr << ToBoldRed("Internal Empecable Error: ") << emp::MakeString(args...) << std::endl;
+inline void InternalError(emplex::Token token, Ts &&... args) {
+  std::cerr << ToBoldRed("Internal Empecable Error (Line ", token.line_id, "): ")
+            << emp::MakeString(args...) << std::endl;
   exit(1);
 }
