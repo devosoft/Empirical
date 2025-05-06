@@ -259,6 +259,7 @@ namespace emp {
     //  size_t capacity() const;
     //  void reserve(size_t new_cap);
     //  void shrink_to_fit();
+    int ssize() const { return static_cast<int>(size()); }
 
 
     // ------ Classification and Comparisons ------
@@ -535,7 +536,6 @@ namespace emp {
     std::string_view ScanView(std::function<std::string_view(size_t pos)> fun, size_t & pos) const {
       auto out = fun(pos); pos += out.size(); return out;
     }
-    std::string_view ScanWord(size_t & pos) const { return ScanTo(pos, FindWhitespace(pos)); }
     char ScanChar(size_t & pos) const { return Get(pos++); }
     std::string_view ScanWhitespace(size_t & pos) const { return ScanWhile(pos, WhitespaceCharSet()); }
     std::string_view ScanUpper(size_t & pos) const { return ScanWhile(pos, UpperCharSet()); }
@@ -545,6 +545,14 @@ namespace emp {
     std::string_view ScanAlphanumeric(size_t & pos) const { return ScanWhile(pos, AlphanumericCharSet()); }
     std::string_view ScanNestedBlock(size_t & pos) const { auto out=ViewNestedBlock(pos); pos+=out.size(); return out; }
     std::string_view ScanQuote(size_t & pos) const { auto out=ViewQuote(pos); pos+=out.size(); return out; }
+
+    // ScanWord is a non-destructive PopWord; it will return a view of the next contiguous block
+    // of non-whitespace but move pos to after the whitespace char.
+    std::string_view ScanWord(size_t & pos) const {
+      std::string_view out = ScanTo(pos, FindWhitespace(pos));
+      if (pos < size()) ++pos;
+      return out;
+    }
 
     // Additional scanning that also converts type.
     char ScanAsChar(size_t & pos) const { return Get(pos++); }
