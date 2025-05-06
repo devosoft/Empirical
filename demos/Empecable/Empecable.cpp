@@ -82,6 +82,7 @@ private:
   emp::FlagManager flags;             // Tracker for command-line flags that were set.
   emp::vector<emp::String> filenames; // Set of files to process.
   emp::vector<fs::path> filepaths;    // Set of full paths for each file.
+  size_t active_file = static_cast<size_t>(-1);  // Which file are we working with?
 
   // Lexer information.
   emplex::Lexer lexer;
@@ -98,7 +99,7 @@ private:
   size_t issue_count = 0;     // Number of issues detected in current file.
 
   // Track changes that need to be saved.
-  bool file_changed = false;
+  bool cpp_file_changed = false;
   bool project_changed = false;
 
 
@@ -143,6 +144,25 @@ private:
       [this](emp::String max_w){ checks.warn_line_width = max_w.AsULL(); } );
   }
 
+  // Check the default key press options that should work from any menu.
+  // Return whether the key was used.
+  bool TestDefaultKeyOptions(char key) {
+    switch (key) {
+    case 'h':
+      std::cout << "Help info should go here..." << std::endl;
+      return true;
+    case 'q':
+      std::cout << "Quitting!" << std::endl;
+      exit(0);
+    case 's':
+      if (active_file < filenames.size()) SaveFile();
+      else std::cout << "No active file to save." << std::endl;
+      SaveProjectConfig();
+      return true;
+    }
+    return false; // Key not used.
+  }
+
   fs::path MakeEmpiricalDir(fs::path common_path) {
     fs::path option_path = common_path;
     if (!fs::is_directory(option_path)) option_path = option_path.parent_path();
@@ -157,9 +177,10 @@ private:
       option_path = option_path.parent_path();
     }
     Print(ToOption("q"), " - Quit.\n");
-    bool done = false;
+    bool done = false, used = false;
     fs::path out_path = common_path;
     while (!done) {
+      used = false;
       char key = emp::GetIOChar();
       switch (key) {
       case '9': if (opt_id <= 9) break; out_path = out_path.parent_path(); [[fallthrough]];
@@ -177,14 +198,12 @@ private:
         std::filesystem::create_directory(out_path);
         done = true;
         break;
-      case 'q':
-        std::cout << "Quitting!" << std::endl;
-        exit(0);
-        break;
       default:
-        void(0);
+        used = TestDefaultKeyOptions(key);
       }
-      if (!done) std::cout << "Unknown option " << ToBoldRed("'", key, "'") << std::endl;
+      if (!done && !used) {
+        std::cout << "Unknown option " << ToBoldRed("'", key, "'") << std::endl;
+      }
 
     }
     return out_path;
@@ -223,7 +242,14 @@ private:
     }
   }
 
-  void SaveFile(emp::String filename) {
+  void SaveFile() {
+    emp::String filename = filenames[active_file];
+    if (!cpp_file_changed) {
+      std::cout << "No changes need to be saved in '" << emp::ANSI::MakeGreen(filename)
+                << "'." << std::endl;
+      return;
+    }
+    std::cout << "Saving '" << emp::ANSI::MakeGreen(filename) << "'." << std::endl;
     std::ofstream file(filename);
     for (auto & token : tokens) {
       file << token.lexeme;
@@ -232,7 +258,12 @@ private:
   }
 
   void SaveProjectConfig() {
-    if (!file_changed) return;
+    if (!project_changed) {
+      std::cout << "No changes need to be saved in '" << emp::ANSI::MakeGreen(word_file.string())
+                << "'." << std::endl;
+      return;
+    }
+    std::cout << "Saving '" << emp::ANSI::MakeGreen(word_file.string()) << "'." << std::endl;
 
     // Move the project_words to a vector and sort them.
     emp::vector<emp::String> out_words;
@@ -284,7 +315,7 @@ private:
     emp_assert(!emp::Has(file_words, word), word);
     std::cout << "Added '" << word.AsANSICyan() << "' to file dictionary." << std::endl;
     file_words.insert(word);
-    file_changed = true;
+    cpp_file_changed = true;
   }
 
   void DoReplace(size_t token_pos, bool change_all) {
@@ -304,7 +335,7 @@ private:
     if (change_all) std::cout << " all instances of ";
     std::cout << "'" << word.AsANSICyan() << "' with '" << new_word.AsANSICyan() << "'.\n";
 
-    file_changed = true;
+    cpp_file_changed = true;
   }
 
   // Interface options for consistency.
@@ -328,24 +359,29 @@ private:
 
   bool TestWordToken(size_t token_pos) {
     emp::String word(tokens[token_pos].lexeme);
+    emp::String lower_word = word.AsLower();
     
     // If a word is short (2 or fewer letters) or is in the dictionary (either directly or or as
     // a lowercase word), mark it as valid.
     if (word.size() <= 2 ||
         project_words.contains(word) ||
-        project_words.contains(word.AsLower())) return true;
+        project_words.contains(lower_word) ||
+        file_words.contains(word) ||
+        file_words.contains(lower_word) ||
+        skip_words.contains(word) ||
+        skip_words.contains(lower_word)) return true;
 
     // We have an unknown word.
     ReportError(emp::MakeString("Unknown word '", word.AsANSICyan(), "'"), token_pos);
 
     if (interactive) {
-      Print(ToOption("p"), " - Add '", word.AsLower().AsANSICyan(), "' to main PROJECT dictionary");
+      Print(ToOption("p"), " - Add '", lower_word.AsANSICyan(), "' to main PROJECT dictionary");
       if (word.HasUpper()) {
         Print(" or ", ToOption("P"), " for case-sensitive '", word.AsANSICyan(), "'");
       }
       std::cout << "\n";
 
-      Print(ToOption("f"), " - Add '", word.AsLower().AsANSICyan(), "' to this FILE's dictionary");
+      Print(ToOption("f"), " - Add '", lower_word.AsANSICyan(), "' to this FILE's dictionary");
       if (word.HasUpper()) {
         Print("  or ", ToOption("F"), " for case-sensitive '", word.AsANSICyan(), "'");
       }
@@ -360,12 +396,12 @@ private:
       while (!done) {
         char key = emp::GetIOChar();
         switch (key) {
-          case 'p': AddProjectWord(word.AsLower()); done = true; break;
-          case 'P': AddProjectWord(word);           done = true; break;
-          case 'f': AddFileWord(word.AsLower());    done = true; break;
-          case 'F': AddFileWord(word);              done = true; break;
-          case 'r': DoReplace(token_pos, false);    done = true; break;
-          case 'R': DoReplace(token_pos, true);     done = true; break;
+          case 'p': AddProjectWord(lower_word);   done = true; break;
+          case 'P': AddProjectWord(word);         done = true; break;
+          case 'f': AddFileWord(lower_word);      done = true; break;
+          case 'F': AddFileWord(word);            done = true; break;
+          case 'r': DoReplace(token_pos, false);  done = true; break;
+          case 'R': DoReplace(token_pos, true);   done = true; break;
           case 'i':
             std::cout << "Skipping '" << word.AsANSICyan() << "'!" << std::endl;
             done = true;
@@ -375,15 +411,11 @@ private:
             skip_words.insert(word);
             done = true;
             break;
-          case 'q':
-            std::cout << "Quitting!" << std::endl;
-            exit(0);
-            break;
-          case 's':
-            SaveFile("test.out");
-            break;
           default:
-            std::cout << "Unknown key " << ToBoldRed("'", key, "'") << std::endl;
+            bool used = TestDefaultKeyOptions(key);
+            if (!used) {
+              std::cout << "Unknown key " << ToBoldRed("'", key, "'") << std::endl;
+            }
         }
       }
     }
@@ -423,9 +455,14 @@ public:
 
     LoadWords();
 
-    for (emp::String filename : filenames) {
-      ProcessFile(filename);
+    for (active_file = 0; active_file < filenames.size(); ++active_file) {
+      ProcessFile();
+      std::cout << "Finished '" << emp::ANSI::MakeGreen(filenames[active_file])
+                << "'. Saving." << std::endl;
+      SaveFile();
+      SaveProjectConfig();
     }
+
   }
 
   ~Empecable() {
@@ -466,14 +503,14 @@ public:
     return true;
   }
 
-  bool ProcessFile(emp::String filename) {
+  bool ProcessFile() {
+    emp::String filename = filenames[active_file];
     std::cout << "=== File: " << filename.AsANSIBrightCyan() << " ===\n";
 
     if (!LoadFile(filename)) return false;
 
-    // For each misspelled word, track the token ids associated with it.
-    std::map<emp::String, std::vector<size_t>> word_ids;
-
+    cpp_file_changed = false; // New file, so no changes!
+    
     for (size_t token_pos = 0; token_pos < tokens.size(); ++token_pos) {
       const auto & token = tokens[token_pos];
       bool found_issue = false;
