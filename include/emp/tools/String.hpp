@@ -333,6 +333,8 @@ namespace emp {
     [[nodiscard]] bool HasOneOfAt(CharSet opts, size_t pos) const { return opts.HasAt(*this, pos); }
     [[nodiscard]] bool HasDigitAt(size_t pos) const { return DigitCharSet().HasAt(*this, pos); }
     [[nodiscard]] bool HasLetterAt(size_t pos) const { return LetterCharSet().HasAt(*this, pos); }
+    [[nodiscard]] bool HasUpperAt(size_t pos) const { return UpperCharSet().HasAt(*this, pos); }
+    [[nodiscard]] bool HasLowerAt(size_t pos) const { return LowerCharSet().HasAt(*this, pos); }
     [[nodiscard]] bool HasWhitespaceAt(size_t pos) const { return WhitespaceCharSet().HasAt(*this, pos); }
 
     [[nodiscard]] size_t CountWhitespace() const { return WhitespaceCharSet().CountMatches(*this); }
@@ -676,11 +678,13 @@ namespace emp {
     String & AppendUpper(const String & in) { *this+=MakeUpper(in); return *this; }
     String & SetUpper(const String & in) { *this = MakeUpper(in); return *this; }
     String & SetUpper() { *this = MakeUpper(*this); return *this; }
+    String & SetUpperAt(size_t pos) { Get(pos) = std::toupper(Get(pos)); return *this; }
     [[nodiscard]] String AsUpper() const { return MakeUpper(*this); }
 
     String & AppendLower(const String & in) { *this+=MakeLower(in); return *this; }
     String & SetLower(const String & in) { *this = MakeLower(in); return *this; }
     String & SetLower() { *this = MakeLower(*this); return *this; }
+    String & SetLowerAt(size_t pos) { Get(pos) = std::tolower(Get(pos)); return *this; }
     [[nodiscard]] String AsLower() const { return MakeLower(*this); }
 
     String & AppendTitleCase(const String & in) { *this+=MakeTitleCase(in); return *this; }
