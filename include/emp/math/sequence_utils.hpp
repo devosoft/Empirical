@@ -103,7 +103,7 @@ namespace emp {
     emp::vector<size_t> cur_row(size1);   // The row we are calculating
     emp::vector<size_t> prev_row(size1);  // The previous row we calculated
 
-    // Initialize the previous row to record the differece from nothing.
+    // Initialize the previous row to record the difference from nothing.
     for (size_t i = 0; i < size1; i++) prev_row[i] = i + 1;
 
     // Loop through all other rows
@@ -220,6 +220,60 @@ namespace emp {
 
     // Now that we are done, return the bottom-right corner of the chart.
     return prev_row[size1 - 1];
+  }
+
+  /// Word distance is similar to Edit distance, but with adjustments based on changes
+  /// common in misspellings, such as letter transpositions.
+  // Todo: weights based on type of change.
+  template <typename TYPE>
+  double calc_word_distance(const TYPE & in1, const TYPE & in2) {
+    const int size1 = std::ssize(in1);
+    const int size2 = std::ssize(in2);
+
+    // If either size is zero, other size indicates number of insertions needed to produce it.
+    if (size1 == 0) return size2;
+    if (size2 == 0) return size1;
+
+    emp::vector<double> cur_row(size1);   // The row we are calculating
+    emp::vector<double> prev_row(size1);  // The previous row we calculated
+
+    // Initialize the previous row to record the difference from nothing.
+    for (int i = 0; i < size1; i++) prev_row[i] = i + 1;
+
+    // Loop through all other rows
+    for (int row = 0; row < size2; row++) {
+      // Initialize the first entry in the current row.
+      if (in1[0] == in2[row]) cur_row[0] = row;
+      else cur_row[0] = std::min<double>(row, prev_row[0]) + 1;
+
+      // Move through the cur_row and fill it in.
+      for (int col = 1; col < size1; col++) {
+        // If the values are equal, keep the value in the upper left.
+        if (in1[col] == in2[row]) cur_row[col] = prev_row[col-1];
+
+        // If this is a transposition, take the single change counted in upper-left.
+        else if (col >= 2 && row >=2 && in1[col] == in2[row-1] && in1[col-1] == in2[row]) {
+          cur_row[col] = prev_row[col-1];
+        }
+
+        // Otherwise, set the current position the the minimal of the three
+        // numbers to the upper right in the chart plus one.
+        else {
+          cur_row[col] = emp::Min(prev_row[col], prev_row[col-1], cur_row[col-1]) + 1;
+        }
+      }
+
+      // Swap cur_row and prev_row (keep cur vals in prev row, recycle vector cur_row)
+      std::swap(cur_row, prev_row);
+    }
+
+    // Bottom-right corner gives the distance between the two words.
+    double result = prev_row[size1 - 1];
+
+    // Make differing first letters an extra penalty.
+    if (in1[0] != in2[0]) result += 0.5;
+
+    return result;
   }
 
 }
