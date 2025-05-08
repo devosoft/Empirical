@@ -38,6 +38,7 @@ private:
   emp::String filename;
   fs::path path;
   std::unordered_set<emp::String> words; // Words to allow in this file specifically.
+  Mode mode = Mode::Normal;              // How much I/O should we do?
 
   emp::vector<emplex::Token> tokens;     // Tokens that make up this file.
   bool save_required = false;            // Does this file need to be updated on disk?
@@ -46,13 +47,16 @@ private:
   emp::vector<emp::String> issues;       // List of issues found with this file.
 
 public:
-  ReviewFile(emp::String filename) : filename(filename), path(fs::absolute(filename.str())) {
+  ReviewFile(emp::String filename, Mode mode)
+    : filename(filename), path(fs::absolute(filename.str())), mode(mode)
+  {
     if (fs::exists(path) && fs::is_regular_file(path)) {
       path = fs::canonical(filename.str());
       valid = true;
     } else {
       std::cerr << ToBoldRed("Error:") << " file does not exist or is not a regular file: "
                 << filename << "\n";
+      valid = false;
     }
   }
 
@@ -151,10 +155,20 @@ public:
 
   void Save() {
     if (!save_required) {
-      PrintLn("No changes need to be saved in '", emp::ANSI::MakeGreen(filename), "'.");
+      if (mode == Mode::Interactive) {
+        PrintLn("No changes need to be saved in '", emp::ANSI::MakeGreen(filename), "'.");
+      }
       return;
     }
     PrintLn("Saving '", emp::ANSI::MakeGreen(filename),"'.");
+
+    // Don't let cruft build up at the end of the file.
+    while (tokens.back().id == emplex::Lexer::ID_END_LINE ||
+           tokens.back().lexeme.empty()) {
+      tokens.pop_back();
+    }
+
+    // Output the main body of the file.
     std::ofstream file(filename);
     for (auto & token : tokens) {
       file << token.lexeme;
@@ -162,17 +176,12 @@ public:
 
     // Attach a comment to the end of the file if there are local words to save.
     if (words.size()) {
-      // Don't let cruft build up at the end of the file.
-      while (tokens.back().id == emplex::Lexer::ID_END_LINE ||
-             tokens.back().lexeme.empty()) {
-        tokens.pop_back();
-      }
-
       file << "\n\n// Special info below for local control over the Empecable file checker.\n"
            << "// empecable_words:";
       for (emp::String word : words) file << " " << word;
-      file << '\n';
     }
+
+    file << '\n'; // End the file in a single newline.
 
     file.close();
   }
@@ -186,12 +195,14 @@ public:
     issues.push_back(issue);
 
     // Report the issue.
-    PrintLn(emp::ANSI::MakeBold(emp::ANSI::MakeYellow("Found: ")), issue);
+    if (mode >= Mode::Verbose) {
+      PrintLn(emp::MakeString("Found in ", filename, ": ").AsANSIYellow().AsANSIBold(), issue);
 
-    // Print line number and the affected code.
-    emp::String line_num = emp::MakeString(GetToken(token_pos).line_id).PadFront(' ', 5)+':';
-    emp::String code_line = GetTokenLine(token_pos);
-    PrintLn(line_num.AsANSIBrightWhite().AsANSIBold(), code_line);
+      // Print line number and the affected code.
+      emp::String line_num = emp::MakeString(GetToken(token_pos).line_id).PadFront(' ', 5)+':';
+      emp::String code_line = GetTokenLine(token_pos);
+      PrintLn(line_num.AsANSIBrightWhite().AsANSIBold(), code_line);
+    }
   }
 
 };
