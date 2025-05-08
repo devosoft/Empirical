@@ -29,7 +29,7 @@ namespace emp {
     // Setup Fitness reflection.
     // 0. A manually set fitness function will override any of the options below.
     // 1. If an organism has a "GetFitness()" member function, use it!
-    // 2. If an organim can be cast to double, use it!
+    // 2. If an organism can be cast to double, use it!
     // 3. Start with a fitness function that throws an assert indicating function must be set.
 
     using std::declval;

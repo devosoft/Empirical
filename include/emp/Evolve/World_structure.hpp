@@ -28,7 +28,7 @@ namespace emp {
   template <typename ORG> class World;
 
   /// A class to track positions in World.
-  /// For the moment, the only informaiton beyond index is active (vs. next) population when
+  /// For the moment, the only information beyond index is active (vs. next) population when
   /// using synchronous generations.
   //
   //  Developer NOTE: For efficiency, internal class members are uint32_t, but to prevent compiler
@@ -181,7 +181,7 @@ namespace emp {
     // if a more fit organism is already in place; you must run clear first if you want to
     // ensure placement.
     world.SetAddInjectFun( [&world,traits,trait_counts](Ptr<ORG> new_org) {
-      // Determine tha position that this phenotype fits in.
+      // Determine the position that this phenotype fits in.
       double org_fitness = world.CalcFitnessOrg(*new_org);
       size_t id = traits.EvalBin(*new_org, trait_counts);
       double cur_fitness = world.CalcFitnessID(id);
@@ -203,7 +203,7 @@ namespace emp {
     // Birth is effectively the same as inject.
     world.SetAddBirthFun( [&world,traits,trait_counts](Ptr<ORG> new_org, WorldPosition parent_pos) {
       (void) parent_pos; // Parent position is not needed for MAP Elites.
-      // Determine tha position that this phenotype fits in.
+      // Determine the position that this phenotype fits in.
       double org_fitness = world.CalcFitnessOrg(*new_org);
       size_t id = traits.EvalBin(*new_org, trait_counts);
       double cur_fitness = world.CalcFitnessID(id);
@@ -254,7 +254,7 @@ namespace emp {
   /// DiverseElites is similar to MAP-Elites, but rather than merely keep the elites on
   /// a pre-defined grid, it merely tries to maintain maximal distance between elites in
   /// trait space.  The main advantages to this technique are (1) It's easy to build
-  /// up an inital population that grows in diversity over time, and (2) You don't need to
+  /// up an initial population that grows in diversity over time, and (2) You don't need to
   /// predefine box sizes or even limits to trait values.
 
   /// Set the population to use a DiverseElites structure.  This means that organism placement has
@@ -280,7 +280,7 @@ namespace emp {
     emp::vector<double> max_vals;    ///< Largest value found for each trait.
     emp::vector<double> bin_width;   ///< Largest value found for each trait.
 
-    bool is_setup;                          ///< Have we initialized the internal data stucture?
+    bool is_setup;                          ///< Have we initialized the internal data structure?
     size_t num_trait_bins;                  ///< How many bins should we use for each trait?
     size_t num_total_bins;                  ///< How many bins are there overall?
     emp::vector<std::set<size_t>> bin_ids;  ///< Which org ids fall into each bin?

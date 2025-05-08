@@ -584,7 +584,7 @@ namespace emp {
   public:
 
     /**
-     * Contructor for Systematics; controls what information should be stored.
+     * Constructor for Systematics; controls what information should be stored.
      * @param calc_taxon       A function that takes an organism and calculates what taxon it belongs to
      * @param store_active     Should living organisms' taxa be tracked? (typically yes!)
      * @param store_ancestors  Should ancestral organisms' taxa be maintained?  (yes for lineages!)
@@ -680,7 +680,7 @@ namespace emp {
     }
     ///@}
 
-    /// Set function used to calculate taxons from organisms
+    /// Set function used to calculate taxa from organisms
     void SetCalcInfoFun(fun_calc_info_t f) {calc_info_fun = f;}
 
     /// Remove all taxa that 1) went extinct before the specified update/time step,
@@ -1164,7 +1164,7 @@ namespace emp {
 
     /** @returns the total number of ancestors between the given taxon and MRCA, if there is one. If
      *  there is no common ancestor, distance to the root of this tree is calculated instead.
-     * @param tax the taxon who's distance to root you want to calculate
+     * @param tax the taxon whose distance to root you want to calculate
      * */
     int GetDistanceToRoot(Ptr<taxon_t> tax) const;
 
@@ -1364,7 +1364,7 @@ namespace emp {
     ++curr_update;
   }
 
-  // Should be called wheneven a taxon has no organisms AND no descendants.
+  // Should be called whenever a taxon has no organisms AND no descendants.
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::Prune(Ptr<taxon_t> taxon) {
     on_prune_sig.Trigger(taxon);
@@ -1816,7 +1816,7 @@ namespace emp {
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t> Systematics<ORG, ORG_INFO, DATA_STRUCT>::GetMRCA() const {
     if (!mrca && num_roots == 1) {  // Determine if we need to calculate the MRCA.
-      // First, find a candidate among the living taxa.  Only taxa that have one offsrping
+      // First, find a candidate among the living taxa.  Only taxa that have one offspring
       // can be on the line-of-descent to the MRCA, so anything else is a good start point.
       // There must be at least one!  Stop as soon as we find a candidate.
       Ptr<taxon_t> candidate = *std::find_if(active_taxa.begin(), active_taxa.end(),
@@ -2009,7 +2009,7 @@ namespace emp {
     if (dists.size() != (active_taxa.size()*(active_taxa.size()-1))/2) {
       // The tree is not connected
       // It's possible we should do something different here...
-      emp_assert_warning(false, "Warning: Tree is not connected - some pairwise distances are infinite (ommitted)");
+      emp_assert_warning(false, "Warning: Tree is not connected - some pairwise distances are infinite (omitted)");
       return dists;
     }
 
@@ -2432,3 +2432,15 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_EVOLVE_SYSTEMATICS_HPP_INCLUDE
+
+
+// Special info below for local control over the Empecable file checker.
+
+
+
+// Special info below for local control over the Empecable file checker.
+
+
+
+// Special info below for local control over the Empecable file checker.
+// empecable_words: distj disti vec mir multifurcating trifurcations sackin phylotrackpy Sackin unifurcations mrca orig phen sig Colless inf inserter

@@ -8,9 +8,9 @@
  *  @brief This file defines iterators for use with emp::World objects.
  *
  *  @note Originally called PopulationIterator.h
- *  @todo Add a const interator.
+ *  @todo Add a const iterator.
  *  @todo Currently we do MakeValid after every change AND before many accesses.  Pick one?
- *  @todo Fix operator-- which can go off of the beginnig of the world.
+ *  @todo Fix operator-- which can go off of the beginning of the world.
  */
 
 #ifndef EMP_EVOLVE_WORLD_ITERATOR_HPP_INCLUDE
@@ -66,7 +66,7 @@ namespace emp {
       return *this;
     }
 
-    /// Backup iterator to the previos non-empty cell in the world.
+    /// Backup iterator to the previous non-empty cell in the world.
     this_t & operator--() {
       --pos;
       while (pos < WorldSize() && OrgPtr() == nullptr) --pos;

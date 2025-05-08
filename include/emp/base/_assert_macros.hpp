@@ -13,7 +13,7 @@
 #ifndef EMP_BASE__ASSERT_MACROS_HPP_INCLUDE
 #define EMP_BASE__ASSERT_MACROS_HPP_INCLUDE
 
-/// Basic elper macros...
+/// Basic helper macros...
 #define emp_assert_STRINGIFY(...) emp_assert_STRINGIFY_IMPL(__VA_ARGS__)
 #define emp_assert_STRINGIFY_IMPL(...) #__VA_ARGS__
 #define emp_assert_TO_PAIR(X) emp_assert_STRINGIFY(X) , X

@@ -213,7 +213,7 @@ namespace emp {
     static PtrTracker & Get() { static PtrTracker tracker; return tracker; }
 
     /// Retrieve the ID associated with a pointer.
-    size_t GetCurID(const void * ptr) const { 
+    size_t GetCurID(const void * ptr) const {
       auto it = ptr_id.find(ptr);
       emp_assert(it != ptr_id.end(), "Ptr is not tracked!");
       return it->second;
@@ -236,7 +236,7 @@ namespace emp {
     size_t GetArrayBytes(size_t id) const { return id_info[id].GetArrayBytes(); }
 
     bool OK(size_t id) const {
-      if (id == UNTRACKED_ID) return true;      
+      if (id == UNTRACKED_ID) return true;
       if (id >= id_info.size()) return false;
       return id_info[id].OK();
     }
@@ -245,7 +245,7 @@ namespace emp {
 
     /// Check if an ID is for a pointer that has been deleted.
     bool IsDeleted(size_t id) const {
-      emp_assert(OK(id)); 
+      emp_assert(OK(id));
       if (!IsTracked(id)) return false;   // Not tracked, so not deleted.
       if (internal::ptr_debug) std::cout << "IsDeleted: " << id << std::endl;
       return !id_info[id].IsActive();
@@ -260,14 +260,14 @@ namespace emp {
 
     /// Is a pointer id associated with a pointer that's active and ready to be used?
     bool IsActiveID(size_t id) const {
-      emp_assert(OK(id)); 
+      emp_assert(OK(id));
       if (id >= id_info.size()) return false; // Includes untracked.
       return id_info[id].IsActive();
     }
 
     /// Is an ID associated with an array?
     bool IsArrayID(size_t id) const {
-      emp_assert(OK(id)); 
+      emp_assert(OK(id));
       if (internal::ptr_debug) std::cout << "IsArrayID: " << id << std::endl;
       if (id >= id_info.size()) return false;  // Includes untracked.
       return id_info[id].IsArray();
@@ -275,13 +275,13 @@ namespace emp {
 
     /// Check if an ID is for a pointer that can be followed.
     bool IsUsable(size_t id) const {
-      emp_assert(OK(id)); 
+      emp_assert(OK(id));
       return !IsTracked(id) || IsActiveID(id);
     }
 
     /// How many Ptr objects are associated with an ID?
     int GetIDCount(size_t id) const {
-      emp_assert(OK(id)); 
+      emp_assert(OK(id));
       if (internal::ptr_debug) std::cout << "Count:  " << id << std::endl;
       return id_info[id].GetCount();
     }
@@ -322,7 +322,7 @@ namespace emp {
 
     /// Decrement the number of Pointers associated with an ID
     void DecID(size_t id) {
-      emp_assert(OK(id)); 
+      emp_assert(OK(id));
       if (id == UNTRACKED_ID) return;   // Not tracked!
       auto & info = id_info[id];
       if (internal::ptr_debug) std::cout << "Dec:    " << id << "(" << info.GetPtr() << ")" << std::endl;
@@ -333,7 +333,7 @@ namespace emp {
 
     /// Mark the pointers associated with this ID as deleted.
     void MarkDeleted(size_t id) {
-      emp_assert(OK(id)); 
+      emp_assert(OK(id));
 #ifdef EMP_ABORT_PTR_DELETE
       if (id == EMP_ABORT_PTR_DELETE) {
         std::cerr << "Aborting at deletion of Ptr id " << id << std::endl;
@@ -374,7 +374,7 @@ namespace emp {
   /// Base class with common functionality (that should not exist in void pointers)
   template <typename TYPE>
   class BasePtr {
-  private:    
+  private:
     bool IsUsable() const {
       return Tracker().IsUsable(id) && (ptr != nullptr);
     }
@@ -391,7 +391,7 @@ namespace emp {
            << " deleted:" << Tracker().IsDeleted(id);
       }
       return ss.str();
-    }    
+    }
   public:
     TYPE * ptr;                 ///< The raw pointer associated with this Ptr object.
     size_t id;                  ///< A unique ID for this pointer type.
@@ -483,7 +483,7 @@ namespace emp {
       Tracker().IncID(id);
     }
 
-    /// Construct from a raw pointer of compatable type.
+    /// Construct from a raw pointer of compatible type.
     template <typename T2>
     Ptr(T2 * in_ptr, bool track=false) : BasePtr<TYPE>(in_ptr, UNTRACKED_ID)
     {
@@ -1125,3 +1125,6 @@ namespace emp {
 } // namespace emp
 
 #endif // #ifndef EMP_BASE_PTR_HPP_INCLUDE
+
+// Special info below for local control over the Empecable file checker.
+// empecable_words: d's

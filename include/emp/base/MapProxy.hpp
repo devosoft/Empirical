@@ -5,7 +5,7 @@
 */
 /**
  *  @file
- *  @brief A proxy for indecies returned from any map type to ensure they are initialized.
+ *  @brief A proxy for indices returned from any map type to ensure they are initialized.
  *  @note Status: ALPHA
  */
 
@@ -55,7 +55,7 @@ namespace emp {
     auto operator++(int) { return emp_GetValue()++; }
     auto operator--(int) { return emp_GetValue()--; }
 
-    // Setup basic arithmatic
+    // Setup basic arithmetic
     auto operator+() const { return +emp_GetValue(); }
     auto operator-() const { return -emp_GetValue(); }
     auto operator!() const { return !emp_GetValue(); }

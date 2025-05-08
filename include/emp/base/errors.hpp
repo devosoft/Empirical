@@ -25,7 +25,7 @@
  *  NOTES:
  *  - Whenever possible, exceptions should be preferred.  They are more specific than warnings,
  *    but don't halt execution like errors.
- *  - Warnings should always detail what should be done differently to surpress the warning.
+ *  - Warnings should always detail what should be done differently to suppress the warning.
  *
  *
  *  @todo We should move over to a pure replacement for exceptions.

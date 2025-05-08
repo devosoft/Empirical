@@ -63,7 +63,7 @@ namespace emp {
 
   template <typename ORG>
   void ResourceSelect(World<ORG> & world, emp::vector< std::function<double(ORG &)> > & extra_funs,
-           emp::vector<emp::Resource> & pools, size_t t_size, size_t tourny_count=1, double frac = .0025, double max_bonus = 5, double cost = 0, bool use_base = true, double min_score = 0) {
+           emp::vector<emp::Resource> & pools, size_t t_size, size_t tourney_count=1, double frac = .0025, double max_bonus = 5, double cost = 0, bool use_base = true, double min_score = 0) {
 
      emp_assert(world.GetFitFun(), "Must define a base fitness function");
      emp_assert(world.GetSize() > 0);
@@ -113,7 +113,7 @@ namespace emp {
        base_fitness[org_id] *= emp::Pow2(cur_fit);
        pools[ex_id].Dec(std::abs(cur_fit));
     //  std::cout << "   Bonus " << ex_id << " = " << extra_funs[ex_id](world[org_id]) << " "<< emp::Pow(2.0,cur_fit) << " " << emp::to_string(world[org_id])
-    // //        << "   fitnes = " << base_fitness[org_id]
+    // //        << "   fitness = " << base_fitness[org_id]
     //        << std::endl;
 
      }
@@ -130,7 +130,7 @@ namespace emp {
   //  std::cout << std::endl;
 
      emp::vector<size_t> entries;
-     for (size_t T = 0; T < tourny_count; T++) {
+     for (size_t T = 0; T < tourney_count; T++) {
      entries.resize(0);
     //  std::cout << T << std::endl;
      for (size_t i=0; i<t_size; i++) entries.push_back( world.GetRandomOrgID() ); // Allows replacement!
@@ -156,7 +156,7 @@ namespace emp {
     //   fitness_index.Adjust(id, base_fitness[id]);
     // }
     //
-    // for (size_t n = 0; n < tourny_count; n++) {
+    // for (size_t n = 0; n < tourney_count; n++) {
     //   const double fit_pos = world.GetRandom().GetDouble(std::min(fitness_index.GetWeight(), 99999.9));
     //   const size_t parent_id = fitness_index.Index(fit_pos);
     //   const size_t offspring_id = world.DoBirth( world.GetGenomeAt(parent_id), parent_id ).index;
@@ -171,3 +171,7 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_EVOLVE_RESOURCE_HPP_INCLUDE
+
+
+// Special info below for local control over the Empecable file checker.
+// empecable_words: curr amt

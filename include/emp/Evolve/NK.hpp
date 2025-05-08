@@ -105,7 +105,7 @@ namespace emp {
     size_t GetN() const { return N; }
     /// Returns K
     size_t GetK() const { return K; }
-    /// Get the number of posssible states for a given site
+    /// Get the number of possible states for a given site
     size_t GetStateCount() const { return state_count; }
     /// Get the total number of states possible in the landscape
     /// (i.e. the number of different fitness contributions in the table)
@@ -184,7 +184,7 @@ namespace emp {
 
   };
 
-  /// The NKLandscapeMemo class is simialar to NKLandscape, but it does not pre-calculate all
+  /// The NKLandscapeMemo class is similar to NKLandscape, but it does not pre-calculate all
   /// of the landscape states.  Instead it determines the value of each gene combination on first
   /// use and memorizes it.
 
@@ -237,3 +237,7 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_EVOLVE_NK_HPP_INCLUDE
+
+
+// Special info below for local control over the Empecable file checker.
+// empecable_words: ltable

@@ -10,7 +10,7 @@
  *  State grids are a matrix of values, representing states of a 2D environment that an organism
  *  can traverse.
  *
- *  @todo Functions such as Load() should throw exceptions (or equilv.), not use asserts.
+ *  @todo Functions such as Load() should throw exceptions (or equiv.), not use asserts.
  *  @todo Need to figure out a default mapping for how outputs translate to moves around a
  *    state grid.  -1 = Back up ; 0 = Turn left ; 1 = Move fast-forwards ; 2 = Turn right
  *  @todo Allow StateGridInfo to be built inside of StateGrid (change reference to pointer and
@@ -371,7 +371,7 @@ namespace emp {
       grid.SetState(cur_state.x, cur_state.y, new_state);
     }
 
-    /// Print the history of an organim moving around a state grid.
+    /// Print the history of an organism moving around a state grid.
     void PrintHistory(StateGrid & grid, std::ostream & os=std::cout) const {
       emp_assert(history.size(), "You can only print history of a StateGrid if you track it!");
       const size_t width = grid.GetWidth();
@@ -390,3 +390,7 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_EVOLVE_STATEGRID_HPP_INCLUDE
+
+
+// Special info below for local control over the Empecable file checker.
+// empecable_words: equiv

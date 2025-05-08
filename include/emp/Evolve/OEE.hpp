@@ -223,8 +223,8 @@ namespace emp {
     emp_assert(org.size() > 0, "Empty org passed to skeletonize");
 
     emp::vector<INST_TYPE> skeleton;
-    // Some fitness functions may require the org to be const and smoe may require it to not be
-    // We can let the compiler deducce whetehr ORG_TYPE is const or not.
+    // Some fitness functions may require the org to be const and some may require it to not be
+    // We can let the compiler deduce whether ORG_TYPE is const or not.
     // But the test org really needs to not be const
     typename std::remove_const<ORG_TYPE>::type test_org = ORG_TYPE(org);
     double fitness = fit_fun(test_org);
@@ -245,3 +245,7 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_EVOLVE_OEE_HPP_INCLUDE
+
+
+// Special info below for local control over the Empecable file checker.
+// empecable_words: skel

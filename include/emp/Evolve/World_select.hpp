@@ -56,7 +56,7 @@ namespace emp {
     }
   }
 
-  /// ==RANDOM== Selection picks an organism with uniform-random probability form the populaiton.
+  /// ==RANDOM== Selection picks an organism with uniform-random probability form the population.
   /// @param world The emp::World object with the organisms to be selected.
   /// @param r_count How many distinct organisms should be chosen?
   /// @param copy_count How many copies should be made of each chosen organism?
@@ -84,15 +84,15 @@ namespace emp {
   /// (optionally) the number of tournaments to run.
   /// @param world The emp::World object with the organisms to be selected.
   /// @param t_size How many organisms should be placed in each tournament?
-  /// @param tourny_count How many tournaments should be run? (with replacement of organisms)
+  /// @param tourney_count How many tournaments should be run? (with replacement of organisms)
   template<typename ORG>
-  void TournamentSelect(World<ORG> & world, size_t t_size, size_t tourny_count=1) {
+  void TournamentSelect(World<ORG> & world, size_t t_size, size_t tourney_count=1) {
     emp_assert(t_size > 0, "Cannot have a tournament with zero organisms.", t_size, world.GetNumOrgs());
     emp_assert(t_size <= world.GetNumOrgs(), "Tournament too big for world.", t_size, world.GetNumOrgs());
-    emp_assert(tourny_count > 0);
+    emp_assert(tourney_count > 0);
 
     emp::vector<size_t> entries;
-    for (size_t T = 0; T < tourny_count; T++) {
+    for (size_t T = 0; T < tourney_count; T++) {
       entries.resize(0);
       // Choose organisms for this tournament (with replacement!)
       for (size_t i=0; i < t_size; i++) entries.push_back(
@@ -122,14 +122,14 @@ namespace emp {
   /// (optionally) the number of tournaments to run.
   /// @param world The emp::World object with the organisms to be selected.
   /// @param t_size How many organisms should be placed in each tournament?
-  /// @param tourny_count How many tournaments should be run? (with replacement of organisms)
+  /// @param tourney_count How many tournaments should be run? (with replacement of organisms)
   template<typename ORG>
-  void LocalTournamentSelect(World<ORG> & world, size_t t_size, size_t tourny_count=1) {
+  void LocalTournamentSelect(World<ORG> & world, size_t t_size, size_t tourney_count=1) {
     emp_assert(t_size > 0, "Cannot have a tournament with zero organisms.", t_size, world.GetNumOrgs());
     emp_assert(t_size <= world.GetNumOrgs(), "Tournament too big for world.", t_size, world.GetNumOrgs());
-    emp_assert(tourny_count > 0);
+    emp_assert(tourney_count > 0);
 
-    for (size_t T = 0; T < tourny_count; T++) {
+    for (size_t T = 0; T < tourney_count; T++) {
       emp::vector<size_t> entries{world.GetRandomOrgID()};
 
       // Choose organisms for this tournament (with replacement!)
@@ -158,7 +158,7 @@ namespace emp {
   /// ==ROULETTE== Selection (aka Fitness-Proportional Selection) chooses organisms to
   /// reproduce based on their current fitness.
   /// @param world The emp::World object with the organisms to be selected.
-  /// @param count How many organims should be selected for replication? (with replacement)
+  /// @param count How many organisms should be selected for replication? (with replacement)
   template<typename ORG>
   void RouletteSelect(World<ORG> & world, size_t count=1) {
     emp_assert(count > 0);
@@ -267,7 +267,7 @@ namespace emp {
   //  ahead of time and performs each analysis only once.
   /// @param world The emp::World object with the organisms to be selected.
   /// @param fit_funs The set of fitness functions to shuffle for each organism reproduced.
-  /// @param repro_count How many rounds of repliction should we do. (default 1)
+  /// @param repro_count How many rounds of replication should we do. (default 1)
   /// @param max_funs The maximum number of fitness functions to use. (use 0 for all; default)
   template<typename ORG>
   void OptimizedLexicaseSelect(World<ORG> & world,
@@ -320,7 +320,7 @@ namespace emp {
     // std::cout << to_string(fitnesses) << std::endl;
   // std::cout << "fitness calculated" << std::endl;
     // Go through a new ordering of fitness functions for each selections.
-  // std::cout << "randdomized" << std::endl;
+  // std::cout << "randomized" << std::endl;
     for (size_t repro = 0; repro < repro_count; ++repro) {
   // std::cout << "repro: " << repro << std::endl;
       // Determine the current ordering of the functions.
@@ -329,11 +329,11 @@ namespace emp {
       if (max_funs == fit_funs.size()) {
         order = GetPermutation(world.GetRandom(), fit_funs.size());
       } else {
-        order.resize(max_funs); // We want to limit the total numebr of tests done.
+        order.resize(max_funs); // We want to limit the total number of tests done.
         for (auto & x : order) x = world.GetRandom().GetUInt(fit_funs.size());
       }
       // @CAO: We could have selected the order more efficiently!
-  // std::cout << "reoreder" << std::endl;
+  // std::cout << "reorder" << std::endl;
       // Step through the functions in the proper order.
       cur_gens = all_gens;  // Start with all of the organisms.
       int depth = -1;
@@ -400,12 +400,12 @@ namespace emp {
 
 
 
-  // EcoSelect works like Tournament Selection, but also uses a vector of supplimentary fitness
+  // EcoSelect works like Tournament Selection, but also uses a vector of supplementary fitness
   // functions.  The best individuals on each supplemental function divide up a resource pool.
   // NOTE: You must turn off the FitnessCache for this function to work properly.
   template<typename ORG>
   void EcoSelect(World<ORG> & world, const emp::vector<std::function<double(ORG &)> > & extra_funs,
-                  const emp::vector<double> & pool_sizes, size_t t_size, size_t tourny_count=1)
+                  const emp::vector<double> & pool_sizes, size_t t_size, size_t tourney_count=1)
   {
     emp_assert(world.GetFitFun(), "Must define a base fitness function");
     emp_assert(world.GetSize() > 0);
@@ -462,7 +462,7 @@ namespace emp {
 
 
     emp::vector<size_t> entries;
-    for (size_t T = 0; T < tourny_count; T++) {
+    for (size_t T = 0; T < tourney_count; T++) {
       entries.resize(0);
       for (size_t i=0; i<t_size; i++) entries.push_back( world.GetRandomOrgID() ); // Allows replacement!
 
@@ -486,12 +486,15 @@ namespace emp {
   /// EcoSelect can be provided a single value if all pool sizes are identical.
   template<typename ORG>
   void EcoSelect(World<ORG> & world, const emp::vector<typename World<ORG>::fun_calc_fitness_t > & extra_funs,
-                  double pool_sizes, size_t t_size, size_t tourny_count=1)
+                  double pool_sizes, size_t t_size, size_t tourney_count=1)
   {
     emp::vector<double> pools(extra_funs.size(), pool_sizes);
-    EcoSelect(world, extra_funs, pools, t_size, tourny_count);
+    EcoSelect(world, extra_funs, pools, t_size, tourney_count);
   }
 
 }
 
 #endif // #ifndef EMP_EVOLVE_WORLD_SELECT_HPP_INCLUDE
+
+// Special info below for local control over the Empecable file checker.
+// empecable_words: lex

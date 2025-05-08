@@ -5,12 +5,12 @@
  *
  *  @file concepts.hpp
  *  @brief Useful concepts that are not trivially available in the C++20 standard library.
- * 
+ *
  *  The concepts available here are:
- * 
- *    canStreamTo<STREAM_T, OBJECT_T> 
- *    canStreamFrom<STREAM_T, OBJECT_T> 
- * 
+ *
+ *    canStreamTo<STREAM_T, OBJECT_T>
+ *    canStreamFrom<STREAM_T, OBJECT_T>
+ *
  */
 
 #ifndef EMP_BASE_CONCEPTS_HPP_INCLUDE

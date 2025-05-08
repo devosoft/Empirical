@@ -1,7 +1,7 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2017-2018
+ *  date: 2017-2025.
 */
 /**
  *  @file
@@ -58,7 +58,7 @@ namespace emp {
   ///
   ///  There are three ways that organisms can enter the population:
   ///   * InjectAt(org, pos) - place the organism at the specified position in the population.
-  ///   * Inject(org) - place the organism using a default postion (given other settings).
+  ///   * Inject(org) - place the organism using a default position (given other settings).
   ///   * DoBirth(org, parent_pos) - place the organism using current birth settings.
   ///
   ///  If the population is in EA mode (with synchronous generations), DoBirth will place offspring in
@@ -230,7 +230,7 @@ namespace emp {
       SetDefaultGetGenomeFun<this_t, ORG>(*this);
       SetPopStruct_Mixed();  // World default structure is well-mixed.
     }
-    World(Random & rnd, std::string _name="") : World(_name,false) { random_ptr = &rnd; }
+    World(Random & random, std::string _name="") : World(_name,false) { random_ptr = &random; }
 
     ~World() {
       world_destruct_sig.Trigger();
@@ -359,7 +359,7 @@ namespace emp {
       return *(pop[id]);
     }
 
-    /// Retrieve a reference to the organsim as the specified position.
+    /// Retrieve a reference to the organism as the specified position.
     /// Same as operator[]; will trip assert if cell is not occupied.
     ORG & GetOrg(size_t id) {
       emp_assert(id < pop.size());         // Pop must be large enough.
@@ -371,7 +371,7 @@ namespace emp {
     // @CAO: Technically, we should set this up with any number of coordinates.
     ORG & GetOrg(size_t x, size_t y) { return GetOrg(x+y*GetWidth()); }
 
-    /// Retrive a pointer to the contents of a specified cell; will be nullptr if the cell is
+    /// Retrieve a pointer to the contents of a specified cell; will be nullptr if the cell is
     /// not occupied.
     const Ptr<ORG> GetOrgPtr(size_t id) const { return pop[id]; }
 
@@ -386,7 +386,7 @@ namespace emp {
     /// Retrieve the genome corresponding to a specified organism.
     const genome_t & GetGenome(ORG & org) { return fun_get_genome(org); }
 
-    /// Retrive the genome corresponding to the organism at the specified position.
+    /// Retrieve the genome corresponding to the organism at the specified position.
     const genome_t & GetGenomeAt(size_t id) { return fun_get_genome(GetOrg(id)); }
 
     /// Get a systematics manager (which is tracking lineages in the population.)
@@ -613,7 +613,7 @@ namespace emp {
     void SetGetNeighborFun(const fun_get_neighbor_t & _fun) { fun_get_neighbor = _fun; }
 
     /// Setup the function to determine if two organisms are neighbors. It should return a
-    /// boolean indicating if they are neighbors.
+    /// Boolean indicating if they are neighbors.
     void SetIsNeighborFun(const fun_is_neighbor_t & _fun) {fun_is_neighbor = _fun; }
 
     /// Same as setting a fitness function, but uses Goldberg and Richardson's fitness sharing
@@ -652,7 +652,7 @@ namespace emp {
       return offspring_ready_sig.AddAction(fun);
     }
 
-    /// Provide a function for World to call before an external organim is injected into the World.
+    /// Provide a function for World to call before an external organism is injected into the World.
     /// Trigger:  New organism about to be added to population from outside
     /// Argument: Reference to organism about to be placed in population.
     /// Return:   Key value needed to make future modifications.
@@ -661,7 +661,7 @@ namespace emp {
     }
 
     /// Provide a function for World to call before an organism is added to the active population,
-    /// but after position is found.  With synchonous generations, this occurs during Update().
+    /// but after position is found.  With synchronous generations, this occurs during Update().
     /// Trigger:  Organism is about to be added to population; position is known (either born or injected)
     /// Args:     (1) Reference to organism about to be placed; (2) Position organism will be placed.
     /// Return:   Key value needed to make future modifications.
@@ -670,7 +670,7 @@ namespace emp {
     }
 
     /// Provide a function for World to call immediately after any organism has been added to the
-    /// active population.  With synchonous generations, this occurs during Update().
+    /// active population.  With synchronous generations, this occurs during Update().
     /// Trigger:  Organism has been added to population (either born or injected)
     /// Argument: Position of organism placed in the population.
     /// Return:   Key value needed to make future modifications.
@@ -920,7 +920,7 @@ namespace emp {
     /// Print unique organisms and the number of copies of each that exist.
     void PrintOrgCounts(std::ostream & os = std::cout);
 
-    /// Print the organisms layed out in a grid structure (assumes a grid population.)
+    /// Print the organisms laid out in a grid structure (assumes a grid population.)
     void PrintGrid(std::ostream& os=std::cout, const std::string & empty="-", const std::string & spacer=" ");
 
 
@@ -1741,3 +1741,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_EVOLVE_WORLD_HPP_INCLUDE
+
+// Special info below for local control over the Empecable file checker.
+// empecable_words: mrca
