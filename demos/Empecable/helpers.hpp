@@ -17,6 +17,12 @@
 
 namespace fs = std::filesystem;
 
+enum class Mode {
+  Silent,        // No output, just error code.
+  Normal,        // Basic summary output.
+  Verbose,       // Full output
+  Interactive    // Full output with questions.
+};
 
 // ========= ANSI Output Format Helpers ==========
 
