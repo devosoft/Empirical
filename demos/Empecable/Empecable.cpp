@@ -10,19 +10,23 @@
  * - Check spelling for the code files.
  * - Remove illegal characters including \r, \t, and end-of-line spaces
  * - Ensure the file ends in a newline
- * - Ensure that 2 spaces are used for indent levels (esp. after `{` at eol?})
- * - Group and track include files
- * - Ensure include guards or #pragma once (or both) exist.
- * - Ensure no merge conflict markers are in the file (and help with merge?)
+ * + Ensure that 2 spaces are used for indent levels (esp. after `{` at eol?})
+ * + Group and track include files
+ * + Ensure include guards or #pragma once (or both) exist.
+ * + Ensure no merge conflict markers are in the file (and help with merge?)
  * - Track any special features about files or projects including custom spelling.
- * - Fully configure actions with a Empecable.cfg file.
- * - Find the .Empirical/ directory for configurations (or create one if it doesn't exist)
+ * + Fully configure actions with a code_format.cfg file in .Empirical/
+ * - Find the .Empirical/ directory for configurations
+ * + Create config files that don't already exist.
  *
  * Possible add-on features to develop?
  * - Produce a levelization map
  * - Dynamic control over boilerplate (for easy scaling to other projects)
  * - Guided shifting of boilerplate to a new format
  * - Spacing must always shift by 0 or 2 OR somehow align with previous line?
+ * - Save previous word changes to use as future suggestions
+ * - Better weighting on words for alternate suggestions
+ *   (e.g., swapping letters counts as 1, bigger penalty for wrong first letter)
  * - Make sure include files have corresponding test files.
  * - Make sure test files are not empty (or effectively empty)
  *
@@ -87,26 +91,29 @@ struct Checks {
 
 class Empecable {
 private:
+
   // Options used:
   Checks checks;
-  bool verbose = false;
-  bool interactive = false;
+  Mode mode = Mode::Normal;
 
   emp::FlagManager flags;         // Tracker for command-line flags that were set.
   emp::vector<ReviewFile> files;  // Files to be reviewed.
   size_t active_file = 0;         // Which file are we working with?
+  size_t total_issues = 0;
 
   // Lexer information.
   emplex::Lexer lexer;
 
   fs::path word_file = "word_list.txt";
+  fs::path replace_file = "replace_list.txt";
   std::optional<fs::path> emp_dir = std::nullopt; // Put emp_dir here if one is found.
 
   using word_set_t = std::unordered_set<emp::String>;
   using word_map_t = std::unordered_map<emp::String, emp::String>;
   word_set_t project_words;   // Dictionary of legal words for this project.
   word_set_t skip_words;      // Words to skip over for now.
-  word_map_t replacement_map; // Track replacement words to use.
+  word_map_t replacement_map; // Track replacement words to always use.
+  word_map_t suggest_map;     // Track replacement words to suggest.
 
   bool project_changed = false; // Have there been any project-level changes requiring save?
 
@@ -125,9 +132,11 @@ private:
       "Activate ALL fixes (except those explicitly excluded; see below)");
     flags.AddOption('h', "help", [this](){ PrintHelp(); },
       "Get additional information about options.");
-    flags.AddOption('i', "interactive", [this](){ interactive = true; },
+    flags.AddOption('i', "interactive", [this](){ mode = Mode::Interactive; },
       "Interactively fix file problems");
-    flags.AddOption('v', "verbose", [this](){ verbose = true; },
+    flags.AddOption('r', "replace_file", [this](emp::String filename){ replace_file = filename.str(); },
+      "Specify the word file to use for spell checks.");
+    flags.AddOption('v', "verbose", [this](){ mode = Mode::Verbose; },
       "Provide more detailed output");
     flags.AddOption('w', "word_file", [this](emp::String filename){ word_file = filename.str(); },
       "Specify the word file to use for spell checks.");
@@ -190,6 +199,8 @@ private:
   }
 
   fs::path MakeEmpiricalDir(fs::path common_path) {
+    emp_assert(IsInteractive());
+
     fs::path option_path = common_path;
     if (!fs::is_directory(option_path)) option_path = option_path.parent_path();
     PrintLn("No .Empirical/ folder could be found in any parent directory.");
@@ -257,46 +268,81 @@ private:
 
   void LoadWords() {
     // Try loading the default word_file.
-    std::ifstream file(word_file);
+    std::ifstream in_file(word_file);
 
     // If word_file fails to load, look for (or make) a .Empirical/ directory.
-    if (!file) {
+    if (!in_file) {
       SetEMPDir();
       word_file = *emp_dir / word_file;
-      file.open(word_file);
+      in_file.open(word_file);
 
       // If we have still failed, report the error and abort.
-      if (!file) {
+      if (!in_file) {
         std::cerr << ToBoldRed("Error:") << " Unable to open file '" << word_file << "'.\n";
         exit(1);
       }
     }
 
-    PrintLn("Loaded word file: '", ToFilename(word_file), "'.");
-
     // Now that we have the file set up, actually load the words!
     emp::String word;
-    while (std::getline(file, word)) {
+    while (std::getline(in_file, word)) {
       project_words.insert(word);
     }
+
+    PrintLn("Loaded word file: '", ToFilename(word_file), "'.");
+
+    in_file.open(replace_file);
+    if (!in_file) {
+      SetEMPDir();
+      replace_file = *emp_dir / replace_file;
+      in_file.open(replace_file);
+
+      // If we have still failed, let the user know, but keep going.
+      if (!in_file) {
+        PrintLn("No word replacement list file found.");
+      }
+    }
+
+    if (in_file) {
+      PrintLn("Loaded replacement list file: '", ToFilename(replace_file), "'.");
+      
+      emp::String translation;
+      while (in_file) {
+        in_file >> word;
+        std::getline(in_file, translation); // Grab entire translation, maybe more than one word.
+        suggest_map[word] = translation;
+      }
+    }
+
   }
 
   void SaveProjectConfig() {
     if (!project_changed) {
       PrintLn("No changes need to be saved in '", ToFilename(word_file), "'.");
-      return;
+    } else {
+      PrintLn("Saving '", ToFilename(word_file), "'.");
+
+      // Move the project_words to a vector and sort them.
+      emp::vector<emp::String> out_words;
+      out_words.reserve(project_words.size());
+      for (emp::String word : project_words) out_words.emplace_back(word);
+      std::sort(out_words.begin(), out_words.end());
+
+      // Print the new file
+      std::ofstream file(word_file);
+      for (emp::String word : out_words) file << word << '\n';
     }
-    PrintLn("Saving '", ToFilename(word_file), "'.");
 
-    // Move the project_words to a vector and sort them.
-    emp::vector<emp::String> out_words;
-    out_words.reserve(project_words.size());
-    for (emp::String word : project_words) out_words.emplace_back(word);
-    std::sort(out_words.begin(), out_words.end());
-
-    // Print the new file
-    std::ofstream file(word_file);
-    for (emp::String word : out_words) file << word << '\n';
+    if (suggest_map.size() || replacement_map.size()) {
+      PrintLn("Saving '", ToFilename(replace_file), "'.");
+      std::ofstream file(replace_file);
+      for (auto [from, to] : suggest_map) {
+        file << from << " " << to << '\n';
+      }
+      for (auto [from, to] : replacement_map) {
+        file << from << " " << to << '\n';
+      }
+    }
   }
 
   void AddProjectWord(emp::String word) {
@@ -308,8 +354,9 @@ private:
 
   void DoReplace(size_t token_pos, emp::String new_word) {
     const emp::String old_word = GetLexeme(token_pos);
+    suggest_map[old_word] = new_word;
     File().SetLexeme(token_pos, new_word);
-    if (verbose || interactive) {
+    if (IsVerbose()) {
       PrintLn("Replacing '", old_word.AsANSICyan(), "' with '", new_word.AsANSICyan(), "'.");
     }
   }
@@ -332,6 +379,7 @@ private:
     File().SetLexeme(token_pos, new_word);
 
     // Record change for future tokens.
+    suggest_map[word] = new_word;
     if (change_all) replacement_map[word] = new_word;
 
     Print("Replacing ");
@@ -341,37 +389,38 @@ private:
 
   // Search through available dictionaries to try to find misspellings.
   emp::vector<emp::String> FindWordMatches(emp::String target_word, size_t max_size=5) {
-    constexpr int max_word_diff = 3;
-    constexpr size_t reduce_threshold = 1024;
+    emp_assert(max_size > 0);
+
+    constexpr double max_word_diff = 3.0;
     const int target_size = target_word.ssize();
 
-    emp_assert(max_size > 0);
-    emp_assert(max_size < reduce_threshold);
+    std::vector<emp::String> matches; // Set of matches to suggest to the user.
 
-    std::vector<std::pair<int, std::string>> scored;
+    // If the target word already has a suggestion associated with it, make sure that comes first.
+    emp::String suggestion = suggest_map.contains(target_word) ? suggest_map[target_word] : "";
+
+    // Score all of the other words in the dictionary (if they're close enough)
+    std::vector<std::pair<double, std::string>> scored;
     const emp::String lower_word = target_word.AsLower();
 
     for (const emp::String & word : project_words) {
       // Don't consider words that are too different in length.
       if (std::abs(word.ssize() - target_size) >= max_word_diff) continue;
 
-      int dist = (int) emp::calc_edit_distance(word.AsLower(), lower_word);
-      if (dist <= max_word_diff) {
-        scored.emplace_back(dist, word);
-        if (scored.size() >= reduce_threshold) {
-          std::sort(scored.begin(), scored.end());
-          scored.resize(max_size);
-        }
-      }
+      // Don't reconsider an existing suggestion.
+      if (word == suggestion) continue;
+
+      // Save all other words with their distance.
+      double dist = emp::calc_word_distance(word.AsLower(), lower_word);
+      if (dist <= max_word_diff) scored.emplace_back(dist, word);
     }
 
     std::sort(scored.begin(), scored.end());
-    if (scored.size() > max_size) scored.resize(max_size);
 
-    std::vector<emp::String> matches;
-    matches.reserve(scored.size());
+    if (suggestion.size()) matches.push_back(suggestion);
     for (auto [score, word] : scored) {
       matches.push_back(word);
+      if (matches.size() >= max_size) break;
     }
 
     return matches;
@@ -400,7 +449,7 @@ private:
     // We have an unknown word.
     File().ReportIssue(emp::MakeString("Unknown word '", word.AsANSICyan(), "'"), token_pos);
 
-    if (interactive) {
+    if (IsInteractive()) {
       emp::String lower_word = word.AsLower();
       Print(ToOption("a"), " - Add '", lower_word.AsANSICyan(), "' to main PROJECT dictionary");
       if (word.HasUpper()) {
@@ -418,6 +467,9 @@ private:
               ToOption("I"), " to ignore ALL instances");
 
       emp::vector<emp::String> matches = FindWordMatches(word);
+      // Use the same case as the word being matched.
+      if (word.OnlyUpper()) { for (auto & match : matches) match.SetUpper(); }
+      else if (word.HasUpperAt(0)) { for (auto & match : matches) match.SetUpperAt(0); }
       for (size_t i = 0; i < matches.size(); ++i) {
         PrintLn(ToOption(std::to_string(i)), " - Replace with '", matches[i].AsANSICyan(), "'");
       }
@@ -500,7 +552,7 @@ public:
     // Validate the filenames, set up full paths, and save as ReviewFile objects.
     size_t err_count = 0;
     for (const std::string & name : filenames) {
-      files.emplace_back(name);
+      files.emplace_back(name, mode);
       if (!files.back().IsValid()) ++err_count;
     }
     if (err_count) {
@@ -513,18 +565,19 @@ public:
     // Step through all of the files.
     for (active_file = 0; active_file < filenames.size(); ++active_file) {
       ProcessFile();
-      PrintLn("Finished '", ToFilename(File().GetName()), "'. Saving.\n");
-      File().Save();
+      File().Save(); // Will save only if a change has occurred.
     }
     SaveProjectConfig();
-
+    std::cout << "\nTotal Issues = " << total_issues << std::endl;
   }
 
   ~Empecable() { }
 
-  Empecable & SetAll(bool _in=true) { checks.SetAll(_in); return *this; }
+  bool IsVerbose() const { return mode >= Mode::Verbose; }
+  bool IsInteractive() const { return mode == Mode::Interactive; }
+  size_t GetNumIssues() const { return total_issues; }
 
-  Empecable & SetVerbose(bool _in) { verbose = _in; return *this; }
+  Empecable & SetAll(bool _in=true) { checks.SetAll(_in); return *this; }
 
   void PrintUsage() const {
     PrintLn("Usage: ", flags[0], " {options ...} files ...");
@@ -545,7 +598,7 @@ public:
   }
 
   void ProcessFile() {
-    PrintLn("=== File: ", File().GetName().AsANSIBrightCyan(), " ==n");
+    PrintLn("=== File: ", File().GetName().AsANSIBrightCyan(), " ==");
 
     if (!File().Load(lexer)) return; // File failed to load.
 
@@ -558,12 +611,12 @@ public:
         break;
       case Lexer::ID_ERR_END_LINE_WS:
         File().ReportIssue("Extra whitespace at end of line:", token_pos);
-        if (interactive && AskYesNo("Remove? ")) File().ClearLexeme(token_pos);
+        if (IsInteractive() && AskYesNo("Remove? ")) File().ClearLexeme(token_pos);
         found_issue = true;
         break;
       case Lexer::ID_ERR_WS:
         File().ReportIssue("Illegal whitespace:", token_pos);
-        if (interactive && AskYesNo("Remove? ")) File().ClearLexeme(token_pos);
+        if (IsInteractive() && AskYesNo("Remove? ")) File().ClearLexeme(token_pos);
         found_issue = true;
         break;
       default:
@@ -571,18 +624,21 @@ public:
       }
 
       // Skip a line between issues.
-      if (found_issue) {
+      if (found_issue && IsVerbose()) {
         PrintLn("-------------------------------------------------------------------------------");
       }
     }
 
-    PrintLn('\n', ToBoldRed("=== ", File().GetNumIssues(), " issues found ==="));
+    PrintLn(ToBoldRed("=== ", File().GetNumIssues(), " issues found ==="));
+    total_issues += File().GetNumIssues();
+    if (IsVerbose()) PrintLn();
   }
 };
 
 int main(int argc, char * argv[])
 {
   class Empecable formatter(argc, argv);
+  return formatter.GetNumIssues();
 }
 
 
