@@ -178,6 +178,13 @@ private:
       else PrintLn("No active file to save.");
       SaveProjectConfig();
       return true;
+    case 'Q':
+    case 'X':
+      PrintLn("Saving and Quitting!");
+      if (active_file < files.size()) File().Save();
+      else PrintLn("No active file to save.");
+      SaveProjectConfig();
+      exit(0);
     }
     return false; // Key not used.
   }
@@ -291,28 +298,29 @@ private:
 
     PrintLn("Loaded word file: '", ToFilename(word_file), "'.");
 
-    in_file.open(replace_file);
-    if (!in_file) {
+    std::ifstream in_replace_file(replace_file);
+    if (!in_replace_file) {
       SetEMPDir();
       replace_file = *emp_dir / replace_file;
-      in_file.open(replace_file);
+      in_replace_file.open(replace_file);
 
       // If we have still failed, let the user know, but keep going.
-      if (!in_file) {
-        PrintLn("No word replacement list file found.");
+      if (!in_replace_file) {
+        PrintLn("No word replacement list file found at ", replace_file, ".");
       }
     }
 
-    if (in_file) {
-      PrintLn("Loaded replacement list file: '", ToFilename(replace_file), "'.");
-      
+    if (in_replace_file) {      
       emp::String translation;
-      while (in_file) {
-        in_file >> word;
-        std::getline(in_file, translation); // Grab entire translation, maybe more than one word.
+      while (in_replace_file) {
+        in_replace_file >> word >> translation;
+        // std::getline(in_replace_file, translation); // Grab entire translation, maybe more than one word.
         suggest_map[word] = translation;
       }
+      PrintLn("Loaded replacement list file: '", ToFilename(replace_file),
+              "' with ", suggest_map.size(), " suggestions.");
     }
+    
 
   }
 
@@ -342,6 +350,8 @@ private:
       for (auto [from, to] : replacement_map) {
         file << from << " " << to << '\n';
       }
+    } else {
+      PrintLn("No suggestions to save.");
     }
   }
 
