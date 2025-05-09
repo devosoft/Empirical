@@ -66,6 +66,7 @@ public:
   fs::path GetPath() const { return path; }
 
   bool IsValid() const { return valid; }
+  size_t MaxLineID() const { return tokens.size() ? tokens.back().line_id : 0; }
 
 
   // ======= Dictionary Management =======
@@ -82,6 +83,7 @@ public:
 
   emplex::Token GetToken(size_t pos) const { return tokens[pos]; }
   emp::String GetLexeme(size_t pos) const { return tokens[pos].lexeme; }
+  size_t GetLineID(size_t pos) const { return tokens[pos].line_id; }
   int GetTokenID(size_t pos) const { return tokens[pos].id; }
   size_t NumTokens() const { return tokens.size(); }
 
@@ -95,22 +97,35 @@ public:
     save_required = true;
   }
 
-  // Find the spot after previous newline char or beginning of file.
-  size_t FindPos_LineStart(size_t token_pos) const {
-    while (token_pos > 0 && tokens[token_pos-1].lexeme != "\n") --token_pos;
+  // Find the first token of the target line (starting from line_id).
+  size_t FindPos_LineStart(size_t token_pos, size_t line_id) const {
+    // Scan forward if needed.
+    while (tokens[token_pos].line_id < line_id) ++token_pos;
+
+    // Scan backward, if needed.
+    while (token_pos > 0 && tokens[token_pos-1].line_id >= line_id) --token_pos;
+
     return token_pos;
   }
 
-  // Find the next newline character (or EOF)
-  size_t FindPos_LineEnd(size_t token_pos) const {
-    while (token_pos < tokens.size() && tokens[token_pos].lexeme != "\n") ++token_pos;
+  // Newline at the end of the target line (or EOF)
+  size_t FindPos_LineEnd(size_t token_pos, size_t line_id) const {
+    // Scan forward, if needed.
+    while (token_pos < tokens.size() && tokens[token_pos].line_id <= line_id) ++token_pos;
+
+    // scan backward, if needed.
+    while (token_pos > 0 && tokens[token_pos-1].line_id > line_id) --token_pos;
+
+    // Move on to the \n at the end of the line.
+    if (token_pos && tokens[token_pos-1].lexeme == "\n") --token_pos;
+
     return token_pos;
   }
 
-  emp::String GetTokenLine(size_t pos) const {
+  emp::String GetTokenLine(size_t pos, size_t line_id) const {
     // Determine the set of tokens to print.
-    const size_t start = FindPos_LineStart(pos);
-    const size_t end = FindPos_LineEnd(pos);
+    const size_t start = FindPos_LineStart(pos, line_id);
+    const size_t end = FindPos_LineEnd(pos, line_id);
 
     // Collect the tokens on this line, highlighting the target.
     emp::String result;
@@ -119,6 +134,23 @@ public:
       else result += tokens[i].lexeme;
     }
     return result;
+  }
+
+  // Print a line near a given token, highlighting that token.
+  void PrintTokenLine(size_t token_pos, size_t line_id) const {
+    emp::String line_str = emp::MakeString(line_id).PadFront(' ', 5)+':';
+    emp::String code_line = GetTokenLine(token_pos, line_id);
+    PrintLn(line_str.AsANSIBrightWhite().AsANSIBold(), code_line);
+  }
+
+  // Print a range of lines around a given token.
+  void PrintTokenRange(size_t token_pos, size_t range=1) {
+    size_t line_id = tokens[token_pos].line_id;
+    size_t min_line = (line_id > range) ? (line_id - range) : 0;
+    size_t max_line = (line_id+range <= MaxLineID()) ? line_id+range : MaxLineID();
+    for (size_t i = min_line; i <= max_line; ++i) {
+      PrintTokenLine(token_pos, i);
+    }
   }
 
   bool Load(emplex::Lexer & lexer) {
@@ -196,12 +228,11 @@ public:
 
     // Report the issue.
     if (mode >= Mode::Verbose) {
-      PrintLn(emp::MakeString("Found in ", filename, ": ").AsANSIYellow().AsANSIBold(), issue);
+      size_t line_num = GetLineID(token_pos);
+      PrintLn(emp::MakeString("Found in ", filename, ":", line_num, ": ").AsANSIYellow().AsANSIBold(), issue);
 
-      // Print line number and the affected code.
-      emp::String line_num = emp::MakeString(GetToken(token_pos).line_id).PadFront(' ', 5)+':';
-      emp::String code_line = GetTokenLine(token_pos);
-      PrintLn(line_num.AsANSIBrightWhite().AsANSIBold(), code_line);
+      // Print the affected code.
+      PrintTokenRange(token_pos, 1);
     }
   }
 
