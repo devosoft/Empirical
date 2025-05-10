@@ -39,8 +39,10 @@
  *  'h' - Help
  *  'q'/'x' - Quit without saving (or 'Q' to quit and save)
  *  's' - Save current updated file (or 'S' to "Save As")
+ *  'v' - View section of code.
  *  'z' - Undo
  *  'y' or 'n' - Answer a specific question.
+ *  '0' through '9' - Multiple choice options.
  */
 
 #include <cstring>
@@ -125,6 +127,7 @@ private:
 
   emplex::Token GetToken(size_t pos) const { return File().GetToken(pos); }
   emp::String GetLexeme(size_t pos) const { return File().GetLexeme(pos); }
+  size_t GetLineID(size_t pos) const { return File().GetLineID(pos); }
 
   void SetupOptionFlags() {
     flags.AddGroup("Basic Operation");
@@ -165,7 +168,7 @@ private:
   // Check the default key press options that should work from any menu.
   // Return whether the key was used.
   bool TestDefaultKeyOptions(char key) {
-    switch (key) {
+      switch (key) {
     case 'h':
       PrintLn("Help info should go here...");
       return true;
@@ -189,16 +192,22 @@ private:
     return false; // Key not used.
   }
 
-  bool AskYesNo(emp::String question) {
+  bool TestDefaultKeyOptions(char key, size_t token_pos) {
+    if (key == 'v') { PrintLn("----------"); File().PrintTokenRange(token_pos, 5); return true; }
+    if (key == 'V') { PrintLn("----------"); File().PrintTokenRange(token_pos, 10); return true; }
+    return TestDefaultKeyOptions(key);
+  }
+
+  bool AskYesNo(emp::String question, size_t token_pos) {
     PrintLn(question, " (", ToOptionSet("yn"), ")");
     std::cout.flush();
-    char key = emp::GetIOChar();
     while (true) {
+      char key = emp::GetIOChar();
       switch (key) {
       case 'y': case 'Y': return true;
       case 'n': case 'N': return false;
       default:
-        if (!TestDefaultKeyOptions(key)) {
+        if (!TestDefaultKeyOptions(key, token_pos)) {
           PrintLn("Unknown option ", ToBoldRed("'", key, "'"));
         }
       }
@@ -345,9 +354,12 @@ private:
       PrintLn("Saving '", ToFilename(replace_file), "'.");
       std::ofstream file(replace_file);
       for (auto [from, to] : suggest_map) {
+        if (to.HasWhitespace()) continue; // Skip saving any suggestions with multiple words.
         file << from << " " << to << '\n';
       }
+      // Also record anything in the replacement map that was NOT in the suggestion map.
       for (auto [from, to] : replacement_map) {
+        if (suggest_map.contains(from) || to.HasWhitespace()) continue;
         file << from << " " << to << '\n';
       }
     } else {
@@ -362,12 +374,15 @@ private:
     project_changed = true;
   }
 
-  void DoReplace(size_t token_pos, emp::String new_word) {
+  void DoReplace(size_t token_pos, emp::String new_word, bool change_all=false) {
     const emp::String old_word = GetLexeme(token_pos);
     suggest_map[old_word] = new_word;
+    if (change_all) replacement_map[old_word] = new_word;
     File().SetLexeme(token_pos, new_word);
     if (IsVerbose()) {
-      PrintLn("Replacing '", old_word.AsANSICyan(), "' with '", new_word.AsANSICyan(), "'.");
+      PrintLn("Line ", GetLineID(token_pos),
+              ": Replacing '", old_word.AsANSICyan(),
+              "' with '", new_word.AsANSICyan(), "'.");
     }
   }
 
@@ -454,7 +469,10 @@ private:
     }
 
     // See if we already have a replacement set up for this word.
-    if (replacement_map.contains(word)) DoReplace(token_pos);
+    if (replacement_map.contains(word)) {
+      DoReplace(token_pos);
+      return false;           // Indicate that we had an issue, even if we fixed it.
+    }
 
     // We have an unknown word.
     File().ReportIssue(emp::MakeString("Unknown word '", word.AsANSICyan(), "'"), token_pos);
@@ -481,7 +499,8 @@ private:
       if (word.OnlyUpper()) { for (auto & match : matches) match.SetUpper(); }
       else if (word.HasUpperAt(0)) { for (auto & match : matches) match.SetUpperAt(0); }
       for (size_t i = 0; i < matches.size(); ++i) {
-        PrintLn(ToOption(std::to_string(i)), " - Replace with '", matches[i].AsANSICyan(), "'");
+        PrintLn(ToOption(std::to_string(i)), " - Replace with '", matches[i].AsANSICyan(), "'",
+                " or ", ToOption(std::to_string(i+5)), " to replace ALL instances");
       }
       if (matches.size() == 0) PrintLn("(no replacement suggestions found)");
       PrintLn(ToOption("r"), " - Provide replacement for this instance of '", word.AsANSICyan(), "' or ",
@@ -489,6 +508,7 @@ private:
 
       bool done = false;
       while (!done) {
+        bool change_all = false;  // Shortcut for below.
         char key = emp::GetIOChar();
         switch (key) {
           case 'a': AddProjectWord(lower_word);     done = true; break;
@@ -506,38 +526,43 @@ private:
             skip_words.insert(word);
             done = true;
             break;
+          case '5': change_all = true; [[fallthrough]];
           case '0':
             if (matches.size() > 0) {
-              DoReplace(token_pos, matches[0]);
+              DoReplace(token_pos, matches[0], change_all);
               done = true;
               break;
             } [[fallthrough]];
+          case '6': change_all = true; [[fallthrough]];
           case '1':
             if (matches.size() > 1) {
-              DoReplace(token_pos, matches[1]);
+              DoReplace(token_pos, matches[1], change_all);
               done = true;
               break;
             } [[fallthrough]];
+          case '7': change_all = true; [[fallthrough]];
           case '2':
             if (matches.size() > 2) {
-              DoReplace(token_pos, matches[2]);
+              DoReplace(token_pos, matches[2], change_all);
               done = true;
               break;
             } [[fallthrough]];
+          case '8': change_all = true; [[fallthrough]];
           case '3':
             if (matches.size() > 3) {
-              DoReplace(token_pos, matches[3]);
+              DoReplace(token_pos, matches[3], change_all);
               done = true;
               break;
             } [[fallthrough]];
+          case '9': change_all = true; [[fallthrough]];
           case '4':
             if (matches.size() > 4) {
-              DoReplace(token_pos, matches[4]);
+              DoReplace(token_pos, matches[4], change_all);
               done = true;
               break;
             } [[fallthrough]];
           default:
-            bool used = TestDefaultKeyOptions(key);
+            bool used = TestDefaultKeyOptions(key, token_pos);
             if (!used) PrintLn("Unknown key ", ToBoldRed("'", key, "'"));
         }
       }
@@ -621,12 +646,12 @@ public:
         break;
       case Lexer::ID_ERR_END_LINE_WS:
         File().ReportIssue("Extra whitespace at end of line:", token_pos);
-        if (IsInteractive() && AskYesNo("Remove? ")) File().ClearLexeme(token_pos);
+        if (IsInteractive() && AskYesNo("Remove? ", token_pos)) File().ClearLexeme(token_pos);
         found_issue = true;
         break;
       case Lexer::ID_ERR_WS:
         File().ReportIssue("Illegal whitespace:", token_pos);
-        if (IsInteractive() && AskYesNo("Remove? ")) File().ClearLexeme(token_pos);
+        if (IsInteractive() && AskYesNo("Remove? ", token_pos)) File().ClearLexeme(token_pos);
         found_issue = true;
         break;
       default:
