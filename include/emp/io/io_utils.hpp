@@ -13,6 +13,7 @@
 #ifndef EMP_IO_IO_UTILS_HPP_INCLUDE
 #define EMP_IO_IO_UTILS_HPP_INCLUDE
 
+#include <compare>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -37,19 +38,73 @@
 
 namespace emp {
 
-  char GetIOChar() {
+  // A shortcut to represent specific IO characters.
+  class IOChar {
+    int char_id=0;
+
+    static constexpr int UNKNOWN = 1000;
+    static constexpr int ESCAPE  = 1001;
+    static constexpr int UP      = 1002;
+    static constexpr int RIGHT   = 1003;
+    static constexpr int DOWN    = 1004;
+    static constexpr int LEFT    = 1005;
+
+    IOChar(int value=0) : char_id(value) { }
+    IOChar(const IOChar &) = default;
+
+    IOChar & operator=(const IOChar &) = default;
+    auto operator<=>() = default;
+
+    operator int() const { return char_id; }
+  };
+
+  IOChar GetIOChar() {
     #ifdef _WIN32
-      return _getch();
+      int key = _getch();
+      if (key == 0 || key == 224) {
+        switch (_getch()) {
+          case 72: return IOChar::UP;
+          case 80: return IOChar::DOWN;
+          case 75: return IOChar::LEFT;
+          case 77: return IOChar::RIGHT;
+          default: return IOChar::UNKNOWN;
+        }
+      }
+      return key;
     #else
       termios old_term;
-      char ch;
       tcgetattr(STDIN_FILENO, &old_term);
       termios new_term = old_term;
       new_term.c_lflag &= ~(ICANON | ECHO);
       tcsetattr(STDIN_FILENO, TCSANOW, &new_term);
-      read(STDIN_FILENO, &ch, 1);
+
+      char key;
+      read(STDIN_FILENO, &key, 1);
+
+      if (key == '\033') {  // Escape character
+        char seq[2];
+        if (read(STDIN_FILENO, &seq[0], 1) == 0 ||
+            read(STDIN_FILENO, &seq[1], 1) == 0) {
+          tcsetattr(STDIN_FILENO, TCSANOW, &old_term);
+          return IOChar::ESCAPE;
+        }
+
+        tcsetattr(STDIN_FILENO, TCSANOW, &old_term);
+
+        if (seq[0] == '[') {
+          switch (seq[1]) {
+            case 'A': return IOChar::UP;
+            case 'B': return IOChar::DOWN;
+            case 'C': return IOChar::RIGHT;
+            case 'D': return IOChar::LEFT;
+          }
+        }
+
+        return IOChar::UNKNOWN;
+      }
+
       tcsetattr(STDIN_FILENO, TCSANOW, &old_term);
-      return ch;
+      return key;
     #endif
   }
 
