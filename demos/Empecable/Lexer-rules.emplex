@@ -22,6 +22,9 @@ ERR_END_LINE_WS " "+$
 # TODO: Allow for ALL CAPS, including inside of a Pascal-case identifier, like GetASCIIValue.
 WORD [A-Za-z](\'?[a-z])*
 
+NUM [0-9]+
+HEX_NUM 0x[0-9a-fA-F]+
+
 # Separate out important types of whitespace.
 WS " "+
 END_LINE \n
