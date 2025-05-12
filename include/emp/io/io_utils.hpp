@@ -19,7 +19,7 @@
 #include <iostream>
 #include <optional>
 #include <string>
- 
+
 #include "../base/assert.hpp"
 #include "../base/vector.hpp"
 
@@ -38,8 +38,21 @@
 
 namespace emp {
 
+  template <typename... ARG_Ts>
+  inline void PrintTo(std::ostream & os, ARG_Ts &&... args) {
+    // If nothing to print, skip.
+    if constexpr (sizeof...(args) == 0) { return; }
+    else (os << ... << std::forward<ARG_Ts>(args));
+  }
+
+  template <typename... ARG_Ts>
+  void Print(ARG_Ts &&... args) { PrintTo(std::cout, std::forward<ARG_Ts>(args)...); }
+
+  template <typename... ARG_Ts>
+  void PrintLn(ARG_Ts &&... args) { Print(std::forward<ARG_Ts>(args)..., '\n'); }
+
   // A shortcut to represent specific IO characters.
-  class IOChar {
+  struct IOChar {
     int char_id=0;
 
     static constexpr int UNKNOWN = 1000;
@@ -53,7 +66,54 @@ namespace emp {
     IOChar(const IOChar &) = default;
 
     IOChar & operator=(const IOChar &) = default;
-    auto operator<=>() = default;
+    auto operator<=>(const IOChar &) const = default;
+
+    std::string GetName() const {
+      switch(char_id) {
+      case 0: return "\\0"; // "Null", Or "\\u" ?
+      case 1: return "Start of Heading";
+      case 2: return "Start of Text";
+      case 3: return "End of Text";
+      case 4: return "End of Transmission";
+      case 5: return "Enquiry";
+      case 6: return "Acknowledge";
+      case 7: return "\\a";  // "Audible Bell"
+      case 8: return "\\b";  // "Backspace"
+      case 9: return "\\t";  // "Tab"
+      case 10: return "\\n"; // "Line Feed"
+      case 11: return "\\v"; // "Vertical Tab"
+      case 12: return "\\f"; // "Form Feed";
+      case 13: return "\\r"; // "Carriage Return";
+      case 14: return "Shift Out";
+      case 15: return "Shift In";
+      case 16: return "Data Link Escape";
+      case 17: return "Device Control One (XON)";
+      case 18: return "Device Control Two";
+      case 19: return "Device Control Three (XOFF)";
+      case 20: return "Device Control Four";
+      case 21: return "Negative Acknowledge";
+      case 22: return "Synchronous Idle";
+      case 23: return "End of Transmission Block";
+      case 24: return "Cancel";
+      case 25: return "End of medium";
+      case 26: return "Substitute";
+      case 27: return "\\e"; // "Escape";
+      case 28: return "File Separator";
+      case 29: return "Group Separator";
+      case 30: return "Record Separator";
+      case 31: return "Unit Separator";
+
+      case IOChar::ESCAPE: return "ESC";
+      case IOChar::UP: return "UP";
+      case IOChar::DOWN: return "DOWN";
+      case IOChar::RIGHT: return "RIGHT";
+      case IOChar::LEFT: return "LEFT";
+      default:
+      if (char_id < 128) return emp::String(1, static_cast<char>(char_id));
+      }
+
+      return "Unknown";
+    }
 
     operator int() const { return char_id; }
   };
@@ -144,7 +204,7 @@ namespace emp {
     }
     return std::nullopt;  // Not found
   }
-  
+
   // Given two split-up paths, reduce the first to the common path.
   void ReduceToCommonPath(split_path_t & path1, const split_path_t & path2) {
     size_t match_size = 0;
@@ -161,13 +221,13 @@ namespace emp {
     auto p1_it = path1.begin();
     auto p2_it = path2.begin();
     std_fs::path result;
-  
+
     while (p1_it != path1.end() && p2_it != path2.end() && *p1_it == *p2_it) {
       result /= *p1_it;
       ++p1_it;
       ++p2_it;
     }
-  
+
     return result;
   };
 
@@ -179,15 +239,15 @@ namespace emp {
     // Start with the first path split into components.
     auto it = filenames.begin();
     split_path_t common = SplitPath(*it);
-  
+
     // Step through each of the other paths, narrowing down the common components.
     while (++it != filenames.end()) {
       ReduceToCommonPath(common, SplitPath(*it));
     }
-  
+
     // Reassemble the common path.
     return JoinPath(common);
-  } 
+  }
 
   bool CanWriteToDirectory(const std_fs::path & dir,
                            std::string test_name=".Empirical_test_delete_me") {
@@ -201,4 +261,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_IO_IO_UTILS_HPP_INCLUDE
- 
+
+// Special info below for local control over the Empecable file checker.
+// empecable_words: lflag tcsetattr tcgetattr termios ofs getch
