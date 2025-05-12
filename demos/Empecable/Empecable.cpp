@@ -7,28 +7,30 @@
  * @brief Load a series of filenames and clean up each file.
  *
  * Features:
- * - Check spelling for the code files.
+ * - Check spelling for the code files (With suggestions, change all, and remembering
+ *   changes to use as suggestions in future.)
  * - Remove illegal characters including \r, \t, and end-of-line spaces
  * - Ensure the file ends in a newline
+ * - Track any special features about files or projects including custom spelling.
+ * - Find the .Empirical/ directory for configurations
+ *
+ * Additional TODO:
  * + Ensure that 2 spaces are used for indent levels (esp. after `{` at eol?})
  * + Group and track include files
  * + Ensure include guards or #pragma once (or both) exist.
  * + Ensure no merge conflict markers are in the file (and help with merge?)
- * - Track any special features about files or projects including custom spelling.
- * + Fully configure actions with a code_format.cfg file in .Empirical/
- * - Find the .Empirical/ directory for configurations
  * + Create config files that don't already exist.
  *
- * Possible add-on features to develop?
+ * - Fully configure actions with a code_format.cfg file in .Empirical/
+ * - Allow configure overrides in individual files.
  * - Produce a levelization map
  * - Dynamic control over boilerplate (for easy scaling to other projects)
  * - Guided shifting of boilerplate to a new format
  * - Spacing must always shift by 0 or 2 OR somehow align with previous line?
- * - Save previous word changes to use as future suggestions
- * - Better weighting on words for alternate suggestions
- *   (e.g., swapping letters counts as 1, bigger penalty for wrong first letter)
  * - Make sure include files have corresponding test files.
  * - Make sure test files are not empty (or effectively empty)
+ * - Better suggestions where 'y' always gives you what Empecable thinks is correct action.
+ * - Cleanup words at the bottom of a file, removing those now in main project dictionary.
  *
  * Master list of interface options for consistency.
  *  'a' - Add lowercase word to project dictionary (or 'A' to preserve current case)
