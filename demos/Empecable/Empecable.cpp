@@ -172,22 +172,22 @@ private:
   bool TestDefaultKeyOptions(char key) {
       switch (key) {
     case 'h':
-      PrintLn("Help info should go here...");
+      emp::PrintLn("Help info should go here...");
       return true;
     case 'q':
     case 'x':
-      PrintLn("Quitting!");
+      emp::PrintLn("Quitting!");
       exit(0);
     case 's':
       if (active_file < files.size()) File().Save();
-      else PrintLn("No active file to save.");
+      else emp::PrintLn("No active file to save.");
       SaveProjectConfig();
       return true;
     case 'Q':
     case 'X':
-      PrintLn("Saving and Quitting!");
+      emp::PrintLn("Saving and Quitting!");
       if (active_file < files.size()) File().Save();
-      else PrintLn("No active file to save.");
+      else emp::PrintLn("No active file to save.");
       SaveProjectConfig();
       exit(0);
     }
@@ -195,13 +195,13 @@ private:
   }
 
   bool TestDefaultKeyOptions(char key, size_t token_pos) {
-    if (key == 'v') { PrintLn("----------"); File().PrintTokenRange(token_pos, 5); return true; }
-    if (key == 'V') { PrintLn("----------"); File().PrintTokenRange(token_pos, 10); return true; }
+    if (key == 'v') { emp::PrintLn("----------"); File().PrintTokenRange(token_pos, 5); return true; }
+    if (key == 'V') { emp::PrintLn("----------"); File().PrintTokenRange(token_pos, 10); return true; }
     return TestDefaultKeyOptions(key);
   }
 
   bool AskYesNo(emp::String question, size_t token_pos) {
-    PrintLn(question, " (", ToOptionSet("yn"), ")");
+    emp::PrintLn(question, " (", ToOptionSet("yn"), ")");
     std::cout.flush();
     while (true) {
       char key = emp::GetIOChar();
@@ -210,7 +210,7 @@ private:
       case 'n': case 'N': return false;
       default:
         if (!TestDefaultKeyOptions(key, token_pos)) {
-          PrintLn("Unknown option ", ToBoldRed("'", key, "'"));
+          emp::PrintLn("Unknown option ", ToBoldRed("'", key, "'"));
         }
       }
     }
@@ -221,16 +221,16 @@ private:
 
     fs::path option_path = common_path;
     if (!fs::is_directory(option_path)) option_path = option_path.parent_path();
-    PrintLn("No .Empirical/ folder could be found in any parent directory.");
-    PrintLn("Where should it be created?");
+    emp::PrintLn("No .Empirical/ folder could be found in any parent directory.");
+    emp::PrintLn("Where should it be created?");
     size_t opt_id = 0;
     while (!option_path.empty() && opt_id < 10 && emp::CanWriteToDirectory(option_path)) {
-      PrintLn(ToOption(std::to_string(opt_id)), " - ", option_path);
+      emp::PrintLn(ToOption(std::to_string(opt_id)), " - ", option_path);
       ++opt_id;
       if (option_path == option_path.parent_path()) break;
       option_path = option_path.parent_path();
     }
-    Print(ToOption("q"), " - Quit.\n");
+    emp::Print(ToOption("q"), " - Quit.\n");
     bool done = false, used = false;
     fs::path out_path = common_path;
     while (!done) {
@@ -248,7 +248,7 @@ private:
       case '1': if (opt_id <= 1) break; out_path = out_path.parent_path(); [[fallthrough]];
       case '0':
         out_path /= ".Empirical";
-        PrintLn("Creating directory: ", out_path);
+        emp::PrintLn("Creating directory: ", out_path);
         std::filesystem::create_directory(out_path);
         done = true;
         break;
@@ -256,7 +256,7 @@ private:
         used = TestDefaultKeyOptions(key);
       }
       if (!done && !used) {
-        PrintLn("Unknown option ", ToBoldRed("'", key, "'"));
+        emp::PrintLn("Unknown option ", ToBoldRed("'", key, "'"));
       }
 
     }
@@ -307,7 +307,7 @@ private:
       project_words.insert(word);
     }
 
-    PrintLn("Loaded word file: '", ToFilename(word_file), "'.");
+    emp::PrintLn("Loaded word file: '", ToFilename(word_file), "'.");
 
     std::ifstream in_replace_file(replace_file);
     if (!in_replace_file) {
@@ -317,7 +317,7 @@ private:
 
       // If we have still failed, let the user know, but keep going.
       if (!in_replace_file) {
-        PrintLn("No word replacement list file found at ", replace_file, ".");
+        emp::PrintLn("No word replacement list file found at ", replace_file, ".");
       }
     }
 
@@ -328,7 +328,7 @@ private:
         // std::getline(in_replace_file, translation); // Grab entire translation, maybe more than one word.
         suggest_map[word] = translation;
       }
-      PrintLn("Loaded replacement list file: '", ToFilename(replace_file),
+      emp::PrintLn("Loaded replacement list file: '", ToFilename(replace_file),
               "' with ", suggest_map.size(), " suggestions.");
     }
     
@@ -337,9 +337,9 @@ private:
 
   void SaveProjectConfig() {
     if (!project_changed) {
-      PrintLn("No changes need to be saved in '", ToFilename(word_file), "'.");
+      emp::PrintLn("No changes need to be saved in '", ToFilename(word_file), "'.");
     } else {
-      PrintLn("Saving '", ToFilename(word_file), "'.");
+      emp::PrintLn("Saving '", ToFilename(word_file), "'.");
 
       // Move the project_words to a vector and sort them.
       emp::vector<emp::String> out_words;
@@ -353,7 +353,7 @@ private:
     }
 
     if (suggest_map.size() || replacement_map.size()) {
-      PrintLn("Saving '", ToFilename(replace_file), "'.");
+      emp::PrintLn("Saving '", ToFilename(replace_file), "'.");
       std::ofstream file(replace_file);
       for (auto [from, to] : suggest_map) {
         if (to.HasWhitespace()) continue; // Skip saving any suggestions with multiple words.
@@ -365,13 +365,13 @@ private:
         file << from << " " << to << '\n';
       }
     } else {
-      PrintLn("No suggestions to save.");
+      emp::PrintLn("No suggestions to save.");
     }
   }
 
   void AddProjectWord(emp::String word) {
     emp_assert(!emp::Has(project_words, word), word);
-    PrintLn("Added '", word.AsANSICyan(), "' to project dictionary.");
+    emp::PrintLn("Added '", word.AsANSICyan(), "' to project dictionary.");
     project_words.insert(word);
     project_changed = true;
   }
@@ -382,7 +382,7 @@ private:
     if (change_all) replacement_map[old_word] = new_word;
     File().SetLexeme(token_pos, new_word);
     if (IsVerbose()) {
-      PrintLn("Line ", GetLineID(token_pos),
+      emp::PrintLn("Line ", GetLineID(token_pos),
               ": Replacing '", old_word.AsANSICyan(),
               "' with '", new_word.AsANSICyan(), "'.");
     }
@@ -398,7 +398,7 @@ private:
   void QueryReplace(size_t token_pos, bool change_all) {
     emp::String word = GetLexeme(token_pos);
 
-    Print("Enter replacement word: ");
+    emp::Print("Enter replacement word: ");
     emp::String new_word;
     std::cin >> new_word;
 
@@ -409,9 +409,9 @@ private:
     suggest_map[word] = new_word;
     if (change_all) replacement_map[word] = new_word;
 
-    Print("Replacing ");
-    if (change_all) Print(" all instances of ");
-    PrintLn("'", word.AsANSICyan(), "' with '", new_word.AsANSICyan(), "'.");
+    emp::Print("Replacing ");
+    if (change_all) emp::Print(" all instances of ");
+    emp::PrintLn("'", word.AsANSICyan(), "' with '", new_word.AsANSICyan(), "'.");
   }
 
   // Search through available dictionaries to try to find misspellings.
@@ -481,19 +481,19 @@ private:
 
     if (IsInteractive()) {
       emp::String lower_word = word.AsLower();
-      Print(ToOption("a"), " - Add '", lower_word.AsANSICyan(), "' to main PROJECT dictionary");
+      emp::Print(ToOption("a"), " - Add '", lower_word.AsANSICyan(), "' to main PROJECT dictionary");
       if (word.HasUpper()) {
-        Print(" or ", ToOption("A"), " to add case-sensitive '", word.AsANSICyan(), "'");
+        emp::Print(" or ", ToOption("A"), " to add case-sensitive '", word.AsANSICyan(), "'");
       }
-      PrintLn();
+      emp::PrintLn();
 
-      Print(ToOption("f"), " - Add '", lower_word.AsANSICyan(), "' to this FILE's dictionary");
+      emp::Print(ToOption("f"), " - Add '", lower_word.AsANSICyan(), "' to this FILE's dictionary");
       if (word.HasUpper()) {
-        Print("  or ", ToOption("F"), " to add case-sensitive '", word.AsANSICyan(), "'");
+        emp::Print("  or ", ToOption("F"), " to add case-sensitive '", word.AsANSICyan(), "'");
       }
-      PrintLn();
+      emp::PrintLn();
 
-      PrintLn(ToOption("i"), " - Ignore this instance of '", word.AsANSICyan(), "'  or ",
+      emp::PrintLn(ToOption("i"), " - Ignore this instance of '", word.AsANSICyan(), "'  or ",
               ToOption("I"), " to ignore ALL instances");
 
       emp::vector<emp::String> matches = FindWordMatches(word);
@@ -501,11 +501,11 @@ private:
       if (word.OnlyUpper()) { for (auto & match : matches) match.SetUpper(); }
       else if (word.HasUpperAt(0)) { for (auto & match : matches) match.SetUpperAt(0); }
       for (size_t i = 0; i < matches.size(); ++i) {
-        PrintLn(ToOption(std::to_string(i)), " - Replace with '", matches[i].AsANSICyan(), "'",
+        emp::PrintLn(ToOption(std::to_string(i)), " - Replace with '", matches[i].AsANSICyan(), "'",
                 " or ", ToOption(std::to_string(i+5)), " to replace ALL instances");
       }
-      if (matches.size() == 0) PrintLn("(no replacement suggestions found)");
-      PrintLn(ToOption("r"), " - Provide replacement for this instance of '", word.AsANSICyan(), "' or ",
+      if (matches.size() == 0) emp::PrintLn("(no replacement suggestions found)");
+      emp::PrintLn(ToOption("r"), " - Provide replacement for this instance of '", word.AsANSICyan(), "' or ",
               ToOption("R"), " for ALL instances");
 
       bool done = false;
@@ -520,11 +520,11 @@ private:
           case 'r': QueryReplace(token_pos, false); done = true; break;
           case 'R': QueryReplace(token_pos, true);  done = true; break;
           case 'i':
-            PrintLn("Skipping '", word.AsANSICyan(), "'!");
+            emp::PrintLn("Skipping '", word.AsANSICyan(), "'!");
             done = true;
             break;
           case 'I':
-            PrintLn("Ignoring all instances of '", word.AsANSICyan(), "'!");
+            emp::PrintLn("Ignoring all instances of '", word.AsANSICyan(), "'!");
             skip_words.insert(word);
             done = true;
             break;
@@ -565,7 +565,7 @@ private:
             } [[fallthrough]];
           default:
             bool used = TestDefaultKeyOptions(key, token_pos);
-            if (!used) PrintLn("Unknown key ", ToBoldRed("'", key, "'"));
+            if (!used) emp::PrintLn("Unknown key ", ToBoldRed("'", key, "'"));
         }
       }
     }
@@ -581,7 +581,7 @@ public:
     // Collect the filenames
     emp::vector<emp::String> filenames = flags.GetExtras();
     if (filenames.size() == 0) {
-      PrintLn("No files listed.");
+      emp::PrintLn("No files listed.");
       PrintUsage();
       exit(0);
     }
@@ -617,25 +617,25 @@ public:
   Empecable & SetAll(bool _in=true) { checks.SetAll(_in); return *this; }
 
   void PrintUsage() const {
-    PrintLn("Usage: ", flags[0], " {options ...} files ...");
-    PrintLn("Type `", flags[0], " -h` for more detailed help.");
+    emp::PrintLn("Usage: ", flags[0], " {options ...} files ...");
+    emp::PrintLn("Type `", flags[0], " -h` for more detailed help.");
   }
 
   void PrintVersion() const {
-    PrintLn("File formatter version 0.1.");
+    emp::PrintLn("File formatter version 0.1.");
   }
 
   void PrintHelp() const {
     PrintVersion();
-    PrintLn();
+    emp::PrintLn();
     PrintUsage();
-    PrintLn();
+    emp::PrintLn();
     flags.PrintOptions();
     exit(0);
   }
 
   void ProcessFile() {
-    PrintLn("=== File: ", File().GetName().AsANSIBrightCyan(), " ==");
+    emp::PrintLn("=== File: ", File().GetName().AsANSIBrightCyan(), " ==");
 
     if (!File().Load(lexer)) return; // File failed to load.
 
@@ -662,13 +662,13 @@ public:
 
       // Skip a line between issues.
       if (found_issue && IsVerbose()) {
-        PrintLn("-------------------------------------------------------------------------------");
+        emp::PrintLn("-------------------------------------------------------------------------------");
       }
     }
 
-    PrintLn(ToBoldRed("=== ", File().GetNumIssues(), " issues found ==="));
+    emp::PrintLn(ToBoldRed("=== ", File().GetNumIssues(), " issues found ==="));
     total_issues += File().GetNumIssues();
-    if (IsVerbose()) PrintLn();
+    if (IsVerbose()) emp::PrintLn();
   }
 };
 
