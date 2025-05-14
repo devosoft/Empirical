@@ -24,7 +24,7 @@
 // #include "../../include/emp/config/command_line.hpp"
 // #include "../../include/emp/config/FlagManager.hpp"
 // #include "../../include/emp/io/File.hpp"
-// #include "../../include/emp/io/io_utils.hpp"
+#include "../../include/emp/io/io_utils.hpp"
 #include "../../include/emp/tools/String.hpp"
 // #include "../../include/emp/tools/string_utils.hpp"
 
@@ -188,11 +188,11 @@ public:
   void Save() {
     if (!save_required) {
       if (mode == Mode::Interactive) {
-        PrintLn("No changes need to be saved in '", emp::ANSI::MakeGreen(filename), "'.");
+        emp::PrintLn("No changes need to be saved in '", emp::ANSI::MakeGreen(filename), "'.");
       }
       return;
     }
-    PrintLn("Saving '", emp::ANSI::MakeGreen(filename),"'.");
+    emp::PrintLn("Saving '", emp::ANSI::MakeGreen(filename),"'.");
 
     // Don't let cruft build up at the end of the file.
     while (tokens.back().id == emplex::Lexer::ID_END_LINE ||
