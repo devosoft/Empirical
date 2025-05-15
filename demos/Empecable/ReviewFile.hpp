@@ -9,24 +9,11 @@
 
 #pragma once
 
-// #include <cstring>
 #include <filesystem>
 #include <fstream>
-// #include <iostream>
-// #include <map>
-// #include <optional>
-// #include <set>
-// #include <string>
-// #include <unordered_set>
 
-// #include "../../include/emp/base/assert.hpp"
-// #include "../../include/emp/base/vector.hpp"
-// #include "../../include/emp/config/command_line.hpp"
-// #include "../../include/emp/config/FlagManager.hpp"
-// #include "../../include/emp/io/File.hpp"
 #include "../../include/emp/io/io_utils.hpp"
 #include "../../include/emp/tools/String.hpp"
-// #include "../../include/emp/tools/string_utils.hpp"
 
 #include "helpers.hpp"
 #include "Lexer.hpp"
@@ -44,6 +31,7 @@ private:
   bool save_required = false;            // Does this file need to be updated on disk?
   bool valid = false;                    // Is this a valid file to work with?
 
+  size_t token_pos = 0;                  // What is the next token to use?
   emp::vector<emp::String> issues;       // List of issues found with this file.
 
 public:
@@ -81,6 +69,15 @@ public:
 
   // ======= Token Management =======
 
+  emplex::Token NextToken() {
+    if (token_pos >= tokens.size()) return emplex::Token{0,"",0}; // No tokens left.
+    return tokens[token_pos++];
+  }
+
+  emplex::Token GetToken() const { return tokens[token_pos]; }
+  emp::String GetLexeme() const { return tokens[token_pos].lexeme; }
+  size_t GetLineID() const { return tokens[token_pos].line_id; }
+  int GetTokenID() const { return tokens[token_pos].id; }
   emplex::Token GetToken(size_t pos) const { return tokens[pos]; }
   emp::String GetLexeme(size_t pos) const { return tokens[pos].lexeme; }
   size_t GetLineID(size_t pos) const { return tokens[pos].line_id; }
@@ -91,65 +88,69 @@ public:
     tokens[pos].lexeme.clear();
     save_required = true;
   }
+  void ClearLexeme() { ClearLexeme(token_pos); }
 
   void SetLexeme(size_t pos, emp::String new_word) {
     tokens[pos].lexeme = new_word;
     save_required = true;
   }
+  void SetLexeme(emp::String new_word) { SetLexeme(token_pos, new_word); }
 
-  // Find the first token of the target line (starting from line_id).
-  size_t FindPos_LineStart(size_t token_pos, size_t line_id) const {
-    // Scan forward if needed.
-    while (tokens[token_pos].line_id < line_id) ++token_pos;
-
-    // Scan backward, if needed.
-    while (token_pos > 0 && tokens[token_pos-1].line_id >= line_id) --token_pos;
-
-    return token_pos;
+  // Find a token anywhere on the target line.
+  size_t FindPos_Line(size_t target_line) const {
+    emp_assert(target_line >= tokens[0].line_id && target_line <= tokens.back().line_id);
+    size_t min=0, max=tokens.size();
+    while (tokens[min].line_id != target_line) {
+      size_t mid = (min+max)/2;
+      if (tokens[mid].line_id > target_line) max = mid;
+      else min = mid;
+    }
+    return min;
   }
 
-  // Newline at the end of the target line (or EOF)
-  size_t FindPos_LineEnd(size_t token_pos, size_t line_id) const {
-    // Scan forward, if needed.
-    while (token_pos < tokens.size() && tokens[token_pos].line_id <= line_id) ++token_pos;
-
-    // scan backward, if needed.
-    while (token_pos > 0 && tokens[token_pos-1].line_id > line_id) --token_pos;
-
-    // Move on to the \n at the end of the line.
-    if (token_pos && tokens[token_pos-1].lexeme == "\n") --token_pos;
-
-    return token_pos;
+  // Find the first token of the target line.
+  size_t FindPos_LineStart(size_t target_line) const {
+    size_t pos = FindPos_Line(target_line);
+    while (pos > 0 && tokens[pos-1].line_id == target_line) --pos;
+    return pos;
   }
 
-  emp::String GetTokenLine(size_t pos, size_t line_id) const {
+  // Find the first token of the target line.
+  size_t FindPos_LineEnd(size_t target_line) const {
+    size_t pos = FindPos_Line(target_line);
+    while (pos+1 < tokens.size() && tokens[pos+1].line_id == target_line) ++pos;
+    return pos;
+  }
+
+
+  emp::String GetTokenLine(size_t line_id) const {
     // Determine the set of tokens to print.
-    const size_t start = FindPos_LineStart(pos, line_id);
-    const size_t end = FindPos_LineEnd(pos, line_id);
+    const size_t start = FindPos_LineStart(line_id);
+    const size_t end = FindPos_LineEnd(line_id);
 
-    // Collect the tokens on this line, highlighting the target.
+    // Collect the tokens on this line, highlighting the current token.
     emp::String result;
     for (size_t i = start; i < end; ++i) {
-      if (i == pos) result += ToBoldRed(tokens[i].lexeme).AsANSIUnderline();
+      if (i == token_pos) result += ToBoldRed(tokens[i].lexeme).AsANSIUnderline();
       else result += tokens[i].lexeme;
     }
     return result;
   }
 
   // Print a line near a given token, highlighting that token.
-  void PrintTokenLine(size_t token_pos, size_t line_id) const {
-    emp::String line_str = emp::MakeString(line_id).PadFront(' ', 5)+':';
-    emp::String code_line = GetTokenLine(token_pos, line_id);
-    PrintLn(line_str.AsANSIBrightWhite().AsANSIBold(), code_line);
+  void PrintLine(size_t line_id) const {
+    emp::String line_num_str = emp::MakeString(line_id).PadFront(' ', 5)+':';
+    emp::String code_line = GetTokenLine(line_id);
+    PrintLn(line_num_str.AsANSIBrightWhite().AsANSIBold(), code_line);
   }
 
-  // Print a range of lines around a given token.
-  void PrintTokenRange(size_t token_pos, size_t range=1) {
+  // Print a range of lines the current token.
+  void PrintTokenRange(size_t range=1) {
     size_t line_id = tokens[token_pos].line_id;
     size_t min_line = (line_id > range) ? (line_id - range) : 0;
     size_t max_line = (line_id+range <= MaxLineID()) ? line_id+range : MaxLineID();
     for (size_t i = min_line; i <= max_line; ++i) {
-      PrintTokenLine(token_pos, i);
+      PrintLine(i);
     }
   }
 
@@ -160,6 +161,7 @@ public:
       return false;
     }
     tokens = lexer.Tokenize(file);
+    token_pos = 0;       // Reset the next token to be analyzed.
     issues.resize(0);    // Reset issues for new file.
 
     // Scan through file for Empecable instructions.
@@ -223,7 +225,7 @@ public:
   size_t GetNumIssues() const { return issues.size(); }
 
   // Print tokens to the screen with a particular token highlighted in read.
-  void ReportIssue(emp::String issue, size_t token_pos) {
+  void ReportIssue(emp::String issue) {
     issues.push_back(issue);
 
     // Report the issue.
@@ -232,7 +234,7 @@ public:
       PrintLn(emp::MakeString("Found in ", filename, ":", line_num, ": ").AsANSIYellow().AsANSIBold(), issue);
 
       // Print the affected code.
-      PrintTokenRange(token_pos, 1);
+      PrintTokenRange(1);
     }
   }
 
