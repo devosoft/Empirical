@@ -26,7 +26,7 @@ namespace emp {
 
   /**
    * @brief A class that can be either a static or dynamic vector, with extra functionality.
-   * 
+   *
    * @tparam VALUE_T Value type that the vector will be using.
    * @tparam MAX_SIZE Maximum number of entries in vector (use 0 for unlimited)
    */
@@ -154,3 +154,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_DATASTRUCT_VECTOR_HPP_INCLUDE
+
+// Special info below for local control over the Empecable file checker.
+// empecable_words: vec

@@ -475,7 +475,7 @@ namespace emp {
       }
     }
 
-    // Are all of the indicies one after the next?
+    // Are all of the indices one after the next?
     bool IsConsecutive() const {
       switch (type) {
         case index_t::NONE: return true;

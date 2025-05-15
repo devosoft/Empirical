@@ -100,7 +100,7 @@ namespace emp {
 
   // compares member variables of lhs and rhs, ignoring callback functions
   // useful for tests
-  bool operator==(const ArgSpec& lhs, const ArgSpec& rhs) {    
+  bool operator==(const ArgSpec& lhs, const ArgSpec& rhs) {
     return
       lhs.most_quota == rhs.most_quota &&
       lhs.least_quota == rhs.least_quota &&
@@ -512,7 +512,7 @@ namespace emp {
 
     }
 
-    /// ViewArg provides, but doesn't comsume,
+    /// ViewArg provides, but doesn't consume,
     /// all argument packs under a certain name.
     emp::vector<pack_t> ViewArg(const std::string & name) const {
 
@@ -771,7 +771,7 @@ namespace emp {
           UseArg(to_string('-', entry->GetName()), config, entry->GetName(), desc);
         }
 
-        // Determine if we're using any special options for comman line flags.
+        // Determine if we're using any special options for command line flags.
         bool print_help    = UseFlag("--help", "Print help information.");
         bool create_config = cfg_file.size() && UseFlag("--gen", "Generate configuration file.");
         bool const_macros  = macro_file.size() && UseFlag("--make-const", "Generate const version of macros file.");
@@ -799,3 +799,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_CONFIG_ARGMANAGER_HPP_INCLUDE
+
+// Special info below for local control over the Empecable file checker.
+// empecable_words: argspec argpack deflag dealias czvf deflagging argspecs deflagged

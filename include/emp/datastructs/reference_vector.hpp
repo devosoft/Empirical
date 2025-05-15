@@ -27,7 +27,7 @@ namespace emp {
     vec_t vals;
 
     class Iterator {
-     ///  @todo Add a const interator, and probably a reverse iterator.
+     ///  @todo Add a const iterator, and probably a reverse iterator.
     private:
       typename vec_t::iterator it;
 

@@ -13,7 +13,7 @@
  *  to those values.)
  *
  *  AddVar<type>("name", value, ["desc"], ["notes"])
- *   Includes a new data entry into the DataMap and returns its uniquq ID.
+ *   Includes a new data entry into the DataMap and returns its unique ID.
  *
  *  Get<type>("name")   - retrieve a reference to a value in the DataMap slowly.
  *  Get<type>(ID)       - retrieve a reference more quickly.

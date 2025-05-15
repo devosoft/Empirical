@@ -20,7 +20,7 @@
 
 namespace emp {
 
-  /// This class uses a combination of a hashtable (std::unordered_map) and emp::vector to
+  /// This class uses a combination of a table (std::unordered_map) and emp::vector to
   /// lookup insert, lookup, and delete values in constant time, while still being able to
   /// step through all values (albeit in an arbitrary order).
   ///

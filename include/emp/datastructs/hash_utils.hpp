@@ -50,7 +50,7 @@ namespace emp {
   /// Generate a unique long from a pair of ints.
   /// @param a_ First 32-bit unsigned int.
   /// @param b_ Second 32-bit unsigned int.
-  /// @return 64-bit unsigned int representing the szudzik hash of both inputs.
+  /// @return 64-bit unsigned int representing the Szudzik hash of both inputs.
   inline uint64_t szudzik_hash(uint32_t a_, uint32_t b_) noexcept
   {
     uint64_t a = a_, b = b_;
@@ -250,3 +250,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_DATASTRUCTS_HASH_UTILS_HPP_INCLUDE
+
+// Special info below for local control over the Empecable file checker.
+// empecable_words: dce ret nblocks bef aappleby fcfaadc fmix ceb smhasher xff ccd afd numbytes szudzik

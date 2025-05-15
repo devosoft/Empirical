@@ -201,7 +201,7 @@ namespace emp {
 
   #ifndef DOXYGEN_SHOULD_SKIP_THIS
   /////////////////////////////////////
-  //  Member function implementaions.
+  //  Member function implementations.
 
   template <typename RETURN, typename... Ts>
   auto BaseFunction::Call(Ts &&... args) {

@@ -170,7 +170,7 @@ namespace emp {
       data_active = true;
     }
   public:
-    /// Create a surface providing maxumum size.
+    /// Create a surface providing maximum size.
     Surface(Point _max) : max_pos(_max), body_set(), max_radius(0.0) { ; }
     ~Surface() { Clear(); }
 

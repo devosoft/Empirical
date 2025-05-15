@@ -7,7 +7,7 @@
  *  @file
  *  @brief A simple Othello game state handler.
  *
- *  @todo Add Hash for boards to be able to cachce moves.
+ *  @todo Add Hash for boards to be able to cache moves.
  *  @todo Setup OPTIONAL caching of expensive board measures.
  */
 
@@ -39,7 +39,7 @@ namespace emp {
     static constexpr size_t NUM_DIRECTIONS = 8;  ///< Number of neighbors each board space has.
   };
 
-  /// Class for othello games of a specific size.
+  /// Class for Othello games of a specific size.
   template <size_t BOARD_SIZE>
   class Othello_Game : public Othello_Base {
   public:
@@ -297,7 +297,7 @@ namespace emp {
     /// copy_board size must match game_board's size.
     void SetBoard(const board_t & other_board) { game_board = other_board; }
 
-    /// Set current board to be the same as board from other othello game.
+    /// Set current board to be the same as board from other Othello game.
     void SetBoard(const this_t & other_othello) { SetBoard(other_othello.GetBoard()); }
 
     /// Set the current player.
@@ -362,3 +362,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_GAMES_OTHELLO_HPP_INCLUDE
+
+// Special info below for local control over the Empecable file checker.
+// empecable_words: opp othello

@@ -553,7 +553,7 @@ namespace emp {
 
     /// Get the skewness of values added since the last reset. This measurement tells you about
     /// the shape of the distribution. For a unimodal distribution, negative skew means that the
-    /// distribution has a longer/thicker tail to the left. Positive skew means that ths distribution
+    /// distribution has a longer/thicker tail to the left. Positive skew means that this distribution
     /// has a longer/thicker tail to the right.
     double GetSkew() const {return sqrt(double(val_count)) * M3/ emp::Pow(M2, 1.5);}
 
@@ -841,3 +841,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_DATA_DATANODE_HPP_INCLUDE
+
+// Special info below for local control over the Empecable file checker.
+// empecable_words: johndcook usort pct

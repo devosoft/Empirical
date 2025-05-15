@@ -44,7 +44,7 @@ namespace emp {
     static constexpr size_t NO_REGION = static_cast<size_t>(-1);
 
     // Calculate multi-cell overlaps between regions; each row/col overlaps with 3 square regions.
-    static constexpr size_t NUM_OVERLAPS = (NUM_ROWS + NUM_COLS) * 3 ;        // 54    
+    static constexpr size_t NUM_OVERLAPS = (NUM_ROWS + NUM_COLS) * 3 ;        // 54
 
     using base_t = GridPuzzleAnalyzer<NUM_ROWS, NUM_COLS, NUM_STATES>;
     using grid_bits_t = BitSet<NUM_CELLS>;
@@ -215,7 +215,7 @@ namespace emp {
       }
       return false;
     }
-    
+
 
     // Print the current state of the puzzle, including all options available.
     void Print(bool verbose=true, std::ostream & out=std::cout) override {
@@ -234,7 +234,7 @@ namespace emp {
       }
     }
 
-    void PrintDetails(std::ostream & out=std::cout) {      
+    void PrintDetails(std::ostream & out=std::cout) {
       out << " +-----------------------+-----------------------+-----------------------+"
           << std::endl;;
       for (size_t r = 0; r < NUM_ROWS; r++) {       // Puzzle row
@@ -262,7 +262,7 @@ namespace emp {
           out << " |                       |                       |                       |";
         }
         out << std::endl;
-      }      
+      }
     }
 
     // Use a brute-force approach to completely solve this puzzle.
@@ -270,7 +270,7 @@ namespace emp {
     // @CAO - Change to use a stack of backup states, remove recursion, and track set counts for faster ID of failure (i.e., no 3's left, but only 8 of 9 set)
     bool ForceSolve(uint8_t cur_state=1) {
       emp_assert(cur_state > 0 && cur_state <= NUM_STATES);
-      
+
       // Continue for as long as we have a state that still needs to be considered.
       while (cur_state <= NUM_STATES) {
         // Advance the start state if the current one is done.
@@ -288,8 +288,8 @@ namespace emp {
         *this = backup_state;                               // Otherwise, restore from backup
         Block(cell_id, cur_state);                          // ...and eliminate this option
       }
-      
-      return IsSolved();      
+
+      return IsSolved();
     }
 
     // More human-focused solving techniques:
@@ -323,7 +323,7 @@ namespace emp {
           }
         }
       }
-      
+
       return moves;
     }
 
@@ -353,10 +353,10 @@ namespace emp {
           }
         }
       }
-      
+
       return moves;
     }
-    
+
     // If 2 cells in a region are all limited to the same 2 states, eliminate those states
     // from all other cells in the same region.
     emp::vector<PuzzleMove> Solve_FindLimitedCells2() {
@@ -419,7 +419,7 @@ namespace emp {
               (bit_options[state1] & bit_options[state3] & two_ones) |
               (bit_options[state2] & bit_options[state3] & two_ones) |
               (bit_options[state1] & bit_options[state2] & bit_options[state3] & three_ones);
-              
+
             // If too few cells have exactly these two states, move on!
             if (test_sites.CountOnes() < 3) continue;
 
@@ -486,10 +486,10 @@ namespace emp {
             for (uint8_t block_state = 1; block_state <= NUM_STATES; ++block_state) {
               if (block_state == state1 || block_state == state2) continue;
               if (bit_options[block_state].Has(pos1)) {
-                moves.push_back(PuzzleMove{PuzzleMove::BLOCK_STATE, pos1, block_state});                
+                moves.push_back(PuzzleMove{PuzzleMove::BLOCK_STATE, pos1, block_state});
               }
               if (bit_options[block_state].Has(pos2)) {
-                moves.push_back(PuzzleMove{PuzzleMove::BLOCK_STATE, pos2, block_state});                
+                moves.push_back(PuzzleMove{PuzzleMove::BLOCK_STATE, pos2, block_state});
               }
             }
           }
@@ -540,13 +540,13 @@ namespace emp {
                   //   << CellToCoords(pos3) << ", "
                   //   << "blocking state " << (block_state+1) << " at pos1"
                   //   << std::endl;
-                  moves.push_back(PuzzleMove{PuzzleMove::BLOCK_STATE, pos1, block_state});                
+                  moves.push_back(PuzzleMove{PuzzleMove::BLOCK_STATE, pos1, block_state});
                 }
                 if (bit_options[block_state].Has(pos2)) {
-                  moves.push_back(PuzzleMove{PuzzleMove::BLOCK_STATE, pos2, block_state});                
+                  moves.push_back(PuzzleMove{PuzzleMove::BLOCK_STATE, pos2, block_state});
                 }
                 if (bit_options[block_state].Has(pos3)) {
-                  moves.push_back(PuzzleMove{PuzzleMove::BLOCK_STATE, pos2, block_state});                
+                  moves.push_back(PuzzleMove{PuzzleMove::BLOCK_STATE, pos2, block_state});
                 }
               }
             }
@@ -807,13 +807,16 @@ namespace emp {
     }
 
 
-    // Make sure the current state is consistant.
+    // Make sure the current state is consistent.
     bool OK() {
       return true;
     }
   };
 
-  
+
 } // END emp namespace
 
 #endif
+
+// Special info below for local control over the Empecable file checker.
+// empecable_words: mercere

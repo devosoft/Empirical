@@ -41,7 +41,7 @@ namespace emp {
     double & operator()(size_t A, size_t B) { return payoff[to_index(A,B)]; }
     double operator()(size_t A, size_t B) const { return payoff[to_index(A,B)]; }
 
-    // Setup a Prisoner's Dilema Payoff Matrix
+    // Setup a Prisoner's Dilemma Payoff Matrix
     void SetupPD(double u) {
       payoff[to_index(0,0)] = u;         // Both defect
       payoff[to_index(0,1)] = 1.0 + u;   // Player defects, other cooperates

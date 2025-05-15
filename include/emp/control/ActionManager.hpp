@@ -58,7 +58,7 @@ namespace emp {
       return *(it->second);
     }
 
-    /// Add a functon to this manager with a pre-specified name.
+    /// Add a function to this manager with a pre-specified name.
     template <typename RETURN, typename... ARGS>
     auto & Add(const std::function<RETURN(ARGS...)> & in_fun, const std::string & name) {
       // Create the new action, save it, and return it.

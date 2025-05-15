@@ -8,7 +8,7 @@
  *  @brief A drop-in wrapper for std::map and std:multimap; makes sure we create vars on access.
  *  @note Status: ALPHA
  *
- *  This class is a drop-in wrapper for std::map, adding on debbing where the indexing operator
+ *  This class is a drop-in wrapper for std::map, adding on debugging where the indexing operator
  *  [square brackets] returns a proxy.  That proxy can either be assigned to OR convert an
  *  existing value ONLY if it exists.  This mechanism ensures that we don't accidentally write
  *  a default value to a map when all we meant to do was read from it, but had a typo.
@@ -28,12 +28,12 @@
 // If debug is turned out, translate back to std::map
 #ifdef EMP_NDEBUG
 
-// Seemlessly translate emp::map to std::map
+// Seamlessly translate emp::map to std::map
 namespace emp {
   template <typename... Ts> using map = std::map<Ts...>;
 }
 
-// Seemlessly translate emp::multimap to std::multimap
+// Seamlessly translate emp::multimap to std::multimap
 namespace emp {
   template <typename... Ts> using multimap = std::multimap<Ts...>;
 }

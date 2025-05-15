@@ -87,7 +87,7 @@ namespace emp {
       if (hw.regs[inst.args[0]] == 0.0) hw.BypassScope(inst.args[1]); // If test fails, move to scope end.
     }
 
-    static void Inst_Countdown(hardware_t & hw, const inst_t & inst) {  // Same as while, but auto-decriments test each loop.
+    static void Inst_Countdown(hardware_t & hw, const inst_t & inst) {  // Same as while, but auto-decrements test each loop.
       // UpdateScope returns false if previous scope isn't finished (e.g., while needs to loop)
       if (hw.UpdateScope(inst.args[1], ScopeType::LOOP) == false) return;
       if (hw.regs[inst.args[0]] == 0.0) hw.BypassScope(inst.args[1]);   // If test fails, move to scope end.
@@ -99,7 +99,7 @@ namespace emp {
 
     static void Inst_Define(hardware_t & hw, const inst_t & inst) {
       if (hw.UpdateScope(inst.args[1]) == false) return; // Update which scope we are in.
-      hw.fun_starts[inst.args[0]] = (int) hw.inst_ptr;     // Record where function should be exectuted.
+      hw.fun_starts[inst.args[0]] = (int) hw.inst_ptr;     // Record where function should be executed.
       hw.BypassScope(inst.args[1]);                     // Skip over the function definition for now.
     }
 
@@ -113,7 +113,7 @@ namespace emp {
       size_t fun_scope = hw.genome[def_pos].args[1];
       if (hw.UpdateScope(fun_scope, ScopeType::FUNCTION) == false) return;
       hw.call_stack.push_back(hw.inst_ptr+1);        // Back up the call position
-      hw.inst_ptr = def_pos+1;                       // Jump to the function body (will adavance)
+      hw.inst_ptr = def_pos+1;                       // Jump to the function body (will advance)
     }
 
     static void Inst_Push(hardware_t & hw, const inst_t & inst) {
@@ -186,3 +186,8 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_HARDWARE_AVIDACPU_INSTLIB_HPP_INCLUDE
+
+// Special info below for local control over the Empecable file checker.
+
+// Special info below for local control over the Empecable file checker.
+// empecable_words: denom

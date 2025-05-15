@@ -2104,3 +2104,6 @@ namespace std
 #endif // DOXYGEN_SHOULD_SKIP_THIS
 
 #endif // #ifndef EMP_BITS_BITARRAY_HPP_INCLUDE
+
+// Special info below for local control over the Empecable file checker.
+// empecable_words: coeff msse ness ing

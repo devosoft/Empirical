@@ -74,7 +74,7 @@ namespace emp {
     // (signal names were handled in the previous overload of this function)
     auto Link(SignalBase & s, const std::string & a) { return s.AddAction(action_m[a]); }
 
-    // If we have base classes for both signals and actions.  Convert to derrived versions!
+    // If we have base classes for both signals and actions.  Convert to derived versions!
     auto Link(SignalBase & s, ActionBase & a) { return s.AddAction(a); }
 
 

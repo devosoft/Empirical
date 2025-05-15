@@ -22,12 +22,12 @@
 // If debug is turned out, translate back to std::map
 #ifdef EMP_NDEBUG
 
-// Seemlessly translate emp::unordered_map to std::unordered_map
+// Seamlessly translate emp::unordered_map to std::unordered_map
 namespace emp {
   template <typename... Ts> using unordered_map = std::unordered_map<Ts...>;
 }
 
-// Seemlessly translate emp::unordered_multimap to std::unordered_multimap
+// Seamlessly translate emp::unordered_multimap to std::unordered_multimap
 namespace emp {
   template <typename... Ts> using unordered_multimap = std::unordered_multimap<Ts...>;
 }
@@ -213,3 +213,6 @@ namespace emp {
 
 
 #endif // #ifndef EMP_BASE_UNORDERED_MAP_HPP_INCLUDE
+
+// Special info below for local control over the Empecable file checker.
+// empecable_words: eql

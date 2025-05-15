@@ -5,7 +5,7 @@
 */
 /**
  *  @file
- *  @brief Allow functions to be bundled (as Actions) and triggered enmasse.
+ *  @brief Allow functions to be bundled (as Actions) and triggered all.
  *  @note Status: Beta
  *
  *  @todo Setup easier mechanism to control the order in which actions are triggered.
@@ -35,7 +35,7 @@ namespace emp {
     uint32_t signal_id;   ///< Which signal is this key associated with?
     uint32_t key_id;      ///< Which key id is this.
 
-    // Internal function to compare two signal kays.
+    // Internal function to compare two signal keys.
     int Compare(const SignalKey& in) const {
       if (signal_id < in.signal_id) return -1;
       if (signal_id > in.signal_id) return 1;
@@ -382,3 +382,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_CONTROL_SIGNAL_HPP_INCLUDE
+
+// Special info below for local control over the Empecable file checker.
+// empecable_words: sid

@@ -50,7 +50,7 @@ namespace emp {
     return out_graph;
   }
 
-  /// Construct a graph where all vertics are degree two and form a single ring.
+  /// Construct a graph where all vertices are degree two and form a single ring.
   Graph build_graph_ring(size_t v_count, Random & random) {
     Graph graph(v_count);
 
@@ -299,7 +299,7 @@ namespace emp {
 
 
   /// Helper function for loading symmetric graphs from an input stream.
-  /// sub1 indicates that verticies are numbered 1 to N instead of 0 to N-1.
+  /// sub1 indicates that vertices are numbered 1 to N instead of 0 to N-1.
   // @CAO Need some error checking here...
   Graph load_graph_sym(std::istream & is, bool sub1=false) {
     size_t n_vert, n_edge;
@@ -349,3 +349,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_DATASTRUCTS_GRAPH_UTILS_HPP_INCLUDE
+
+// Special info below for local control over the Empecable file checker.
+// empecable_words: vert dag

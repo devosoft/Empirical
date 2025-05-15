@@ -53,10 +53,10 @@
 
 namespace emp {
 
-  /// Information about an exception that has occured.
+  /// Information about an exception that has occurred.
   struct ExceptInfo {
     std::string id;         ///< A unique string ID for this exception type.
-    std::string desc;       ///< A detailed description of thie exception.
+    std::string desc;       ///< A detailed description of this exception.
     bool default_to_error;  ///< Should we default to an error (or a warning) if not resolved?
   };
 
@@ -106,7 +106,7 @@ namespace emp {
   /// Remove all waiting exceptions.
   inline void ClearExcepts() { GetExceptMap().clear(); }
 
-  /// Remove all waiting exceptions of the desginated type.
+  /// Remove all waiting exceptions of the designated type.
   inline void ClearExcept(const std::string & id) {
     auto & fail_map = GetExceptMap();
     auto it = fail_map.find(id);

@@ -5,7 +5,7 @@
 */
 /**
  *  @file
- *  @brief A simple Malcala game state handler.
+ *  @brief A simple mancala game state handler.
  */
 
 #ifndef EMP_GAMES_MANCALA_HPP_INCLUDE

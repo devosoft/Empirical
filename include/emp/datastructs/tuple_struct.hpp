@@ -11,7 +11,7 @@
  *  @note Status: ALPHA
  *
  *  "But WHY???" you ask. Let me explain: Keeping a tuple allows us to easily track the
- *  members in the stuct or class, and makes possible powerful types of reflection
+ *  members in the struct or class, and makes possible powerful types of reflection
  *  including identifying all members and performing an action on each (such as
  *  serialization).  Since tuples instantiate members directly, these benefits should
  *  come at no cost to performance.
@@ -229,3 +229,6 @@ namespace emp {
 #endif /*DOXYGEN_SHOULD_SKIP_THIS*/
 
 #endif // #ifndef EMP_DATASTRUCTS_TUPLE_STRUCT_HPP_INCLUDE
+
+// Special info below for local control over the Empecable file checker.
+// empecable_words: endcond cond

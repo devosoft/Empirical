@@ -10,7 +10,7 @@
  *  overlapping.
  *
  *  BODY_TYPE is the class that represents the body geometry.
- *  BODY_INFO represents the internal infomation about the body, including the controller.
+ *  BODY_INFO represents the internal information about the body, including the controller.
  *
  *  Member functions include:
  *   Surface2D(double _width, double _height);

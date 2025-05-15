@@ -11,7 +11,7 @@
  *  One way of tracking memory leaks is to simply count instances of classes.  The macros here
  *  simplify this process.
  *
- *  To setup, every constructor for a class must incude EMP_TRACK_CONSTRUCT(CLASS_NAME),
+ *  To setup, every constructor for a class must include EMP_TRACK_CONSTRUCT(CLASS_NAME),
  *  and every destructor must have EMP_TRACK_DESTRUCT(CLASS_NAME).  Make sure to avoid
  *  implicit constructors/destructors or counts will be off.
  *
@@ -120,3 +120,6 @@ namespace emp {
 
 
 #endif // #ifndef EMP_DEBUG_MEM_TRACK_HPP_INCLUDE
+
+// Special info below for local control over the Empecable file checker.
+// empecable_words: onload

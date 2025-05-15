@@ -139,7 +139,7 @@ namespace emp {
         return MaskLow<field_t>(NumEndBits());
       }
 
-      /// How many felids do we need for the current set of bits?
+      /// How many fields do we need for the current set of bits?
       [[nodiscard]] constexpr size_t NumFields() const noexcept {
         return NUM_BITS ? (1 + ((NUM_BITS - 1) / NUM_FIELD_BITS)) : 0;
       }

@@ -5,7 +5,7 @@
 */
 /**
  *  @file
- *  @brief Physics2D - handles movement and collissions in a simple 2D world.
+ *  @brief Physics2D - handles movement and collisions in a simple 2D world.
  *
  */
 
@@ -107,7 +107,7 @@ namespace emp {
       body1.AddShift(shift_dist);
       body2.AddShift(-shift_dist);
 
-      // @CAO if we have inelastic collisions, we just take the weighted average of velocites
+      // @CAO if we have inelastic collisions, we just take the weighted average of velocities
       // and let the move together.
 
       // Assume elastic: Re-adjust velocity to reflect bounce.
@@ -197,3 +197,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_GEOMETRY_PHYSICS2D_HPP_INCLUDE
+
+// Special info below for local control over the Empecable file checker.
+// empecable_words: rel

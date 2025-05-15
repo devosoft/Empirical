@@ -242,7 +242,7 @@ namespace emp {
       return *this;
     }
 
-    /// Substract the weights from another index map from this one.
+    /// Subtract the weights from another index map from this one.
     UnorderedIndexMap & operator-=(UnorderedIndexMap & in_map) {
       emp_assert(size() == in_map.size());
       for (size_t i = 0; i < in_map.size(); i++) {

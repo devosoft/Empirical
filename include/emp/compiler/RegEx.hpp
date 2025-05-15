@@ -427,7 +427,7 @@ namespace emp {
             case '-':
             case '\\':
             case ']':
-            case '[':  // Technically not needed. 
+            case '[':  // Technically not needed.
             case '^':
 
             // These technically don't need to be escaped, but any symbol should be allowed to be escaped.
@@ -530,7 +530,7 @@ namespace emp {
             case 'S': result = NewPtr<re_charset>(" \f\n\r\t\v", true); break;
             case 'w': result = NewPtr<re_charset>("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"); break;
             case 'W': result = NewPtr<re_charset>("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_", true); break;
-            
+
             // Special escape sequences
             case 'f': result = NewPtr<re_string>('\f'); break;
             case 'n': result = NewPtr<re_string>('\n'); break;
@@ -720,3 +720,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_COMPILER_REGEX_HPP_INCLUDE
+
+// Special info below for local control over the Empecable file checker.
+// empecable_words: re's

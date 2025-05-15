@@ -33,7 +33,7 @@
  *   include OTHER_FILENAME         -- Load in all data from another file.
  *   set SETTING_NAME VALUE         -- Set a basic configuration setting.
  *   new OBJECT_TYPE OBJECT_NAME    -- Create a new config object of a managed class.
- *   use OBJECT_TYPE OBJECT_NAME    -- Use a previouly created configuration object.
+ *   use OBJECT_TYPE OBJECT_NAME    -- Use a previously created configuration object.
  */
 
 #ifndef EMP_CONFIG_CONFIG_HPP_INCLUDE
@@ -101,7 +101,7 @@ namespace emp {
     /// Retrieve the value of this setting as a string.
     virtual std::string GetValue() const = 0;
 
-    /// Conver the value of this setting into a literal that C++ would recognize as its current value.
+    /// Convert the value of this setting into a literal that C++ would recognize as its current value.
     virtual std::string GetLiteralValue() const = 0;
 
     /// Use a string to set the value of this setting.
@@ -169,7 +169,7 @@ namespace emp {
       bool IsConst() const { return true; }
     };
 
-    /// Special settings entry for settings created during the run (only accissibly dynamically)
+    /// Special settings entry for settings created during the run (only accessible dynamically)
     class ConfigLiveEntry : public ConfigEntry {
     public:
       ConfigLiveEntry(const std::string _name, const std::string _type,
@@ -366,7 +366,7 @@ namespace emp {
     }
 
     // === Protected member variables ===
-    emp::vector<std::string> class_names;           // Names in class heiarchy.
+    emp::vector<std::string> class_names;           // Names in class hierarchy.
     emp::unordered_map<std::string, ConfigEntry *> var_map;   // All variables across groups.
     std::string version_id;                         // Unique version ID to ensure synced config.
     emp::vector<ConfigGroup *> group_set;           // All of the config groups.
@@ -398,7 +398,7 @@ namespace emp {
     }
 
     ~Config() {
-      // Delete all alocated memory!
+      // Delete all allocated memory!
       for (auto & x : var_map) delete x.second;
       for (auto & x : group_set) delete x;
       for (auto & x : type_manager_map) delete x.second;
@@ -611,7 +611,7 @@ namespace emp {
         else if (command == "new") {
           std::string type_name = emp::string_pop_word(cur_line);
           if (emp::Has(new_map, type_name) == false) {
-            emp::NotifyError(emp::to_string("Command 'new' failede: Unknown type '",
+            emp::NotifyError(emp::to_string("Command 'new' failed: Unknown type '",
                                             type_name, "'.  Aborting."));
             return false;
           }
@@ -726,7 +726,7 @@ namespace emp {
 // Below are macros that help build the config classes.
 
 // Check that all of the commands are legal so that sensible errors can be produced.
-// (legal commands convert to two arguments; illeagal ones stay as one, so second arg is error!)
+// (legal commands convert to two arguments; illegal ones stay as one, so second arg is error!)
 #define EMP_CONFIG__ERROR_CHECK(CMD) EMP_GET_ARG(2, EMP_CONFIG__ARG_OKAY_ ## CMD, \
                                      static_assert(false, "Unknown Config option: " #CMD);, ~)
 #define EMP_CONFIG__ARG_OKAY_VALUE(...) ~,

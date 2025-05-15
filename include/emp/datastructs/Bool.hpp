@@ -38,7 +38,7 @@ namespace emp {
       bool & Value() { return value; }
       bool Value() const { return value; }
 
-      /// Compound assignement operators using Bool as lvalue.
+      /// Compound assignment operators using Bool as lvalue.
       Bool & operator &=(bool b) { value &= b; return *this; }
       Bool & operator |=(bool b) { value |= b; return *this; }
       Bool & operator ^=(bool b) { value ^= b; return *this; }

@@ -275,7 +275,7 @@ namespace emp {
 
 
     // =========  Type Status  ========= //
-    
+
     [[nodiscard]] static constexpr bool ZeroLeft() { return ZERO_LEFT; }
     [[nodiscard]] static constexpr bool IsFixedSize() { return DATA_T::IsFixedSize(); }
     [[nodiscard]] static constexpr bool IsAutoResize() { return DATA_T::IsAutoResize(); }
@@ -332,7 +332,7 @@ namespace emp {
       for (size_t i=0; i < GetSize(); ++i) Set(i, test_fun(i));
       return *this;
     }
-    
+
     /// @brief Set all bits to 0.
     Bits & Clear();
 
@@ -363,7 +363,7 @@ namespace emp {
 
     /// @brief Set a specified bit even if resizing is required.
     Bits & Include(size_t index, bool value=true);
-    
+
     /// @brief Return true if ANY bits are set to 1, otherwise return false.
     [[nodiscard]] bool Any() const;
 
@@ -825,7 +825,7 @@ namespace emp {
       size_t last1 = FindOne();
       Clear(last1);
       SetRange(last1-one_count-1, last1);
-      return true;      
+      return true;
     }
 
 
@@ -2675,7 +2675,7 @@ namespace emp {
 
   // Some external functions to process collections of Bits objects.
 
-  /// Find bit positions where ANY sequence has a one in that position.  
+  /// Find bit positions where ANY sequence has a one in that position.
   template <typename CONTAINER_T>
   [[nodiscard]] auto FindAnyOnes(const CONTAINER_T & container) {
     using bits_t = typename CONTAINER_T::value_type;
@@ -2689,7 +2689,7 @@ namespace emp {
     return found;
   }
 
-  /// Find bit positions where ALL sequences have a one in that position.  
+  /// Find bit positions where ALL sequences have a one in that position.
   template <typename CONTAINER_T>
   [[nodiscard]] auto FindAllOnes(const CONTAINER_T & container) {
     using bits_t = typename CONTAINER_T::value_type;
@@ -2703,7 +2703,7 @@ namespace emp {
     return found;
   }
 
-  /// Find bit positions where NO sequences have a one in that position.  
+  /// Find bit positions where NO sequences have a one in that position.
   template <typename CONTAINER_T>
   [[nodiscard]] auto FindNoOnes(const CONTAINER_T & container) {
     using bits_t = typename CONTAINER_T::value_type;
@@ -2717,7 +2717,7 @@ namespace emp {
     return ~ones_found;
   }
 
-  /// Find bit positions where exactly one sequence has a one in that position.  
+  /// Find bit positions where exactly one sequence has a one in that position.
   template <typename CONTAINER_T>
   [[nodiscard]] auto FindUniqueOnes(const CONTAINER_T & container, size_t start=0) {
     using bits_t = typename CONTAINER_T::value_type;
@@ -2732,7 +2732,7 @@ namespace emp {
     return any_ones ^ multi_ones; // any_ones is a subset of multi_ones, so this gives extra bit
   }
 
-  /// Find bit positions where multiple sequences have a one in that position.  
+  /// Find bit positions where multiple sequences have a one in that position.
   template <typename CONTAINER_T>
   [[nodiscard]] auto FindMultiOnes(const CONTAINER_T & container) {
     using bits_t = typename CONTAINER_T::value_type;
@@ -2747,7 +2747,7 @@ namespace emp {
     return multi_ones;
   }
 
-  /// Find bit positions where exactly two sequences have a one in that position.  
+  /// Find bit positions where exactly two sequences have a one in that position.
   template <typename CONTAINER_T>
   [[nodiscard]] auto FindTwoOnes(const CONTAINER_T & container) {
     using bits_t = typename CONTAINER_T::value_type;
@@ -2765,7 +2765,7 @@ namespace emp {
     return two_plus ^ three_plus; // two_plus is a subset of three_plus, so this gives extra bit
   }
 
-  /// Find bit positions where exactly three sequences have a one in that position.  
+  /// Find bit positions where exactly three sequences have a one in that position.
   template <typename CONTAINER_T>
   [[nodiscard]] auto FindThreeOnes(const CONTAINER_T & container) {
     using bits_t = typename CONTAINER_T::value_type;
@@ -2800,3 +2800,6 @@ namespace std {
 }
 
 #endif // #ifndef EMP_BITS_BITS_HPP_INCLUDE
+
+// Special info below for local control over the Empecable file checker.
+// empecable_words: zero'd ing msse

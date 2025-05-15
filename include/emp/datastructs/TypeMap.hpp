@@ -23,7 +23,7 @@ namespace emp {
   template <typename T>
   class TypeMap {
   private:
-    // Internally, types are converted to numbers, so we will buld a map of size_t to the desired value
+    // Internally, types are converted to numbers, so we will build a map of size_t to the desired value
     // type.  Since order doesn't make sense for types, we'll use unordered_map for the speedup.
     using val_map_t = std::unordered_map<size_t, T>;
     val_map_t val_map;

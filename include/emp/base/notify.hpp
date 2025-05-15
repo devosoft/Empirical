@@ -5,7 +5,7 @@
 */
 /**
  *  @file
- *  @brief Tools to alert users of messages (including errors and warnings) in a consistant manner.
+ *  @brief Tools to alert users of messages (including errors and warnings) in a consistent manner.
  *  @note Status: ALPHA
  *
  *
@@ -18,7 +18,7 @@
  *  - Debug: A simple notification that should only be printed when NDEBUG is not set (don't exit)
  *
  *  Messages default to "standard out"; all of the other default to "standard error".  Handling of
- *  these notifications can all be overriden by either whole category or by specific tag.
+ *  these notifications can all be overridden by either whole category or by specific tag.
  *
  *  There are three possible recipients for all errors/warnings.
  *  - The end-user if the problem stems from inputs they provided to the executable.
@@ -31,7 +31,7 @@
  *  NOTES:
  *  - Whenever possible, exceptions should be preferred.  They are more specific than warnings
  *    and can be responded to rather than automatically halting execution like errors.
- *  - Warnings should always detail what should be done differently to surpress that warning.
+ *  - Warnings should always detail what should be done differently to suppress that warning.
  *
  */
 
@@ -175,7 +175,7 @@ namespace notify {
     }
   };
 
-  /// Staticly stored data about current notifications.
+  /// Statically stored data about current notifications.
   struct NotifyData {
     // For each exception name we will keep a vector of handlers, appended to in the order
     // that they arrive (most recent will be last)

@@ -257,7 +257,7 @@ namespace emp {
       return *this;
     }
 
-    /// Substract the weights from another index map from this one.
+    /// Subtract the weights from another index map from this one.
     IndexMap & operator-=(IndexMap & in_map) {
       emp_assert(size() == in_map.size());
       for (size_t i = 0; i < in_map.size(); i++) {
@@ -268,7 +268,7 @@ namespace emp {
     }
 
     /// Indicate that we need to adjust weights before relying on them in the future; this will
-    /// prevent refreshes from occuring immediately and is useful when many updates to weights are
+    /// prevent refreshes from occurring immediately and is useful when many updates to weights are
     /// likely to be done before any are accessed again.
     void DeferRefresh() {
       needs_refresh = true;

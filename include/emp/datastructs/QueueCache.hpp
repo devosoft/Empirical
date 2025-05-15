@@ -50,7 +50,7 @@
       // @param it Iterator to element to update
       // @return Reference to value of updated element
       Value& UpdateCache(const typename cache_list_t::iterator it) {
-        // update our cache since we are accesing an item
+        // update our cache since we are accessing an item
         cache_list.splice(
           cache_list.begin(),
           cache_list,

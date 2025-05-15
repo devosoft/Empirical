@@ -107,9 +107,9 @@ namespace emp {
     /// Determine how big bins should be for optimal coverage.
     double OptimizeBinWeight() const {
       double best_coverage = 0.0;
-      double best_bin_weight = 0.0;      
+      double best_bin_weight = 0.0;
       for (size_t div = MAX_BINS; ; ++div) {
-        const double bin_weight = GetWeight() / div;                
+        const double bin_weight = GetWeight() / div;
         const size_t cur_bins = CalcBinCount(bin_weight);
         // std::cout << "div=" << div
         //           << " bin_weight=" << bin_weight
@@ -161,3 +161,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_DATASTRUCTS_STATICINDEXMAP_HPP_INCLUDE
+
+// Special info below for local control over the Empecable file checker.
+// empecable_words: cov

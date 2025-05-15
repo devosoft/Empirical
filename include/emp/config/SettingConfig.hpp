@@ -118,7 +118,7 @@ namespace emp {
         // Divide up inputs into comma-separated units.
         auto slices = emp::slice(input, ',');
 
-        // Clear out the values to set, one at a time (in most cases, aleady clear)
+        // Clear out the values to set, one at a time (in most cases, already clear)
         values.resize(0);
 
         // Process each slice into one or more values.

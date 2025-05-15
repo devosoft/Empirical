@@ -15,7 +15,7 @@
  *  option, providing a the function to call when the option is triggered.  The functions can
  *  take zero, one, or two Strings as arguments OR they can take a vector of Strings and the
  *  range of allowed arguments should be specified.
- * 
+ *
  *  When Process() is run, the appropriate function will be called on each and any invalid
  *  arguments will trigger an error.
  *
@@ -50,7 +50,7 @@ namespace emp {
   private:
     String name;    ///< Name used for this option.
     String desc;          ///< Name to type to trigger option.  E.g. "--help"
-    size_t min_args = 0;  ///< Minumum number of arguments option needs to operate.
+    size_t min_args = 0;  ///< Minimum number of arguments option needs to operate.
     size_t max_args = 0;  ///< Maximum number of arguments option can handle.
     fun_t fun;            ///< Function to run when this option is selected.
     char shortcut = '\0'; ///< Single-letter shortcut for this option.  E.g., 'h' is for "-h"
@@ -112,7 +112,7 @@ namespace emp {
     FlagInfo & _AddOption(String name, std::function<void(const emp::vector<String> &)> fun,
                    size_t min_args=0, size_t max_args=npos, String desc="") {
       emp_assert(name.size() > 0, "FlagManager cannot take an empty option name.");
-      emp_assert(!name.HasWhitespace(), "Option names cannot contain whitespace.");      
+      emp_assert(!name.HasWhitespace(), "Option names cannot contain whitespace.");
       if (!name.HasPrefix("--")) name.insert(0, "--");
       emp_assert(name[2] != '-', name, "Option names cannot begin with a single '-')");
       flag_options[name] = FlagInfo{name, desc, min_args, max_args, fun};
@@ -270,7 +270,7 @@ namespace emp {
         os << '\n';
       }
       os.flush();
-      
+
       // Print any uncategorized options
       if (GroupSize("none") == 0) return; // No uncategorized options.
 

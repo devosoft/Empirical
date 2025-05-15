@@ -24,7 +24,7 @@ namespace emp {
 
   template <class T> class flex_function;    // Not defined.
 
-  /// A functon class that is almost identical to std::function, but is provided with default values
+  /// A function class that is almost identical to std::function, but is provided with default values
   /// for all parameters so that it can be called with fewer arguments, as needed.
   template <class R, class... ARGS>
   class flex_function<R(ARGS...)> {

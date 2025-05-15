@@ -116,3 +116,6 @@ namespace std {
 #endif
 
 #endif // #ifndef EMP_BASE_OPTIONAL_HPP_INCLUDE
+
+// Special info below for local control over the Empecable file checker.
+// empecable_words: elem

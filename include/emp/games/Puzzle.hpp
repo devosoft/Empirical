@@ -67,7 +67,7 @@ namespace emp {
     bool IsSolved() const { return final_state == SOLVED; }
     bool IsUnsolved() const { return final_state == UNSOLVED; }
     bool IsUnsolvable() const { return final_state == UNSOLVABLE; }
-    
+
     void AddMoves(size_t level, size_t count) {
       slices.push_back(Slice{level, count});
     }
@@ -75,7 +75,7 @@ namespace emp {
     void SetSolved()     { final_state = SOLVED; }
     void SetUnsolved()   { final_state = UNSOLVED; }
     void SetUnsolvable() { final_state = UNSOLVABLE; }
-    
+
     void Clear() { slices.resize(0); final_state = UNSOLVED; }
 
     size_t CountTypes() const {
@@ -113,7 +113,7 @@ namespace emp {
       out << ToString() << std::endl;
     }
   };
-  
+
 
   /// @brief A generic analyzer for puzzles that have a set of positions, each in a set of values.
   template <size_t NUM_ROWS, size_t NUM_COLS, size_t NUM_STATES>
@@ -124,7 +124,7 @@ namespace emp {
     static constexpr uint8_t UNSET_STATE = 0;
     static constexpr uint8_t UNKNOWN_STATE = NUM_STATES+1;
 
-    // Which symbols are we using in this puzzle? (default to sudoku standard)
+    // Which symbols are we using in this puzzle? (default to Sudoku standard)
     emp::array<char, NUM_STATES+1> symbols; // sudoku_symbols = {'-', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
     emp::array<uint8_t, 128> symbol_map;  // What symbols ID do different characters map to?
 
@@ -187,7 +187,7 @@ namespace emp {
       // Format: Provide site by site with a dash for empty; whitespace is ignored.
       values_t values;
       char cur_char;
-      
+
       for (size_t cell_id = 0; cell_id < NUM_CELLS; ++cell_id) {
         is >> cur_char;
         if (emp::is_whitespace(cur_char)) { --cell_id; continue; }
@@ -198,7 +198,7 @@ namespace emp {
         }
         values[cell_id] = state_id;
       }
-      
+
       return values;
     }
 
@@ -274,7 +274,7 @@ namespace emp {
     }
     bool IsSet(size_t cell) const { return is_set[cell]; }
     bool IsSolved() const { return is_set.All(); }
-    
+
     /// Clear out the old solution info when starting a new solve attempt.
     void Clear() {
       values.fill(UNSET_STATE);
@@ -307,7 +307,7 @@ namespace emp {
 
       // Clear this cell from all sets of options.
       for (auto & val_options : bit_options) val_options.Clear(cell);
-      
+
       return true;
     }
 
@@ -320,7 +320,7 @@ namespace emp {
     bool MoveProgress(const PuzzleMove & move) const {
       emp_assert(move.pos_id >= 0 && move.pos_id < NUM_CELLS, move.pos_id);
       emp_assert(move.state > 0 && move.state <= NUM_STATES, (size_t) move.state);
-      
+
       if (move.type == PuzzleMove::SET_STATE) {
         return GetValue(move.pos_id) != move.state;
       }
@@ -339,7 +339,7 @@ namespace emp {
     bool Move(const PuzzleMove & move) {
       emp_assert(move.pos_id >= 0 && move.pos_id < NUM_CELLS, move.pos_id);
       emp_assert(move.state > 0 && move.state <= NUM_STATES, move.state);
-      
+
       switch (move.type) {
       case PuzzleMove::SET_STATE:
         if (!HasOption(move.pos_id, move.state)) return false;
@@ -354,7 +354,7 @@ namespace emp {
 
       return true;
     }
-    
+
     // Operate on a set of "move" objects.
     bool Move(const emp::vector<PuzzleMove> & moves) {
       for (const auto & move : moves) {
@@ -439,7 +439,7 @@ namespace emp {
             break;
           }
         }
-        else {  
+        else {
           ++fun_id;  // This move type didn't work; shift to the next one.
         }
       }

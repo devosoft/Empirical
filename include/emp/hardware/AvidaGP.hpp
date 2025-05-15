@@ -51,7 +51,7 @@ namespace emp {
     using this_t = AvidaCPU_Base<HARDWARE>;
     using hardware_t = HARDWARE;
     using inst_t = Instruction;
-    using arg_t = size_t;                                               // Args are indicies.
+    using arg_t = size_t;                                               // Args are indices.
     using inst_lib_t = AvidaCPU_InstLib<hardware_t, arg_t, INST_ARGS>;
     using genome_t = Genome<Instruction, inst_lib_t>;
 

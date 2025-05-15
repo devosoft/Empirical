@@ -32,14 +32,14 @@
  *
  *    size_t next_id = time_queue.Next();
  *
- *  This will set next_id to the earliest occuring event, removing that event from the queue
+ *  This will set next_id to the earliest occurring event, removing that event from the queue
  *  and updating the current time to the time of that event.  You can check the current
  *  time with:
  *
  *    double cur_time = time_queue.GetTime();
  *
  *  Important note for EFFICIENCY: You must always insert events for after the current time,
- *  but the longer after the current time (and the more other insertions that occuer between
+ *  but the longer after the current time (and the more other insertions that occur between
  *  each insertion and its trigger) the faster the TimeQueue will run.  If an item will be
  *  triggered immediately, you should try to avoid putting it in the TimeQueue.
  */

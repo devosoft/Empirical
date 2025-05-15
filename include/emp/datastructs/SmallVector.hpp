@@ -988,3 +988,6 @@ namespace std {
 #endif // DOXYGEN_SHOULD_SKIP_THIS
 
 #endif // #ifndef EMP_DATASTRUCTS_SMALLVECTOR_HPP_INCLUDE
+
+// Special info below for local control over the Empecable file checker.
+// empecable_words: alignof ctor elt memmove smallvector dtors uninvalidate alignas offsetof elts Sizer

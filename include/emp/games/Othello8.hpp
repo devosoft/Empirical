@@ -7,7 +7,7 @@
  *  @file
  *  @brief A simple Othello game state handler limited to an 8x8 board.
  *
- *  @todo Add Hash for boards to be able to cachce moves.
+ *  @todo Add Hash for boards to be able to cache moves.
  *  @todo Setup OPTIONAL caching of expensive board measures.
  */
 
@@ -34,7 +34,7 @@ namespace emp {
   ///     calculating flip lists, scores, etc, which would speed up asking for flip lists, etc. multiple
   ///     times during a turn.
 
-  /// Class for size-8 othello games.
+  /// Class for size-8 Othello games.
   class Othello8 {
   public:
     enum Player { DARK=0, LIGHT=1, NONE };          ///< All possible states of a board space.
@@ -349,7 +349,7 @@ namespace emp {
     /// copy_board size must match game_board's size.
     void SetBoard(const Board & other_board) { game_board = other_board; cache_ok = false; }
 
-    /// Set current board to be the same as board from other othello game.
+    /// Set current board to be the same as board from other Othello game.
     void SetBoard(const this_t & other_othello) { SetBoard(other_othello.GetBoard()); }
 
     /// Set the current player.
@@ -413,3 +413,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_GAMES_OTHELLO8_HPP_INCLUDE
+
+// Special info below for local control over the Empecable file checker.
+// empecable_words: opp othello

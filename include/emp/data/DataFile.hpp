@@ -83,7 +83,7 @@ namespace emp {
 
     /// Returns the string that is printed at the beginning of each line.
     const std::string & GetLineBegin() const { return line_begin; }
-    /// Returns the string that is printed between elements on each line (i.e. the delimeter).
+    /// Returns the string that is printed between elements on each line (i.e. the delimiter).
     const std::string & GetSpacer() const { return line_spacer; }
     /// Returns the string that is printed at the end of each line.
     const std::string & GetLineEnd() const { return line_end; }
@@ -117,12 +117,12 @@ namespace emp {
 
     /// Print a string at the beginning of each line. @param _in the string to print
     void SetLineBegin(const std::string & _in) { line_begin = _in; }
-    /// Print a string between elements @param _in the string (i.e. the delimeter).
+    /// Print a string between elements @param _in the string (i.e. the delimiter).
     void SetSpacer(const std::string & _in) { line_spacer = _in; }
     /// Print a string at the end of each line. @param _in the string to print
     void SetLineEnd(const std::string & _in) { line_end = _in; }
-    /// Set line begin, delimeter, and line end characters.
-    /// @param b line-begin character. @param s column delimeter @param e line end character
+    /// Set line begin, delimiter, and line end characters.
+    /// @param b line-begin character. @param s column delimiter @param e line end character
     void SetupLine(const std::string & b, const std::string & s, const std::string & e) {
       line_begin = b;
       line_spacer = s;
@@ -685,8 +685,8 @@ namespace emp {
   /// Convenience function for building a container data file.
   /// @param fun is the function to call to update the container
   /// @param filename is the name of the file to output to
-  /// @param b character to print at the beggininning of each line
-  /// @param s delimeter (i.e. what character to print between entries on each line)
+  /// @param b character to print at the beginning of each line
+  /// @param s delimiter (i.e. what character to print between entries on each line)
   /// @param e character to print at the end of each line
   template <typename CONTAINER>
   ContainerDataFile<CONTAINER> MakeContainerDataFile(std::function<CONTAINER(void)> fun,
@@ -702,3 +702,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_DATA_DATAFILE_HPP_INCLUDE
+
+// Special info below for local control over the Empecable file checker.
+// empecable_words: dfile pct cstart

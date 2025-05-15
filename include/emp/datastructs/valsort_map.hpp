@@ -77,7 +77,7 @@ namespace emp {
     auto crbegin() { return item_map.crbegin(); }
     auto crend() { return item_map.crend(); }
 
-    // Add iterators that are ordred by value instead of key.
+    // Add iterators that are ordered by value instead of key.
     auto cvbegin() { return val_set.cbegin(); }
     auto cvend() { return val_set.cend(); }
     auto crvbegin() { return val_set.crbegin(); }

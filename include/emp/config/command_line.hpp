@@ -10,7 +10,7 @@
  *  Functions here include:
  *
  *    emp::vector<std::string> args_to_strings(int argc, char* argv[]);
- *        - Convert the standard command-line args to a more managable vector of strings.
+ *        - Convert the standard command-line args to a more manageable vector of strings.
  *
  *    int find_arg(const emp::vector<std::string> & args, const std::string & pattern);
  *        - Return index where a specified argument can be found (or -1 if it doesn't exist).
