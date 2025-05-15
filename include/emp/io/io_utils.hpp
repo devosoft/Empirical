@@ -51,6 +51,15 @@ namespace emp {
   template <typename... ARG_Ts>
   void PrintLn(ARG_Ts &&... args) { Print(std::forward<ARG_Ts>(args)..., '\n'); }
 
+  void PrintRepeat(char ch, size_t count) { Print(emp::String(count, ch)); }
+
+  template <typename T>
+  void PrintRepeat(T arg, size_t count) { for (size_t i=0; i < count; ++i) Print(arg); }
+
+  template <typename... ARG_Ts>
+  void PrintRepeatLn(ARG_Ts &&... args) { PrintRepeat(std::forward<ARG_Ts>(args)...), PrintLn(); }
+
+
   // A shortcut to represent specific IO characters.
   struct IOChar {
     int char_id=0;

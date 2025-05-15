@@ -33,9 +33,9 @@
 #include "../base/assert.hpp"
 #include "../base/notify.hpp"
 #include "../base/vector.hpp"
+#include "../io/ANSI.hpp"
 #include "../meta/type_traits.hpp"  // emp::IsIterable()
 
-#include "ANSI.hpp"
 #include "char_utils.hpp"           // emp::CharSet (+ functions)
 #include "_StringSyntax.hpp"
 
