@@ -153,11 +153,11 @@ namespace emp {
       }
       if (status == PtrStatus::ARRAY) {
         if (array_bytes == 0) { return false; }  // Arrays cannot be size 0.
-        if (count == 0) { return false; }  // Active arrays must have pointers to them.
+        if (count == 0) { return false; }        // Active arrays must have pointers to them.
       }
       if (status == PtrStatus::ACTIVE) {
         if (array_bytes > 0) { return false; }  // non-arrays must be array size 0.
-        if (count == 0) { return false; }  // Active pointers must have references to them.
+        if (count == 0) { return false; }       // Active pointers must have references to them.
       }
       return true;
     }
@@ -276,7 +276,7 @@ namespace emp {
     /// Is a pointer id associated with a pointer that's active and ready to be used?
     bool IsActiveID(size_t id) const {
       emp_assert(OK(id));
-      if (id >= id_info.size()) { return false; } // Includes untracked.
+      if (id >= id_info.size()) { return false; }  // Includes untracked.
       return id_info[id].IsActive();
     }
 
@@ -1238,7 +1238,7 @@ namespace emp {
   template <typename T>
   [[nodiscard]] Ptr<T> NewArrayPtr(size_t array_size) {
     auto ptr = new T[array_size];  // Build a new raw pointer.
-    emp_assert(ptr, array_size);  // No exceptions in emscripten; assert alloc!
+    emp_assert(ptr, array_size);   // No exceptions in emscripten; assert alloc!
     return Ptr<T>(ptr, array_size, true);
   }
 
