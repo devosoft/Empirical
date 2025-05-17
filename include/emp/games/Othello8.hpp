@@ -52,6 +52,8 @@ namespace emp {
       constexpr Index(size_t x, size_t y) : pos() { Set(x,y); }
       constexpr Index(const Index & _in) : pos(_in.pos) { emp_assert(pos <= NUM_CELLS); }
 
+      constexpr Index & operator=(const Index & _in) { pos = _in.pos; emp_assert(pos <= NUM_CELLS); return *this; }
+
       constexpr operator size_t() const { return pos; }
       constexpr size_t x() const { return pos & 7; }
       constexpr size_t y() const { return pos >> 3; }

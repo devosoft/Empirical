@@ -136,7 +136,7 @@ namespace emp {
 
     // -- No constructors, destructors, or assignment operators to preserve aggregate type.
 
-    int operator<=>(const array &) const = default;
+    auto operator<=>(const array &) const = default;
 
     // Allow automatic conversion to regular array type.
     operator std::array<T,N>() {

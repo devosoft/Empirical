@@ -73,6 +73,7 @@ namespace emp {
       StyleEntry(size_t style_id, String full_info, size_t rule_id)
         : style_id(style_id), full_info(full_info), rule_id(rule_id) { }
       StyleEntry(const StyleEntry &) = default;
+      StyleEntry & operator=(const StyleEntry &) = default;
     };
 
     // Track info about each unique tag.
@@ -218,7 +219,7 @@ namespace emp {
 
     /// Helper function to append a tag part 1: Test if it is CLOSING a style.
     /// @return Was the tag used?
-    bool Append_Tag_Close(Text & text, const TagInfo & info) {
+    bool Append_Tag_Close([[maybe_unused]] Text & text, const TagInfo & info) {
       if (!info.HasClose()) return false;   // If this token can't CLOSE a style, abort.
 
       // Scan active styles from most recent to figure out which one to remove.
