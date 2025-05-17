@@ -74,7 +74,7 @@ namespace emp {
     const emp::vector<Author> & GetAuthors() const { return author_list; }
     const emp::vector<std::string> & GetNotes() const { return notes; }
     const std::set<std::string> & GetKeywords() const { return keywords; }
-    const bool HasKeyword(const std::string & kw) const {
+    bool HasKeyword(const std::string & kw) const {
       return keywords.find(kw) != keywords.end();
     }
 

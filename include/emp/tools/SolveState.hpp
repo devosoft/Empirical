@@ -92,14 +92,14 @@ namespace emp {
 
     /// Mark a specific item as to be included; okay if it was previously excluded.
     void Include(size_t id) {
-      emp_assert(id >= 0 && id < in_items.size());
+      emp_assert(id < in_items.size());
       unk_items.Clear(id);
       in_items.Set(id);
     }
 
     /// Mark a specific item as to be excluded.
     void Exclude(size_t id) {
-      emp_assert(id >= 0 && id < in_items.size());
+      emp_assert(id < in_items.size());
       emp_assert(!in_items.Has(id));  // Use ForceExclude if item may already be included.
       unk_items.Set(id, false);
     }

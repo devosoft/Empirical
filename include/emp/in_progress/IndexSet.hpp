@@ -45,8 +45,8 @@ namespace emp {
 
     /// Will identify if two ranges are next to each other or overlapping.
     bool IsConnected(IndexRange in) const {
-      return (in.start >= start && in.start <= end ||
-          start >= in.start && start <= in.end);
+      return (in.start >= start && in.start <= end) ||
+             (start >= in.start && start <= in.end);
     }
 
     /// Grow this range (default, by one)
@@ -102,7 +102,7 @@ namespace emp {
     // @CAO - consider doing a binary search.
     size_t _FindRange(size_t val) const {
       for (size_t id = 0; id < range_set.size(); ++id) {
-        if (id <= range_set[id].GetEnd()) return id;
+        if (range_set[id].Has(val)) return id;
       }
       return range_set.size();
     }
@@ -309,16 +309,16 @@ namespace emp {
       return (bits & ~(bits >> 1)).CountOnes();
     }
     size_t GetSize() const { return bits.CountOnes(); }
-    bool Insert(size_t val) {
+    void Insert(size_t val) {
       _ExpandRange(val); // Make sure there is room for the new value.
       bits.Set(val-offset);
     }
-    bool Insert(IndexRange in) {
+    void Insert(IndexRange in) {
       _ExpandRange(in.GetStart());
       _ExpandRange(in.GetEnd());
       bits.SetRange(in.GetStart()-offset, in.GetEnd()-offset);
     }
-    bool Remove(size_t val) {
+    void Remove(size_t val) {
       bits.Clear(val - offset);
     }
   };

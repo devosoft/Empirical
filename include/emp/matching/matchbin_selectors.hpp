@@ -361,7 +361,7 @@ namespace emp {
 
       for (size_t p = 0; p < partition; ++p) {
         emp_assert( scores[p].second - baseline >= 0 );
-        match_index.Adjust(p, 1.0 / ( skew + scores[p].second - baseline ));
+        match_index.Set(p, 1.0 / ( skew + scores[p].second - baseline ));
       }
 
       emp::vector<size_t> uids;
@@ -505,7 +505,7 @@ namespace emp {
 
       for (size_t p = 0; p < partition; ++p) {
         emp_assert(scores[p].second - baseline >= 0);
-        match_index.Adjust(
+        match_index.Set(
           p,
           std::pow(
             b,
