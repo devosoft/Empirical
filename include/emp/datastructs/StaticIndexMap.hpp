@@ -12,7 +12,7 @@
 #ifndef EMP_DATASTRUCTS_STATICINDEXMAP_HPP_INCLUDE
 #define EMP_DATASTRUCTS_STATICINDEXMAP_HPP_INCLUDE
 
-#include "emp/base/array.hpp"
+#include "../base/array.hpp"
 
 #include "UnorderedIndexMap.hpp"
 

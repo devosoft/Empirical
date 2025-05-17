@@ -20,12 +20,12 @@
 #include <set>
 #include <vector>
 
-#include "emp/base/array.hpp"
-#include "emp/base/assert.hpp"
-#include "emp/bits/BitSet.hpp"
-#include "emp/math/ComboSet.hpp"
-#include "emp/math/Random.hpp"
-#include "emp/tools/String.hpp"
+#include "../base/array.hpp"
+#include "../base/assert.hpp"
+#include "../bits/BitSet.hpp"
+#include "../math/ComboSet.hpp"
+#include "../math/Random.hpp"
+#include "../tools/String.hpp"
 
 #include "Puzzle.hpp"
 
