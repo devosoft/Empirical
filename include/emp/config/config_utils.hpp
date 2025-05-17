@@ -16,7 +16,7 @@
 
 namespace emp {
 
-  static emp::Config & GetEmptyConfig() {
+  [[maybe_unused]] static emp::Config & GetEmptyConfig() {
     static emp::Config empty_config;
     return empty_config;
   }

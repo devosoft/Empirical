@@ -66,7 +66,7 @@ namespace emp {
       return *track_mem_class_map;
     }
 
-    static std::string TrackMem_Status() {
+    [[maybe_unused]] static std::string TrackMem_Status() {
       auto & mem_map = TrackMem_GetMap();
 
       std::stringstream ss;
@@ -102,7 +102,7 @@ namespace emp {
       }
     }
 
-    static int TrackMem_Count(const std::string & class_name) {
+    [[maybe_unused]] static int TrackMem_Count(const std::string & class_name) {
       (void) class_name;
       auto & mem_map = TrackMem_GetMap();
 

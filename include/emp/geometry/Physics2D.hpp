@@ -31,19 +31,22 @@ namespace emp {
 
     Surface_t surface;    // Bodies that can collide.
     Surface_t background; // Bodies that can't collide.
+    const double max_diameter = 20;
 
     bool detach_on_birth; // Should bodies detach from their parents when born?
 
   public:
-    Physics2D(double width, double height, double max_org_diameter=20, bool detach=true)
+    Physics2D(double width, double height, double max_diameter=20, bool detach=true)
       : surface(width, height)
       , background(width, height)
+      , max_diameter(max_diameter)
       , detach_on_birth(detach)
     { ; }
     ~Physics2D() = default;
 
     const Surface_t & GetSurface() const { return surface; }
     const Surface_t & GetBackground() const { return background; }
+    double GetMaxDiameter() const { return max_diameter; }
     bool GetDetach() const { return detach_on_birth; }
 
     Physics2D & SetDetach(bool _in) {
@@ -54,6 +57,7 @@ namespace emp {
       return *this;
     }
 
+    // @CAO Check diameter is less than max before adding a new body?
     Physics2D & AddBody(Ptr<BODY_TYPE> in_body) { surface.AddBody(in_body); return *this; }
     Physics2D & AddBackground(Ptr<BODY_TYPE> in_body) { background.AddBody(in_body); return *this; }
 

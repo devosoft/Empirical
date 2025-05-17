@@ -47,7 +47,7 @@ namespace emp {
   };
 
   /// A mapping of allowed symbol names to placeholder characters.
-  static const auto & GetTextSymbolNames() {
+  [[maybe_unused]] static const auto & GetTextSymbolNames() {
     static std::set<TextSymbolInfo> symbol_map;
     if (symbol_map.size() == 0) {
 
@@ -472,7 +472,7 @@ namespace emp {
   /// Request a map of html tags to the emphatic style that they represent.
   /// Since the mapping between HTML and Emphatic text encodings are useful in multiple contexts,
   /// include easy access to them here.
-  static const auto & GetTextStyleMap_ToHTML() {
+  [[maybe_unused]] static const auto & GetTextStyleMap_ToHTML() {
     using map_t = std::map<String, String>;
     static map_t out_map = emp::flip_map<String, String, map_t>(GetTextStyleMap_FromHTML());
     return out_map;

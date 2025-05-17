@@ -94,7 +94,7 @@ namespace emp {
 
     std::string name() const override { return "No-op Regulator"; }
 
-    bool operator!=(const NopRegulator & other) const { return false; }
+    bool operator!=(const NopRegulator & /* other */) const { return false; }
 
     #ifdef CEREAL_NVP
     template <class Archive>

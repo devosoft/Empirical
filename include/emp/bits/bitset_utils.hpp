@@ -35,7 +35,7 @@ namespace emp {
 
   /// @brief Convert a single bit field to a string.
   /// @param field A single bit field to convert to a string.
-  [[nodiscard]] static std::string BitFieldToString(bits_field_t field) {
+  [[maybe_unused]] [[nodiscard]] std::string BitFieldToString(bits_field_t field) {
     std::stringstream ss;
     ss << '[' << std::hex << field << ']';
     return ss.str();
@@ -43,7 +43,7 @@ namespace emp {
 
   /// @brief Convert a series of bit fields to a string.
   /// @param field A single bit field to convert to a string.
-  [[nodiscard]] static std::string BitFieldsToString(emp::Ptr<bits_field_t> bits, size_t count) {
+  [[maybe_unused]] [[nodiscard]] std::string BitFieldsToString(emp::Ptr<bits_field_t> bits, size_t count) {
     std::stringstream ss;
     for (size_t i = 0; i < count; ++i) {
       if (i) ss << ' ';

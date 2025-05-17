@@ -44,7 +44,7 @@ namespace emp {
       // Interface
       emp::Ptr<T> PoolPtr() const { return &pool; }
       emp::Ptr<T> EndPoolPtr() const { return &((&pool)[1]); }
-      void Initialize(size_t _mem_count, size_t _pool_count) {
+      void Initialize(size_t /*_mem_count*/, size_t /*_pool_count*/) {
         emp_error("Cannot re-initialize a static MemoryFactory.");
       }
       auto FreeBegin() const { return free_ids.begin(); }
@@ -129,7 +129,7 @@ namespace emp {
       bool IsFreeID(size_t id) const { return std::any_of(data.FreeBegin(), data.FreeBegin()+free_count, id); }
       bool IsValidID(size_t id) const { return id < data.pool_count; }
       emp::Ptr<T> GetAtID(size_t id) { return &data.pool[id*data.mem_count]; }
-      std::span<T> GetSpanAtID(size_t id) { return std::span<T>(GetAtID(), data.mem_count); }
+      std::span<T> GetSpanAtID(size_t id) { return std::span<T>(GetAtID(id), data.mem_count); }
 
       bool IsCurrent(emp::Ptr<T> in) {
         if (in < data.PoolPtr()) return false;

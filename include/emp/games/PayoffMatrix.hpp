@@ -56,7 +56,7 @@ namespace emp {
       payoff[to_index(1,1)] = 1.0 - cost/2; // Both dig out together and share cost.
     }
 
-    std::unordered_map<int, double> AsInput(size_t player_id) const {
+    std::unordered_map<int, double> AsInput(size_t /*player_id*/) const {
       std::unordered_map<int, double> out_map;
       out_map[-1] = num_moves;
       for (size_t i = 0; i < payoff.size(); i++) {

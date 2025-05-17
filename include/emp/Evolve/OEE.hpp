@@ -32,7 +32,7 @@ namespace emp {
     public:
     using skel_t = SKEL_TYPE;
     // Placeholders to ensure that constructor signature is same as bloom filter
-    SeenSet(int placeholder_1 = 200000, double placeholder_2 = 0.0001) { ; }
+    SeenSet(int /*placeholder_1*/ = 200000, double /*placeholder_2*/ = 0.0001) { ; }
     void insert(const skel_t & val) {s.insert(val);}
     bool contains(const skel_t & val) {return Has(s, val);}
   };
@@ -184,7 +184,7 @@ namespace emp {
       std::swap(prev_coal_set, coal_set);
     }
 
-    std::map<SKEL_TYPE, int> CoalescenceFilter(size_t ud) {
+    std::map<SKEL_TYPE, int> CoalescenceFilter(size_t /*ud*/) {
 
       emp_assert(emp::Mod(generation_interval, resolution) == 0, "Generation interval must be a multiple of resolution", generation_interval, resolution);
 

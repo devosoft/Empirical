@@ -1347,7 +1347,9 @@ namespace emp {
       emp::vector<size_t> best_matches{FindBestFuncMatch(affinity)};
       if (best_matches.empty()) return;
       if (best_matches.size() == 1) fID = best_matches[0];
-      else if (stochastic_fun_call) fID = best_matches[(size_t)random_ptr->GetUInt(0, best_matches.size())];
+      else if (stochastic_fun_call) {
+        fID = best_matches[(size_t)random_ptr->GetUInt(0, best_matches.size())];
+      }
       else fID = best_matches[0];
       CallFunction(fID);
     }
@@ -1759,14 +1761,14 @@ namespace emp {
     /// Default instruction: Break
     /// Number of arguments: 0
     /// Description: Break out of current block if there's a block to close.
-    static void Inst_Break(EventDrivenGP_t & hw, const inst_t & inst) {
+    static void Inst_Break(EventDrivenGP_t & hw, const inst_t & /*inst*/) {
       hw.BreakBlock();
     }
 
     /// Default instruction: Close
     /// Number of arguments: 0
     /// Description: Marks the end of a block.
-    static void Inst_Close(EventDrivenGP_t & hw, const inst_t & inst) {
+    static void Inst_Close(EventDrivenGP_t & hw, const inst_t & /*inst*/) {
       hw.CloseBlock();
     }
 
@@ -1780,7 +1782,7 @@ namespace emp {
     /// Default instruction: Return
     /// Number of arguments: 0
     /// Description: Return from current function call unless in main function call.
-    static void Inst_Return(EventDrivenGP_t & hw, const inst_t & inst) {
+    static void Inst_Return(EventDrivenGP_t & hw, const inst_t & /*inst*/) {
       hw.ReturnFunction();
     }
 
@@ -1856,7 +1858,7 @@ namespace emp {
     /// Description: Terminate the thread that executes this instruction.
     /// WARNING: This instruction does not respect any 'main' function calls.
     ///          *Any* thread where this is called is terminated.
-    static void Inst_Terminate(EventDrivenGP_t & hw, const inst_t & inst) {
+    static void Inst_Terminate(EventDrivenGP_t & hw, const inst_t & /*inst*/) {
       // Pop all the call states from current core.
       exec_stk_t & core = hw.GetCurCore();
       core.resize(0);
@@ -1865,7 +1867,7 @@ namespace emp {
     /// Default instruction: Nop
     /// Number of arguments: 0
     /// Description: No operation.
-    static void Inst_Nop(EventDrivenGP_t & hw, const inst_t & inst) { ; }
+    static void Inst_Nop(EventDrivenGP_t & /*hw*/, const inst_t & /*inst*/) { ; }
 
     /// Default instruction: BroadcastMsg
     /// Number of arguments: 0
