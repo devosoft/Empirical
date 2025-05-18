@@ -1,0 +1,33 @@
+Checks: >
+  bugprone-*,                       # Common mistakes (e.g. misuse of `sizeof`)
+   -bugprone-easily-swappable-parameters # Exceptions are too common.
+  cert-*,
+  clang-analyzer-*,                 # Static analysis for bugs
+  misc-*,                           # Unused functions, parameters, etc.
+  modernize-*,                      # Modern C++ idioms (e.g. range-based loops, nullptr)
+   -modernize-use-trailing-return-type  #  Avoid requiring -> return types
+  performance-*,                    # Performance pitfalls (e.g. unnecessary copies)
+  portability-*,                    # Cross-platform issues
+  readability-*,                    # Readability & clean style
+   -readability-identifier-length       #  Shorter identifiers can be useful
+  cppcoreguidelines-*,              # From C++ Core Guidelines (useful but verbose)
+#  -cppcoreguidelines-pro-type-vararg,  # Allow varargs in some low-level code
+#  -cppcoreguidelines-owning-memory,    # Header-only libraries sometimes manage memory differently
+#  -readability-magic-numbers,          # Avoid noise unless you're enforcing magic number policies
+
+WarningsAsErrors: '*'
+
+# CheckOptions:
+#   - key:             modernize-use-nullptr.NullMacros
+#     value:           'NULL'
+#   - key:             modernize-use-using.CheckAliasTemplates
+#     value:           true
+#   - key:             readability-identifier-naming.VariableCase
+#     value:           lower_case  # You can customize to match your naming rules
+#   - key:             readability-identifier-naming.ClassCase
+#     value:           CamelCase
+#   - key:             readability-identifier-naming.FunctionCase
+#     value:           camelBack
+
+HeaderFilterRegex: '^(include/|demos/|examples/|tests/)'  # Ignore third party, etc.
+FormatStyle: file  # Use .clang-format
