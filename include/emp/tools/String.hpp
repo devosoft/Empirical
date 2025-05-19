@@ -20,20 +20,20 @@
 #ifndef EMP_TOOLS_STRING_HPP_INCLUDE
 #define EMP_TOOLS_STRING_HPP_INCLUDE
 
-#include <algorithm>  // std::count
-#include <cctype>     // std::toupper and std::tolower
-#include <concepts> // std::same_as<>
-#include <cstddef>  // size_t, nullptr_t
-#include <cstdlib>  // std::abs
-#include <format> // std::format
-#include <functional>  // std::function
+#include <algorithm>         // std::count
+#include <cctype>            // std::toupper and std::tolower
+#include <concepts>          // std::same_as<>
+#include <cstddef>           // size_t, nullptr_t
+#include <cstdlib>           // std::abs
+#include <format>            // std::format
+#include <functional>        // std::function
 #include <initializer_list>  // std::initializer_list
-#include <map> // std::map
-#include <ranges>  // std::ranges::range<T>
-#include <sstream> // std::stringstream
-#include <string> // std::string
-#include <string_view> // std::string_view
-#include <utility>  // std::move
+#include <map>               // std::map
+#include <ranges>            // std::ranges::range<T>
+#include <sstream>           // std::stringstream
+#include <string>            // std::string
+#include <string_view>       // std::string_view
+#include <utility>           // std::move
 
 #include "../base/assert.hpp"
 #include "../base/concepts.hpp"
@@ -81,7 +81,8 @@ namespace emp {
   template <typename CONTAINER_T>
   [[nodiscard]] inline String MakeQuotedList(const CONTAINER_T & container);
   template <typename... Args>
-  [[nodiscard]] inline String MakeFormatted(const std::format_string<Args...> & format, Args &&... args);
+  [[nodiscard]] inline String MakeFormatted(const std::format_string<Args...> & format,
+                                            Args &&... args);
   [[nodiscard]] inline String MakeRepeat(const String & base, size_t n);
 
   [[nodiscard]] inline String MakeTrimFront(const String & in,
@@ -117,15 +118,15 @@ namespace emp {
     template <typename T>
     static auto Convert_(T && value) {
       if constexpr (emp::hasToString<T>) {  // .ToString() member fun takes priority.
-        return value.ToString();      
+        return value.ToString();
       } else if constexpr (std::convertible_to<T, std::string>) {  // If convertible, do so!
         return std::forward<T>(value);
       } else if constexpr (std::ranges::range<T>) {  // Break down containers with Join()
         return '{' + Join(value, ",") + '}';
-      } else { // If all else fails, send through a stringstream.
+      } else {  // If all else fails, send through a stringstream.
         std::stringstream ss;
         ss << std::forward<T>(value);
-        return ss.str();        
+        return ss.str();
       }
     }
 
@@ -660,7 +661,7 @@ namespace emp {
     // Find any instances of ${X} and replace with dictionary lookup of X.
     template <typename MAP_T>
     String & ReplaceVars(const MAP_T & var_map,
-                         const String & symbol         = "$",
+                         const String & symbol = "$",
                          const Syntax & syntax = Syntax::Full());
 
     // Find any instance of MACRO_NAME(ARGS) and call replace it with return from fun(ARGS).
@@ -728,7 +729,9 @@ namespace emp {
     [[nodiscard]] inline emp::vector<size_t> FindAll(char target,
                                                      const Syntax & syntax = Syntax::None()) const;
     template <typename... Ts>
-    [[nodiscard]] inline size_t FindAnyOfFrom(size_t start, const String & test1, Ts... tests) const;
+    [[nodiscard]] inline size_t FindAnyOfFrom(size_t start,
+                                              const String & test1,
+                                              Ts... tests) const;
     template <typename T, typename... Ts>
     [[nodiscard]] inline size_t FindAnyOf(T test1, Ts... tests) const;
     [[nodiscard]] inline size_t FindID(const String & target,
@@ -889,28 +892,28 @@ namespace emp {
                       bool trim_whitespace  = false) const;
 
     template <typename DELIM_T = emp::String>
-    [[nodiscard]] inline emp::vector<String> Slice(const DELIM_T & delim         = ",",
+    [[nodiscard]] inline emp::vector<String> Slice(const DELIM_T & delim = ",",
                                                    const Syntax & syntax = Syntax::Quotes(),
                                                    bool trim_whitespace  = false) const;
 
     inline void ViewSlices(emp::vector<std::string_view> & out_set,
-                           const String & delim          = ",",
+                           const String & delim  = ",",
                            const Syntax & syntax = Syntax::Quotes()) const;
 
     [[nodiscard]] inline emp::vector<std::string_view>
     ViewSlices(const String & delim = ",", const Syntax & syntax = Syntax::Quotes()) const;
 
     inline void SliceAssign(std::map<String, String> & result_map,
-                            const String & delim          = ",",
-                            const String & assign_op      = "=",
-                            const Syntax & syntax = Syntax::Quotes(),
-                            bool trim_whitespace  = true) const;
+                            const String & delim     = ",",
+                            const String & assign_op = "=",
+                            const Syntax & syntax    = Syntax::Quotes(),
+                            bool trim_whitespace     = true) const;
 
     [[nodiscard]] inline std::map<String, String> SliceAssign(
-      const String & delim          = ",",
-      const String & assign_op      = "=",
-      const Syntax & syntax = Syntax::Quotes(),
-      bool trim_whitespace  = true) const;
+      const String & delim     = ",",
+      const String & assign_op = "=",
+      const Syntax & syntax    = Syntax::Quotes(),
+      bool trim_whitespace     = true) const;
 
     // ------ Other Operators ------
     // Inherited functions from std::string:
@@ -1262,8 +1265,8 @@ namespace emp {
     template <typename CONTAINER_T>
     String & AppendJoin(const CONTAINER_T & container,
                         const String & delim = "",
-                        String open  = "",
-                        String close = "") {
+                        String open          = "",
+                        String close         = "") {
       *this += Join(container, delim, open, close);
       return *this;
     }
@@ -1271,8 +1274,8 @@ namespace emp {
     template <typename CONTAINER_T>
     String & SetJoin(const CONTAINER_T & container,
                      const String & delim = "",
-                     String open  = "",
-                     String close = "") {
+                     String open          = "",
+                     String close         = "") {
       *this = Join(container, delim, open, close);
       return *this;
     }
@@ -1289,6 +1292,7 @@ namespace emp {
     }
 
     [[nodiscard]] static String Make(std::string in_str) { return in_str; }
+
     [[nodiscard]] static String Make(std::string && in_str) { return std::move(in_str); }
 
     // <= ANSI manipulations =>
@@ -1532,7 +1536,9 @@ namespace emp {
       return *this += emp::ANSI::MakeBrightGreenBG(sv);
     }
 
-    [[nodiscard]] String AsANSIBrightYellowBG() const { return emp::ANSI::MakeBrightYellowBG(*this); }
+    [[nodiscard]] String AsANSIBrightYellowBG() const {
+      return emp::ANSI::MakeBrightYellowBG(*this);
+    }
 
     String & SetANSIBrightYellowBG() { return *this = AsANSIBrightYellowBG(); }
 
@@ -1548,7 +1554,9 @@ namespace emp {
       return *this += emp::ANSI::MakeBrightBlueBG(sv);
     }
 
-    [[nodiscard]] String AsANSIBrightMagentaBG() const { return emp::ANSI::MakeBrightMagentaBG(*this); }
+    [[nodiscard]] String AsANSIBrightMagentaBG() const {
+      return emp::ANSI::MakeBrightMagentaBG(*this);
+    }
 
     String & SetANSIBrightMagentaBG() { return *this = AsANSIBrightMagentaBG(); }
 
@@ -1581,18 +1589,18 @@ namespace emp {
 
   /// Determine if this string represents a proper number.
   bool String::IsNumber() const {
-    if (empty()) { return false; } // If string is empty, not a number!
+    if (empty()) { return false; }  // If string is empty, not a number!
 
     size_t pos = 0;
     if (HasOneOfAt("+-", pos)) { ++pos; }  // Allow leading +/-
-    while (HasDigitAt(pos)) { ++pos; } // Any number of digits (none is okay)
-    if (HasCharAt('.', pos)) {  // If there's a DECIMAL PLACE, look for more digits.
-      ++pos;                    // Skip over the dot.
-      if (!HasDigitAt(pos++)) { return false; } // Must have at least one digit after '.'
-      while (HasDigitAt(pos)) { ++pos; } // Any number of digits is okay.
+    while (HasDigitAt(pos)) { ++pos; }     // Any number of digits (none is okay)
+    if (HasCharAt('.', pos)) {             // If there's a DECIMAL PLACE, look for more digits.
+      ++pos;                               // Skip over the dot.
+      if (!HasDigitAt(pos++)) { return false; }  // Must have at least one digit after '.'
+      while (HasDigitAt(pos)) { ++pos; }         // Any number of digits is okay.
     }
-    if (HasOneOfAt("eE", pos)) {  // If there's an e... SCIENTIFIC NOTATION!
-      ++pos;                      // Skip over the e.
+    if (HasOneOfAt("eE", pos)) {                 // If there's an e... SCIENTIFIC NOTATION!
+      ++pos;                                     // Skip over the e.
       if (HasOneOfAt("+-", pos)) { ++pos; }      // skip leading +/-
       if (!HasDigitAt(pos++)) { return false; }  // Must have at least one digit after 'e'
       while (HasDigitAt(pos)) { ++pos; }         // Allow for MORE digits.
@@ -1605,11 +1613,11 @@ namespace emp {
   size_t String::FindQuoteMatch(size_t pos) const {
     const char mark = Get(pos);
     while (++pos < size()) {
-      if (Get(pos) == '\\') { // Skip escaped characters in quotes
+      if (Get(pos) == '\\') {  // Skip escaped characters in quotes
         ++pos;
         continue;
-      }                        
-      if (Get(pos) == mark) { return pos; } // Found match!
+      }
+      if (Get(pos) == mark) { return pos; }  // Found match!
     }
     return npos;  // Not found.
   }
@@ -1881,7 +1889,7 @@ namespace emp {
 
   /// Pop a segment from the beginning of a string as another string, shortening original.
   String String::PopFixed(size_t end_pos, size_t delim_size) {
-    if (end_pos == 0) { return ""; }  // Not popping anything!
+    if (end_pos == 0) { return ""; }             // Not popping anything!
     if (end_pos >= size()) { return PopAll(); }  // Popping everything!
 
     String out = substr(0, end_pos);  // Copy up to the deliminator for ouput
@@ -1972,7 +1980,7 @@ namespace emp {
 
   // Scanning that converts type.
   int String::ScanAsInt(size_t & pos) const {
-    int result = 0;
+    int result         = 0;
     constexpr int BASE = 10;
     while (pos < size() && is_digit(Get(pos))) {
       result = result * BASE + (Get(pos) - '0');
@@ -2162,7 +2170,9 @@ namespace emp {
 
   /// Find any instances of ${X} and replace with dictionary lookup of X.
   template <typename MAP_T>
-  String & String::ReplaceVars(const MAP_T & var_map, const String & symbol, const Syntax & syntax) {
+  String & String::ReplaceVars(const MAP_T & var_map,
+                               const String & symbol,
+                               const Syntax & syntax) {
     for (size_t pos = Find(symbol, 0, syntax);
          pos < size() - 3;  // Need room for a replacement tag.
          pos = Find(symbol, pos + symbol.size(), syntax)) {
@@ -2326,38 +2336,37 @@ namespace emp {
       case '\004': return "\\004";
       case '\005': return "\\005";
       case '\006': return "\\006";
-      case '\a':   return "\\a";  // case  7 (audible bell)
-      case '\b':   return "\\b";  // case  8 (backspace)
-      case '\t':   return "\\t";  // case  9 (tab)
-      case '\n':   return "\\n";  // case 10 (newline)
-      case '\v':   return "\\v";  // case 11 (vertical tab)
-      case '\f':   return "\\f";  // case 12 (form feed - new page)
-      case '\r':   return "\\r";  // case 13 (carriage return)
-      case '\016': return "\\016"; // case 14
-      case '\017': return "\\017"; // case 15
-      case '\020': return "\\020"; // case 16
-      case '\021': return "\\021"; // case 17
-      case '\022': return "\\022"; // case 18
-      case '\023': return "\\023"; // case 19
-      case '\024': return "\\024"; // case 20
-      case '\025': return "\\025"; // case 21
-      case '\026': return "\\026"; // case 22
-      case '\027': return "\\027"; // case 23
-      case '\030': return "\\030"; // case 24
-      case '\031': return "\\031"; // case 25
-      case '\032': return "\\032"; // case 26
-      case '\033': return "\\033"; // case 27 (ESC), sometimes \e
-      case '\034': return "\\034"; // case 28
-      case '\035': return "\\035"; // case 29
-      case '\036': return "\\036"; // case 30
-      case '\037': return "\\037"; // case 31
+      case '\a':   return "\\a";    // case  7 (audible bell)
+      case '\b':   return "\\b";    // case  8 (backspace)
+      case '\t':   return "\\t";    // case  9 (tab)
+      case '\n':   return "\\n";    // case 10 (newline)
+      case '\v':   return "\\v";    // case 11 (vertical tab)
+      case '\f':   return "\\f";    // case 12 (form feed - new page)
+      case '\r':   return "\\r";    // case 13 (carriage return)
+      case '\016': return "\\016";  // case 14
+      case '\017': return "\\017";  // case 15
+      case '\020': return "\\020";  // case 16
+      case '\021': return "\\021";  // case 17
+      case '\022': return "\\022";  // case 18
+      case '\023': return "\\023";  // case 19
+      case '\024': return "\\024";  // case 20
+      case '\025': return "\\025";  // case 21
+      case '\026': return "\\026";  // case 22
+      case '\027': return "\\027";  // case 23
+      case '\030': return "\\030";  // case 24
+      case '\031': return "\\031";  // case 25
+      case '\032': return "\\032";  // case 26
+      case '\033': return "\\033";  // case 27 (ESC), sometimes \e
+      case '\034': return "\\034";  // case 28
+      case '\035': return "\\035";  // case 29
+      case '\036': return "\\036";  // case 30
+      case '\037': return "\\037";  // case 31
 
       case '\"':   return include_visible ? "\\\"" : "\"";  // case 34
       case '\'':   return include_visible ? "\\\'" : "\'";  // case 39
       case '\\':   return include_visible ? "\\\\" : "\\";  // case 92
-      case '\177': return "\\177";  // case 127 (delete)
-      default:
-        return emp::MakeString(c);
+      case '\177': return "\\177";                          // case 127 (delete)
+      default:     return emp::MakeString(c);
     }
   }
 
@@ -2430,9 +2439,7 @@ namespace emp {
   /// Take a value and convert it to a C++-style literal.
   template <typename T>
   [[nodiscard]] String MakeLiteral(const T & value) {
-    if constexpr (std::is_convertible_v<T, std::string>) {
-      return MakeLiteral(std::string{value});
-    }
+    if constexpr (std::is_convertible_v<T, std::string>) { return MakeLiteral(std::string{value}); }
 
     std::stringstream ss;
     if constexpr (emp::IsIterable<T>::value) {
@@ -2523,7 +2530,7 @@ namespace emp {
   /// Make first letter of each word upper case
   [[nodiscard]] String MakeTitleCase(String value) {
     constexpr char char_shift = 'a' - 'A';
-    bool next_upper          = true;
+    bool next_upper           = true;
 
     for (char & ch : value) {
       if (next_upper && ch >= 'a' && ch <= 'z') {
@@ -2544,18 +2551,20 @@ namespace emp {
     return MakeString(val, " ", item, plural_suffix);
   }
 
-  [[nodiscard]] inline String MakeCount(int val, const String & item) { return MakeCount(val, item, "s"); }
+  [[nodiscard]] inline String MakeCount(int val, const String & item) {
+    return MakeCount(val, item, "s");
+  }
 
   /// Convert an integer to a roman numeral string.
   [[nodiscard]] String MakeRoman(int val) {
-    constexpr int VALUE_MAX = 3999; // Max value with traditional Roman numerals
-    constexpr int GROUPING = 1000;  // How to group for oversize values
-    constexpr int VALUE_M = 1000;
-    constexpr int VALUE_D = 500;
-    constexpr int VALUE_C = 100;
-    constexpr int VALUE_L = 50;
-    constexpr int VALUE_X = 10;
-    constexpr int VALUE_V = 5;
+    constexpr int VALUE_MAX = 3999;  // Max value with traditional Roman numerals
+    constexpr int GROUPING  = 1000;  // How to group for oversize values
+    constexpr int VALUE_M   = 1000;
+    constexpr int VALUE_D   = 500;
+    constexpr int VALUE_C   = 100;
+    constexpr int VALUE_L   = 50;
+    constexpr int VALUE_X   = 10;
+    constexpr int VALUE_V   = 5;
 
     String out;
     if (val < 0) {
