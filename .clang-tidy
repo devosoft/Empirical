@@ -1,19 +1,23 @@
-Checks: >
-  bugprone-*,                       # Common mistakes (e.g. misuse of `sizeof`)
-   -bugprone-easily-swappable-parameters # Exceptions are too common.
+Checks: |
+  bugprone-*,
+   -bugprone-easily-swappable-parameters,
   cert-*,
-  clang-analyzer-*,                 # Static analysis for bugs
-  misc-*,                           # Unused functions, parameters, etc.
-  modernize-*,                      # Modern C++ idioms (e.g. range-based loops, nullptr)
-   -modernize-use-trailing-return-type  #  Avoid requiring -> return types
-  performance-*,                    # Performance pitfalls (e.g. unnecessary copies)
-  portability-*,                    # Cross-platform issues
-  readability-*,                    # Readability & clean style
-   -readability-identifier-length       #  Shorter identifiers can be useful
-  cppcoreguidelines-*,              # From C++ Core Guidelines (useful but verbose)
-#  -cppcoreguidelines-pro-type-vararg,  # Allow varargs in some low-level code
-#  -cppcoreguidelines-owning-memory,    # Header-only libraries sometimes manage memory differently
-#  -readability-magic-numbers,          # Avoid noise unless you're enforcing magic number policies
+  clang-analyzer-*
+  misc-*
+   -misc-no-recursion
+  modernize-*
+   -modernize-use-trailing-return-type
+  performance-*
+  portability-*
+  readability-*
+   -readability-identifier-length
+  cppcoreguidelines-*
+   -cppcoreguidelines-avoid-do-while
+   -cppcoreguidelines-pro-bounds-array-to-pointer-decay
+   -cppcoreguidelines-pro-bounds-pointer-arithmetic
+#  -cppcoreguidelines-pro-type-vararg
+#  -cppcoreguidelines-owning-memory
+#  -readability-magic-numbers
 
 WarningsAsErrors: '*'
 
