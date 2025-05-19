@@ -9,8 +9,8 @@
  *  @note For internal use.
  */
 
-#ifndef EMP_BASE__NATIVE_ASSERT_TRIGGER_HPP_INCLUDE
-#define EMP_BASE__NATIVE_ASSERT_TRIGGER_HPP_INCLUDE
+#ifndef EMP_BASE_NATIVE_ASSERT_TRIGGER_HPP_INCLUDE
+#define EMP_BASE_NATIVE_ASSERT_TRIGGER_HPP_INCLUDE
 
 #include <iostream>
 #include <sstream>
@@ -55,4 +55,4 @@ namespace emp {
 } // namespace emp
 
 
-#endif // #ifndef EMP_BASE__NATIVE_ASSERT_TRIGGER_HPP_INCLUDE
+#endif // #ifndef EMP_BASE_NATIVE_ASSERT_TRIGGER_HPP_INCLUDE

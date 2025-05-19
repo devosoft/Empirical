@@ -10,8 +10,8 @@
  *  @todo Reflect error message to browser (e.g., as an alert)
  */
 
-#ifndef EMP_BASE__EMSCRIPTEN_ERROR_TRIGGER_HPP_INCLUDE
-#define EMP_BASE__EMSCRIPTEN_ERROR_TRIGGER_HPP_INCLUDE
+#ifndef EMP_BASE_EMSCRIPTEN_ERROR_TRIGGER_HPP_INCLUDE
+#define EMP_BASE_EMSCRIPTEN_ERROR_TRIGGER_HPP_INCLUDE
 
 #include <iostream>
 #include <stddef.h>
@@ -29,4 +29,4 @@ namespace emp {
 
 } // namespace emp
 
-#endif // #ifndef EMP_BASE__EMSCRIPTEN_ERROR_TRIGGER_HPP_INCLUDE
+#endif // #ifndef EMP_BASE_EMSCRIPTEN_ERROR_TRIGGER_HPP_INCLUDE

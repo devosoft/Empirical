@@ -9,8 +9,8 @@
  *  @note For internal use.
  */
 
-#ifndef EMP_BASE__NATIVE_ERROR_TRIGGER_HPP_INCLUDE
-#define EMP_BASE__NATIVE_ERROR_TRIGGER_HPP_INCLUDE
+#ifndef EMP_BASE_NATIVE_ERROR_TRIGGER_HPP_INCLUDE
+#define EMP_BASE_NATIVE_ERROR_TRIGGER_HPP_INCLUDE
 
 
 #include <stddef.h>
@@ -30,4 +30,4 @@ namespace emp {
 
 } // namespace emp
 
-#endif // #ifndef EMP_BASE__NATIVE_ERROR_TRIGGER_HPP_INCLUDE
+#endif // #ifndef EMP_BASE_NATIVE_ERROR_TRIGGER_HPP_INCLUDE

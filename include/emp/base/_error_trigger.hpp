@@ -9,8 +9,8 @@
  *  @note For internal use.
  */
 
-#ifndef EMP_BASE__ERROR_TRIGGER_HPP_INCLUDE
-#define EMP_BASE__ERROR_TRIGGER_HPP_INCLUDE
+#ifndef EMP_BASE_ERROR_TRIGGER_HPP_INCLUDE
+#define EMP_BASE_ERROR_TRIGGER_HPP_INCLUDE
 
 /// TDEBUG should trigger its EMP equivalent.
 #ifdef TDEBUG
@@ -25,4 +25,4 @@
   #include "_native_error_trigger.hpp"
 #endif
 
-#endif // #ifndef EMP_BASE__ERROR_TRIGGER_HPP_INCLUDE
+#endif // #ifndef EMP_BASE_ERROR_TRIGGER_HPP_INCLUDE

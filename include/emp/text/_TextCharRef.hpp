@@ -10,8 +10,8 @@
  *
  */
 
-#ifndef EMP_TEXT__TEXTCHARREF_HPP_INCLUDE
-#define EMP_TEXT__TEXTCHARREF_HPP_INCLUDE
+#ifndef EMP_TEXT_TEXTCHARREF_HPP_INCLUDE
+#define EMP_TEXT_TEXTCHARREF_HPP_INCLUDE
 
 #include <type_traits>  // std::conditional
 
@@ -86,4 +86,4 @@ namespace emp {
   };
 }
 
-#endif // #ifndef EMP_TEXT__TEXTCHARREF_HPP_INCLUDE
+#endif // #ifndef EMP_TEXT_TEXTCHARREF_HPP_INCLUDE

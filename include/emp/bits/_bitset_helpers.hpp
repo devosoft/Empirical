@@ -8,8 +8,8 @@
  *  @brief An internal Empirical class with tools to build collections of bits.
  */
 
-#ifndef EMP_BITS__BITSET_HELPERS_HPP_INCLUDE
-#define EMP_BITS__BITSET_HELPERS_HPP_INCLUDE
+#ifndef EMP_BITS_BITSET_HELPERS_HPP_INCLUDE
+#define EMP_BITS_BITSET_HELPERS_HPP_INCLUDE
 
 #include <stddef.h>
 
@@ -59,4 +59,4 @@ namespace emp {
   }; // --- End of BitProxy
 }
 
-#endif // #ifndef EMP_BITS__BITSET_HELPERS_HPP_INCLUDE
+#endif // #ifndef EMP_BITS_BITSET_HELPERS_HPP_INCLUDE
