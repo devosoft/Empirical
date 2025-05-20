@@ -33,7 +33,9 @@
 
 #include <cstring>
 #include <sstream>
-#include <stddef.h>
+#include <cstddef>
+#include <cstdint>
+#include <iostream>
 #include <string>
 #include <unordered_map>
 
@@ -49,27 +51,29 @@ namespace emp {
 
 
   template <typename T>
-  inline void FillMemory(emp::Ptr<unsigned char> mem_ptr, const size_t num_bytes, T fill_value);
+  inline void FillMemory(emp::Ptr<unsigned char> mem_ptr, size_t num_bytes, T fill_value);
 
   /// Fill an array by repeatedly calling the provided fill functions.
   template <typename T>
   inline void FillMemoryFunction(emp::Ptr<unsigned char> mem_ptr,
-                                 const size_t num_bytes,
+                                 size_t num_bytes,
                                  T fill_fun);
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
     /// An anonymous log2 calculator for hashing below.
     static constexpr size_t Log2(size_t x) { return x <= 1 ? 0 : (Log2(x / 2) + 1); }
-
-    static bool ptr_debug = false;
   }  // namespace internal
 #endif  // DOXYGEN_SHOULD_SKIP_THIS
-  inline void SetPtrDebug(bool _d = true) { internal::ptr_debug = _d; }
 
-  inline bool GetPtrDebug() { return internal::ptr_debug; }
+  [[nodiscard]] static inline bool & GetPtrDebug() {
+    static bool ptr_debug = false;
+    return ptr_debug;
+  }
 
-  enum class PtrStatus { DELETED = 0, ACTIVE, ARRAY };
+  inline void SetPtrDebug(bool _d = true) { GetPtrDebug() = _d; }
+
+  enum class PtrStatus : std::uint8_t { DELETED = 0, ACTIVE, ARRAY };
 
   class PtrInfo {
   private:
@@ -80,13 +84,13 @@ namespace emp {
 
   public:
     PtrInfo(const void * _ptr) : ptr(_ptr), count(1), status(PtrStatus::ACTIVE), array_bytes(0) {
-      if (internal::ptr_debug) { std::cout << "Created info for pointer: " << ptr << std::endl; }
+      if (GetPtrDebug()) { std::cout << "Created info for pointer: " << ptr << std::endl; }
     }
 
     PtrInfo(const void * _ptr, size_t _array_bytes)
       : ptr(_ptr), count(1), status(PtrStatus::ARRAY), array_bytes(_array_bytes) {
       emp_assert(_array_bytes >= 1);
-      if (internal::ptr_debug) {
+      if (GetPtrDebug()) {
         std::cout << "Created info for array pointer (bytes=" << array_bytes << "): " << ptr
                   << std::endl;
       }
@@ -98,23 +102,23 @@ namespace emp {
     PtrInfo & operator=(PtrInfo &&) &      = default;
 
     ~PtrInfo() {
-      if (internal::ptr_debug) { std::cout << "Deleted info for pointer " << ptr << std::endl; }
+      if (GetPtrDebug()) { std::cout << "Deleted info for pointer " << ptr << std::endl; }
     }
 
     /// What pointer does this one hold information about?
-    const void * GetPtr() const noexcept { return ptr; }
+    [[nodiscard]] const void * GetPtr() const noexcept { return ptr; }
 
     /// How many Ptr objects point to the associated position?
-    int GetCount() const noexcept { return count; }
+    [[nodiscard]] int GetCount() const noexcept { return count; }
 
     /// If this ptr is to an array, how many bytes large is the array (may be different from size!)
-    size_t GetArrayBytes() const noexcept { return array_bytes; }
+    [[nodiscard]] size_t GetArrayBytes() const noexcept { return array_bytes; }
 
     /// Is this pointer currently valid to access?
-    bool IsActive() const noexcept { return (bool) status; }
+    [[nodiscard]] bool IsActive() const noexcept { return (bool) status; }
 
     /// Is this pointer pointing to an array?
-    bool IsArray() const noexcept { return status == PtrStatus::ARRAY; }
+    [[nodiscard]] bool IsArray() const noexcept { return status == PtrStatus::ARRAY; }
 
     /// Denote that this pointer is an array.
     void SetArray(size_t bytes) noexcept {
@@ -124,14 +128,14 @@ namespace emp {
 
     /// Add one more pointer.
     void Inc([[maybe_unused]] const size_t id) {
-      if (internal::ptr_debug) { std::cout << "Inc info for pointer " << ptr << std::endl; }
+      if (GetPtrDebug()) { std::cout << "Inc info for pointer " << ptr << std::endl; }
       emp_assert(status != PtrStatus::DELETED, "Incrementing deleted pointer!", id);
       count++;
     }
 
     /// Remove a pointer.
     void Dec([[maybe_unused]] const size_t id) {
-      if (internal::ptr_debug) { std::cout << "Dec info for pointer " << ptr << std::endl; }
+      if (GetPtrDebug()) { std::cout << "Dec info for pointer " << ptr << std::endl; }
 
       // Make sure that we have more than one copy, -or- we've already deleted this pointer
       emp_assert(count > 1 || status == PtrStatus::DELETED,
@@ -142,12 +146,12 @@ namespace emp {
 
     /// Indicate that the associated position has been deleted.
     void MarkDeleted() {
-      if (internal::ptr_debug) { std::cout << "Marked deleted for pointer " << ptr << std::endl; }
+      if (GetPtrDebug()) { std::cout << "Marked deleted for pointer " << ptr << std::endl; }
       status = PtrStatus::DELETED;
     }
 
     /// Debug utility to determine if everything looks okay with this pointer's information.
-    bool OK() const noexcept {
+    [[nodiscard]] bool OK() const noexcept {
       if (ptr == nullptr) {
         return false;  // Should not have info for a null pointer.
       }
@@ -171,16 +175,16 @@ namespace emp {
     static constexpr size_t UNTRACKED_ID = (size_t) -1;
 
     // Make PtrTracker a singleton.
-    PtrTracker() : ptr_id(), id_info() {
+    PtrTracker() {
       std::cout << "EMP_TRACK_MEM: Pointer tracking is active!\n";
     }
 
+  public:
     PtrTracker(const PtrTracker &)             = delete;
     PtrTracker(PtrTracker &&)                  = delete;
     PtrTracker & operator=(const PtrTracker &) = delete;
     PtrTracker & operator=(PtrTracker &&)      = delete;
 
-  public:
     ~PtrTracker() {
       // Track stats about pointer record.
       size_t total  = 0;
@@ -237,7 +241,7 @@ namespace emp {
 
     /// Determine if a pointer is being tracked.
     bool HasPtr(const void * ptr) const {
-      if (internal::ptr_debug) { std::cout << "HasPtr: " << ptr << std::endl; }
+      if (GetPtrDebug()) { std::cout << "HasPtr: " << ptr << std::endl; }
       return ptr_id.find(ptr) != ptr_id.end();
     }
 
@@ -262,13 +266,13 @@ namespace emp {
     bool IsDeleted(size_t id) const {
       emp_assert(OK(id));
       if (!IsTracked(id)) { return false; }  // Not tracked, so not deleted.
-      if (internal::ptr_debug) { std::cout << "IsDeleted: " << id << std::endl; }
+      if (GetPtrDebug()) { std::cout << "IsDeleted: " << id << std::endl; }
       return !id_info[id].IsActive();
     }
 
     /// Is a pointer active and ready to be used?
     bool IsActive(const void * ptr) const {
-      if (internal::ptr_debug) { std::cout << "IsActive: " << ptr << std::endl; }
+      if (GetPtrDebug()) { std::cout << "IsActive: " << ptr << std::endl; }
       if (ptr_id.find(ptr) == ptr_id.end()) { return false; }  // Not in database.
       return GetInfo(ptr).IsActive();
     }
@@ -283,7 +287,7 @@ namespace emp {
     /// Is an ID associated with an array?
     bool IsArrayID(size_t id) const {
       emp_assert(OK(id));
-      if (internal::ptr_debug) { std::cout << "IsArrayID: " << id << std::endl; }
+      if (GetPtrDebug()) { std::cout << "IsArrayID: " << id << std::endl; }
       if (id >= id_info.size()) { return false; }  // Includes untracked.
       return id_info[id].IsArray();
     }
@@ -297,7 +301,7 @@ namespace emp {
     /// How many Ptr objects are associated with an ID?
     int GetIDCount(size_t id) const {
       emp_assert(OK(id));
-      if (internal::ptr_debug) { std::cout << "Count:  " << id << std::endl; }
+      if (GetPtrDebug()) { std::cout << "Count:  " << id << std::endl; }
       return id_info[id].GetCount();
     }
 
@@ -311,7 +315,7 @@ namespace emp {
         abort();
       }
 #endif
-      if (internal::ptr_debug) { std::cout << "New:    " << id << " (" << ptr << ")" << std::endl; }
+      if (GetPtrDebug()) { std::cout << "New:    " << id << " (" << ptr << ")" << std::endl; }
       // Make sure pointer is not already stored -OR- has been deleted (since re-use is possible).
       emp_assert(!HasPtr(ptr) || IsDeleted(GetCurID(ptr)), id);
       id_info.emplace_back(ptr);
@@ -322,7 +326,7 @@ namespace emp {
     /// This pointer was just created as a Ptr ARRAY!
     size_t NewArray(const void * ptr, size_t array_bytes) {
       size_t id = New(ptr);  // Build the new pointer.
-      if (internal::ptr_debug) { std::cout << "  ...Array of size " << array_bytes << std::endl; }
+      if (GetPtrDebug()) { std::cout << "  ...Array of size " << array_bytes << std::endl; }
       id_info[id].SetArray(array_bytes);
       return id;
     }
@@ -331,7 +335,7 @@ namespace emp {
     void IncID(size_t id) {
       emp_assert(OK(id));
       if (id == UNTRACKED_ID) { return; }  // Not tracked!
-      if (internal::ptr_debug) { std::cout << "Inc:    " << id << std::endl; }
+      if (GetPtrDebug()) { std::cout << "Inc:    " << id << std::endl; }
       id_info[id].Inc(id);
     }
 
@@ -340,7 +344,7 @@ namespace emp {
       emp_assert(OK(id));
       if (id == UNTRACKED_ID) { return; }  // Not tracked!
       auto & info = id_info[id];
-      if (internal::ptr_debug) {
+      if (GetPtrDebug()) {
         std::cout << "Dec:    " << id << "(" << info.GetPtr() << ")" << std::endl;
       }
       emp_assert(info.GetCount() > 0,
@@ -360,7 +364,7 @@ namespace emp {
         abort();
       }
 #endif
-      if (internal::ptr_debug) { std::cout << "Delete: " << id << std::endl; }
+      if (GetPtrDebug()) { std::cout << "Delete: " << id << std::endl; }
       emp_assert(id_info[id].IsActive(), "Deleting same emp::Ptr a second time!", id);
       id_info[id].MarkDeleted();
     }
@@ -511,19 +515,19 @@ namespace emp {
 
     /// Construct a null Ptr by default.
     Ptr() : BasePtr<TYPE>(nullptr, UNTRACKED_ID) {
-      if (internal::ptr_debug) { std::cout << "null construct." << std::endl; }
+      if (GetPtrDebug()) { std::cout << "null construct." << std::endl; }
     }
 
     /// Construct using copy constructor
     Ptr(const Ptr<TYPE> & _in) : BasePtr<TYPE>(_in.ptr, _in.id) {
-      if (internal::ptr_debug) { std::cout << "copy construct: " << ptr << std::endl; }
+      if (GetPtrDebug()) { std::cout << "copy construct: " << ptr << std::endl; }
       Tracker().IncID(id);
     }
 
     /// Construct from a raw pointer of compatible type.
     template <typename T2>
     Ptr(T2 * in_ptr, bool track = false) : BasePtr<TYPE>(in_ptr, UNTRACKED_ID) {
-      if (internal::ptr_debug) {
+      if (GetPtrDebug()) {
         std::cout << "raw construct: " << ((void *) ptr) << ". track=" << track << std::endl;
       }
       emp_assert((PtrIsConvertible<T2, TYPE>(in_ptr)));
@@ -544,7 +548,7 @@ namespace emp {
     template <typename T2>
     Ptr(T2 * _ptr, size_t array_size, bool track) : BasePtr<TYPE>(_ptr, UNTRACKED_ID) {
       const size_t array_bytes = array_size * sizeof(T2);
-      if (internal::ptr_debug) {
+      if (GetPtrDebug()) {
         std::cout << "raw ARRAY construct: " << ptr << ". size=" << array_size << "(" << array_bytes
                   << " bytes); track=" << track << std::endl;
       }
@@ -566,19 +570,19 @@ namespace emp {
     /// Construct from another Ptr<> object of compatible type.
     template <typename T2>
     Ptr(Ptr<T2> _in) : BasePtr<TYPE>(_in.Raw(), _in.GetID()) {
-      if (internal::ptr_debug) { std::cout << "inexact copy construct: " << ptr << std::endl; }
+      if (GetPtrDebug()) { std::cout << "inexact copy construct: " << ptr << std::endl; }
       emp_assert((PtrIsConvertible<T2, TYPE>(_in.Raw())), id);
       Tracker().IncID(id);
     }
 
     /// Construct from nullptr.
     Ptr(std::nullptr_t) : Ptr() {
-      if (internal::ptr_debug) { std::cout << "null construct 2." << std::endl; }
+      if (GetPtrDebug()) { std::cout << "null construct 2." << std::endl; }
     }
 
     /// Destructor.
     ~Ptr() {
-      if (internal::ptr_debug) {
+      if (GetPtrDebug()) {
         std::cout << "destructing Ptr instance ";
         if (ptr) {
           std::cout << id << " (" << ((void *) ptr) << ")\n";
@@ -649,7 +653,7 @@ namespace emp {
       // emp_emscripten_assert(ptr);                     // No exceptions in emscripten; assert alloc!
       // ptr = new (ptr) TYPE(std::forward<T>(args)...); // Special new that uses allocated space.
 
-      if (internal::ptr_debug) { std::cout << "Ptr::New() : " << ptr << std::endl; }
+      if (GetPtrDebug()) { std::cout << "Ptr::New() : " << ptr << std::endl; }
       id = Tracker().New(ptr);  // And track it!
       DebugInfo().AddPtr();
     }
@@ -671,7 +675,7 @@ namespace emp {
       //   new (ptr + i*sizeof(TYPE)) TYPE(args...);
       // }
 
-      if (internal::ptr_debug) { std::cout << "Ptr::NewArray() : " << ptr << std::endl; }
+      if (GetPtrDebug()) { std::cout << "Ptr::NewArray() : " << ptr << std::endl; }
       id = Tracker().NewArray(ptr, array_size * sizeof(TYPE));  // And track it!
       DebugInfo().AddPtr();
     }
@@ -688,7 +692,7 @@ namespace emp {
       emp_assert(Tracker().IsActive(ptr),
                  id,
                  "Trying to delete inactive pointer (already deleted!)");
-      if (internal::ptr_debug) { std::cout << "Ptr::Delete() : " << ptr << std::endl; }
+      if (GetPtrDebug()) { std::cout << "Ptr::Delete() : " << ptr << std::endl; }
       delete ptr;
       Tracker().MarkDeleted(id);
       DebugInfo().RemovePtr();
@@ -704,7 +708,7 @@ namespace emp {
       emp_assert(Tracker().IsActive(ptr),
                  id,
                  "Trying to delete inactive pointer (already deleted!)");
-      if (internal::ptr_debug) { std::cout << "Ptr::DeleteArray() : " << ptr << std::endl; }
+      if (GetPtrDebug()) { std::cout << "Ptr::DeleteArray() : " << ptr << std::endl; }
       delete[] ptr;
       Tracker().MarkDeleted(id);
       DebugInfo().RemovePtr();
@@ -723,19 +727,19 @@ namespace emp {
 
     /// Copy assignment
     Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) & {
-      if (internal::ptr_debug) {
+      if (GetPtrDebug()) {
         std::cout << "copy assignment from id " << _in.id << " to id " << id << std::endl;
       }
       emp_assert(Tracker().IsDeleted(_in.id) == false, _in.id, "Do not copy deleted pointers.");
       if (id != _in.id ||
           ptr != _in.ptr) {  // Assignments only need to happen if ptrs are different.
-        if (internal::ptr_debug) { std::cout << "...pointers differ -- copying!" << std::endl; }
+        if (GetPtrDebug()) { std::cout << "...pointers differ -- copying!" << std::endl; }
         Tracker().DecID(id);
         ptr = _in.ptr;
         id  = _in.id;
         Tracker().IncID(id);
       } else {
-        if (internal::ptr_debug) { std::cout << "...pointers same -- no copying!" << std::endl; }
+        if (GetPtrDebug()) { std::cout << "...pointers same -- no copying!" << std::endl; }
       }
       return *this;
     }
@@ -744,7 +748,7 @@ namespace emp {
     /// correctly, otherwise don't track.
     template <typename T2>
     Ptr<TYPE> & operator=(T2 * _in) & {
-      if (internal::ptr_debug) { std::cout << "raw assignment" << std::endl; }
+      if (GetPtrDebug()) { std::cout << "raw assignment" << std::endl; }
       emp_assert((PtrIsConvertible<T2, TYPE>(_in)));
 
       Tracker().DecID(id);  // Decrement references to former pointer at this position.
@@ -766,7 +770,7 @@ namespace emp {
     /// Assign to a convertible Ptr
     template <typename T2>
     Ptr<TYPE> & operator=(Ptr<T2> _in) & {
-      if (internal::ptr_debug) { std::cout << "convert-copy assignment" << std::endl; }
+      if (GetPtrDebug()) { std::cout << "convert-copy assignment" << std::endl; }
       emp_assert((PtrIsConvertible<T2, TYPE>(_in.Raw())), _in.id);
       emp_assert(Tracker().IsDeleted(_in.id) == false, _in.id, "Do not copy deleted pointers.");
       Tracker().DecID(id);
