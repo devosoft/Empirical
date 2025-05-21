@@ -14,23 +14,24 @@
  * - Track any special features about files or projects including custom spelling.
  * - Find the .Empirical/ directory for configurations
  *
+ * Some features will also be covered by clang-format
+ * - Ensure 2 spaces are used for indent levels.
+ * - Group and track include files
+ *
  * Additional TODO:
- * + Ensure that 2 spaces are used for indent levels (esp. after `{` at eol?})
- * + Group and track include files
- * + Ensure include guards or #pragma once (or both) exist.
+ * + Ensure include guards or #pragma once (or both) exist for header files.
  * + Ensure no merge conflict markers are in the file (and help with merge?)
  * + Create config files that don't already exist.
+ * + Dynamic control over boilerplate (for easy scaling to other projects)
  *
- * - Fully configure actions with a code_format.cfg file in .Empirical/
- * - Allow configure overrides in individual files.
- * - Produce a levelization map
- * - Dynamic control over boilerplate (for easy scaling to other projects)
- * - Guided shifting of boilerplate to a new format
- * - Spacing must always shift by 0 or 2 OR somehow align with previous line?
- * - Make sure include files have corresponding test files.
- * - Make sure test files are not empty (or effectively empty)
- * - Better suggestions where 'y' always gives you what Empecable thinks is correct action.
- * - Cleanup words at the bottom of a file, removing those now in main project dictionary.
+ * + Fully configure actions with a code_format.cfg file in .Empirical/
+ * + Allow configure overrides in individual files.
+ * + Produce a levelization map
+ * + Guided shifting of boilerplate to a new format
+ * + Make sure emp/include/ header (.hpp) files have corresponding test files.
+ * + Make sure test files are not empty (or effectively empty)
+ * + Better suggestions where 'y' always gives you what Empecable thinks is correct action.
+ * + remove local words if in project dictionary; remove 'replace' if in either local of project
  *
  * Master list of interface options for consistency.
  *  'a' - Add lowercase word to project dictionary (or 'A' to preserve current case)
@@ -207,6 +208,13 @@ private:
     menu.Run();
 
     return result;
+  }
+
+  void AskRemoveToken() {
+    if (IsInteractive() && AskYesNo("Remove? ")) {
+      File().ClearLexeme();
+    }
+    if (IsVerbose()) { emp::PrintRepeatLn('-',79); }
   }
 
   void MakeEmpiricalDir(fs::path common_path) {
@@ -440,9 +448,8 @@ private:
     return matches;
   }
 
-  bool TestWordToken() {
-    emp::String word(GetLexeme());
-
+  // Should we automatically allow the provided word in the file?
+  bool IsWordAllowed(const emp::String & word) {
     // If we have a valid word, return true.
     if (word.size() <= 2 ||                       // Allow all short (1 or 2 char) words
         project_words.contains(word) ||           // Check the white list for project
@@ -457,57 +464,70 @@ private:
           skip_words.contains(lower_word)) return true;
     }
 
+    return false; // Word not found as an automatically allowed option.
+  }
+
+  // If we have a disallowed word that we need to interactively deal with, do so.
+  void ManageWord_Interactive(const emp::String & word) {
+    emp::String lower_word = word.AsLower();
+
+    emp::ANSIOptionMenu menu;
+    menu.AddOption('a', "Add '" + lower_word.AsANSICyan() + "' to main PROJECT dictionary",
+      [this,lower_word](){ AddProjectWord(lower_word); return true; });
+    if (word.HasUpper()) {
+      menu.AddOption('A', "add case-sensitive '" + word.AsANSICyan() + "'",
+        [this,word](){ AddProjectWord(word); return true; }, true);
+    }
+
+    menu.AddOption('f', "Add '" + lower_word.AsANSICyan() + "' to this FILE's dictionary",
+      [this,lower_word](){ File().AddWord(lower_word); return true; });
+    if (word.HasUpper()) {
+      menu.AddOption('F', "add case-sensitive '" + word.AsANSICyan() + "'",
+        [this,word](){ File().AddWord(word); return true; }, true);
+    }
+
+    menu.AddOption('i', "Ignore this instance of '" + word.AsANSICyan() + "'",
+      [word](){ emp::PrintLn("Skipping '", word.AsANSICyan(), "'!"); return true; });
+    menu.AddOption('I', "ignore ALL instances",
+      [this,word](){ emp::PrintLn("Ignoring all instances of '", word.AsANSICyan(), "'!");
+        skip_words.insert(word); return true; }, true);
+
+    // Come up with word matches (and keep case the same as the original word)
+    emp::vector<emp::String> matches = FindWordMatches(word);
+    if (word.OnlyUpper()) { for (auto & match : matches) match.SetUpper(); }
+    else if (word.HasUpperAt(0)) { for (auto & match : matches) match.SetUpperAt(0); }
+
+    // Put the match suggestions into the menu.
+    for (int i = 0; i < std::ssize(matches); ++i) {
+      menu.AddOption('0'+i, "Replace with '" + matches[i].AsANSICyan() + "'",
+        [this,new_word=matches[i]](){ DoReplace(new_word, false); return true; });
+      menu.AddOption('0'+i+5, "replace ALL instances",
+        [this,new_word=matches[i]](){ DoReplace(new_word, true); return true; }, true);
+    }
+    menu.AddOption('r', "Provide replacement for this instance of '" + word.AsANSICyan() + "'",
+      [this](){ QueryReplace(false); return true; });
+    menu.AddOption('R', "for ALL instances",
+      [this](){ QueryReplace(true); return true; }, true);
+
+    AddDefaultMenuOptions(menu);
+
+    menu.Run();
+  }
+
+  // Look at the current token and test if it is allowed, possibly interactively asking user.
+  bool TestWordToken() {
+    emp::String word(GetLexeme());
+
+    if (IsWordAllowed(word)) return true;
+
     // See if we already have a replacement set up for this word.
     if (replacement_map.contains(word)) { DoReplace(); return false; }
 
-    // We have an unknown word.
+    // Report unknown word.
     File().ReportIssue(emp::MakeString("Unknown word '", word.AsANSICyan(), "'"));
 
-    if (IsInteractive()) {
-      emp::String lower_word = word.AsLower();
-
-      emp::ANSIOptionMenu menu;
-      menu.AddOption('a', "Add '" + lower_word.AsANSICyan() + "' to main PROJECT dictionary",
-        [this,lower_word](){ AddProjectWord(lower_word); return true; });
-      if (word.HasUpper()) {
-        menu.AddOption('A', "add case-sensitive '" + word.AsANSICyan() + "'",
-          [this,word](){ AddProjectWord(word); return true; }, true);
-      }
-
-      menu.AddOption('f', "Add '" + lower_word.AsANSICyan() + "' to this FILE's dictionary",
-        [this,lower_word](){ File().AddWord(lower_word); return true; });
-      if (word.HasUpper()) {
-        menu.AddOption('F', "add case-sensitive '" + word.AsANSICyan() + "'",
-          [this,word](){ File().AddWord(word); return true; }, true);
-      }
-
-      menu.AddOption('i', "Ignore this instance of '" + word.AsANSICyan() + "'",
-        [word](){ emp::PrintLn("Skipping '", word.AsANSICyan(), "'!"); return true; });
-      menu.AddOption('I', "ignore ALL instances",
-        [this,word](){ emp::PrintLn("Ignoring all instances of '", word.AsANSICyan(), "'!");
-          skip_words.insert(word); return true; }, true);
-
-      // Come up with word matches (and keep case the same as the original word)
-      emp::vector<emp::String> matches = FindWordMatches(word);
-      if (word.OnlyUpper()) { for (auto & match : matches) match.SetUpper(); }
-      else if (word.HasUpperAt(0)) { for (auto & match : matches) match.SetUpperAt(0); }
-
-      // Put the match suggestions into the menu.
-      for (int i = 0; i < std::ssize(matches); ++i) {
-        menu.AddOption('0'+i, "Replace with '" + matches[i].AsANSICyan() + "'",
-          [this,new_word=matches[i]](){ DoReplace(new_word, false); return true; });
-        menu.AddOption('0'+i+5, "replace ALL instances",
-          [this,new_word=matches[i]](){ DoReplace(new_word, true); return true; }, true);
-      }
-      menu.AddOption('r', "Provide replacement for this instance of '" + word.AsANSICyan() + "'",
-        [this](){ QueryReplace(false); return true; });
-      menu.AddOption('R', "for ALL instances",
-        [this](){ QueryReplace(true); return true; }, true);
-
-      AddDefaultMenuOptions(menu);
-
-      menu.Run();
-    }
+    // If interactive, allow user to decide how to handle the unknown word.
+    if (IsInteractive()) { ManageWord_Interactive(word); }
 
     return false;
   }
@@ -579,19 +599,32 @@ public:
     if (!File().Load(lexer)) return; // File failed to load.
 
     while (File().NextToken()) {
-      if (GetToken() == emplex::Lexer::ID_WORD) {
+      switch (GetToken()) {
+        using namespace emplex;
+      case Lexer::ID_WORD:
         if (!TestWordToken() && IsVerbose()) emp::PrintRepeatLn('-',79);
-      }
-      else if (GetToken() == emplex::Lexer::ID_ERR_END_LINE_WS) {
+        break;
+      case Lexer::ID_ERR_END_LINE_WS:
         File().ReportIssue("Extra whitespace at end of line:");
-        if (IsInteractive() && AskYesNo("Remove? ")) File().ClearLexeme();
-        if (IsVerbose()) emp::PrintRepeatLn('-',79);
-      }
-      else if (GetToken() == emplex::Lexer::ID_ERR_WS) {
+        AskRemoveToken();
+        break;
+      case Lexer::ID_ERR_WS:
         File().ReportIssue("Illegal whitespace:");
-        if (IsInteractive() && AskYesNo("Remove? ")) File().ClearLexeme();
-        if (IsVerbose()) emp::PrintRepeatLn('-',79);
+        AskRemoveToken();
+        break;
+      case Lexer::ID_PRAGMA:
+        if (GetLexeme().View(8, emp::String::npos) == "once") {
+          if (File().GetPragmaOnce() > 0) {
+            File().ReportIssue("Duplicate #pragma once (original on line ",
+                               File().GetPragmaOnce(), "):");
+            AskRemoveToken();
+          }
+          else {
+            File().SetPragmaOnce();
+          }
+        }
       }
+
     }
 
     emp::PrintLn(ToBoldRed("=== ", File().GetNumIssues(), " issues found ==="));
@@ -610,6 +643,10 @@ int main(int argc, char * argv[])
 // Special info below for local control over the Empecable file checker.
 
 
+
+// Special info below for local control over the Empecable file checker.
+
+// Special info below for local control over the Empecable file checker.
 
 // Special info below for local control over the Empecable file checker.
 
