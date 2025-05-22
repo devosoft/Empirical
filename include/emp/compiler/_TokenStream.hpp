@@ -35,7 +35,7 @@ namespace emp {
     TokenStream & operator=(const TokenStream &) = default;
     TokenStream & operator=(TokenStream &&) = default;
 
-    static const Token & GetEOF() {
+    [[nodiscard]] static const Token & GetEOF() {
       static Token eof_token{0,"",0};
       return eof_token;
     }
@@ -50,44 +50,44 @@ namespace emp {
       Iterator(const TokenStream & in_ts, size_t in_pos) : ts(&in_ts), pos(in_pos) { }
       Iterator & operator=(const Iterator &) = default;
 
-      const TokenStream & GetTokenStream() const { return *ts; }
-      size_t GetIndex() const { return pos; }
-      emp::Ptr<const Token> ToPtr() const { return ts->GetPtr(pos); }
+      [[nodiscard]] const TokenStream & GetTokenStream() const { return *ts; }
+      [[nodiscard]] size_t GetIndex() const { return pos; }
+      [[nodiscard]] emp::Ptr<const Token> ToPtr() const { return ts->GetPtr(pos); }
 
-      Token operator*() const { return ts->tokens[pos]; }
-      const Token * operator->() const { return &(ts->tokens[pos]); }
+      [[nodiscard]] Token operator*() const { return ts->tokens[pos]; }
+      [[nodiscard]] const Token * operator->() const { return &(ts->tokens[pos]); }
 
-      bool operator==(const Iterator & in) const { return ToPtr() == in.ToPtr(); }
-      bool operator!=(const Iterator & in) const { return ToPtr() != in.ToPtr(); }
-      bool operator< (const Iterator & in) const { return ToPtr() <  in.ToPtr(); }
-      bool operator<=(const Iterator & in) const { return ToPtr() <= in.ToPtr(); }
-      bool operator> (const Iterator & in) const { return ToPtr() >  in.ToPtr(); }
-      bool operator>=(const Iterator & in) const { return ToPtr() >= in.ToPtr(); }
+      [[nodiscard]] bool operator==(const Iterator & in) const { return ToPtr() == in.ToPtr(); }
+      [[nodiscard]] bool operator!=(const Iterator & in) const { return ToPtr() != in.ToPtr(); }
+      [[nodiscard]] bool operator< (const Iterator & in) const { return ToPtr() <  in.ToPtr(); }
+      [[nodiscard]] bool operator<=(const Iterator & in) const { return ToPtr() <= in.ToPtr(); }
+      [[nodiscard]] bool operator> (const Iterator & in) const { return ToPtr() >  in.ToPtr(); }
+      [[nodiscard]] bool operator>=(const Iterator & in) const { return ToPtr() >= in.ToPtr(); }
 
       Iterator & operator++() { ++pos; return *this; }
       Iterator operator++(int) { Iterator old(*this); ++pos; return old; }
       Iterator & operator--() { --pos; return *this; }
       Iterator operator--(int) { Iterator old(*this); --pos; return old; }
 
-      bool IsValid() const { return pos < ts->size(); }
-      bool AtEnd() const { return pos == ts->size(); }
+      [[nodiscard]] bool IsValid() const { return pos < ts->size(); }
+      [[nodiscard]] bool AtEnd() const { return pos == ts->size(); }
 
       operator bool() const { return IsValid(); }
 
       // Test if there are ANY tokens remaining.
-      bool Any() const { return !AtEnd(); }
+      [[nodiscard]] bool Any() const { return !AtEnd(); }
 
       // Test if there are NO tokens remaining.
-      bool None() const { return AtEnd(); }
+      [[nodiscard]] bool None() const { return AtEnd(); }
 
       // Get the current (or upcoming) token, but don't remove it from the queue.
-      const Token & Peek(size_t skip_count=0) const {
+      [[nodiscard]] const Token & Peek(size_t skip_count=0) const {
         if (pos + skip_count >= ts->tokens.size()) return ts->GetEOF();
         return ts->tokens[pos];
       }
 
       // Test if the current token is a specific type.
-      bool Is(int id, size_t skip_count=0) const { return Peek(skip_count) == id; }
+      [[nodiscard]] bool Is(int id, size_t skip_count=0) const { return Peek(skip_count) == id; }
 
       // Get the current token, removing it from the queue.
       const Token & Use() {
@@ -128,13 +128,13 @@ namespace emp {
 
     };
 
-    size_t size() const { return tokens.size(); }
-    const Token & Get(size_t pos) const { return tokens[pos]; }
-    emp::Ptr<const Token> GetPtr(size_t pos) const { return &(tokens.data()[pos]); }
-    const String & GetName() const { return name; }
-    Iterator begin() const { return Iterator(*this, 0); }
-    Iterator end() const { return Iterator(*this, tokens.size()); }
-    const Token & back() const { return tokens.back(); }
+    [[nodiscard]] size_t size() const { return tokens.size(); }
+    [[nodiscard]] const Token & Get(size_t pos) const { return tokens[pos]; }
+    [[nodiscard]] emp::Ptr<const Token> GetPtr(size_t pos) const { return &(tokens.data()[pos]); }
+    [[nodiscard]] const String & GetName() const { return name; }
+    [[nodiscard]] Iterator begin() const { return Iterator(*this, 0); }
+    [[nodiscard]] Iterator end() const { return Iterator(*this, tokens.size()); }
+    [[nodiscard]] const Token & back() const { return tokens.back(); }
 
     void push_back(const Token & in) { tokens.push_back(in); }
 
