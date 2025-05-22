@@ -116,6 +116,7 @@ namespace emp {
     };
 
     std::map<emp::String, SettingInfo> setting_map;
+    emp::String error_note;
 
     SettingInfo & GetInfo(const emp::String & name) {
       emp_assert(Has(name), "Invalid setting name", name);
@@ -165,7 +166,9 @@ namespace emp {
 
       for (const auto& [key, info] : setting_map) {
         ofs << "# " << info.GetDescription() << "\n";
-        ofs << key << " = " << info.AsString().AsLiteral() << "\n\n";
+        ofs << key << " = "
+            << (info.IsString() ? info.AsString().AsLiteral() : info.AsString())
+            << ";\n\n";
       }
     }
 
@@ -184,15 +187,30 @@ namespace emp {
       auto tokens = lexer.TokenizeFile(filename);
       auto it = tokens.begin();
       while (it.Any()) {
-        emp::String name =
-          it.Use(ident_ID, "Expected config line to start with identifier, not '",
-                 it.Peek().lexeme, "'.").lexeme;
-        if (!setting_map.contains(name)) {
-          notify::Error("Unknown configuration setting, '", name, "'.");
+        const Token name_token = it.Use();
+        if (name_token != ident_ID) { 
+          error_note = "UnexpectedToken '" + name_token.lexeme + "'; expected parameter name.";
+          break;
         }
-        it.Use(assign_ID, "Expected assignment ('='), not '", it.Peek().lexeme, "'.").lexeme;
-        Token value_token = it.Use();
+        const emp::String name = name_token.lexeme;
+        if (!setting_map.contains(name)) {
+          error_note = "Unknown configuration setting, '" + name + "'.";
+          break;
+        }
 
+        const Token op_token = it.Use();
+        if (op_token != assign_ID) {
+          error_note = "UnexpectedToken '" + op_token.lexeme + "'; expected '='.";
+          break;
+        }
+
+        const Token value_token = it.Use();
+        if (!IsValue(value_token)) {
+          error_note = "UnexpectedToken '" + value_token.lexeme + "'; expected assignment value.";
+          break;
+        }
+
+        // Everything looks okay, so set the config value!
         GetInfo(name).SetFromString(value_token.lexeme);
       }
     }
