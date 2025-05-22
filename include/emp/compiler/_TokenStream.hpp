@@ -35,6 +35,11 @@ namespace emp {
     TokenStream & operator=(const TokenStream &) = default;
     TokenStream & operator=(TokenStream &&) = default;
 
+    static const Token & GetEOF() {
+      static Token eof_token{0,"",0};
+      return eof_token;
+    }
+
     class Iterator {
     private:
       emp::Ptr<const TokenStream> ts;
@@ -68,6 +73,59 @@ namespace emp {
       bool AtEnd() const { return pos == ts->size(); }
 
       operator bool() const { return IsValid(); }
+
+      // Test if there are ANY tokens remaining.
+      bool Any() const { return !AtEnd(); }
+
+      // Test if there are NO tokens remaining.
+      bool None() const { return AtEnd(); }
+
+      // Get the current (or upcoming) token, but don't remove it from the queue.
+      const Token & Peek(size_t skip_count=0) const {
+        if (pos + skip_count >= ts->tokens.size()) return ts->GetEOF();
+        return ts->tokens[pos];
+      }
+
+      // Test if the current token is a specific type.
+      bool Is(int id, size_t skip_count=0) const { return Peek(skip_count) == id; }
+
+      // Get the current token, removing it from the queue.
+      const Token & Use() {
+        if (None()) return ts->GetEOF();
+        return ts->tokens[pos++];
+      }
+
+      // Use the current token if it is the expected type; otherwise error.
+      // (Use provided error if available, otherwise use default error)
+      template <typename... Ts>
+      const Token & Use(int id, Ts &&... message) {
+        if (!Is(id)) { notify::Error(std::forward<Ts>(message)...); }
+        return Use();
+      }
+
+      // If the current token is one of the provided ids, use it an return the ID used.
+      // Otherwise, don't use it and return 0.
+      template <typename... Ts>
+      const Token & UseIf(int id, Ts... args) {
+        if (Is(id)) { return Use(); }
+        return UseIf(args...);
+      }
+
+      // Base case for UseIf
+      const Token & UseIf() { return ts->GetEOF(); }
+
+      // Rewind one or more tokens.
+      bool Rewind(size_t steps=1) {
+        if (pos >= steps) {
+          pos -= steps;
+          return true;
+        }
+        else {
+          pos = 0;
+          return false;
+        }
+      }
+
     };
 
     size_t size() const { return tokens.size(); }
