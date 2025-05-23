@@ -24,7 +24,7 @@
  * + Create config files that don't already exist.
  * + Dynamic control over boilerplate (for easy scaling to other projects)
  *
- * + Fully configure actions with a code_format.cfg file in .Empirical/
+ * + Fully configure actions with a Empecable.cfg file in .Empirical/
  * + Allow configure overrides in individual files.
  * + Produce a levelization map
  * + Guided shifting of boilerplate to a new format
@@ -54,7 +54,12 @@
  *  magenta - keypress options
  *  yellow  - line numbers
  *  blue    - ?
+ * 
+ * Config options:
+ * - HeaderExtensions: .hpp|.h|.H|.hh
+ * - ProtectHeaders: None|Pragma|Guards|Both
  */
+
 
 #include <cstring>
 #include <filesystem>
@@ -70,6 +75,7 @@
 #include "../../include/emp/base/vector.hpp"
 #include "../../include/emp/config/command_line.hpp"
 #include "../../include/emp/config/FlagManager.hpp"
+#include "../../include/emp/config/SettingsManager.hpp"
 #include "../../include/emp/io/ascii_utils.hpp"
 #include "../../include/emp/io/File.hpp"
 #include "../../include/emp/io/io_utils.hpp"
@@ -81,33 +87,9 @@
 #include "Lexer.hpp"
 #include "ReviewFile.hpp"
 
-struct Checks {
-  // Important fixes; on by default.
-  bool require_copyright = true;      // Check Copyright at the front.
-  bool prevent_end_spaces = true;     // Check the no lines end with spaces.
-  bool disallow_tabs = true;          // Check that no tabs are in code.
-  bool require_include_guards = true; // Check that the file is protected by include guards.
-  bool require_pragma_once = true;    // Check that the file has a "#pragma once"
-  bool sort_include = true;           // Check that the includes in the file are grouped correctly.
-
-  // Warnings that you can turn on.
-  size_t warn_line_width = 0;     // Warn if a line is too long (zero = off)
-
-  void SetAll(bool _in=true) {
-    require_copyright = _in;
-    prevent_end_spaces = _in;
-    disallow_tabs = _in;
-    require_include_guards = _in;
-    require_pragma_once = _in;
-    sort_include = _in;
-  }
-};
-
 class Empecable {
 private:
-
-  // Options used:
-  Checks checks;
+  emp::SettingsManager settings;
   Mode mode = Mode::Normal;
 
   emp::FlagManager flags;         // Tracker for command-line flags that were set.
@@ -149,10 +131,50 @@ private:
   emp::String GetLexeme(size_t pos) const { return File().GetLexeme(pos); }
   size_t GetLineID(size_t pos) const { return File().GetLineID(pos); }
 
+  void ConfigureSettings() {
+    settings.AddSetting("Copyright",
+      "This file is part of Empirical, https://github.com/devosoft/Empirical\n"
+      "Copyright (C) {year} Michigan State University\n"
+      "MIT Software license; see doc/LICENSE.md\n\n"
+      "@file\n"
+      "@brief [File Description]",
+      "Full text of the copyright heading that should be at the top of each file."
+    );
+
+    settings.AddSetting("HeaderExtensions", ".hpp|.h|.H|.hh",
+      "File extensions to assume are C++ headers.");
+
+    settings.AddSetting("CodeExtensions", ".cpp|.C|.cc",
+      "File extensions to assume are C++ code files.");
+
+    settings.AddSetting("HeaderProtections", "None|Pragma|Guards|Both",
+      "Type of protections against multiple includes to use in headers (None|Pragma|Guards|Both)\n"
+      "E.g., if you want either type of protection, but not both, use \"Pragma|Guards\"");
+
+    settings.AddSetting("SpellCheck", true,
+      "Count spelling mistakes as errors in a file? (On/Off)");
+
+    settings.AddSetting("ProjectDictionary", true,
+      "Track a master list of legal words in .Empirical/word_list.txt (On/Off)");
+
+    settings.AddSetting("FileDictionary", true,
+      "Track a local list of legal words in comment at bottom of each file? (On/Off)");
+
+    settings.AddSetting("TrackReplacements", true,
+      "Track word replacements in .Empirical/replace_list.txt for future suggestions? (On/Off)");
+
+    settings.AddSetting("Interactive", false,
+      "Go into interactive mode by default? (On/Off; Use -i flag to activate from command line)");
+
+    settings.AddSetting("RemoveIllegalChars", true,
+      "Remove tabs ('\t') and carriage returns ('\r')? (On/Off)");
+
+    settings.AddSetting("MapLevels", true,
+      "Create a levelization map of header files include each other? (On/Off)");
+  }
+
   void SetupOptionFlags() {
     flags.AddGroup("Basic Operation");
-    flags.AddOption('a', "all", [this](){ SetAll(true); },
-      "Activate ALL fixes (except those explicitly excluded; see below)");
     flags.AddOption('h', "help", [this](){ PrintHelp(); },
       "Get additional information about options.");
     flags.AddOption('i', "interactive", [this](){ mode = Mode::Interactive; },
@@ -163,26 +185,6 @@ private:
       "Provide more detailed output");
     flags.AddOption('w', "word_file", [this](emp::String filename){ word_file = filename.str(); },
       "Specify the word file to use for spell checks.");
-
-    flags.AddGroup("Activating Specific Fixes");
-    flags.AddOption("require_copyright", [this](){ checks.require_copyright = true; });
-    flags.AddOption("prevent_end_spaces", [this](){ checks.prevent_end_spaces = true; });
-    flags.AddOption("disallow_tabs", [this](){ checks.disallow_tabs = true; });
-    flags.AddOption("require_include_guards", [this](){ checks.require_include_guards = true; });
-    flags.AddOption("require_pragma_once", [this](){ checks.require_pragma_once = true; });
-    flags.AddOption("sort_include", [this](){ checks.sort_include = true; });
-
-    flags.AddGroup("Deactivate Specific Fixes");
-    flags.AddOption("no_require_copyright", [this](){ checks.require_copyright = false; });
-    flags.AddOption("no_prevent_end_spaces", [this](){ checks.prevent_end_spaces = false; });
-    flags.AddOption("no_disallow_tabs", [this](){ checks.disallow_tabs = false; });
-    flags.AddOption("no_sort_include_guards", [this](){ checks.require_include_guards = false; });
-    flags.AddOption("no_require_pragma_once", [this](){ checks.require_pragma_once = false; });
-    flags.AddOption("no_sort_include", [this](){ checks.sort_include = false; });
-
-    flags.AddGroup("Extra Warnings to Enable (off by default)");
-    flags.AddOption('W', "max_line_width",
-      [this](emp::String max_w){ checks.warn_line_width = max_w.AsULL(); } );
   }
 
   // Check the default key press options that should work from any menu.
@@ -534,6 +536,7 @@ private:
 
 public:
   Empecable(int argc, char * argv[]) : flags(argc, argv) {
+    ConfigureSettings();
     SetupOptionFlags();
     flags.Process();
 
@@ -572,8 +575,6 @@ public:
   bool IsVerbose() const { return mode >= Mode::Verbose; }
   bool IsInteractive() const { return mode == Mode::Interactive; }
   size_t GetNumIssues() const { return total_issues; }
-
-  Empecable & SetAll(bool _in=true) { checks.SetAll(_in); return *this; }
 
   void PrintUsage() const {
     emp::PrintLn("Usage: ", flags[0], " {options ...} files ...");
