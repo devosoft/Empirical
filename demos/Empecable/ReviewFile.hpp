@@ -33,6 +33,7 @@ private:
 
   size_t token_pos = 0;                  // What is the next token to use?
   emp::vector<emp::String> issues;       // List of issues found with this file.
+  size_t pragma_once_line = 0;           // Have we found a "#pragma once" in this file?
 
 public:
   ReviewFile(emp::String filename, Mode mode)
@@ -50,12 +51,14 @@ public:
 
   // ======= Accessors =======
 
-  emp::String GetName() const { return filename; }
-  fs::path GetPath() const { return path; }
+  [[nodiscard]] emp::String GetName() const { return filename; }
+  [[nodiscard]] fs::path GetPath() const { return path; }
 
-  bool IsValid() const { return valid; }
-  size_t MaxLineID() const { return tokens.size() ? tokens.back().line_id : 0; }
+  [[nodiscard]] bool IsValid() const { return valid; }
+  [[nodiscard]] size_t MaxLineID() const { return tokens.size() ? tokens.back().line_id : 0; }
 
+  [[nodiscard]] size_t GetPragmaOnce() const { return pragma_once_line; }
+  void SetPragmaOnce() { pragma_once_line = GetLineID(token_pos); }
 
   // ======= Dictionary Management =======
 
@@ -225,7 +228,9 @@ public:
   size_t GetNumIssues() const { return issues.size(); }
 
   // Print tokens to the screen with a particular token highlighted in read.
-  void ReportIssue(emp::String issue) {
+  template <typename... ARG_Ts>
+  void ReportIssue(ARG_Ts &&... args) {
+    emp::String issue = emp::MakeString(std::forward<ARG_Ts>(args)...);
     issues.push_back(issue);
 
     // Report the issue.
