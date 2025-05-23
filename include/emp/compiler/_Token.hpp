@@ -32,6 +32,13 @@ namespace emp {
 
     operator int() const { return id; } // Convert to token ID if used as an int.
     operator const std::string &() const { return lexeme; } // Convert to lexeme if used as string.
+
+    template <std::same_as<int>... Ts>
+    [[nodiscard]] bool IsOneOf(int test_id, Ts... args) const {
+      if (id == test_id) return true;
+      if constexpr (sizeof...(args) > 0) return IsOneOf(args...);
+      else return false;
+    }
   };
 
 }
