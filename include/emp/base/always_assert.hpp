@@ -64,10 +64,10 @@
   #define emp_always_assert_impl(...)                                     \
     do {                                                                  \
       if (!(emp_assert_GET_ARG_1(__VA_ARGS__, ~))) {                      \
-        emp::assert_throw(                                             \
+        emp::assert_throw(                                                \
         __FILE__, __LINE__,                                               \
         emp_assert_STRINGIFY( emp_assert_GET_ARG_1(__VA_ARGS__, ~),  ),   \
-        emp_assert_TO_PAIRS(__VA_ARGS__));                                       \
+        emp_assert_TO_PAIRS(__VA_ARGS__));                                \
       }                                                                   \
     } while(0)
 
@@ -76,6 +76,7 @@
 
   #define emp_always_assert_impl(...)                                     \
     do {                                                                  \
+      /* NOLINTNEXTLINE(readability-simplify-boolean-expr) */             \
       !(emp_assert_GET_ARG_1(__VA_ARGS__, ~))                             \
       && emp::assert_trigger(                                             \
         __FILE__, __LINE__,                                               \
