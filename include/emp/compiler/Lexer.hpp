@@ -37,6 +37,7 @@
 #include <cstdint>
 #include <iostream>
 #include <iterator>
+#include <fstream>
 #include <map>
 #include <stddef.h>
 
@@ -144,6 +145,12 @@ namespace emp {
     /// Turn a vector of strings into a vector of tokens.
     TokenStream Tokenize(const emp::vector<String> & str_v,
                          String name="in_string vector", bool keep_all=false) const;
+    
+    /// Load from a file and tokenize it.
+    TokenStream TokenizeFile(String filename) const {
+      std::ifstream file(filename);
+      return Tokenize(file, filename);
+    }
 
     /// Get the lexeme associated with the last token identified.
     const String & GetLexeme() const { return lexeme; }
