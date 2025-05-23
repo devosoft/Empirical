@@ -61,8 +61,9 @@ namespace emp {
   [[nodiscard]] inline String MakeLiteral(const std::string & value);
   template <typename T>
   [[nodiscard]] inline String MakeLiteral(const T & value);
-  [[nodiscard]] inline char MakeFromLiteral_Char(const String & value);
-  [[nodiscard]] inline String MakeFromLiteral_String(const String & value, CharSet quotes = "\"");
+  [[nodiscard]] inline char MakeCharFromLiteral(const String & value);
+  [[nodiscard]] inline String MakeStringFromLiteral(const String & value, CharSet quotes = "\"");
+  [[nodiscard]] inline int MakeIntFromLiteral(const String & value);
   template <typename T>
   [[nodiscard]] inline T MakeFromLiteral(const String & value);
   [[nodiscard]] inline String MakeUpper(const String & value);
@@ -1041,6 +1042,11 @@ namespace emp {
     String & SetLiteral() { return (*this = MakeLiteral(*this)); }
 
     [[nodiscard]] String AsLiteral() const { return MakeLiteral(*this); }
+
+    template <typename T>
+    [[nodiscard]] T ConvertFromLiteral() const { return MakeFromLiteral<T>(*this); }
+
+    [[nodiscard]] String ConvertStringFromLiteral() const { return MakeStringFromLiteral(*this); }
 
     String & AppendUpper(const String & in) { return (*this += MakeUpper(in)); }
 
@@ -2465,7 +2471,7 @@ namespace emp {
 
   /// Convert a literal character representation to an actual string.
   /// (i.e., 'A', ';', or '\n')
-  [[nodiscard]] char MakeFromLiteral_Char(const String & value) {
+  [[nodiscard]] char MakeCharFromLiteral(const String & value) {
     emp_assert(value.IsLiteralChar());
     // Given the assert, we can assume the string DOES contain a literal representation,
     // and we just need to convert it.
@@ -2477,7 +2483,7 @@ namespace emp {
   }
 
   /// Convert a literal string representation to an actual string.
-  [[nodiscard]] String MakeFromLiteral_String(const String & value,
+  [[nodiscard]] String MakeStringFromLiteral(const String & value,
                                               [[maybe_unused]] CharSet quotes) {
     emp_assert(value.IsLiteralString(quotes), value, value.DiagnoseLiteralString(quotes));
     // Given the assert, we can assume string DOES contain a literal string representation.
@@ -2502,9 +2508,9 @@ namespace emp {
     if (value.empty()) { return T{}; }
 
     if constexpr (std::is_same_v<char, T>) {
-      return MakeFromLiteral_Char(value);
+      return MakeCharFromLiteral(value);
     } else if constexpr (std::is_base_of_v<std::string, T>) {
-      return MakeFromLiteral_String(value);
+      return MakeStringFromLiteral(value);
     } else if constexpr (std::is_floating_point_v<T>) {
       return static_cast<T>(std::stold(value));
     } else if constexpr (std::is_unsigned_v<T>) {
@@ -2717,27 +2723,25 @@ namespace emp {
 
   // Take a set of characters and compress sequences of them down to a single character.
   String MakeCompressed(String in,
-                        const CharSet & chars,
+                        const CharSet & compress_chars,
                         char compress_to,
                         bool trim_start,
                         bool trim_end) {
     bool skip_next = trim_start;  // Remove characters from beginning of line?
-    size_t pos     = 0;
+    size_t pos = 0;
     for (const auto c : in) {
-      if (chars.Has(c)) {  // This char should be compressed.
-        if (skip_next) {
-          continue;  // Already skipping...
-        }
+      if (compress_chars.Has(c)) {  // This char should be compressed.
+        if (skip_next) continue;  // Already skipping...
         in.Get(pos++) = compress_to;  // Convert any block of chars to a single replace char.
         skip_next     = true;
-      } else {  // Not a compress char.
+      } else {  // Not a char to compress.
         in.Get(pos++) = c;
         skip_next     = false;
       }
     }
 
     if (trim_end && (pos != 0) && skip_next) {
-      pos--;  // Remove chars from end if needed.
+      pos--;  // Remove char from end if needed.
     }
     in.resize(pos);
 
