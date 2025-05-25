@@ -54,7 +54,7 @@
  *  magenta - keypress options
  *  yellow  - line numbers
  *  blue    - ?
- * 
+ *
  * Config options:
  * - HeaderExtensions: .hpp|.h|.H|.hh
  * - ProtectHeaders: None|Pragma|Guards|Both
@@ -100,6 +100,7 @@ private:
   // Lexer information.
   emplex::Lexer lexer;
 
+  fs::path config_file = "Empecable.cfg";
   fs::path word_file = "word_list.txt";
   fs::path replace_file = "replace_list.txt";
   std::optional<fs::path> emp_dir = std::nullopt; // Put emp_dir here if one is found.
@@ -175,16 +176,18 @@ private:
 
   void SetupOptionFlags() {
     flags.AddGroup("Basic Operation");
+    flags.AddOption('c', "config-file", [this](emp::String filename){ config_file = filename.str(); },
+      "Set the name of the main configuration file to use (Default: '" + config_file.string() + "').");
     flags.AddOption('h', "help", [this](){ PrintHelp(); },
       "Get additional information about options.");
     flags.AddOption('i', "interactive", [this](){ mode = Mode::Interactive; },
       "Interactively fix file problems");
     flags.AddOption('r', "replace_file", [this](emp::String filename){ replace_file = filename.str(); },
-      "Specify the word file to use for spell checks.");
+      "Specify the word file to use for spell checks (Default: '" + replace_file.string() + "').");
     flags.AddOption('v', "verbose", [this](){ mode = Mode::Verbose; },
       "Provide more detailed output");
     flags.AddOption('w', "word_file", [this](emp::String filename){ word_file = filename.str(); },
-      "Specify the word file to use for spell checks.");
+      "Specify the word file to use for spell checks (Default: '" + word_file.string() + "').");
   }
 
   // Check the default key press options that should work from any menu.
@@ -597,7 +600,9 @@ public:
   void ProcessFile() {
     emp::PrintLn("=== File: ", File().GetName().AsANSIBrightCyan(), " ==");
 
-    if (!File().Load(lexer)) return; // File failed to load.
+    if (!File().Load(lexer, project_words)) {
+      return; // File failed to load.
+    }
 
     while (File().NextToken()) {
       switch (GetToken()) {
@@ -613,16 +618,14 @@ public:
         File().ReportIssue("Illegal whitespace:");
         AskRemoveToken();
         break;
-      case Lexer::ID_PRAGMA:
-        if (GetLexeme().View(8, emp::String::npos) == "once") {
-          if (File().GetPragmaOnce() > 0) {
-            File().ReportIssue("Duplicate #pragma once (original on line ",
-                               File().GetPragmaOnce(), "):");
-            AskRemoveToken();
-          }
-          else {
-            File().SetPragmaOnce();
-          }
+      case Lexer::ID_PRAGMA_ONCE:
+        if (File().GetPragmaOnce() > 0) {
+          File().ReportIssue("Duplicate `#pragma once` found (original on line ",
+                              File().GetPragmaOnce(), "):");
+          AskRemoveToken();
+        }
+        else {
+          File().SetPragmaOnce();
         }
       }
 
@@ -640,16 +643,5 @@ int main(int argc, char * argv[])
   return formatter.GetNumIssues();
 }
 
-
-// Special info below for local control over the Empecable file checker.
-
-
-
-// Special info below for local control over the Empecable file checker.
-
-// Special info below for local control over the Empecable file checker.
-
-// Special info below for local control over the Empecable file checker.
-
-// Special info below for local control over the Empecable file checker.
-// empecable_words: formatter eol esp
+// Local settings for Empecable file checker.
+// empecable_words: formatter eol
