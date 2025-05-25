@@ -89,7 +89,7 @@ namespace emp {
       }
 
       bool OK(bool begin_ok=true, bool end_ok=true, std::string op="") const {
-        std::string type_name = typeid(ITERATOR_T).name();;
+        // std::string type_name = typeid(ITERATOR_T).name();
 
         if (v_ptr == nullptr) { ErrorCode() = "Invalid Vector! (set to nullptr)"; return false; }
         if (v_ptr->revision == 0) { ErrorCode() = "Vector deleted! (revision==0)"; return false; }

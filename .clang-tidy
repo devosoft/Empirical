@@ -8,6 +8,7 @@ Checks: |
   modernize-*
    -modernize-use-trailing-return-type
   performance-*
+   -performance-avoid-endl
   portability-*
   readability-*
    -readability-identifier-length
