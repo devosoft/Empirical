@@ -157,7 +157,7 @@ public:
     }
   }
 
-  bool Load(emplex::Lexer & lexer) {
+  bool Load(emplex::Lexer & lexer, const std::unordered_set<emp::String> & project_words) {
     std::ifstream file(filename);
     if (!file.is_open()) {
       PrintLn(ToBoldRed("ERROR: '", filename, "' failed to open."));
@@ -169,21 +169,31 @@ public:
 
     // Scan through file for Empecable instructions.
     for (auto & token : tokens) {
-      if (token.id == emplex::Lexer::ID_EMP_META_WORDS) {
+      switch (token) {
+      case emplex::Lexer::ID_EMP_META_START:
+        token.lexeme = ""; // Clear out this lexeme; we will reconstruct it when saving.        
+        break;
+      case emplex::Lexer::ID_EMP_META_START_OLD:
+        SetLexeme(""); // Clear out this lexeme; record change to ensure file save later.        
+        break;
+      case emplex::Lexer::ID_EMP_META_WORDS: {
         const emp::String line = token.lexeme;
-        token.lexeme = ""; // Clear out this lexeme; we will reconstruct it when saving.
+        token.lexeme = ""; // Clear out this lexeme; we will reconstruct it if we save.
 
         size_t pos = 0;
-        if (line.ScanWord(pos) != "//") {
-          InternalError(token, "Meta-data mismatch; expected: \"//\"");
-        }
-        if (line.ScanWord(pos) != "empecable_words:") {
-          pos = 0; line.ScanWord(pos);
-          InternalError(token, "Meta-data mismatch; expected: \"empecable_words:\"\n");
+        if (line.ScanWord(pos) != "//" ||
+            line.ScanWord(pos) != "empecable_words:") {
+          InternalError(token, "Meta-data mismatch; expected: \"// empecable_words:\"\n");
         }
         while (pos < line.size()) {
-          words.insert(line.ScanWord(pos));
+          const emp::String word = line.ScanWord(pos);
+          if (project_words.contains(word)) {
+            save_required = true;  // Word is now in project; don't keep as part of this file.
+          } else {
+            words.insert(word);
+          }
         }
+      }
       }
     }
 
@@ -213,7 +223,7 @@ public:
 
     // Attach a comment to the end of the file if there are local words to save.
     if (words.size()) {
-      file << "\n\n// Special info below for local control over the Empecable file checker.\n"
+      file << "\n\n// Local settings for Empecable file checker.\n"
            << "// empecable_words:";
       for (emp::String word : words) file << " " << word;
     }
