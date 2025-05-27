@@ -35,13 +35,21 @@ COMMENT_START "/*"
 COMMENT_END "*/"
 
 # Special metadata to collect file-specific words
+EMP_META_START_OLD ^"// Special info below for local control over the Empecable file checker.\n"
+EMP_META_START ^"// Local settings for Empecable file checker.\n"
 EMP_META_WORDS ^"// empecable_words: "[^\n\r\t]*[^ \n\r\t]
 
-# Identify preprocessor commands.
-# All on one line, ending in a non-space and cannot have illegal characters.
-PRAGMA "#pragma "[^\n\r\t]*[^ \n\r\t]
-INCLUDE "#include "[^\n\r\t]*[^ \n\r\t]
-IFDEF "#ifdef "[^\n\r\t]*[^ \n\r\t]
-IFNDEF "#ifndef "[^\n\r\t]*[^ \n\r\t]
-DEFINE "#define "[^\n\r\t]*[^ \n\r\t]
-ENDIF "#endif"[^\n\r\t]*[^ \n\r\t]
+# == Identify preprocessor commands ==
+
+# Consume whole line, ending in a non-space and cannot have illegal whitespace characters.
+IFDEF ^[ ]*"#ifdef "[^\n\r\t]*\S
+IFNDEF ^[ ]*"#ifndef "[^\n\r\t]*\S
+
+# define should collect the rest of the line and possibly wrap with \ at line end.
+DEFINE ^[ ]*"#define "([^\n\r\t\\]|(\\(\n|.)))+\S
+
+PRAGMA_ONCE ^[ ]*"#pragma"[ ]+"once"
+ENDIF ^[ ]*"#endif"
+
+INCLUDE_SYS ^[ ]*"#include"[ ]*\<\S*\>
+INCLUDE_LOCAL ^[ ]*"#include"[ ]*\"\S*\"
