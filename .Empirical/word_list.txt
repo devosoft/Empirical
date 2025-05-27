@@ -26119,6 +26119,7 @@ fallacious
 fallaciously
 fallacy
 fallback
+fallbacks
 fallen
 fallibilities
 fallibility
@@ -35350,12 +35351,14 @@ idyllically
 idylls
 idyls
 if
+ifdef
 iffier
 iffiest
 iffiness
 iffinesses
 iffy
 ifile
+ifndef
 ifs
 ifstream
 igloo
@@ -69911,6 +69914,7 @@ stodgy
 stogie
 stogies
 stogy
+stoi
 stoic
 stoical
 stoically
