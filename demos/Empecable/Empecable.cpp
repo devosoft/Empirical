@@ -106,7 +106,7 @@ private:
   std::optional<fs::path> emp_dir = std::nullopt; // Put emp_dir here if one is found.
 
   using word_set_t = std::unordered_set<emp::String>;
-  using word_map_t = std::unordered_map<emp::String, emp::String>;
+  using word_map_t = std::map<emp::String, emp::String>;
   word_set_t project_words;   // Dictionary of legal words for this project.
   word_set_t skip_words;      // Words to skip over for now.
   word_map_t replacement_map; // Track replacement words to always use.
@@ -366,7 +366,10 @@ private:
   }
 
   [[noreturn]] void Quit(bool save_before_quitting) {
-    if (save_before_quitting) SaveAll();
+    if (save_before_quitting || AskYesNo("Save before quitting?")) {
+      SaveAll();
+    }
+
     exit(0);
   }
 
@@ -644,4 +647,4 @@ int main(int argc, char * argv[])
 }
 
 // Local settings for Empecable file checker.
-// empecable_words: formatter eol
+// empecable_words: formatter
