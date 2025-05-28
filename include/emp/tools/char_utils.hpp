@@ -28,6 +28,7 @@
 #ifndef EMP_TOOLS_CHAR_UTILS_HPP_INCLUDE
 #define EMP_TOOLS_CHAR_UTILS_HPP_INCLUDE
 
+#include <functional>
 #include <string>
 #include <string_view>
 
