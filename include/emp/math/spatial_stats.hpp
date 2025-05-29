@@ -121,3 +121,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_MATH_SPATIAL_STATS_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: yid xid

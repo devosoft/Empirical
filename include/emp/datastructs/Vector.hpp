@@ -1,4 +1,5 @@
 /*
+
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  date: 2025.
@@ -154,6 +155,3 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_DATASTRUCT_VECTOR_HPP_INCLUDE
-
-// Special info below for local control over the Empecable file checker.
-// empecable_words: vec

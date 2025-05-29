@@ -11,11 +11,11 @@
 
  #ifndef EMP_MATH_RANDOM_XORSHIFT_HPP_INCLUDE
  #define EMP_MATH_RANDOM_XORSHIFT_HPP_INCLUDE
- 
+
  #include "../base/assert.hpp"
- 
+
  namespace emp {
- 
+
   // The Xorshift random number generators step through all 64-bit values for a
   // 2^64 period.  The weaker randomness comes with much faster computation.
   // Not for encryption, but good for simulations.
@@ -31,7 +31,7 @@
       state ^= state >> 27;
       return state * 2685821657736338717ULL;
     }
-    
+
     /// Starts a new sequence of pseudo random numbers; seed must be > 0.
     void ResetSeed(uint64_t seed) noexcept {
       emp_assert(seed > 0);
@@ -39,8 +39,7 @@
     }
 
   };
- 
+
 } // END emp namespace
- 
+
  #endif // #ifndef EMP_MATH_RANDOM_XORSHIFT_HPP_INCLUDE
- 

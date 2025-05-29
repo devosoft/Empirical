@@ -22,7 +22,7 @@
  *      Link a function to the KeypressManager that is called for any unresolved keypress.
  *      The function must take in an emp::web::KeyboardEvent (which includes information about
  *      the specific key pressed as well as any modifiers such as SHIFT or CTRL) and it
- *      must return a boolean value indicating whether it has resolved the keypress.
+ *      must return a Boolean value indicating whether it has resolved the keypress.
  *
  *    void AddKeydownCallback(char key, std::function<void()> cb_fun, int order=-1)
  *
@@ -101,7 +101,7 @@ namespace web {
     ///  Link a function to the KeypressManager that is called for any unresolved keypress.
     ///  The function must take in an emp::web::KeyboardEvent (which includes information about
     ///  the specific key pressed as well as any modifiers such as SHIFT or CTRL) and it
-    ///  must return a boolean value indicating whether it has resolved the keypress.
+    ///  must return a Boolean value indicating whether it has resolved the keypress.
     void AddKeydownCallback(
       std::function<bool(const KeyboardEvent &)> cb_fun,
       int order=-1
@@ -114,8 +114,8 @@ namespace web {
 
     ///  Link a specific key to a target function to be called when that key is pressed.
     ///  The function my return a void and take no arguments.
-    /// Specify keys as lowercase characters. To sepcify uppercase, you'll
-    /// need to monitor fo rthe shift modifier associated with a KeypressEvent.
+    /// Specify keys as lowercase characters. To specify uppercase, you'll
+    /// need to monitor for the shift modifier associated with a KeypressEvent.
     void AddKeydownCallback(
       char key,
       std::function<void()> cb_fun,
@@ -138,8 +138,8 @@ namespace web {
 
     /// Provide a whole set of keys that should all trigger the same function, including an
     /// ordering for priority.
-    /// Specify keys as lowercase characters. To sepcify uppercase, you'll
-    /// need to monitor fo rthe shift modifier associated with a KeypressEvent.
+    /// Specify keys as lowercase characters. To specify uppercase, you'll
+    /// need to monitor for the shift modifier associated with a KeypressEvent.
     void AddKeydownCallback(
       const std::string & key_set,
       const std::function<void()> & cb_fun,
@@ -186,3 +186,6 @@ namespace web {
 };
 
 #endif // #ifndef EMP_WEB_KEYPRESSMANAGER_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: evt

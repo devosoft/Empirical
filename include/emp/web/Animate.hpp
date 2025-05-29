@@ -69,7 +69,7 @@ namespace web {
     emp::vector<web::Widget> targets;   ///< What widgets should be refreshed after each frame?
     bool active;                        ///< Is this animation currently running?
     bool do_step;                       ///< Should this animation take just a single step?
-    size_t callback_id;                 ///< Internal ID for javascript to call back AdvanceFrame()
+    size_t callback_id;                 ///< Internal ID for Javascript to call back AdvanceFrame()
 
     double start_time;                  ///< At what time did this animation most recently start?
     double prev_time;                   ///< What was the time point of the previous frame?

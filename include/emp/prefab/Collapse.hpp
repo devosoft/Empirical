@@ -5,7 +5,7 @@
 */
 /**
  *  @file
- *  @brief Sets up a collapsable DOM element.
+ *  @brief Sets up a collapsible DOM element.
  */
 
 #ifndef EMP_PREFAB_COLLAPSE_HPP_INCLUDE
@@ -21,7 +21,7 @@ namespace prefab {
   namespace internal {
 
     /**
-     * CollpaseController class adds necessary html attributes to controller
+     * CollapseController class adds necessary html attributes to controller
      * to function as the controller for a group or groups of target areas.
      * Only ever called by CollapseCoupling class.
      */
@@ -135,7 +135,7 @@ namespace prefab {
        * This caused issues when it tried to stream widgets into a div but the widget
        * already had another parent.
        *
-       * Note: Maybe if we web::internal::FacetedWidget intead of web::Widget in the
+       * Note: Maybe if we web::internal::FacetedWidget instead of web::Widget in the
        * first constructor, templating this constructor will work?
        */
       /**

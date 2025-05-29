@@ -53,7 +53,7 @@ namespace emp {
     void ResetSeed(uint64_t seed) noexcept {
       emp_assert(seed > 0);
 
-      // Simple splitmix64 seeding (adapted from Blackman & Vigna)      
+      // Simple splitmix64 seeding (adapted from Blackman & Vigna)
       uint64_t tmp;
       for (size_t i = 0; i < 4; ++i) {
         tmp = (seed += 0x9e3779b97f4a7c15); // Shift seed for each starting point.
@@ -68,3 +68,6 @@ namespace emp {
 } // END emp namespace
 
 #endif // #ifndef EMP_MATH_RANDOM_XOSHIRO256PP_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: splitmix Vigna Blackman xoshiro

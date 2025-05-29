@@ -9,7 +9,7 @@
  *
  * Init.hpp should always be included if you are compiling Empirical's web tools with Emscripten. It
  * handles making sure that behind the scenes stuff is all set up properly. It also defines some
- * useful stubs and dummy functions so that your code will still be possible to comple with a normal
+ * useful stubs and dummy functions so that your code will still be possible to compile with a normal
  * C++ compiler (although the web part won't do anything, of course). These stubs are also helpful
  * for avoiding confusion in linters and IDEs.
  */
@@ -124,7 +124,7 @@ namespace emp {
 
     SetupGlobalThisPolyfill();
 
-    // have to dip into javascript because static and thread_local are wonky
+    // have to dip into Javascript because static and thread_local are wonky
     // with pthreads
     const bool should_run = EM_ASM_INT({
       if ( !globalThis.emp_init_once_flag ) {
@@ -237,3 +237,6 @@ namespace emp {
 #endif
 
 #endif // #ifndef EMP_WEB_INIT_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: lolwat globalthis mathiasbynens bitmaprenderer moz

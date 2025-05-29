@@ -845,3 +845,6 @@ namespace emp{
 
 
 #endif // #ifndef EMP_HARDWARE_VIRTUALCPU_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: sstr xyzabc

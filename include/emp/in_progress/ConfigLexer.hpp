@@ -154,7 +154,7 @@ namespace emp {
           return Token(Token::ID, cur_lexeme);
         }
 
-        // Any remaining possibilities start with a specific chatacter (or small set of options).
+        // Any remaining possibilities start with a specific character (or small set of options).
         // Advance next_char now for look-ahead.
         char prev_char = next_char;
         next_char = is.get();

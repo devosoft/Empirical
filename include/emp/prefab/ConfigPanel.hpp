@@ -341,3 +341,6 @@ namespace prefab {
 }
 
 #endif // #ifndef EMP_PREFAB_CONFIGPANEL_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: btn

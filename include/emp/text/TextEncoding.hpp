@@ -601,3 +601,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_TEXT_TEXTENCODING_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: multiclose

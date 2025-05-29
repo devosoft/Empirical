@@ -68,3 +68,6 @@ namespace prefab {
 }
 
 #endif // #ifndef EMP_PREFAB_CODEBLOCK_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: hljs lang highlightjs

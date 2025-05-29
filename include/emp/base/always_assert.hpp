@@ -95,3 +95,6 @@
 #define emp_always_assert(...) emp_always_assert_impl(__VA_ARGS__)
 
 #endif // #ifndef EMP_BASE_ALWAYS_ASSERT_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: boolean

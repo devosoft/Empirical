@@ -90,7 +90,7 @@ namespace prefab {
     web::Div card_header{emp::to_string(card_base, "_card_header")};
     // all body content will be added here
     web::Div card_body{emp::to_string(card_base, "_card_body")};
-    // Asssigns classes to card elements for styling
+    // Assigns classes to card elements for styling
     void AddBootstrap() {
       this->SetAttr("class", "card");
       card_header.SetAttr("class", "card-header");
@@ -142,7 +142,7 @@ namespace prefab {
         on_toggle_fun_t & tog = GetOnToggle();
         header_div.OnClick([header_div, &toggle = tog](){
           toggle();
-          // TODO: toggle really should accept boolean so the user can trigger
+          // TODO: toggle really should accept Boolean so the user can trigger
           // different events on open/close to prevent double click issues
           // but getting that state is currently impossible, see
           // https://github.com/devosoft/Empirical/issues/440.
@@ -175,7 +175,7 @@ namespace prefab {
        */
       if (link_content) {
         /*
-         * Add bootstrap link properities to content (hover, underline, etc.),
+         * Add bootstrap link properties to content (hover, underline, etc.),
          * but does not set a target or href because it is assumed that
          * this content will control the card collapse, which is done in the
          * constructor.
@@ -234,3 +234,6 @@ namespace prefab {
 }
 
 #endif // #ifndef EMP_PREFAB_CARD_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: btn

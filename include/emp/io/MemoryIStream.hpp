@@ -40,3 +40,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_IO_MEMORYISTREAM_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: setg buf

@@ -305,3 +305,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_TOOLS_CHAR_UTILS_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: bfnrtv

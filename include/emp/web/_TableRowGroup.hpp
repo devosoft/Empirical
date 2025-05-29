@@ -5,9 +5,9 @@
 */
 /**
  *  @file
- *  @brief The TableRowGoup widget, which behaves like the Table widget, but focuses on a group of rows.
+ *  @brief The TableRowGroup widget, which behaves like the Table widget, but focuses on a group of rows.
  *
- *  DO NOT include this file directly.  All files begining with '_' are for internal use only.
+ *  DO NOT include this file directly.  All files beginning with '_' are for internal use only.
  */
 
 #ifndef EMP_WEB__TABLEROWGROUP_HPP_INCLUDE

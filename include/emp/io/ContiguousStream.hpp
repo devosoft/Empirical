@@ -91,7 +91,7 @@ namespace emp {
     }
 
     /// Copy stored data into an ostream.
-    /// Useful for degugging.
+    /// Useful for debugging.
     void Print(std::ostream & os=std::cout) const {
       for (const auto & c : buffer) {
         os << c;
@@ -174,7 +174,7 @@ namespace emp {
     inline size_t GetSize() const { return buffer.GetSize(); }
 
     /// Copy stored data into an ostream.
-    /// Useful for degugging.
+    /// Useful for debugging.
     void Print(std::ostream & os=std::cout) const { buffer.Print(os); }
 
     /// Begin iterator on stored data
@@ -188,3 +188,6 @@ namespace emp {
 } // namespace emp
 
 #endif // #ifndef EMP_IO_CONTIGUOUSSTREAM_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: sputc streambufs andreoffringa nateriz isi pbase huy pbump uvector onlinedocs ujv cplusplus epptr setp pptr

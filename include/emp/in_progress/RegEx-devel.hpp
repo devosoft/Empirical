@@ -82,16 +82,16 @@ namespace emp {
       } else {
         min_repeat = max_repeat = lexeme.AsInt();
       }
-    }    
+    }
   };
-  
+
   // Deterministic Finite Automaton (DFA) for token recognition.
   class RegEx_DFA {
   private:
     static constexpr int NUM_SYMBOLS=128;
     static constexpr int NUM_STATES=25;
     using row_t = std::array<int, NUM_SYMBOLS>;
-  
+
     // RegEx_DFA transition table
     static constexpr std::array<row_t, NUM_STATES> table = {{
       /* State 0 */ {1,1,1,1,1,1,1,1,1,1,-1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,3,1,1,1,4,5,6,7,1,1,8,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,10,11,1,12,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,13,14,1,1,1},
@@ -122,7 +122,7 @@ namespace emp {
     }};
     // RegEx_DFA stop states (0 indicates NOT a stop)
     static constexpr std::array<int, NUM_STATES> stop_id = {0,242,242,244,247,246,249,250,243,251,242,242,245,242,248,0,0,252,255,0,0,254,0,253,0};
-  
+
   public:
     static constexpr int GetStop(int state) {
       return (state >= 0) ? stop_id[static_cast<size_t>(state)] : 0;
@@ -142,18 +142,18 @@ namespace emp {
       return GetStop(out);
     }
   };
-  
+
   class RegEx_Lexer {
   private:
     static constexpr int ERROR_ID = -1;     ///< Code for unknown token ID.
-  
+
     // -- Current State --
     size_t cur_line = 1;   // Track LINE we are reading in the input.
     int start_pos = 0;  // Track INDEX for the start of current lexeme.
     std::string lexeme{};  // Lexeme found for the current token
     std::string errors{};  // Description of any errors encountered
-  
-  public:    
+
+  public:
     // Identify if a token (by ID) should be skipped during tokenizing.
     static constexpr bool IgnoreToken(int id) {
       switch (id) {
@@ -162,18 +162,18 @@ namespace emp {
       default: return false;
       };
     }
-  
+
     // Generate and return the next token from the input stream.
     RegEx_Token NextToken(std::string_view in) {
       // If we cannot read in, return an "EOF" token.
       if (start_pos >= std::ssize(in)) return { 0, "", cur_line };
-  
+
       int cur_pos = start_pos;   // Position in the input that we are actively analyzing
       int best_pos = start_pos;  // Best look-ahead we've found so far
       int cur_state = 0;         // Next state for the DFA analysis
       int cur_stop = 0;          // Current "stop" state (or 0 if we can't stop here)
       int best_stop = -1;        // Best stop state found so far?
-  
+
       // Keep looking as long as:
       // 1: We may be able to continue the current lexeme, and
       // 2: We have not entered an invalid state, and
@@ -185,24 +185,24 @@ namespace emp {
         cur_stop = RegEx_DFA::GetStop(cur_state);
         if (cur_stop > 0) { best_pos = cur_pos; best_stop = cur_stop; }
       }
-  
+
       // If we did not find any options, peel off just one character.
       if (best_pos == start_pos) best_pos++;
-  
+
       // Update the line number we are on.
       const size_t out_line = cur_line;
       cur_line += static_cast<size_t>(std::count(lexeme.begin(),lexeme.end(),'\n'));
-  
+
       lexeme = in.substr(start_pos, best_pos-start_pos);
       start_pos += lexeme.size();
-  
+
       // If we can't find a token, return error token.
       if (best_stop < 0) return { ERROR_ID, lexeme, out_line };
-  
+
       // Otherwise return the best token we've found so far.
       return { best_stop, lexeme, out_line };
     }
-  
+
     // Convert an input string into a vector of tokens.
     emp::vector<RegEx_Token> Tokenize(std::string_view in) {
       start_pos = 0; // Start processing at beginning of string.
@@ -213,7 +213,7 @@ namespace emp {
       }
       return out_tokens;
     }
-  
+
     // Convert an input stream to a string, then tokenize.
     emp::vector<RegEx_Token> Tokenize(std::istream & is) {
       return Tokenize(
@@ -299,7 +299,7 @@ namespace emp {
         case 'W': token.id = ID_SET; token.lexeme = "[^a-zA-Z0-9_]";  break;
         default: // convert this to an escape character.
           token.id = ID_TEXT;
-          token.lexeme[0] = ToEscapeChar(token.lexeme[1]); 
+          token.lexeme[0] = ToEscapeChar(token.lexeme[1]);
           token.lexeme.resize(1);
       }
     }
@@ -335,7 +335,7 @@ namespace emp {
         case ID_ANY:    CleanupAnyToken(token);    break;  // .       - Converted to ID_SET
         case ID_BEGIN:  CleanupRemoveToken('^');   break;  // ^       - Remove and give warning.
         case ID_END:    CleanupRemoveToken('$');   break;  // $       - Remove and give warning.
-        }        
+        }
       }
     }
 
@@ -482,7 +482,7 @@ namespace emp {
       }
       os << ":" << token.min_repeat << "," << token.max_repeat << "] ";
     }
-  
+
     void Print(const emp::vector<RegEx_Token> & tokens, std::ostream & os=std::cout) const {
       os << "{";
       for (const RegEx_Token & token : tokens) Print(token);
@@ -499,7 +499,7 @@ namespace emp {
     RegEx & operator=(const RegEx & r) {
       regex = r.regex;
       notes.resize(0);
-      valid = true;      
+      valid = true;
       Process();
       return *this;
     }
@@ -823,7 +823,7 @@ namespace emp {
   //           case '-':
   //           case '\\':
   //           case ']':
-  //           case '[':  // Technically not needed. 
+  //           case '[':  // Technically not needed.
   //           case '^':
 
   //           // These technically don't need to be escaped, but any symbol should be allowed to be escaped.
@@ -905,7 +905,7 @@ namespace emp {
   //           case 'S': result = NewPtr<re_charset>(" \f\n\r\t\v", true); break;
   //           case 'w': result = NewPtr<re_charset>("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"); break;
   //           case 'W': result = NewPtr<re_charset>("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_", true); break;
-            
+
   //           // Special escape sequences
   //           case 'f': result = NewPtr<re_string>('\f'); break;
   //           case 'n': result = NewPtr<re_string>('\n'); break;
@@ -1059,3 +1059,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_COMPILER_REGEX_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: re's disjoin mergeable

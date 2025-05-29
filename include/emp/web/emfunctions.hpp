@@ -151,7 +151,7 @@ namespace emp {
   }
 
   // Generate a file that the user can then download.
-  inline void DownloadFile(std::string filename, const std::string & content) {    
+  inline void DownloadFile(std::string filename, const std::string & content) {
     MAIN_THREAD_ASYNC_EM_ASM({
       var filename = UTF8ToString($0);
       var content = UTF8ToString($1);

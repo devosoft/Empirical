@@ -109,7 +109,7 @@ namespace emp {
 
     // >1.0 downregulated
     // 1.0 neutral
-    // <1.0 upgregulated
+    // <1.0 upregulated
     // must be >=0.0
     double state;
 
@@ -132,7 +132,7 @@ namespace emp {
 
     /// A negative value upregulates the item,
     /// a value of exactly zero is neutral
-    /// and a postive value the item.
+    /// and a positive value the item.
     bool Adj(const double & amt) override {
       // regulator value must be positive
       state = std::max(0.0, state + amt);
@@ -192,7 +192,7 @@ namespace emp {
     // ...   | ...
     // -inf  | -= 1.0
 
-    // countdown timer to reseting state
+    // countdown timer to resetting state
     size_t timer;
 
     AdditiveCountdownRegulator() : state(0.0), timer(0) {}
@@ -225,7 +225,7 @@ namespace emp {
 
     /// A negative value upregulates the item,
     /// a value of exactly zero is neutral
-    /// and a postive value downregulates the item.
+    /// and a positive value downregulates the item.
     bool Adj(const double & amt) override {
       timer = 1;
 
@@ -305,7 +305,7 @@ namespace emp {
     // ...   | ...
     // -inf  | += 1.0 * -score
 
-    // countdown timer to reseting state
+    // countdown timer to resetting state
     size_t timer;
 
     MultiplicativeCountdownRegulator() : state(0.0), timer(0) {}
@@ -340,7 +340,7 @@ namespace emp {
 
     /// A negative value upregulates the item,
     /// a value of exactly zero is neutral
-    /// and a postive value downregulates the item.
+    /// and a positive value downregulates the item.
     bool Adj(const double & amt) override {
       timer = 1;
 
@@ -394,3 +394,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_MATCHING_MATCHBIN_REGULATORS_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: adj amt

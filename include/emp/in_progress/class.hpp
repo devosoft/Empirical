@@ -42,12 +42,12 @@
  *
  *
  *  Developer notes:
- *  Goal: Make it trival to build a class that has self-reflection.
- *        As such, it should interact will with serializaion and Javascript conversion.
+ *  Goal: Make it trivial to build a class that has self-reflection.
+ *        As such, it should interact will with serialization and Javascript conversion.
  *
  *  An alternative option is to do something similar to the config object.  In order to build
  *  a dynamic class, one would just create a file with a full set of macro calls.  They would
- *  need to be included several times -- it might not be possible, but if it is it wouild allow
+ *  need to be included several times -- it might not be possible, but if it is it would allow
  *  an arbitrarily large class definition.
  */
 
@@ -64,10 +64,10 @@
   public: TYPE Get ## ID() { return m_ ## ID; }                         \
   NAME & Set ## ID(const TYPE & _in) { m_ ## ID = _in;  return *this; }
 
-// EMP_CLASS_ACCESSORS expect the name of the class followd by type/id pairs to setup.
+// EMP_CLASS_ACCESSORS expect the name of the class followed by type/id pairs to setup.
 #define EMP_CLASS_ACCASSORS(NAME, ...) @CAO
 
-// EMP_CLASS_CONSTRUCTOR takes the class name followd by a set of types, ids, and default
+// EMP_CLASS_CONSTRUCTOR takes the class name followed by a set of types, ids, and default
 // values which it uses to setup initialization.
 #define EMP_CLASS_CONSTRUCTOR(NAME, ...) @CAO
 

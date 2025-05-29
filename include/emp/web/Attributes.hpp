@@ -140,7 +140,7 @@ namespace web {
 #endif
     }
 
-    /// Apply only a SPECIFIC attributes setting with a specifid value!
+    /// Apply only a SPECIFIC attributes setting with a specified value!
     static void Apply(const std::string & widget_id, const std::string & setting,
                       const std::string & value) {
 #ifdef __EMSCRIPTEN__

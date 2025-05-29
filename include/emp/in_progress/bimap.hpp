@@ -40,3 +40,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_DATASTRUCTS_BIMAP_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: bimap

@@ -68,3 +68,6 @@
 
 
 #endif // #ifndef EMP_BASE_OPTIONAL_THROW_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: mscv

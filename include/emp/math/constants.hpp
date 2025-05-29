@@ -21,7 +21,7 @@ namespace emp {
   constexpr const double PI     = 3.14159265358979;       ///< pi
   constexpr const double SQRT2  = 1.41421356237310;       ///< sqrt(2)
   constexpr const double LN2    = 0.6931471805599453;     ///< ln(2)
-  
+
 
   constexpr uint8_t  MAX_BYTE  =            255;  ///< 2^8 - 1
   constexpr uint16_t MAX_2BYTE =         65'535;  ///< 2^16 - 1
@@ -334,7 +334,7 @@ namespace emp {
     2.0
   };
 
-  /// The following function takes a table and a position [0.0, 1.0) and intepolates a value.
+  /// The following function takes a table and a position [0.0, 1.0) and interpolates a value.
   template <typename T>
     constexpr double InterpolateTable(T && table, double pos, double tsize) {
     return table[(int)(pos*tsize)] * (1.0-pos+((double)((int)(pos*tsize)))/tsize)
@@ -344,3 +344,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_MATH_CONSTANTS_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: tsize

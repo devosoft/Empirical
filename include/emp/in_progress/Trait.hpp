@@ -5,7 +5,7 @@
 */
 /**
  *  @file
- *  @brief The TraitDef class maintains a category of measuments about another class.
+ *  @brief The TraitDef class maintains a category of measurements about another class.
  *
  *  Each trait is associated with a name, a description, and a type.  Instance of that
  *  trait are of type TraitValue.  A TraitManager contains information about a group of

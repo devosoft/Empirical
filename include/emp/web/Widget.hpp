@@ -401,7 +401,7 @@ namespace web {
       virtual std::string GetType() { return "web::WidgetInfo"; }
     };
 
-  }  // end namespaceinternal
+  }  // end namespace
   #endif // DOXYGEN_SHOULD_SKIP_THIS
 
   // Implementation of Widget methods...
@@ -623,7 +623,7 @@ namespace web {
       WidgetFacet(const std::string & in_id="") : Widget(in_id) { }
       WidgetFacet(const WidgetFacet & in) : Widget(in) { }
       WidgetFacet(const Widget & in) : Widget(in) {
-        // Converting from a generic widget; make sure type is correct or non-existant!
+        // Converting from a generic widget; make sure type is correct or non-existent!
         emp_assert(!in || dynamic_cast<typename RETURN_TYPE::INFO_TYPE *>( Info(in) ) != NULL,
                    in.GetID());
       }
@@ -1029,3 +1029,6 @@ namespace web {
 
 
 #endif // #ifndef EMP_WEB_WIDGET_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: evt

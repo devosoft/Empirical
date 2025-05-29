@@ -721,5 +721,5 @@ namespace emp {
 
 #endif // #ifndef EMP_COMPILER_REGEX_HPP_INCLUDE
 
-// Special info below for local control over the Empecable file checker.
+// Local settings for Empecable file checker.
 // empecable_words: re's

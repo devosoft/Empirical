@@ -170,7 +170,7 @@ namespace emp::prefab {
 
     }
 
-    /// A helper function to formate IDs generated for sub-components
+    /// A helper function to format IDs generated for sub-components
     inline static std::string FormatName(const std::string & name) {
       return to_lower(join(slice(name, ' '), "_"));
     }
@@ -222,3 +222,6 @@ namespace emp::prefab {
 }
 
 #endif // #ifndef EMP_PREFAB_READOUTPANEL_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: lvd liv

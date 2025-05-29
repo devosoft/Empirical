@@ -251,5 +251,5 @@ namespace emp {
 
 #endif // #ifndef EMP_DATASTRUCTS_HASH_UTILS_HPP_INCLUDE
 
-// Special info below for local control over the Empecable file checker.
-// empecable_words: dce ret nblocks bef aappleby fcfaadc fmix ceb smhasher xff ccd afd numbytes szudzik
+// Local settings for Empecable file checker.
+// empecable_words: ret nblocks bef aappleby fcfaadc fmix ceb smhasher ccd xff numbytes afd dce szudzik

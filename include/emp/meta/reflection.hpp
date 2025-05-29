@@ -15,7 +15,7 @@
 #include "TypePack.hpp"
 
 /// This macro will generate a function that calls a member function on a given object IF that
-/// member exists, but otherwise pass the object as an arguent to a function fallback.
+/// member exists, but otherwise pass the object as an argument to a function fallback.
 ///
 /// NEW_NAME - name of the function to be generated.
 /// METHOD - name of the member function that should be attempted.

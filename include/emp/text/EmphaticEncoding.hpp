@@ -148,3 +148,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_TEXT_EMPHATICENCODING_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: rrrr ooooo oooo rrrrr ooo aaaaa rrr aaaa aaa rjustify ljustify

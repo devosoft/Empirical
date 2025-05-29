@@ -102,7 +102,7 @@ namespace web {
     }; // End of TextAreaInfo definition
     #endif // DOXYGEN_SHOULD_SKIP_THIS
 
-    // Get a properly cast version of indo.
+    // Get a properly cast version of info.
     TextAreaInfo * Info() { return (TextAreaInfo *) info; }
     const TextAreaInfo * Info() const { return (TextAreaInfo *) info; }
 

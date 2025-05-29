@@ -63,7 +63,7 @@ namespace web {
     };
     #endif // DOXYGEN_SHOULD_SKIP_THIS
 
-    // Get a properly cast version of indo.
+    // Get a properly cast version of info.
     ImageInfo * Info() { return (ImageInfo *) info; }
     const ImageInfo * Info() const { return (ImageInfo *) info; }
 
@@ -96,3 +96,6 @@ namespace web {
 }
 
 #endif // #ifndef EMP_WEB_IMAGE_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: kripken

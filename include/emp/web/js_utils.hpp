@@ -27,7 +27,7 @@
 namespace emp {
 
   /// This function returns a std::map mapping typeid names to the appropriate
-  /// strings to describe those types in Javscript. This is useful when using
+  /// strings to describe those types in Javascript. This is useful when using
   /// getValue() from within MAIN_THREAD_EM_ASM macros.
   ///
   ///  For example, say we have a templated function that takes a pointer to type
@@ -426,7 +426,7 @@ namespace emp {
 
     char * buffer = (char *) MAIN_THREAD_EM_ASM_INT({
       // Since we're treating each char as it's own string, each one
-      // will be null-termianted. So we malloc length*2 addresses.
+      // will be null-terminated. So we malloc length*2 addresses.
       var new_length = emp_i.__outgoing_array.length*2;
       var buffer = Module._malloc(new_length);
 
@@ -456,7 +456,7 @@ namespace emp {
 
     char * buffer = (char *) MAIN_THREAD_EM_ASM_INT({
       // Since we're treating each char as it's own string, each one
-      // will be null-termianted. So we malloc length*2 addresses.
+      // will be null-terminated. So we malloc length*2 addresses.
       var buffer = Module._malloc(emp_i.__outgoing_array.length*2);
 
       for (i=0; i<emp_i.__outgoing_array.length; i++) {
@@ -747,3 +747,6 @@ namespace emp {
 
 
 #endif // #ifndef EMP_WEB_JS_UTILS_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: els javascript

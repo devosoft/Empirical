@@ -17,7 +17,7 @@
  *  draws with arbitrary trail counts without storing N distributions.
  *  By storing distributions for powers of 2, we only store log_2(N) distributions.
  *
- *  Developor Notes:
+ *  Developer Notes:
  *    - We should come up with a more informative name for the file/class
  */
 

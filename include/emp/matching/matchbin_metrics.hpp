@@ -563,7 +563,7 @@ namespace emp {
   }
 
   /// Matches based on longest streaks of equal and unequal bits in two bitsets.
-  /// This implementation uses Corect Math adapted from
+  /// This implementation uses Correct Math adapted from
   /// https://www.askamathematician.com/2010/07/q-whats-the-chance-of-getting-a-run-of-k-successes-in-n-bernoulli-trials-why-use-approximations-when-the-exact-answer-is-known/
   /// This metric is NOT uniformly distributed.
   /// Adapted from Downing, Keith L. Intelligence emerging: adaptivity and search in evolving neural systems. MIT Press, 2015.
@@ -612,7 +612,7 @@ namespace emp {
   };
 
   /// Matches based on longest streak of equal bits in two bitsets.
-  /// This implementation uses Corect Math adapted from
+  /// This implementation uses Correct Math adapted from
   /// https://www.askamathematician.com/2010/07/q-whats-the-chance-of-getting-a-run-of-k-successes-in-n-bernoulli-trials-why-use-approximations-when-the-exact-answer-is-known/
   /// This metric is uniformly distributed.
   /// Adapted from Downing, Keith L. Intelligence emerging: adaptivity and search in evolving neural systems. MIT Press, 2015.
@@ -645,7 +645,7 @@ namespace emp {
 
     inline static double calculate(const query_t& a, const tag_t& b) {
       const size_t same = (a.EQU(b)).LongestSegmentOnes();
-      // sampling from probabilty distribution
+      // sampling from probability distribution
       // and then viewing location in cumulative probability distribution
       // gives us a uniform result
       const double p_same = GetDistn().GetStreakProbability(same);
@@ -1229,3 +1229,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_MATCHING_MATCHBIN_METRICS_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: uniformified unif distn isocpp askamathematician downing's bino cumu ctors lcrypto hashme bernoulli shactx amt cumsum srtate cmp uncg lssl antilog sha thasher qhasher

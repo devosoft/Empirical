@@ -29,7 +29,7 @@ namespace emp {
   static constexpr size_t NUM_FIELD_BITS = sizeof(bits_field_t)*8;
 
   /// @brief Convert a bit count to the number of fields needed to store them.
-  [[nodiscard]] static constexpr size_t NumBitFields(size_t num_bits) noexcept {
+  [[nodiscard]] inline constexpr size_t NumBitFields(size_t num_bits) noexcept {
     return num_bits ? (1 + ((num_bits - 1) / NUM_FIELD_BITS)) : 0;
   }
 
@@ -128,20 +128,20 @@ namespace emp {
 
   /// Quick bit-mask generator for low bits.
   template <typename TYPE=size_t>
-  [[nodiscard]] static constexpr TYPE MaskLow(std::size_t num_bits) {
+  [[nodiscard]] inline constexpr TYPE MaskLow(std::size_t num_bits) {
     static_assert( std::is_unsigned_v<TYPE>, "Bit manipulation requires unsigned values." );
     return (num_bits == 8*sizeof(TYPE)) ? ((TYPE)-1) : ((((TYPE)1) << num_bits) - 1);
   }
 
   /// Quick bit-mask generator for high bits.
   template <typename TYPE=size_t>
-  [[nodiscard]] static constexpr TYPE MaskHigh(std::size_t num_bits) {
+  [[nodiscard]] inline constexpr TYPE MaskHigh(std::size_t num_bits) {
     static_assert( std::is_unsigned_v<TYPE>, "Bit manipulation requires unsigned values." );
     return MaskLow<TYPE>(num_bits) << (8*sizeof(TYPE)-num_bits);
   }
 
   template <typename TYPE=size_t>
-  [[nodiscard]] static constexpr TYPE MaskUsed(TYPE val) {
+  [[nodiscard]] inline constexpr TYPE MaskUsed(TYPE val) {
     static_assert( std::is_unsigned_v<TYPE>, "Bit manipulation requires unsigned values." );
     size_t shift = 1;
     TYPE last = 0;
@@ -249,7 +249,7 @@ namespace emp {
   }
 
   /// Count the number of bits ('0' or '1') found in a string.
-  static size_t CountBits(const std::string & bitstring) {
+  inline size_t CountBits(const std::string & bitstring) {
     return static_cast<size_t>(
       std::count_if(
         bitstring.begin(),

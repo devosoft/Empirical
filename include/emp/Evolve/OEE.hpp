@@ -1,4 +1,5 @@
 /*
+
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  date: 2021
@@ -246,6 +247,5 @@ namespace emp {
 
 #endif // #ifndef EMP_EVOLVE_OEE_HPP_INCLUDE
 
-
-// Special info below for local control over the Empecable file checker.
+// Local settings for Empecable file checker.
 // empecable_words: skel

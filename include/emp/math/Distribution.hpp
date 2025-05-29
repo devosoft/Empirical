@@ -3,7 +3,7 @@
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  date: 2018-2024
  */
-/** 
+/**
  *  @file
  *  @brief A set of pre-calculated discrete distributions that can quickly generate random values.
  *  @note Status: BETA
@@ -127,7 +127,7 @@ namespace emp {
     }
 
   };
-  
+
   /// How many successes with p probability and N attempts?
   class Binomial : public Distribution {
   private:

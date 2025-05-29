@@ -29,7 +29,7 @@ namespace emp {
     static constexpr uint64_t STEP_SIZE2  = 0x278c5a4d8419fe6b; // Extra step size for 64 bit
 
     [[nodiscard]] std::string GetType() const noexcept { return "Random_MSWS"; }
-    
+
     /// Return a 32-bit Random number
     uint32_t Get() noexcept {
       value *= value;                       // Square the current value.
@@ -77,7 +77,7 @@ namespace emp {
     //      x2 *= x2; x2 += (w2 += s2); x2 = (x2 >> 32) | (x2 << 32);
     //      return xx ^ x2;
     //    }
-    
+
 
     /// Starts a new sequence of pseudo random numbers.  Seed is guaranteed > 0.
     void ResetSeed(const uint64_t seed) noexcept {
@@ -95,3 +95,6 @@ namespace emp {
 } // END emp namespace
 
 #endif // #ifndef EMP_MATH_RANDOM_MSWS_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: nonswap msws weyl

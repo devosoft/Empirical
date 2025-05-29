@@ -9,7 +9,7 @@
  *
  * The SerialPod object knows whether it is loading or saving and object, and provides a
  * simple mechanism to do so.
- * 
+ *
  * => How to use:
  *  A standard class can use a SerialPod by adding a `Serialize(SerialPod & pod)` member function.
  *
@@ -18,25 +18,25 @@
  *
  *  Any class can have a constructor that takes a `SerialPod` to allow reconstruction of const
  *  objects.  As long as such a constructor is provided, the Serialize function can be const.
- * 
+ *
  *  More complex classes (e.g., those that do memory management) will need to have separate
  *  `SerialSave(SerialPod & pod) const` and `SerialLoad(SerialPod & pod)` functions.
  *
  * => Example:
  *  Inside of MyClass we might have:
- * 
+ *
  *  void MyClass(SerialPod & pod) {
  *    pod(member_a, member_b, member_c);  // List all members to save/load
  *  }
- * 
+ *
  * => Resolving duplications:
  *  If more than one version of a serialization function exists, functions external to the class
  *  always have precedence over those internal (so that classes can later be changed how they
  *  serialize).
- * 
+ *
  *  If both a specific function (e.g., Load) and general function (i.e, Serialize) exist, the
  *  more specific one will always be used.
- * 
+ *
  *  Regular streaming is used only when no other options exist.
  */
 
@@ -61,7 +61,7 @@
 namespace emp {
 
   // Pre-declarations
-  class SerialPod; 
+  class SerialPod;
   class String;
 
   /// Concept to identify id a type has a Serialize() member function.
@@ -243,7 +243,7 @@ namespace emp {
         }
       }
       else Save(std::forward<T>(in), std::forward<EXTRA_Ts>(extras)...);
- 
+
       return *this;
     }
   };

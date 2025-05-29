@@ -60,21 +60,21 @@ namespace web {
     const std::string & GetColor() const { return color; }
     /// @returns color of lines through text (underline or strikethrough)
     const std::string & GetLineColor() const { return line_color; }
-    /// @returns boolean indicating whether font is bold
+    /// @returns Boolean indicating whether font is bold
     bool IsBold() const { return is_bold; }
-    /// @returns boolean indicating whether font is italic
+    /// @returns Boolean indicating whether font is italic
     bool IsItalic() const { return is_italic; }
-     /// @returns boolean indicating whether font is in small caps
+     /// @returns Boolean indicating whether font is in small caps
     bool IsSmallcaps() const { return is_smallcaps; }
-    /// @returns boolean indicating whether font is underlined
+    /// @returns Boolean indicating whether font is underlined
     bool IsUnderlined() const { return is_underlined; }
-    /// @returns boolean indicating whether font is overlined
+    /// @returns Boolean indicating whether font is overlined
     bool IsOverlined() const { return is_overlined; }
-    /// @returns boolean indicating whether font is strikethrough
+    /// @returns Boolean indicating whether font is strikethrough
     bool IsStrikethrough() const { return is_linethrough; }
-    /// @returns boolean indicating whether font is wavy line
+    /// @returns Boolean indicating whether font is wavy line
     bool IsWavyLine() const { return is_wavy_line; }
-    /// @returns boolean indicating whether font has any kind of line (underline, overline, or strikethrough)
+    /// @returns Boolean indicating whether font has any kind of line (underline, overline, or strikethrough)
     bool HasLine() const { return is_underlined || is_overlined || is_linethrough; }
 
     /// Sets font family to specified value

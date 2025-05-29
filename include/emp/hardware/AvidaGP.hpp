@@ -110,7 +110,7 @@ namespace emp {
     std::unordered_map<int, double> inputs;  // Map of all available inputs (position -> value)
     std::unordered_map<int, double> outputs; // Map of all outputs (position -> value)
     emp::array< stack_t, CPU_SIZE > stacks;  // Stacks for long-term storage.
-    emp::array< int, CPU_SIZE > fun_starts;  // Postions where functions being in genome.
+    emp::array< int, CPU_SIZE > fun_starts;  // Positions where functions being in genome.
 
     size_t inst_ptr;
     emp::vector<ScopeInfo> scope_stack;
@@ -119,7 +119,7 @@ namespace emp {
 
     size_t errors;
 
-    // A simple way of recording which traits a CPU has demonstrated, and at what qaulity.
+    // A simple way of recording which traits a CPU has demonstrated, and at what quality.
     emp::vector<double> traits;
 
     // Run every time we need to exit the current scope.
@@ -161,8 +161,8 @@ namespace emp {
       if (CurScopeType() == ScopeType::FUNCTION) {
         // @CAO Make sure we exit multiple scopes if needed to close the function...
         inst_ptr = call_stack.back();             // Return from the function call.
-        if (inst_ptr >= genome.GetSize()) {          // Test if call occured at end of genome.
-          ResetIP();                              // ...and reset to the begnning if so.
+        if (inst_ptr >= genome.GetSize()) {          // Test if call occurred at end of genome.
+          ResetIP();                              // ...and reset to the beginning if so.
         } else {
           call_stack.pop_back();                  // Clear the return position from the call stack.
           ExitScope();                            // Leave the function scope.
@@ -242,7 +242,7 @@ namespace emp {
 
     /// Reset just the CPU hardware, but keep the genome and traits.
     virtual void ResetHardware() {
-      // Initialize registers to their posision.  So Reg0 = 0 and Reg11 = 11.
+      // Initialize registers to their position.  So Reg0 = 0 and Reg11 = 11.
       for (size_t i = 0; i < CPU_SIZE; i++) {
         regs[i] = (double) i;
         inputs.clear();
@@ -272,10 +272,10 @@ namespace emp {
     // Accessors
     Ptr<const inst_lib_t> GetInstLib() const { return genome.GetInstLib(); }
     inst_t GetInst(size_t pos) const { return genome[pos]; }
-    inst_t& operator[](size_t pos) {return genome[pos]; } // Alias for compatability with tools
+    inst_t& operator[](size_t pos) {return genome[pos]; } // Alias for compatibility with tools
     const genome_t & GetGenome() const { return genome; }
     size_t GetSize() const { return genome.GetSize(); }
-    size_t size() const { return GetSize(); } // Alias for compatability with tools
+    size_t size() const { return GetSize(); } // Alias for compatibility with tools
     double GetReg(size_t id) const { return regs[id]; }
     double GetInput(int id) const { return Find(inputs, id, 0.0); }
     const std::unordered_map<int,double> & GetInputs() const { return inputs; }
@@ -419,7 +419,7 @@ namespace emp {
     /// Print out the state of the virtual CPU.
     void PrintState(std::ostream & os=std::cout) const;
 
-    /// Trace the instructions being exectured, with full CPU details.
+    /// Trace the instructions being executed, with full CPU details.
     void Trace(size_t num_inst, std::ostream & os=std::cout) {
       for (size_t i = 0; i < num_inst; i++) { PrintState(os); SingleProcess(); }
     }

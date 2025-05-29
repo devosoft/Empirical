@@ -93,7 +93,7 @@ namespace emp {
   /// Generate a random SignalGP instruction (templated off of tag width).
   /// @param rnd - Random number generator to use when generating a random tag.
   /// @param inst_lib - Instruction library used to generate the instruction (instruction will be valid within instruction library)
-  /// @param min_arg_val - Mininum value for an instruction argument.
+  /// @param min_arg_val - Minimum value for an instruction argument.
   /// @param max_arg_val - Maximum value for an instruction argument.
   template<
     size_t TAG_WIDTH,
@@ -127,7 +127,7 @@ namespace emp {
   /// @param inst_lib - Instruction library used to generate the function (instruction will be valid within instruction library)
   /// @param min_inst_cnt - Minimum number of instructions in generated function.
   /// @param max_inst_cnt - Maximum number of instructions in generated function.
-  /// @param min_arg_val - Mininum value for an instruction argument.
+  /// @param min_arg_val - Minimum value for an instruction argument.
   /// @param max_arg_val - Maximum value for an instruction argument.
   template<
     size_t TAG_WIDTH,
@@ -163,11 +163,11 @@ namespace emp {
   /// Generate a random SignalGP program (templated off of tag width).
   /// @param rnd - Random number generator to use when generating a random tag.
   /// @param inst_lib - Instruction library used to generate the program.
-  /// @param min_func_cnt - Mininum number of functions in generated program.
+  /// @param min_func_cnt - Minimum number of functions in generated program.
   /// @param max_func_cnt - Maximum number of functions in generated program.
   /// @param min_fun_len - Minimum number of instructions per function.
   /// @param max_fun_len - Maximum number of instructions per function.
-  /// @param min_arg_val - Mininum value for an instruction argument.
+  /// @param min_arg_val - Minimum value for an instruction argument.
   /// @param max_arg_val - Maximum value for an instruction argument.
   template<
     size_t TAG_WIDTH,
@@ -436,7 +436,7 @@ namespace emp {
     /// Return the parameter name for the parameter with the given ID.
     const std::string & GetParamName(size_t id) const { return param_lib[id].name; }
 
-    /// Add a paramter to the parameter set.
+    /// Add a parameter to the parameter set.
     /// Return ID of that parameter, which can be used to access the parameter value more quickly than with its name.
     size_t AddParam(const std::string & name, double param, const std::string & desc="") {
       emp_assert(!Has(param_name_map, name));
@@ -452,7 +452,7 @@ namespace emp {
       SetParam(GetParamID(name), param);
     }
 
-    /// Modify existing paramter value (by ID).
+    /// Modify existing parameter value (by ID).
     void SetParam(size_t id, double param) {
       emp_assert(id < param_lib.size());
       param_lib[id].param = param;
@@ -619,7 +619,7 @@ namespace emp {
     /// Mutator: Default implementation for instruction substitution mutations, including instruction-operation substitutions,
     ///          instruction-argument substitutions, and instruction-tag bit-flips.
     /// Respects constraints (e.g., max total program length, etc.).
-    /// Instruction substitions occur at a per-instruction rate specified by "INST_SUB__PER_INST".
+    /// Instruction substitutions occur at a per-instruction rate specified by "INST_SUB__PER_INST".
     /// Instruction argument substitutions occur at a per-argument rate specified by "ARG_SUB__PER_ARG".
     /// Instruction tag mutations occur at a per-bit rate specified by "TAG_BIT_FLIP__PER_BIT".
     size_t DefaultMutator_Subs(program_t & program, emp::Random & rnd) {
@@ -756,3 +756,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_HARDWARE_SIGNALGP_UTILS_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: rnd uset cnt amlalejini locs dels rhead matchbin

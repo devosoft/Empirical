@@ -139,7 +139,7 @@ namespace web {
             ClearCellChildren(row_id, col_id);
           }
         }
-  
+
         // Clear removed rows.
         for (size_t row_id = new_rows; row_id < row_count; ++row_id) {
           ClearRowChildren(row_id);
@@ -757,7 +757,7 @@ namespace web {
     }
 
     /// Apply CSS to all rows.
-    // (@CAO: Should we use fancier javascript here?)
+    // (@CAO: Should we use fancier Javascript here?)
     template <typename SETTING_TYPE>
     Table & RowsCSS(const std::string & setting, SETTING_TYPE && value) {
       for (auto & row : Info()->rows) row.extras.style.Set(setting, emp::to_string(value));
@@ -842,7 +842,7 @@ namespace web {
     return *this;
   }
 
-  //============  Table 
+  //============  Table
 
   // Add a single new Row to the table.
   TableRow Table::AddRow() {
@@ -874,3 +874,6 @@ namespace web {
 }
 
 #endif // #ifndef EMP_WEB_TABLE_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: colgroup rowg tbody colg

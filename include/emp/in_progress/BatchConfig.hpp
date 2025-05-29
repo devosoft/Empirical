@@ -20,7 +20,7 @@
 
 namespace emp {
 
-  /// Class to managae a set of runs:
+  /// Class to manage a set of runs:
   /// RUN_T is the type of the object that contains the run info.
   /// CONFIG_T is the config object being used.
 

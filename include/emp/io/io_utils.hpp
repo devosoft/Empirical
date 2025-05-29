@@ -22,6 +22,7 @@
 
 #include "../base/assert.hpp"
 #include "../base/vector.hpp"
+#include "../tools/String.hpp"
 
 #ifdef _WIN32
   #include <conio.h>
@@ -271,5 +272,5 @@ namespace emp {
 
 #endif // #ifndef EMP_IO_IO_UTILS_HPP_INCLUDE
 
-// Special info below for local control over the Empecable file checker.
-// empecable_words: lflag tcsetattr tcgetattr termios ofs getch
+// Local settings for Empecable file checker.
+// empecable_words: termios tcgetattr lflag tcsetattr getch ofs

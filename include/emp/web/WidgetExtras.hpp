@@ -5,7 +5,7 @@
 */
 /**
  *  @file
- *  @brief A collection of extra details about HTML Widgets (attributes, style, listerns)
+ *  @brief A collection of extra details about HTML Widgets (attributes, style, listeners)
  */
 
 #ifndef EMP_WEB_WIDGETEXTRAS_HPP_INCLUDE

@@ -37,7 +37,7 @@
 
 namespace emp {
 
-  /// A single symbol in a grammer including the patterns that generate it.
+  /// A single symbol in a grammar including the patterns that generate it.
   struct ParseSymbol {
     std::string name = "";      ///< Unique name for this parse symbol.
     std::set<int> rule_ids;     ///< Which rules apply to this symbol?
@@ -105,7 +105,7 @@ namespace emp {
     /// Trivial conversions of ID to ID...
     int GetID(int id) const { return id; }
 
-    /// Converstion of a symbol name to its ID.
+    /// Conversion of a symbol name to its ID.
     int GetID(const std::string & name) {
       int spos = GetSymbolPos(name);                  // First check if parse symbol exists.
       if (spos >= 0) return symbols[(size_t)spos].id; // ...if so, return it.
@@ -117,7 +117,7 @@ namespace emp {
       return symbols[new_spos].id;
     }
 
-    /// Conversion of a sybol ID to its name.
+    /// Conversion of a symbol ID to its name.
     std::string GetName(int symbol_id) const {
       if (Lexer::TokenOK(symbol_id)) return lexer.GetTokenName(symbol_id);
       const size_t spos = symbol_id - lexer.MaxTokenID() - 1;
@@ -220,3 +220,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_IN_PROGRESS_PARSER_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: tid spos sid

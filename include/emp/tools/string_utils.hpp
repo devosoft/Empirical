@@ -747,8 +747,8 @@ namespace emp {
       in_string = "";
     }
     else {
-      out_string = in_string.substr(0, end_pos);  // Copy up to the deliminator for ouput
-      in_string.erase(0, end_pos + delim_size);   // Delete output string AND deliminator
+      out_string = in_string.substr(0, end_pos);  // Copy up to the delimiter for output
+      in_string.erase(0, end_pos + delim_size);   // Delete output string AND delimiter
     }
 
     return out_string;
@@ -763,27 +763,27 @@ namespace emp {
     return in_string.substr(start_pos, end_pos - start_pos);
   }
 
-  /// Remove a prefix of the input string (up to a specified delimeter) and return it.  If the
-  /// delimeter is not found, return the entire input string and clear it.
+  /// Remove a prefix of the input string (up to a specified delimiter) and return it.  If the
+  /// delimiter is not found, return the entire input string and clear it.
   inline std::string string_pop(std::string & in_string, const char delim=' ') {
     return string_pop_fixed(in_string, in_string.find(delim), 1);
   }
 
-  /// Return a prefix of the input string (up to a specified delimeter), but do not modify it.
-  /// If the delimeter is not found, return the entire input string.
+  /// Return a prefix of the input string (up to a specified delimiter), but do not modify it.
+  /// If the delimiter is not found, return the entire input string.
   [[nodiscard]] inline std::string
   string_get(const std::string & in_string, const char delim=' ', size_t start_pos=0) {
     return string_get_range(in_string, start_pos, in_string.find(delim, start_pos));
   }
 
-  /// Remove a prefix of the input string (up to any of a specified set of delimeters) and
-  /// return it.  If the delimeter is not found, return the entire input string and clear it.
+  /// Remove a prefix of the input string (up to any of a specified set of delimiters) and
+  /// return it.  If the delimiter is not found, return the entire input string and clear it.
   inline std::string string_pop(std::string & in_string, const std::string & delim_set) {
     return string_pop_fixed(in_string, in_string.find_first_of(delim_set), 1);
   }
 
-  /// Return a prefix of the input string (up to any of a specified set of delimeters), but do not
-  /// modify it. If the delimeter is not found, return the entire input string.
+  /// Return a prefix of the input string (up to any of a specified set of delimiters), but do not
+  /// modify it. If the delimiter is not found, return the entire input string.
   [[nodiscard]] inline std::string
   string_get(const std::string & in_string, const std::string & delim_set, size_t start_pos=0) {
     emp_assert(start_pos <= in_string.size());
@@ -948,8 +948,8 @@ namespace emp {
     return std::string_view(str.data()+start, end - start);
   }
 
-  /// Return a view of the prefix of the input string up to a specified delimeter.
-  /// If the delimeter is not found, return the entire input string.
+  /// Return a view of the prefix of the input string up to a specified delimiter.
+  /// If the delimiter is not found, return the entire input string.
   static inline std::string_view view_string_to(const std::string_view & in_string,
                                                 const char delim,
                                                 size_t start_pos=0) {
@@ -1275,9 +1275,9 @@ namespace emp {
   }
 
   /// This function returns values from a container as a single string separated
-  /// by a given delimeter.
+  /// by a given delimiter.
   /// @param container is any standard-interface container holding objects to be joined.
-  /// @param join_str optional delimeter
+  /// @param join_str optional delimiter
   /// @return merged string of all values
   template <typename CONTAINER_T>
   inline std::string join(const CONTAINER_T & container, std::string join_str="") {
@@ -1498,7 +1498,7 @@ namespace emp {
           case '`':   // Back quote
             continue;
           default:
-            return "Unknown escape charater.";
+            return "Unknown escape character.";
         }
       }
     }
@@ -1764,7 +1764,7 @@ namespace emp {
       // Record the current segment.
       out_set.emplace_back( in_string.substr(start_pos, pos-start_pos) );
 
-      start_pos = ++pos;  // Skip deliminator and record next start.
+      start_pos = ++pos;  // Skip delimiter and record next start.
     }
 
     // If there are any segments left, put them all at the end.
@@ -1775,3 +1775,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_TOOLS_STRING_UTILS_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: ghi snprintf wformat english ret buf apm isalnum quot apos

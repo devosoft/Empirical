@@ -661,3 +661,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_MATCHING_MATCHBIN_SELECTORS_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: amt lockins infty infy uids

@@ -8,7 +8,7 @@
  *  @brief Functionality similar to emp::String, but tracks text formatting for easy conversion.
  *  @note Status: ALPHA
  *
- *  Text should be functionally interchangable with string, but can easily convert to
+ *  Text should be functionally interchangeable with string, but can easily convert to
  *  HTML, Latex, RTF, or other formats that support bold, italic, super/sub-scripting, fonts,
  *  etc.
  *

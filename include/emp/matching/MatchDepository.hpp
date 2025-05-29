@@ -235,3 +235,6 @@ public:
 } // namespace emp
 
 #endif // #ifndef EMP_MATCHING_MATCHDEPOSITORY_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: amt adj uid

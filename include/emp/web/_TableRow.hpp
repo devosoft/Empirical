@@ -7,7 +7,7 @@
  *  @file
  *  @brief The TableRow widget, which behaves like the Table widget, but focuses on a single row.
  *
- *  DO NOT include this file directly.  All files begining with '_' are for internal use only.
+ *  DO NOT include this file directly.  All files beginning with '_' are for internal use only.
  */
 
 #ifndef EMP_WEB__TABLEROW_HPP_INCLUDE

@@ -40,7 +40,7 @@ namespace emp {
 
       // Meaningful tokens have next priority.
 
-      // An indentifier must begin with a letter, underscore, or dot, and followed by
+      // An identifier must begin with a letter, underscore, or dot, and followed by
       // more of the same OR numbers or brackets.
       token_identifier = AddToken("Identifier", "[a-zA-Z_.][a-zA-Z0-9_.[\\]]*");
 

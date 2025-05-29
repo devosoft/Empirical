@@ -145,7 +145,7 @@ namespace emp {
     /// Turn a vector of strings into a vector of tokens.
     TokenStream Tokenize(const emp::vector<String> & str_v,
                          String name="in_string vector", bool keep_all=false) const;
-    
+
     /// Load from a file and tokenize it.
     TokenStream TokenizeFile(String filename) const {
       std::ifstream file(filename);
@@ -722,5 +722,5 @@ namespace emp {
 
 #endif // #ifndef EMP_COMPILER_LEXER_HPP_INCLUDE
 
-// Special info below for local control over the Empecable file checker.
-// empecable_words: seekg tellg
+// Local settings for Empecable file checker.
+// empecable_words: tellg seekg

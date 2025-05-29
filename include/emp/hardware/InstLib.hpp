@@ -123,7 +123,7 @@ namespace emp {
     /// Get the number of instructions in this set.
     size_t GetSize() const { return inst_lib.size(); }
 
-    /// Returns boolean indicating whether the given
+    /// Returns Boolean indicating whether the given
     /// string is a valid instruction.
     bool IsInst(const emp::String name) const {
       return Has(name_map, name);

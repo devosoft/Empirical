@@ -33,7 +33,7 @@ namespace prefab {
 
     public:
       Modal(const std::string & id=""): web::Div(id) {
-        // nest Divs propery
+        // nest Divs properly
         *this << modal_dialog;
         modal_dialog << modal_content;
         modal_content << modal_header;
@@ -55,7 +55,7 @@ namespace prefab {
       }
 
       /**
-       * Add contnet to the header section of the modal
+       * Add content to the header section of the modal
        * Content can be of any type
        */
       template <typename T>
@@ -121,3 +121,6 @@ namespace prefab {
 }
 
 #endif // #ifndef EMP_PREFAB_MODAL_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: btn tabindex

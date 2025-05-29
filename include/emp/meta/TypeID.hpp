@@ -569,3 +569,6 @@ namespace std {
 #endif // DOXYGEN_SHOULD_SKIP_THIS
 
 #endif // #ifndef EMP_META_TYPEID_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: myns

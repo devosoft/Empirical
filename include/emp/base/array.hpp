@@ -238,6 +238,3 @@ namespace std {
 }
 
 #endif // #ifndef EMP_BASE_ARRAY_HPP_INCLUDE
-
-// Special info below for local control over the Empecable file checker.
-// empecable_words: arr

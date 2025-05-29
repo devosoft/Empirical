@@ -124,7 +124,7 @@ namespace serialize {
       StoreVar(pod, var[i], true);
     }
 
-    // @CAO for now use ':' separator, but more generally we need to ensure uniquness.
+    // @CAO for now use ':' separator, but more generally we need to ensure uniqueness.
     pod.OStream() << ':';
     // emp_assert(pod.OStream()); // @ELD - this is throwing a compiler error
   }
@@ -132,7 +132,7 @@ namespace serialize {
   // As a fallback, just send the saved object to the DataPod's output stream.
   template <typename T>
   void StoreVar(DataPod & pod, const T & var, int) {
-    // @CAO for now use ':', but more generally we need to ensure uniquness.
+    // @CAO for now use ':', but more generally we need to ensure uniqueness.
     pod.OStream() << var << ':';
     // emp_assert(pod.OStream()); // @ELD - this is throwing a compiler error
   }

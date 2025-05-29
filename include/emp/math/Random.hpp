@@ -80,7 +80,7 @@ namespace emp {
     uint64_t Get64() noexcept {
       // Always prefer a call with the specified number of bits.
       if constexpr (requires { engine.Get64(); }) { return engine.Get64(); }
-      
+
       // If the regular Get() is already 64 bits, use it.
       else if constexpr (NATIVE64) { return Get(); }
 
@@ -90,7 +90,7 @@ namespace emp {
 
     // Get a value at the native resolution produced by the engine.
     auto Get() noexcept { return engine.Get(); }
-   
+
   public:
     /// Set up the random generator object with an optional seed value (0 = based on time and ptr).
     Random_Base(uint64_t seed = 0) noexcept { ResetSeed(seed); }
@@ -564,3 +564,6 @@ namespace emp {
 } // END emp namespace
 
 #endif // #ifndef EMP_MATH_RANDOM_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: olast ofirst

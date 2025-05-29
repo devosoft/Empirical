@@ -10,7 +10,7 @@
  *  Developer notes:
  *  * Right now test_type<> returns false if a template can't resolve, but if it's true it checks
  *    if a value field is present; if so that determines success.  The reason for this choice was
- *    to make sure that true_type and false_type are handled correctly (with built-in type_tratis)
+ *    to make sure that true_type and false_type are handled correctly (with built-in type_traits)
  */
 
 #ifndef EMP_META_META_HPP_INCLUDE
@@ -182,7 +182,7 @@ namespace emp {
 
 
   // sfinae_decoy<X,Y> will always evaluate to X no matter what Y is.
-  // X is type you want it to be; Y is a decoy trigger potential substituion failue.
+  // X is type you want it to be; Y is a decoy trigger potential substitution failure.
   template <typename REAL_TYPE, typename EVAL_TYPE> using sfinae_decoy = REAL_TYPE;
   template <typename REAL_TYPE, typename EVAL_TYPE> using type_decoy = REAL_TYPE;
   template <typename REAL_TYPE, typename EVAL_TYPE> using decoy_t = REAL_TYPE;
@@ -369,3 +369,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_META_META_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: schizofreni Varshavchik tcall

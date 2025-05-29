@@ -1,4 +1,5 @@
 /*
+
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  date: 2024
@@ -2433,14 +2434,5 @@ namespace emp {
 
 #endif // #ifndef EMP_EVOLVE_SYSTEMATICS_HPP_INCLUDE
 
-
-// Special info below for local control over the Empecable file checker.
-
-
-
-// Special info below for local control over the Empecable file checker.
-
-
-
-// Special info below for local control over the Empecable file checker.
-// empecable_words: distj disti vec mir multifurcating trifurcations sackin phylotrackpy Sackin unifurcations mrca orig phen sig Colless inf inserter
+// Local settings for Empecable file checker.
+// empecable_words: Colless Sackin phylotrackpy sackin phen mrca unifurcations distj mir trifurcations multifurcating disti

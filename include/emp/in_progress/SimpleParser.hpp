@@ -5,7 +5,7 @@
 */
 /**
  *  @file
- *  @brief Common praser functionality with custom plugins for variables and functions.
+ *  @brief Common parser functionality with custom plugins for variables and functions.
  *  @note Status: ALPHA
  *
  *  Developer TODO:
@@ -288,7 +288,7 @@ namespace emp {
         // If we have an operator, act on it!
         if (Has(binary_ops, pos->lexeme)) {
           const BinaryOperator & op = binary_ops[pos->lexeme];
-          if (prec_limit >= op.prec) return val1; // Precedence not allowed; return currnet value.
+          if (prec_limit >= op.prec) return val1; // Precedence not allowed; return current value.
           ++pos;
           ValueType val2 = ParseMath(dm, pos, op.prec);
           if (val1.type == ValueType::VALUE) {
@@ -339,7 +339,7 @@ namespace emp {
       #ifdef NDEBUG
         return val.fun;
       #else
-        // If we are in debug mode, save the original datamap and double-check compatability.
+        // If we are in debug mode, save the original datamap and double-check compatibility.
         return [fun=val.fun,&orig_layout=dm.GetLayout()](emp::DataMap & dm){
           emp_assert(dm.HasLayout(orig_layout));
           return fun(dm);

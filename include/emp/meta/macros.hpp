@@ -38,7 +38,7 @@
  *
  *  ===== Argument Manipulation and Formatting =====
  *  EMP_MERGE(...) merge all arguments (after conversion) into a single unit.
- *  EMP_WRAP_EACH(W, ...) will run macro W on each of the other args and concatinate them.
+ *  EMP_WRAP_EACH(W, ...) will run macro W on each of the other args and concatenate them.
  *  EMP_LAYOUT(W, P, ...) Similar to EMP_WRAP_EACH, but puts a P between each arg pair.
  *  EMP_WRAP_ARGS(W, ...) Similar to EMP_WRAP_EACH, but puts a COMMA between each arg pair.
  *  EMP_WRAP_ARG_PAIRS(W, ...) Similar to EMP_WRAP_ARGS, but passes pairs of args into W.
@@ -55,7 +55,7 @@
  *  EMP_FAKE_ARG or EMP_FAKE_2ARG behave as a single argument.  If, in manipulating them
  *  You make them become EMP_CONVERT_ARG_EMP_FAKE_ARG(A) or EMP_CONVERT_ARG_EMP_FAKE_2ARG(A)
  *  (i.e., prepend with EMP_CONVERT and provide an argument) it will trigger a conversion.
- *  If you prepend anything else similarly, it wil NOT trigger a conversion.
+ *  If you prepend anything else similarly, it will NOT trigger a conversion.
  *
  *  This is especially useful with _2ARG since anything unconverted will be a single
  *  argument, while anything converted will be two, allowing us to shift arguments
@@ -90,7 +90,7 @@
 
 /// The below values allow you to have EMP_FAKE_ARG or EMP_FAKE_2ARG as a single argument.
 /// If you prepend it with EMP_CONVERT it will trigger a conversion.  If you prepend anything
-/// else similarly, it wil NOT trigger a conversion (and stay a single argument)
+/// else similarly, it will NOT trigger a conversion (and stay a single argument)
 #define EMP_CONVERT_ARG_EMP_FAKE_ARG(A) A
 #define EMP_CONVERT_ARG_EMP_FAKE_2ARG(A) ~, A
 
@@ -176,7 +176,7 @@
 #define EMP_DUPLICATE_ARGS_SUM(S0,S1,S2,S3,S4,S5,S6,S7,S8,S9,...) EMP_POP_ARG(~ EMP_dup_bin_##S0(__VA_ARGS__)EMP_dup_bin_##S1(__VA_ARGS__)EMP_dup_bin_##S2(__VA_ARGS__)EMP_dup_bin_##S3(__VA_ARGS__)EMP_dup_bin_##S4(__VA_ARGS__)EMP_dup_bin_##S5(__VA_ARGS__)EMP_dup_bin_##S6(__VA_ARGS__)EMP_dup_bin_##S7(__VA_ARGS__)EMP_dup_bin_##S8(__VA_ARGS__)EMP_dup_bin_##S9(__VA_ARGS__))
 
 
-// Some PARAMETER PACK manipulatation (for macros, sets of args in parens to they are treated
+// Some PARAMETER PACK manipulation (for macros, sets of args in parens to they are treated
 // as if they were a single argument.
 
 #define EMP_ECHO_ARGS(...) __VA_ARGS__

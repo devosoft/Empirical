@@ -791,5 +791,5 @@ private:
 
 #endif // #ifndef EMP_DATASTRUCTS_BLOOMFILTER_HPP_INCLUDE
 
-// Special info below for local control over the Empecable file checker.
-// empecable_words: tbl fpp itr predef optp Partow hashfunctions partow srand Arash
+// Local settings for Empecable file checker.
+// empecable_words: tbl fpp predef optp itr hashfunctions Partow partow srand Arash

@@ -354,3 +354,6 @@ namespace web {
 }
 
 #endif // #ifndef EMP_WEB_INPUT_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: evt imdr chriscoyier codepen

@@ -680,17 +680,17 @@ namespace emp {
             std::forward<U0>(arg), std::forward<U>(args)...) {}
 
       private:
-      constexpr static struct __impl_AssignOp_asssigner_t {
+      constexpr static struct __impl_AssignOp_assigner_t {
         template <typename T1, typename T2>
         constexpr void operator()(T1& to, T2&& from) const {
           to = std::forward<T2>(from);
         }
-      } __impl_AssignOp_asssigner{};
+      } __impl_AssignOp_assigner{};
 
       public:
       template <typename F>
       Attrs& operator=(F&& from) {
-        emp::tools::Foreach(__impl_AssignOp_asssigner, *this,
+        emp::tools::Foreach(__impl_AssignOp_assigner, *this,
                             std ::forward<F>(from));
 
         return *this;
@@ -769,7 +769,7 @@ namespace emp {
       /// user's perspective.
       template <class... U>
       constexpr bool operator==(const Attrs<U...>& other) const {
-        // @todo: this needs more carefull checking, as it will have strange
+        // @todo: this needs more careful checking, as it will have strange
         // behavior when the other attribute pack has different types
         return tools::Reduce(true, eq_reducer{}, *this, other);
       }
@@ -915,8 +915,8 @@ namespace emp {
     };
 
     template <typename... T>
-    constexpr typename Attrs<T...>::__impl_AssignOp_asssigner_t
-      Attrs<T...>::__impl_AssignOp_asssigner;
+    constexpr typename Attrs<T...>::__impl_AssignOp_assigner_t
+      Attrs<T...>::__impl_AssignOp_assigner;
 
     ///  An alternative syntax for creating attribute packs. Takes any number
     ///  of attributes and returns a pack containing each of those attributes.
@@ -985,3 +985,6 @@ namespace emp {
 }  // namespace emp
 
 #endif // #ifndef EMP_TOOLS_ATTRS_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: attrs opengl

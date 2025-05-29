@@ -198,3 +198,6 @@ namespace std {
 #endif // DOXYGEN_SHOULD_SKIP_THIS
 
 #endif // #ifndef EMP_HARDWARE_BITSORTER_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: bitsort svals

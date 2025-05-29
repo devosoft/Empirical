@@ -157,7 +157,7 @@ namespace emp {
       return random.P(p);
     }
   };
-  
+
   class LowProbability {
   private:
     const double scale;
@@ -192,7 +192,7 @@ namespace emp {
     }
   public:
     HighProbability(double p) : scale(CalcScale(p)) {
-      emp_assert(p > 0.0 && p < 1.0);     
+      emp_assert(p > 0.0 && p < 1.0);
     }
     template <typename RAND_T>
     bool Test(RAND_T & random) {
@@ -203,7 +203,7 @@ namespace emp {
       return --next;
     }
   };
-  
+
   class BufferedProbability {
   private:
     static constexpr uint32_t BUFFER_SIZE=256;

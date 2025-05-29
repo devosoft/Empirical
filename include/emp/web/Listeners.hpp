@@ -136,3 +136,6 @@ namespace web {
 
 
 #endif // #ifndef EMP_WEB_LISTENERS_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: evt

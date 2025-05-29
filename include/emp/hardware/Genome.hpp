@@ -59,7 +59,7 @@ namespace emp {
     }
     bool operator!=(const Genome& other) const { return !(*this == other); }
 
-    /// Compare genomes using an equivilent of alphabetical order.
+    /// Compare genomes using an equivalent of alphabetical order.
     bool operator< (const Genome& other) const {
       // Step through the instructions
       auto it1 = SEQUENCE_T::begin();

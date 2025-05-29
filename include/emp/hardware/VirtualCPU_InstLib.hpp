@@ -249,7 +249,7 @@ namespace emp {
         inst_lib.AddInst("HDivide", Inst_H_Divide, 1, "Attempt to split offspring");
         inst_lib.AddInst("HCopy", Inst_H_Copy, 1, "Copy instruction from read head to write head");
         inst_lib.AddInst("HSearch", Inst_H_Search, 1, "Search for label complement");
-        inst_lib.AddInst("MovHead", Inst_Mov_Head, 1, "Move a given head to a postiion");
+        inst_lib.AddInst("MovHead", Inst_Mov_Head, 1, "Move a given head to a position");
         inst_lib.AddInst("JmpHead", Inst_Jmp_Head, 1, "Move a given head by a relative amount");
         inst_lib.AddInst("GetHead", Inst_Get_Head, 1, "Get location of head");
         inst_lib.AddInst("IfLabel", Inst_If_Label, 1,
@@ -295,3 +295,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_HARDWARE_VIRTUALCPU_INSTLIB_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: stk jmp mov

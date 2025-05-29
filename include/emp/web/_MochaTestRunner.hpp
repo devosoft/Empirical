@@ -6,7 +6,7 @@
 /**
  *  @file
  *  @brief Utility class for managing software testing for Emscripten web code using the Karma + Mocha
- *         javascript testing framework.
+ *         Javascript testing framework.
  *
  */
 
@@ -52,7 +52,7 @@ namespace web {
         auto res = documents.emplace(
           id, id
         );
-        emp_assert(res.second, "Document IDs should be unqiue.");
+        emp_assert(res.second, "Document IDs should be unique.");
         res.first->second.Activate();
       }
 
@@ -105,7 +105,7 @@ namespace web {
   };
 
   /// Utility class for managing software tests written for Emscripten web code.
-  /// IMPORTANT: This utility assumes the Karma + Mocha javascript testing framework.
+  /// IMPORTANT: This utility assumes the Karma + Mocha Javascript testing framework.
   /// MochaTestRunner is useful because emscripten does not play very nice with the browser event queue (i.e.,
   /// it does not relinquish control back to the browser until it finishes executing the compiled 'C++'
   /// code). This interacts poorly with Mocha because Mocha's 'describe' statements do not execute when
@@ -159,7 +159,7 @@ namespace web {
         test_runners.end(),
         [](TestRunner & runner) {
           #ifdef __EMSCRIPTEN__
-          // Runner will only get marked as done if all the javascript stuff is actually happening
+          // Runner will only get marked as done if all the Javascript stuff is actually happening
           emp_assert(runner.done);
           #endif
           if (runner.test != nullptr) runner.test.Delete();
@@ -245,11 +245,11 @@ namespace web {
           cur_runner.done = true;
 
           // Did this test trigger any C++ test failures?
-          const size_t post_test_error_cnt = emp::GetUnitTestOutput().errors;
+          const size_t post_test_error_count = emp::GetUnitTestOutput().errors;
           auto & test_name = cur_runner.test_name;
 
           // Did the error count increase after running this test? If so, force failure.
-          if (post_test_error_cnt != cur_runner.before_test_error_count) {
+          if (post_test_error_count != cur_runner.before_test_error_count) {
             MAIN_THREAD_EM_ASM({
               const test_name = UTF8ToString($0);
               describe(`${test_name} failed`, function() {
@@ -295,7 +295,7 @@ namespace web {
         // Element tests will attach things to the DOM, so we'll want to add a
         // container div where test HTML components can live.
         // Remember, Karma is generating our HTML file, so we need to attach any
-        // pre-requisite HTML using javascript.
+        // pre-requisite HTML using Javascript.
         MAIN_THREAD_EM_ASM(
           {
             const id = UTF8ToString($0);
@@ -384,3 +384,6 @@ namespace web {
 }
 
 #endif // #ifndef EMP_WEB__MOCHATESTRUNNER_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: chai mochajs

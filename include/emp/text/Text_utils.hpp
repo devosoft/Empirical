@@ -26,7 +26,7 @@
 
 namespace emp {
 
-  // Information about 
+  // Information about
   struct TextSymbolInfo {
     String name = "";        ///< General symbol name (usually based on HTML name)
     size_t id = 0;           ///< Unicode ID number of symbol
@@ -101,13 +101,13 @@ namespace emp {
       symbol_map.emplace("Ecirc",     202,  "Ê", 'E',  "Capital e with circumflex accent");
       symbol_map.emplace("Euml",      203,  "Ë", 'E',  "Capital e with umlaut");
       symbol_map.emplace("Igrave",    204,  "Ì", 'I',  "Capital i with grave accent");
-      symbol_map.emplace("Iacute",    205,  "Í", 'I',  "Capital i with accute accent");
+      symbol_map.emplace("Iacute",    205,  "Í", 'I',  "Capital i with acute accent");
       symbol_map.emplace("Icirc",     206,  "Î", 'I',  "Capital i with circumflex accent");
       symbol_map.emplace("Iuml",      207,  "Ï", 'I',  "Capital i with umlaut");
       symbol_map.emplace("ETH",       208,  "Ð", 'D',  "Capital eth (Icelandic)");
       symbol_map.emplace("Ntilde",    209,  "Ñ", 'N',  "Capital n with tilde");
       symbol_map.emplace("Ograve",    210,  "Ò", 'O',  "Capital o with grave accent");
-      symbol_map.emplace("Oacute",    211,  "Ó", 'O',  "Capital o with accute accent");
+      symbol_map.emplace("Oacute",    211,  "Ó", 'O',  "Capital o with acute accent");
       symbol_map.emplace("Ocirc",     212,  "Ô", 'O',  "Capital o with circumflex accent");
       symbol_map.emplace("Otilde",    213,  "Õ", 'O',  "Capital o with tilde");
       symbol_map.emplace("Ouml",      214,  "Ö", 'O',  "Capital o with umlaut");
@@ -157,7 +157,7 @@ namespace emp {
 
       // === UNICODE Latin Extended-A ===
 
-      // European latin
+      // European Latin
       symbol_map.emplace("Amacr",     256,  "Ā", 'A',   "Latin capital letter a with macron");
       symbol_map.emplace("amacr",     257,  "ā", 'a',   "Latin small letter a with macron");
       symbol_map.emplace("Abreve",    258,  "Ă", 'A',   "Latin capital letter a with breve");
@@ -480,3 +480,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_TEXT_TEXT_UTILS_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: rfloor otimes oplus nsub equiv congurent ang radic lowast isin nabla forall crarr harr darr rarr permil sbquo rsquo ndash lrm infin zwj rceil zwnj larr upsih thetasym circ uarr fnof notin mdash longfs hellip emsp zcaron zdot zacute diaeres ycirc uogon uring ubreve wcirc tstrok scedil scirc eth abreve ncedil rcaron rcedil udblac racute napos obreve ncaron oelig lcaron lcedil diams tcaron lacute eng rlm kcedil jcirc ijlig sigmaf imath imacr itilde ucirc hstrok dcaron gdot gbreve rdquo ecaron omacr sacute eogon ccirc ebreve lceil ldquo caron loz ccaron ogonek plusmn oslash oline yuml amacr cacute lsaquo eacute lfloor aelig gcedil cdot sdot brvbar uml lmidot nacute asymp yacute ouml ecirc bdquo uacute aogon ugrave otilde kgreen thinsp tcedil jlig ocirc oacute odblac cong igrave laquo elig icirc emacr umacr scaron ibreve ntilde atilde iacute szlig perp aring sube acirc idot curren edot auml iquest egrave ensp gcirc ordf aacute iogon agrave utilde ccedil kra iuml euml piv dstrok cedil raquo hcirc ograve lstrok supe ordm rsaquo uuml mille macr lsquo deg iexcl

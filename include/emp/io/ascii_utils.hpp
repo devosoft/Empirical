@@ -130,7 +130,7 @@ namespace emp {
     }
 
     void PrintHelp() const {
-      emp::Print("Available options:");
+      emp::Print("=== Available options:");
       for (const Entry & entry : entry_list) {
         entry.PrintActive();
       }

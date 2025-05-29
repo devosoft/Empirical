@@ -128,8 +128,8 @@ namespace emp {
   template <typename... Ts> using has_any_member_pointer = has_trait_any<std::is_member_pointer, Ts...>;
   template <typename... Ts> using has_only_member_pointer = has_trait_all<std::is_member_pointer, Ts...>;
   template <typename... Ts> using has_no_member_pointer = has_trait_none<std::is_member_pointer, Ts...>;
-  
-  
+
+
   template <typename... Ts> using has_any_const = has_trait_any<std::is_const, Ts...>;
   template <typename... Ts> using has_only_const = has_trait_all<std::is_const, Ts...>;
   template <typename... Ts> using has_no_const = has_trait_none<std::is_const, Ts...>;
@@ -692,3 +692,6 @@ namespace emp {
 }  // namespace emp
 
 #endif // #ifndef EMP_META_TYPE_TRAITS_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: cmp

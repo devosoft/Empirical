@@ -8,9 +8,9 @@
  *  @brief A simple tool for managing configuration settings.
  *  @note An older version of this class became SettingCombos.hpp
  *  @note Status: Alpha
- * 
+ *
  *  Settings can be either a string of a numerical value (size_t or double).
- * 
+ *
  *  DEVELOPER NOTES:
  *  - Consider allowing types to be more dynamic, perhaps set in a template.
  */
@@ -219,7 +219,7 @@ namespace emp {
       error_note.clear();
       while (it.Any()) {
         const Token name_token = it.Use();
-        if (name_token != ident_ID) { 
+        if (name_token != ident_ID) {
           error_note = "UnexpectedToken '" + name_token.lexeme + "'; expected parameter name.";
           break;
         }
@@ -262,3 +262,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_CONFIG_SETTINGS_MANAGER_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: ident ofs

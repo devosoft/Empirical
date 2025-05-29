@@ -79,7 +79,7 @@ namespace emp {
     /// Get the BitVector associated with which items have yet to be decided upon.
     const BitVector & GetUnkVector() const { return unk_items; }
 
-    /// Get the BitVector associated with which iterm have been excluded for sure.
+    /// Get the BitVector associated with which items have been excluded for sure.
     BitVector GetOutVector() const { return ~(in_items | unk_items); }
 
     /// Get the ID of the next unknown item.

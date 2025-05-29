@@ -220,7 +220,7 @@ namespace emp {
     T & AddStream(const std::string & name) {
       emp_assert(!Has(name), name);                          // Must be a new name.
       using info_t = TypedStreamInfo<T, TYPE, ACCESS>;       // Setup type for info about stream
-      emp::Ptr<info_t> info_ptr = emp::NewPtr<info_t>(name); // Build the info (& stream iteslf)
+      emp::Ptr<info_t> info_ptr = emp::NewPtr<info_t>(name); // Build the info (& stream itself)
       streams[name] = info_ptr;                              // Store the info for the future
       return info_ptr->GetStream();                          // Return just the stream.
     }
@@ -250,7 +250,7 @@ namespace emp {
 
       emp_assert(!Has(name), name);                            // Must be a new name.
       using info_t = TypedStreamInfo<T, Type::OTHER, ACCESS>;  // Setup type for info about stream
-      auto info_ptr = emp::NewPtr<info_t>(name, &in_stream);   // Build the info (& stream iteslf)
+      auto info_ptr = emp::NewPtr<info_t>(name, &in_stream);   // Build the info (& stream itself)
       streams[name] = info_ptr;                                // Store the info for the future
       return info_ptr->GetStream();                            // Return just the stream.
     }
@@ -338,3 +338,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_IO_STREAMMANAGER_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: stdout

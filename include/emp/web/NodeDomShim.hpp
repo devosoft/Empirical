@@ -5,7 +5,7 @@
 */
 /**
  *  @file
- *  @brief Shim for Empirical compatibility with node.js. Mimicks the browser
+ *  @brief Shim for Empirical compatibility with node.js. Mimics the browser
  *  document object model (DOM).
  */
 
@@ -57,3 +57,6 @@ namespace web {
 } // namespace emp
 
 #endif // #ifndef EMP_WEB_NODEDOMSHIM_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: jsdom

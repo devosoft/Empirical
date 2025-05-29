@@ -435,7 +435,7 @@ namespace emp {
       Tracker().IncID(id);
     }
 
-    /// Construct from a raw pointer of compatable type.
+    /// Construct from a raw pointer of compatible type.
     template <typename T2>
     Ptr(std::enable_if_t<std::is_convertible_v<T2*,TYPE*>,T2*> in_ptr,
         bool track=false)

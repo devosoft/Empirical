@@ -1,4 +1,5 @@
 /*
+
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  date: 2020
@@ -989,5 +990,5 @@ namespace std {
 
 #endif // #ifndef EMP_DATASTRUCTS_SMALLVECTOR_HPP_INCLUDE
 
-// Special info below for local control over the Empecable file checker.
-// empecable_words: alignof ctor elt memmove smallvector dtors uninvalidate alignas offsetof elts Sizer
+// Local settings for Empecable file checker.
+// empecable_words: Sizer elts offsetof alignas uninvalidate dtors smallvector memmove elt ctor alignof

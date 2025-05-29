@@ -62,7 +62,7 @@ namespace emp {
     return entropy;
   }
 
-  /// Calculate the entropy when their are two possibile states based on one state's probability.
+  /// Calculate the entropy when their are two possible states based on one state's probability.
   constexpr double Entropy2(const double p) {
     return -(p * Log2(p) + (1.0-p)*Log2(1.0-p));
   }
@@ -70,3 +70,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_MATH_INFO_THEORY_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: askamathematician

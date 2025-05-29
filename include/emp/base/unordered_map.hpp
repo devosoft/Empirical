@@ -214,5 +214,5 @@ namespace emp {
 
 #endif // #ifndef EMP_BASE_UNORDERED_MAP_HPP_INCLUDE
 
-// Special info below for local control over the Empecable file checker.
+// Local settings for Empecable file checker.
 // empecable_words: eql

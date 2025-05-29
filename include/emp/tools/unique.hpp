@@ -30,15 +30,18 @@ namespace emp {
     return val++;
   }
 
-  /// A function that will always return a unique stringname (using UniqVal) with provided
-  /// prefix and postfix.)
+  /// A function that will always return a unique string (using UniqVal) with provided
+  /// prefix and name.)
   static inline std::string UniqueName(const std::string & prefix="",
-                                       const std::string & postfix="") {
+                                       const std::string & suffix="") {
     std::stringstream ss;
-    ss << prefix << UniqueVal() << postfix;
+    ss << prefix << UniqueVal() << suffix;
     return ss.str();
   }
 
 } // namespace emp
 
 #endif // #ifndef EMP_TOOLS_UNIQUE_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: uniq

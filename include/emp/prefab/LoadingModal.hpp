@@ -5,7 +5,7 @@
 */
 /**
  *  @file
- *  @brief Wrapper for loading moadal
+ *  @brief Wrapper for loading modal
  *
  * To add a loading modal to your web page, you must
  * link the LoadingModal.js script directly after the

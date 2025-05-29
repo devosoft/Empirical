@@ -180,3 +180,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_SCHOLAR_CITATION_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: rname mastersthesis phdthesis incollection techreport inbook

@@ -175,7 +175,7 @@ namespace emp::prefab {
   };
 
   /**
-   * Use a TextValueControl to display a boolean value with a label,
+   * Use a TextValueControl to display a Boolean value with a label,
    * description, and a text input to manipulate the value.
    */
   class TextValueControl : public ValueControl {
@@ -203,7 +203,7 @@ namespace emp::prefab {
   };
 
   /**
-   * Use a BoolValueControl to display a boolean value with a label,
+   * Use a BoolValueControl to display a Boolean value with a label,
    * description, and a switch to toggle the value.
    */
   class BoolValueControl : public ValueBox {
@@ -322,3 +322,6 @@ namespace emp::prefab {
 }
 
 #endif // #ifndef EMP_PREFAB_VALUEBOX_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: fmax det btn descr

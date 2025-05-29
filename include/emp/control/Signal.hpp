@@ -383,5 +383,5 @@ namespace emp {
 
 #endif // #ifndef EMP_CONTROL_SIGNAL_HPP_INCLUDE
 
-// Special info below for local control over the Empecable file checker.
+// Local settings for Empecable file checker.
 // empecable_words: sid

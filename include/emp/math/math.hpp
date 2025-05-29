@@ -228,7 +228,7 @@ namespace emp {
   template <typename T>
   static constexpr T PowIntImpl(T base, T p) {
     if (p <= 0) return 1;
-    if (p & 1) return base * PowIntImpl(base, p-1); // Odd exponent: strip one mulitple off and recurse.
+    if (p & 1) return base * PowIntImpl(base, p-1); // Odd exponent: strip one multiple off and recurse.
     return emp::Square( PowIntImpl(base,p/2) );          // Even exponent: calc for half and square result.
   }
   } // namespace internal
@@ -391,3 +391,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_MATH_MATH_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: bools lst sgn

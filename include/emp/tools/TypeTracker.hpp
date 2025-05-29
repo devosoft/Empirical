@@ -263,3 +263,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_TOOLS_TYPETRACKER_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: gfun

@@ -1898,21 +1898,21 @@ namespace emp {
     if (end_pos == 0) { return ""; }             // Not popping anything!
     if (end_pos >= size()) { return PopAll(); }  // Popping everything!
 
-    String out = substr(0, end_pos);  // Copy up to the deliminator for ouput
+    String out = substr(0, end_pos);  // Copy up to the delimiter for output
     erase(0, end_pos + delim_size);   // Delete output string AND delimiter
     return out;
   }
 
-  /// Remove a prefix of the string (up to a specified delimeter) and return it.  If the
-  /// delimeter is not found, return the entire string and clear it.
+  /// Remove a prefix of the string (up to a specified delimiter) and return it.  If the
+  /// delimiter is not found, return the entire string and clear it.
   String String::Pop(CharSet chars, const Syntax & syntax) {
     const size_t pop_end    = Find(chars, 0, syntax);
     const size_t delim_size = pop_end == npos ? 0 : 1;
     return PopFixed(pop_end, delim_size);
   }
 
-  /// Remove a prefix of the string (up to a specified delimeter) and return it.  If the
-  /// delimeter is not found, return the entire string and clear it.
+  /// Remove a prefix of the string (up to a specified delimiter) and return it.  If the
+  /// delimiter is not found, return the entire string and clear it.
   String String::PopTo(const String & delim, const Syntax & syntax) {
     return PopFixed(Find(delim, 0, syntax), delim.size());
   }
@@ -2308,7 +2308,7 @@ namespace emp {
           return "Cannot escape the final quote.";  // Backslash must have char to escape.
         }
         pos++;
-        if (!is_escape_code(Get(pos))) { return "Unknown escape charater."; }
+        if (!is_escape_code(Get(pos))) { return "Unknown escape character."; }
       }
     }
 
@@ -2681,7 +2681,7 @@ namespace emp {
     return out;
   }
 
-  /// Create a standard english list from a container of strings.
+  /// Create a standard English list from a container of strings.
   /// For example, the strings {"one", "two"} would become "one and two"
   //  The strings {"one", "two", "three"} would become "one, two, and three"
   template <typename CONTAINER_T>
@@ -2775,9 +2775,9 @@ namespace emp {
   }
 
   /// This function returns values from a container as a single string separated
-  /// by a given delimeter and with optional surrounding strings.
+  /// by a given delimiter and with optional surrounding strings.
   /// @param container is any standard-interface container holding objects to be joined.
-  /// @param join_str optional delimeter
+  /// @param join_str optional delimiter
   /// @param open string to place before each string (e.g., "[" or "'")
   /// @param close string to place after each string (e.g., "]" or "'")
   /// @return merged string of all values
@@ -2807,3 +2807,6 @@ struct std::hash<emp::String> {
 
 
 #endif  // #ifndef EMP_TOOLS_STRING_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: quot apos nrt

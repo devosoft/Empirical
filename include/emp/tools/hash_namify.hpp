@@ -2734,3 +2734,6 @@ namespace internal {
 } // namespace emp
 
 #endif // #ifndef EMP_TOOLS_HASH_NAMIFY_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: yacare whimbrel turaco tsessebe titi tinamou thrip tenrec spurfowl tegula tayra adhoc tamanduas tamandua sungazer springhaas francolin siskin wryneck quoll galago phalarope palawan murex mara pollan morpho loerie markhor vendace locifera shelduck pinscher woylie legaan laridae langur kudu kongoni paca cygini kea katipo ibisbill kinkajou hoopoe guanaco gourami toco wambenger hamerkop agouti genet duiker gemsbok gayal dassie lottia gastrotrich phascogale dobermann cusimanse dik chital kori flufy corncrake lechwe gentoo capercaillie british chiton sheathbill caecilian bettong roborovski budgrerigar chickaree prevost dugong bulbul hawaiian binturong combinatory magellanic bengal degu balanus addax moa hyrax seriema gharial gerenuk jerboa credal

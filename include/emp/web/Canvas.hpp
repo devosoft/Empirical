@@ -109,7 +109,7 @@ namespace web {
     };  // End of ButtonInfo definition.
     #endif // DOXYGEN_SHOULD_SKIP_THIS
 
-    // Get a properly cast version of indo.
+    // Get a properly cast version of info.
     CanvasInfo * Info() { return (CanvasInfo *) info; }
     const CanvasInfo * Info() const { return (CanvasInfo *) info; }
 
@@ -156,7 +156,7 @@ namespace web {
       return *this;
     }
 
-    /// Add a Rectangle to this canvas at x,y with width w and heigh h.  Optional face color and
+    /// Add a Rectangle to this canvas at x,y with width w and height h.  Optional face color and
     /// line color.
     template <typename... Ts>
     Canvas & Rect(Point corner, double w, double h, Ts &&... vals) {
@@ -170,7 +170,7 @@ namespace web {
       return *this;
     }
 
-    /// Add an Image to this canvas at x,y with width w and heigh h.
+    /// Add an Image to this canvas at x,y with width w and height h.
     template <typename... Ts>
     Canvas & Image(const emp::RawImage & image, Point corner, Ts &&... vals) {
       Info()->AddAction( new CanvasImage(image, corner, std::forward<Ts>(vals)...) );
@@ -342,3 +342,6 @@ namespace web {
 }
 
 #endif // #ifndef EMP_WEB_CANVAS_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: ext ctext fname ctx cname

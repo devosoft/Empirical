@@ -112,7 +112,7 @@ namespace emp {
       };
     }
 
-    /// Convert a function's arguments using a dynamic (tempalted) lambda function.
+    /// Convert a function's arguments using a dynamic (templated) lambda function.
     template <typename NEW_T, typename FUN_T, typename CONVERTER_T>
     static auto ConvertParameterTypes(FUN_T fun, CONVERTER_T convert_lambda)
     {
@@ -145,7 +145,7 @@ namespace emp {
     template <size_t ID1, size_t... IDs, typename T1, typename... Ts>
     static auto Bind(CLASS_T fun, T1 && bound1, Ts &&... bound) {
       static_assert(emp::ValPack<ID1,IDs...>::IsSorted() && emp::ValPack<ID1,IDs...>::IsUnique(),
-                    "FunInfo::Bind must be given unique, sorted indicies.");
+                    "FunInfo::Bind must be given unique, sorted indices.");
       static_assert(sizeof...(IDs) == sizeof...(Ts),
                     "FunInfo::Bind must have exactly one ID per bound value.");
 
@@ -191,7 +191,7 @@ namespace emp {
       return fun;
     }
 
-    /// Convert a function's arguments using a dynamic (tempalted) lambda function.
+    /// Convert a function's arguments using a dynamic (templated) lambda function.
     template <typename NEW_T, typename FUN_T, typename CONVERTER_T>
     static auto ConvertParameterTypes(FUN_T fun, CONVERTER_T /*convert_lambda*/)
     {
@@ -255,3 +255,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_META_FUNINFO_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: ret

@@ -12,7 +12,7 @@
  *  containers.
  *
  *  @todo Allow a minimum and maximum combo size, not just a fixed combo size.  If no sizes are
- *        specifed, all sizes should be explored (all possible combinations).
+ *        specified, all sizes should be explored (all possible combinations).
  *  @todo Create a ComboGenerator template to take a container and generate all combinations
  *  @todo Create a combos function that will build a ComboGenerator for the container type
  *        passed in.
@@ -161,3 +161,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_MATH_COMBOS_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: inv

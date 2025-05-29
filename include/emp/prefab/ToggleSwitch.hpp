@@ -70,3 +70,6 @@ namespace prefab {
 }
 
 #endif // #ifndef EMP_PREFAB_TOGGLESWITCH_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: usr Bootstrap's

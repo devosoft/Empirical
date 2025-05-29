@@ -15,6 +15,7 @@
 #include "../base/vector.hpp"
 
 namespace emp {
+
   template <typename Key, typename T>
   class RobinHoodMap {
   private:
@@ -26,9 +27,9 @@ namespace emp {
     };
 
     static constexpr double MAX_LOAD_FACTOR = 0.8;
-    static constexpr size_t INIT_CAPACITY = 16;
+    static constexpr size_t INIT_CAPACITY = 15;
     static constexpr double GROW_FACTOR = 2.0;
-    static constexpr size_t GROW_OFFSET = 0;
+    static constexpr size_t GROW_OFFSET = 1;
 
     emp::vector<Entry> table{INIT_CAPACITY};
     size_t num_elements = 0;
@@ -66,7 +67,7 @@ namespace emp {
         if (table[pos].hash == hash_value && table[pos].key == key) { return &table[pos].value; }
 
         size_t existing_dist = CalcDist(pos);
-  
+
         // If existing_dist has gotten too high, we would have swapped; stop here.
         if (existing_dist < dist) return nullptr; // Early exit: key not in table
 
@@ -84,6 +85,8 @@ namespace emp {
     [[nodiscard]] size_t size() const { return num_elements; }
     [[nodiscard]] size_t capacity() const { return table.size(); }
     [[nodiscard]] bool empty() const { return num_elements == 0; }
+    [[nodiscard]] bool contains(const T & key) const { return FindPtr(key) != nullptr; }
+    void insert(std::pair<Key, T> in) { Insert(in.first, in.second); }
 
     void Insert(const Key & key, const T & value) {
       // Test if we need to grow the table...

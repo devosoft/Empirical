@@ -163,11 +163,11 @@ namespace emp {
 
     /// ---=== Member Functions ===---
 
-    /// Return wheter an ValPack contains the value V.
+    /// Return whether an ValPack contains the value V.
     template <typename T>
     constexpr static bool Has(T val) { return (val==V1) | pop::Has(val); }
 
-    /// Count the number of occurances of value V in ValPack.
+    /// Count the number of occurrences of value V in ValPack.
     template <typename T>
     constexpr static size_t Count(T val) { return pop::Count(val) + (val==V1); }
 
@@ -234,7 +234,7 @@ namespace emp {
     template <auto V> using push_back = ValPack<V>;
     template <auto V, auto X> using push_if_not = typename internal::vp_push_if_not<V,X,ValPack<>>::result;
     template <auto V, auto X> using push_back_if_not = typename internal::vp_push_if_not<V,X,ValPack<>>::back;
-    template <auto V> using pop_val = ValPack<>;  // No value to pop!  Faulure?
+    template <auto V> using pop_val = ValPack<>;  // No value to pop!  Failure?
     template <auto V> using remove = ValPack<>;
     template <typename T> using append = T;
 
@@ -277,3 +277,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_META_VALPACK_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: usort snext rsort pbin spop uniq pnext

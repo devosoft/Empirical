@@ -112,7 +112,7 @@ namespace emp::internal {
     #endif
     ;
 
-    // a ContaierDataFile is a DataFile that runs a function on every element of a container before every write.
+    // a ContainerDataFile is a DataFile that runs a function on every element of a container before every write.
     // in this case, we simply return the data from our logbuffer.
     emp::ContainerDataFile<logbuffer_t> datafile;
 
@@ -153,7 +153,7 @@ namespace emp::internal {
       datafile.AddVar(log_counter, "epoch", "Counter for how many times this file was written to");
       datafile.AddContainerFun(get_query_log, "query", "Query");
       datafile.AddContainerFun(get_tag_log, "tag", "Tag");
-      datafile.AddContainerFun(get_hit_count_log, "hit_count", "Counter for how many times this match occured");
+      datafile.AddContainerFun(get_hit_count_log, "hit_count", "Counter for how many times this match occurred");
       datafile.AddContainerFun(get_logbuffer_type, "matchtype", "Type of match");
       datafile.PrintHeaderKeys();
     }
@@ -247,7 +247,7 @@ namespace emp::internal {
       /// Get this log instance's ID
       int GetID() const { return instance_id; }
 
-      /// Constucts a ContainerDataFile in place (without copy) by
+      /// Constructs a ContainerDataFile in place (without copy) by
       /// forwarding the arguments to the ContainerDataFile constructor,
       /// and then setting up the variables we keep track of.
       /// Look in the ContainerDataFile constructor for this function's type signature.
@@ -372,13 +372,13 @@ namespace emp::internal {
       }
 
       /// Gets query from regulated cache.
-      /// User must check for existance of query in cache before calling this method.
+      /// User must check for existence of query in cache before calling this method.
       cache_state_t& GetRegulated(const query_t& query) {
         return cache_regulated.at(query);
       }
 
       /// Gets query from regulated cache.
-      /// User must check for existance of query in cache before calling this method.
+      /// User must check for existence of query in cache before calling this method.
       cache_state_t& GetRaw(const query_t& query) {
         return cache_raw.at(query);
       }
@@ -1007,3 +1007,6 @@ void load(
 } // namespace cereal
 
 #endif // #ifndef EMP_MATCHING_MATCHBIN_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: amt adj uids matchbin uid logbuffer logentry

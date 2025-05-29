@@ -138,7 +138,7 @@ namespace emp {
 
     CPPFile & Write() {
       std::ofstream out(filename);
-      return Write(out);      
+      return Write(out);
     }
   };
 

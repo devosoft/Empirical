@@ -99,8 +99,8 @@ namespace web {
     }
 
     /// Remove a specific class
-    void RemoveClass(const std::string & clss) {
-      classes.erase(clss);
+    void RemoveClass(const std::string & css_class) {
+      classes.erase(css_class);
     }
 
     /// Apply ALL of the style settings to a specified widget.
@@ -164,7 +164,7 @@ namespace web {
 #endif
     }
 
-    /// Apply onlay a SPECIFIC style setting with a specifid value!
+    /// Apply only a SPECIFIC style setting with a specified value!
     static void Apply(const std::string & widget_id, const std::string & setting,
                       const std::string & value) {
 #ifdef __EMSCRIPTEN__
@@ -181,7 +181,7 @@ namespace web {
 #endif
     }
 
-    static void ApplyClass(const std::string & widget_id, const std::string & clss){
+    static void ApplyClass(const std::string & widget_id, const std::string & css_class){
 
 #ifdef EMSCRIPTEN
       EM_ASM_ARGS({
@@ -189,22 +189,22 @@ namespace web {
           var name = UTF8ToString($1);
           var element = document.getElementById(id);
           if (element) element.classList.add(name);
-        }, widget_id.c_str(), clss.c_str());
+        }, widget_id.c_str(), css_class.c_str());
 #else
-      std::cout << "Adding class to '" << widget_id << "': '" << clss;
+      std::cout << "Adding class to '" << widget_id << "': '" << css_class;
 #endif
     }
 
-    static void ApplyRemoveClass(const std::string & widget_id, const std::string & clss){
+    static void ApplyRemoveClass(const std::string & widget_id, const std::string & css_class){
 #ifdef EMSCRIPTEN
       EM_ASM_ARGS({
           var id = UTF8ToString($0);
           var name = UTF8ToString($1);
           var element = document.getElementById(id);
           if (element) element.classList.remove(name);
-        }, widget_id.c_str(), clss.c_str());
+        }, widget_id.c_str(), css_class.c_str());
 #else
-      std::cout << "Adding class to '" << widget_id << "': '" << clss;
+      std::cout << "Adding class to '" << widget_id << "': '" << css_class;
 #endif
     }
 

@@ -8,10 +8,10 @@
  *  @brief Basic information about an author.
  *
  *  Developer notes:
- *    * Prefixs (Dr., Prof., etc) and Suffixes (Jr., Sr., III, etc.) should be allowed.
+ *    * Prefixes (Dr., Prof., etc) and Suffixes (Jr., Sr., III, etc.) should be allowed.
  *    * Most parts of names can be auto-detected.
  *    * GetName() (with formatting) needs to be implemented (notes below)
- *    * Consider using ce_string for inputs?  And making other aspects const experession?
+ *    * Consider using ce_string for inputs?  And making other aspects const expression?
  */
 
 #ifndef EMP_SCHOLAR_AUTHOR_HPP_INCLUDE
@@ -144,7 +144,7 @@ namespace emp {
     //    M = middle names   m = middle initials
     //    L = last name      l = last initial
     //    P = prefix         S = suffix
-    //    x = an empty breakpoint to ensure certain puctuation exists.
+    //    x = an empty breakpoint to ensure certain punctuation exists.
     //
     //  Allowable punctuation = [ ,.-:] and is associated with the prior name key, so it will
     //  appear only if the name does (and in the case of the middle name, will appear with each).
@@ -179,3 +179,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_SCHOLAR_AUTHOR_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: fml inits lfml

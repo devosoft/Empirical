@@ -42,7 +42,7 @@
  *   BIN - Binary numbers, with bits separated by commas (e.g.  0, 0, 0,  1, 0,  1, 1, 0, 1, 1 )
  *   SUM - Like BIN, but stored as zero or magnitude.    (e.g., 0, 0, 0, 64, 0, 16, 8, 0, 2, 1 )
  *   PACK - Like SUM, but without zeros and in parens    (e.g., (64,16,8,2,1) )
- *   HEX - Hexidecimal representation (e.g., 0x5B)  [todo]
+ *   HEX - Hexadecimal representation (e.g., 0x5B)  [todo]
  */
 
 #ifndef EMP_META_MACRO_MATH_HPP_INCLUDE
@@ -2184,7 +2184,7 @@
 #define EMP_DEC_TO_PACK(A) EMP_BIN_TO_PACK EMP_EMPTY() ( EMP_DEC_TO_BIN(A) )
 
 
-// Pre-define simple comparisons & boolean logic
+// Pre-define simple comparisons & Boolean logic
 #define EMP_MATH_BIT_EQU_00 1
 #define EMP_MATH_BIT_EQU_01 0
 #define EMP_MATH_BIT_EQU_10 0
@@ -2327,7 +2327,7 @@
 #define EMP_MATH_CLEAR_CARRY_2 0
 #define EMP_MATH_CLEAR_CARRY_N 1
 
-// In order to handle carrys, we need to run RESTORE_BIN once per bit (-1)
+// In order to handle carries, we need to run RESTORE_BIN once per bit (-1)
 
 #define EMP_MATH_RESTORE_BIN(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9)  \
   EMP_MATH_RESTORE_BIN_1(                                             \
@@ -2592,7 +2592,7 @@
                         EMP_MATH_DIFF_BITS(A8, B8), EMP_MATH_DIFF_BITS(A9, B9)  \
                         )
 /// @endcond
-/// Combute A - B
+/// Compute A - B
 #define EMP_SUB(A, B) EMP_EVAL( EMP_SUB_IMPL( EMP_DEC_TO_BIN(A), EMP_DEC_TO_BIN(B) ) )
 
 /// @cond MACROS

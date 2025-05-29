@@ -51,3 +51,6 @@ namespace prefab {
 }
 
 #endif // #ifndef EMP_PREFAB_FONTAWESOMEICON_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: fontawesome Awesome's

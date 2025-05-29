@@ -1,4 +1,5 @@
-/**
+/*
+
  *  @note This file is part of MABE, https://github.com/mercere99/MABE2
  *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  @date 2024.
@@ -818,5 +819,5 @@ namespace emp {
 
 #endif
 
-// Special info below for local control over the Empecable file checker.
+// Local settings for Empecable file checker.
 // empecable_words: mercere

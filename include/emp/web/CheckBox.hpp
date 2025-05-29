@@ -45,7 +45,7 @@ namespace web {
   class CheckBox : public internal::WidgetFacet<CheckBox> {
     friend class CheckBoxInfo;
   protected:
-    using cb_type = std::function<void(size_t)>; 
+    using cb_type = std::function<void(size_t)>;
 
     #ifndef DOXYGEN_SHOULD_SKIP_THIS
     // CheckBoxes associated with the same DOM element share a single CheckBoxInfo object.

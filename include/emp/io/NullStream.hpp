@@ -38,3 +38,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_IO_NULLSTREAM_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: nout

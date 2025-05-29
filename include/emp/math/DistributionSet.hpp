@@ -49,3 +49,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_MATH_DISTRIBUTIONSET_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: tup

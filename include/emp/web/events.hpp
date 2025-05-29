@@ -91,8 +91,8 @@ namespace web {
     int button;      ///< Which mouse button was pressed?  -1=none  (0/1/2)
     int detail;      ///< How many clicks happened in short succession?
 
-    int clientX;     ///< X-mouse postion, relative to current window
-    int clientY;     ///< Y-mouse postion, relative to current window
+    int clientX;     ///< X-mouse position, relative to current window
+    int clientY;     ///< Y-mouse position, relative to current window
     int screenX;     ///< X-mouse position, relative to the screen
     int screenY;     ///< Y-mouse position, relative to the screen
     // int buttons;     ///< Which mouse buttons were pressed? Sum: (1/4/2) (Special: 8,16)
