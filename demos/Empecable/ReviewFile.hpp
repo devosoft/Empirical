@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Empirical, https://github.com/devosoft/Empirical
  * Copyright (C) 2025 Michigan State University
  * MIT Software license; see doc/LICENSE.md
@@ -77,6 +77,11 @@ public:
     return tokens[token_pos++];
   }
 
+  emplex::Token PrevToken() {
+    if (token_pos > 0) token_pos--;
+    return tokens[token_pos];
+  }
+
   emplex::Token GetToken() const { return tokens[token_pos]; }
   emp::String GetLexeme() const { return tokens[token_pos].lexeme; }
   size_t GetLineID() const { return tokens[token_pos].line_id; }
@@ -87,7 +92,16 @@ public:
   int GetTokenID(size_t pos) const { return tokens[pos].id; }
   size_t NumTokens() const { return tokens.size(); }
 
+  void InsertToken(size_t pos, emplex::Token token) {
+    tokens.insert(tokens.begin()+pos, token);
+    save_required = true;
+  }
+
   void ClearLexeme(size_t pos) {
+    if (pos == 0) {
+      std::cerr << "ERROR ERROR ERROR!!!!!!!!!!!!!!\n";
+      abort();
+    }
     tokens[pos].lexeme.clear();
     save_required = true;
   }
@@ -133,9 +147,15 @@ public:
 
     // Collect the tokens on this line, highlighting the current token.
     emp::String result;
+    emp::String target_word = tokens[token_pos].lexeme;
     for (size_t i = start; i < end; ++i) {
-      if (i == token_pos) result += ToBoldRed(tokens[i].lexeme).AsANSIUnderline();
-      else result += tokens[i].lexeme;
+      if (i == token_pos) {
+        result += ToBoldRed(tokens[i].lexeme).AsANSIUnderline();
+      }
+      else if (tokens[i].lexeme == target_word) {
+        result += target_word.AsANSIBlue();
+      }
+      else { result += tokens[i].lexeme; }
     }
     return result;
   }
@@ -171,10 +191,7 @@ public:
     for (auto & token : tokens) {
       switch (token) {
       case emplex::Lexer::ID_EMP_META_START:
-        token.lexeme = ""; // Clear out this lexeme; we will reconstruct it when saving.        
-        break;
-      case emplex::Lexer::ID_EMP_META_START_OLD:
-        SetLexeme(""); // Clear out this lexeme; record change to ensure file save later.        
+        token.lexeme = ""; // Clear out this lexeme; we will reconstruct it when saving.
         break;
       case emplex::Lexer::ID_EMP_META_WORDS: {
         const emp::String line = token.lexeme;
