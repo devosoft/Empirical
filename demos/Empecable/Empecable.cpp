@@ -53,7 +53,7 @@
  *  green   - filenames and directories
  *  magenta - keypress options
  *  yellow  - line numbers
- *  blue    - ?
+ *  blue    - duplicates of highlighted words
  *
  * Config options:
  * - HeaderExtensions: .hpp|.h|.H|.hh
@@ -517,6 +517,11 @@ private:
     menu.AddOption('R', "for ALL instances",
       [this](){ QueryReplace(true); return true; }, true);
 
+    menu.AddOption(emp::IOChar::LEFT, "Move to previous token.",
+      [this](){ File().PrevToken(); File().PrintTokenRange(); return false; });
+    menu.AddOption(emp::IOChar::RIGHT, "next token.",
+      [this](){ File().NextToken(); File().PrintTokenRange(); return false; }, true);
+
     AddDefaultMenuOptions(menu);
 
     menu.Run();
@@ -601,15 +606,23 @@ public:
   }
 
   void ProcessFile() {
+    using namespace emplex;
     emp::PrintLn("=== File: ", File().GetName().AsANSIBrightCyan(), " ==");
 
     if (!File().Load(lexer, project_words)) {
       return; // File failed to load.
     }
 
+    if (File().NumTokens() && File().GetToken(0) != Lexer::ID_COMMENT_START) {
+      emp::PrintLn("No open comment ('/*') found at beginning of file.");
+      if (IsInteractive() && AskYesNo("Add? ")) {
+        File().InsertToken(0, {Lexer::ID_COMMENT_START,"/*\n",0});
+      }
+      if (IsVerbose()) { emp::PrintRepeatLn('-',79); }
+    }
+
     while (File().NextToken()) {
       switch (GetToken()) {
-        using namespace emplex;
       case Lexer::ID_WORD:
         if (!TestWordToken() && IsVerbose()) emp::PrintRepeatLn('-',79);
         break;
@@ -619,6 +632,10 @@ public:
         break;
       case Lexer::ID_ERR_WS:
         File().ReportIssue("Illegal whitespace:");
+        AskRemoveToken();
+        break;
+      case emplex::Lexer::ID_EMP_META_START_OLD:
+        File().ReportIssue("Old-style EMP meta-data:");
         AskRemoveToken();
         break;
       case Lexer::ID_PRAGMA_ONCE:
