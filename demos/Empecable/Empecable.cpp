@@ -192,14 +192,14 @@ private:
 
   // Check the default key press options that should work from any menu.
   void AddDefaultMenuOptions(emp::ANSIOptionMenu & menu) {
-    menu.AddSilent('h', "Help", [](){ emp::PrintLn("Help info goes here..."); return false; });
+    menu.AddSilent('h', "Help", [&menu](){ menu.PrintHelp(); return false; }).AddAlias('?');
     menu.AddSilent('s', "Save", [this](){ SaveAll(); return false; });
     menu.AddSilent('q', "Quit", [this](){ Quit(false); return false; }).AddAlias('x');
     menu.AddSilent('Q', "Save & Quit", [this](){ Quit(true); return false; }).AddAlias('X');
     menu.AddSilent('v', "View code around token (5 lines per side)",
       [this](){ emp::PrintLn("----------"); File().PrintTokenRange(5); return false; });
-    menu.AddSilent('V', "10 lines per side",
-      [this](){ emp::PrintLn("----------"); File().PrintTokenRange(10); return false; }, true);
+    menu.AddLinked('V', "10 lines per side",
+      [this](){ emp::PrintLn("----------"); File().PrintTokenRange(10); return false; });
   }
 
   bool AskYesNo(emp::String question) {
@@ -207,9 +207,9 @@ private:
     menu.SetQuestion(question + " (" + ToOptionSet("yn") + ")");
     bool result = false;
 
-    menu.AddSilent('y', "Accept", [&result](){ result=true; return true; });
-    menu.AddSilent('n', "Reject", [&result](){ result=false; return true; });
     AddDefaultMenuOptions(menu);
+    menu.AddSilent('y', "Accept suggestion", [&result](){ result=true; return true; });
+    menu.AddSilent('n', "Reject suggestion", [&result](){ result=false; return true; });
     menu.Run();
 
     return result;
@@ -366,7 +366,7 @@ private:
   }
 
   [[noreturn]] void Quit(bool save_before_quitting) {
-    if (save_before_quitting || AskYesNo("Save before quitting?")) {
+    if (save_before_quitting || (project_changed && AskYesNo("Save before quitting?"))) {
       SaveAll();
     }
 
@@ -480,25 +480,27 @@ private:
     emp::String lower_word = word.AsLower();
 
     emp::ANSIOptionMenu menu;
+    AddDefaultMenuOptions(menu);
+
     menu.AddOption('a', "Add '" + lower_word.AsANSICyan() + "' to main PROJECT dictionary",
       [this,lower_word](){ AddProjectWord(lower_word); return true; });
     if (word.HasUpper()) {
-      menu.AddOption('A', "add case-sensitive '" + word.AsANSICyan() + "'",
-        [this,word](){ AddProjectWord(word); return true; }, true);
+      menu.AddLinked('A', "add case-sensitive '" + word.AsANSICyan() + "'",
+        [this,word](){ AddProjectWord(word); return true; });
     }
 
     menu.AddOption('f', "Add '" + lower_word.AsANSICyan() + "' to this FILE's dictionary",
       [this,lower_word](){ File().AddWord(lower_word); return true; });
     if (word.HasUpper()) {
-      menu.AddOption('F', "add case-sensitive '" + word.AsANSICyan() + "'",
-        [this,word](){ File().AddWord(word); return true; }, true);
+      menu.AddLinked('F', "add case-sensitive '" + word.AsANSICyan() + "'",
+        [this,word](){ File().AddWord(word); return true; });
     }
 
     menu.AddOption('i', "Ignore this instance of '" + word.AsANSICyan() + "'",
       [word](){ emp::PrintLn("Skipping '", word.AsANSICyan(), "'!"); return true; });
-    menu.AddOption('I', "ignore ALL instances",
+    menu.AddLinked('I', "ignore ALL instances",
       [this,word](){ emp::PrintLn("Ignoring all instances of '", word.AsANSICyan(), "'!");
-        skip_words.insert(word); return true; }, true);
+        skip_words.insert(word); return true; });
 
     // Come up with word matches (and keep case the same as the original word)
     emp::vector<emp::String> matches = FindWordMatches(word);
@@ -509,20 +511,26 @@ private:
     for (int i = 0; i < std::ssize(matches); ++i) {
       menu.AddOption('0'+i, "Replace with '" + matches[i].AsANSICyan() + "'",
         [this,new_word=matches[i]](){ DoReplace(new_word, false); return true; });
-      menu.AddOption('0'+i+5, "replace ALL instances",
-        [this,new_word=matches[i]](){ DoReplace(new_word, true); return true; }, true);
+      menu.AddLinked('0'+i+5, "replace ALL instances",
+        [this,new_word=matches[i]](){ DoReplace(new_word, true); return true; });
     }
     menu.AddOption('r', "Provide replacement for this instance of '" + word.AsANSICyan() + "'",
       [this](){ QueryReplace(false); return true; });
-    menu.AddOption('R', "for ALL instances",
-      [this](){ QueryReplace(true); return true; }, true);
+    menu.AddLinked('R', "for ALL instances",
+      [this](){ QueryReplace(true); return true; });
 
-    menu.AddOption(emp::IOChar::LEFT, "Move to previous token.",
-      [this](){ File().PrevToken(); File().PrintTokenRange(); return false; });
-    menu.AddOption(emp::IOChar::RIGHT, "next token.",
-      [this](){ File().NextToken(); File().PrintTokenRange(); return false; }, true);
-
-    AddDefaultMenuOptions(menu);
+    menu.AddOption(emp::IOChar::LEFT, "Move to previous token", [this](){
+      File().PrevToken();
+      emp::PrintLn("===");
+      File().PrintTokenRange();
+      return false;
+    });
+    menu.AddLinked(emp::IOChar::RIGHT, "next token.", [this](){
+      File().NextToken();
+      emp::PrintLn("===");
+      File().PrintTokenRange();
+      return false;
+    });
 
     menu.Run();
   }
