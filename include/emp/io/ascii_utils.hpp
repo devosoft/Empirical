@@ -43,7 +43,7 @@ namespace emp {
       bool is_add_on = false;           // Should this option be an "or" on previous line?
       bool is_active = true;            // Should this option be displayed at all?
       bool is_visible = true;           // Should this be listed in a regular menu?
-      
+
     public:
       Entry(int key, emp::String effect_text, std::function<bool()> trigger,
             bool is_add_on=false, bool is_active=true, bool is_visible=true)
@@ -56,7 +56,8 @@ namespace emp {
         : key(key), effect_text(effect_text), trigger([trigger](){ trigger(); return false; }),
           is_add_on(is_add_on), is_active(is_active), is_visible(is_visible) { }
 
-      bool IsVisible() const { return is_active && is_visible; }
+      [[nodiscard]] bool IsActive() const { return is_active; }
+      [[nodiscard]] bool IsVisible() const { return is_active && is_visible; }
 
       void Print() const {
         if (is_add_on) emp::Print(" or ", IOCharName(key), " to ", effect_text);
@@ -73,7 +74,7 @@ namespace emp {
 
     emp::String question;
     emp::vector<Entry> entry_list;
-    std::unordered_map<int, size_t> key_map; // Map of keys to entires.
+    std::unordered_map<int, size_t> key_map; // Map of keys to entries.
 
     // Get an entry associated with a particular key.
     Entry & GetEntryByKey(int key) {
@@ -84,20 +85,32 @@ namespace emp {
   public:
     ANSIOptionMenu & SetQuestion(emp::String in_q) { question = in_q; return *this; }
 
+    /// Add an option to the menu.
     ANSIOptionMenu & AddOption(int key, emp::String effect_text, std::function<bool()> trigger,
                                bool is_add_on=false, bool is_active=true, bool is_visible=true) {
+      emp_assert(!key_map.contains(key), "Adding key option to menu more than once", key);
       key_map[key] = entry_list.size();
       entry_list.emplace_back(key, effect_text, trigger, is_add_on, is_active, is_visible);
       return *this;
     }
 
-    // And an option that allows for a keystroke, but does not print by default.
+    /// Add an option to the menu on the same line as the previous option, linked by an "or"
+    ANSIOptionMenu & AddLinked(int key, emp::String effect_text, std::function<bool()> trigger) {
+      emp_assert(entry_list.size() > 0, "Cannot add a linked option to menu as FIRST option.");
+      const bool is_active = entry_list.back().IsActive();
+      const bool is_visible = entry_list.back().IsVisible();
+      return AddOption(key, effect_text, trigger, true, is_active, is_visible);
+    }
+
+    /// And an option that allows for a keystroke, but is not listed by default.
     ANSIOptionMenu & AddSilent(int key, emp::String effect_text, std::function<bool()> trigger,
                                bool is_add_on=false, bool is_active=true) {
       return AddOption(key, effect_text, trigger, is_add_on, is_active, false);
     }
 
+    /// Set up an additional key that will also trigger the most recent option.
     ANSIOptionMenu & AddAlias(int key) {
+      emp_assert(!key_map.contains(key), "Aliasing option to key already in use", key);
       emp_assert(entry_list.size() > 0); // No entries to alias!
       key_map[key] = entry_list.size()-1;
       return *this;
@@ -108,10 +121,18 @@ namespace emp {
       GetEntryByKey(key).SetTrigger(trigger);
       return *this;
     }
-    
+
     void PrintOptions() const {
       for (const Entry & entry : entry_list) {
         entry.PrintVisible();
+      }
+      PrintLn();
+    }
+
+    void PrintHelp() const {
+      emp::Print("Available options:");
+      for (const Entry & entry : entry_list) {
+        entry.PrintActive();
       }
       PrintLn();
     }
@@ -131,7 +152,7 @@ namespace emp {
         done = entry_list[id].Trigger();
       }
     }
-};
+  };
 
   /// The following function prints an ascii bar graph on to the screen (or provided stream).
   template <typename T>
