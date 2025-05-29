@@ -48,8 +48,8 @@ IFNDEF ^[ ]*\#[ ]*"ifndef "[^\n\r\t]*\S
 # define should collect the rest of the line and possibly wrap with \ at line end.
 DEFINE ^[ ]*\#[ ]*"define "([^\n\r\t\\]|(\\(\n|.)))+\S
 
-PRAGMA_ONCE ^[ ]*\#[ ]*"#pragma"[ ]+"once"
-ENDIF ^[ ]*\#[ ]*"#endif"
+PRAGMA_ONCE ^[ ]*\#[ ]*"pragma"[ ]+"once"
+ENDIF ^[ ]*\#[ ]*"endif"
 
-INCLUDE_SYS ^[ ]*\#[ ]*"#include"[ ]*\<\S*\>
-INCLUDE_LOCAL ^[ ]*\#[ ]*"#include"[ ]*\"\S*\"
+INCLUDE_SYS ^[ ]*\#[ ]*"include"[ ]*\<\S*\>
+INCLUDE_LOCAL ^[ ]*\#[ ]*"include"[ ]*\"\S*\"
