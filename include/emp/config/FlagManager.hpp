@@ -110,11 +110,13 @@ namespace emp {
     }
 
     FlagInfo & _AddOption(String name, std::function<void(const emp::vector<String> &)> fun,
+    FlagInfo & _AddOption(String name, std::function<void(const emp::vector<String> &)> fun,
                    size_t min_args=0, size_t max_args=npos, String desc="") {
       emp_assert(name.size() > 0, "FlagManager cannot take an empty option name.");
       emp_assert(!name.HasWhitespace(), "Option names cannot contain whitespace.");
       if (!name.HasPrefix("--")) name.insert(0, "--");
       emp_assert(name[2] != '-', name, "Option names cannot begin with a single '-')");
+      emp_assert(!emp::Has(flag_options, name), "Duplicate flag option name.", name);
       flag_options[name] = FlagInfo{name, desc, min_args, max_args, fun};
       if (cur_group >= 0) flag_options[name].SetGroup(groups[cur_group].name);
       return flag_options[name];
@@ -202,11 +204,25 @@ namespace emp {
 
     // Process an argument associated with a particular name; return num additional args used.
     size_t ProcessArg(String name, size_t cur_pos=0) {
-      if (!emp::Has(flag_options, name)) { emp::notify::Error("Unknown flag '", name , "'."); }
-      auto option = flag_options[name];
+      if (!emp::Has(flag_options, name)) {
+        emp::notify::Error("Unknown flag '", name , "'.");
+        return 0;
+      }
+      FlagInfo & option = flag_options[name];
       emp::vector<String> flag_args;
-      for (size_t i = 1; i <= option.GetMinArgs(); ++i) {
-        flag_args.push_back(args[cur_pos+i]);
+      for (size_t i = 0; i < option.GetMinArgs(); ++i) {
+        const size_t test_pos = cur_pos+i+1;
+        if (test_pos >= args.size()) {
+          emp::notify::Error("Insufficient arguments for flag '", name, "'");
+          return 0;
+        }
+        flag_args.push_back(args[test_pos]);
+      }
+      for (size_t i = option.GetMinArgs(); i < option.GetMaxArgs(); ++i) {
+        const size_t test_pos = cur_pos+i+1;
+        if (test_pos >= args.size()) break;  // No more args.
+        if (args[test_pos][0] == '-') break; // New flag; stop collecting args for previous.
+        flag_args.push_back(args[test_pos]);
       }
       option.Run(flag_args);
       return option.GetMinArgs();
@@ -228,15 +244,32 @@ namespace emp {
     }
 
     // Process all of the flag data that we have.
+    // Flags should have their effects triggered; non-flags should be collected in "extras"
     void Process() {
+      // Step through all of the arguments from the command line.
       for (size_t i = 1; i < args.size(); ++i) {
         String & arg = args[i];
         if (arg[0] == '-') {  // We have a flag!
+          // If there a two dashes at the front (--) assume we have a single, full option name.
           if (arg.size() > 1 && arg[1] == '-') i += ProcessArg(arg, i);
+
+          // Otherwise with a single '-', assume we have one or more option shortcuts.
           else i += ProcessFlagSet(arg, i);
         }
         else extras.push_back(arg);
       }
+    }
+
+    /// Process a specific argument, if available (return whether it was found).
+    bool FindAndProcess(emp::String arg_name) {
+      // Step through all of the arguments from the command line.
+      for (size_t i = 1; i < args.size(); ++i) {
+        if (args[i] == arg_name) {
+          ProcessArg(arg_name, i);
+          return true;
+        }
+      }
+      return false; // Not found.
     }
 
     size_t GroupSize(emp::String group_name) const {
