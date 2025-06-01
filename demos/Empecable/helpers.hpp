@@ -49,6 +49,21 @@ emp::String ToBoldRed(Ts &&... args) {
   return emp::MakeString(args...).AsANSIRed().AsANSIBold();
 }
 
+template <typename... Ts>
+emp::String ToBoldYellow(Ts &&... args) {
+  return emp::MakeString(args...).AsANSIYellow().AsANSIBold();
+}
+
+template <typename... Ts>
+void PrintError(Ts &&... args) {
+  emp::PrintLn(ToBoldRed("ERROR: ", args...));
+}
+
+template <typename... Ts>
+void PrintWarning(Ts &&... args) {
+  emp::PrintLn(ToBoldRed("Warning: ", args...));
+}
+
 // ========= Screen output Helpers ==========
 
 template <typename... Ts>
