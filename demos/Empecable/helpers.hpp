@@ -61,7 +61,7 @@ void PrintError(Ts &&... args) {
 
 template <typename... Ts>
 void PrintWarning(Ts &&... args) {
-  emp::PrintLn(ToBoldRed("Warning: ", args...));
+  emp::PrintLn(ToBoldYellow("Warning: ", args...));
 }
 
 // ========= Screen output Helpers ==========
