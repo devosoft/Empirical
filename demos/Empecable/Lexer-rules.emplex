@@ -24,6 +24,7 @@ WORD [A-Za-z](\'?[a-z])*
 
 NUM [0-9]+
 HEX_NUM 0x[0-9a-fA-F]+
+ESCAPE \\.
 
 # Separate out important types of whitespace.
 WS " "+
@@ -53,3 +54,6 @@ ENDIF ^[ ]*\#[ ]*"endif"
 
 INCLUDE_SYS ^[ ]*\#[ ]*"include"[ ]*\<\S*\>
 INCLUDE_LOCAL ^[ ]*\#[ ]*"include"[ ]*\"\S*\"
+
+# "Other" will represent arbitrary characters OR inserted tokens during fixes.
+OTHER .
