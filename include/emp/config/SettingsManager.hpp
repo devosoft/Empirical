@@ -2,7 +2,7 @@
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  date: 2025.
-*/
+ */
 /**
  *  @file
  *  @brief A simple tool for managing configuration settings.
@@ -26,11 +26,9 @@
 #include <variant>
 
 #include "../base/notify.hpp"
-#include "../base/vector.hpp"
 #include "../compiler/Lexer.hpp"
-#include "../config/command_line.hpp"
-#include "../io/File.hpp"
 #include "../tools/String.hpp"
+
 
 namespace emp {
 
@@ -46,10 +44,14 @@ namespace emp {
       emp::String desc="";    ///< Description of setting
       char flag='\0';         ///< Command-line flag ('\0' for none)
       emp::String option="";  ///< Command-line longer option ("" for none)
+      std::function<void(const SettingInfo &)> action; /// Action to take when set.
 
       // Helper: convert from string to val_t of current type.
       val_t ParseFromString(emp::String str) const {
-        if (IsString()) { return MakeStringFromLiteral(str); }
+        if (IsString()) {
+          if (str.size() && str[0] == '\"') { return emp::MakeStringFromLiteral(str); }
+          else { return str; }
+        }
         if (IsBool()) { str.SetLower(); return str == "on" || str == "true" || str == "1"; }
         if (IsInt()) { return std::stoi(str); }
         if (IsDouble()) { return std::stod(str); }
@@ -62,21 +64,22 @@ namespace emp {
       SettingInfo(const SettingInfo &) = default;
       SettingInfo(SettingInfo &&) = default;
 
-      SettingInfo(emp::String name, emp::String value, emp::String desc,
+      SettingInfo(emp::String name, emp::String & var, emp::String desc,
                   char flag='\0', emp::String option="")
-        : name(name), value(value), desc(desc), flag(flag), option(option) { }
-      SettingInfo(emp::String name, const char * value, emp::String desc,
+        : name(name), value(var), desc(desc), flag(flag), option(option), 
+          action([&var](const SettingInfo & info){ var = info.GetValue<emp::String>(); }) { }
+      SettingInfo(emp::String name, bool & var, emp::String desc,
                   char flag='\0', emp::String option="")
-        : name(name), value(emp::String(value)), desc(desc), flag(flag), option(option) { }
-      SettingInfo(emp::String name, bool value, emp::String desc,
+        : name(name), value(var), desc(desc), flag(flag), option(option),
+          action([&var](const SettingInfo & info){ var = info.GetValue<bool>(); }) { }
+      SettingInfo(emp::String name, int & var, emp::String desc,
                   char flag='\0', emp::String option="")
-        : name(name), value(value), desc(desc), flag(flag), option(option) { }
-      SettingInfo(emp::String name, int value, emp::String desc,
+        : name(name), value(var), desc(desc), flag(flag), option(option),
+          action([&var](const SettingInfo & info){ var = info.GetValue<int>(); }) { }
+      SettingInfo(emp::String name, double & var, emp::String desc,
                   char flag='\0', emp::String option="")
-        : name(name), value(value), desc(desc), flag(flag), option(option) { }
-      SettingInfo(emp::String name, double value, emp::String desc,
-                  char flag='\0', emp::String option="")
-        : name(name), value(value), desc(desc), flag(flag), option(option) { }
+        : name(name), value(var), desc(desc), flag(flag), option(option),
+          action([&var](const SettingInfo & info){ var = info.GetValue<double>(); }) { }
 
       template <typename T>
       [[nodiscard]] bool IsType() const { return std::holds_alternative<T>(value); }
@@ -85,19 +88,26 @@ namespace emp {
       [[nodiscard]] bool IsInt() const { return IsType<int>(); }
       [[nodiscard]] bool IsDouble() const { return IsType<double>(); }
 
-      [[nodiscard]] const emp::String& GetName() const { return name; }
-      [[nodiscard]] const emp::String& GetDescription() const { return desc; }
+      [[nodiscard]] const emp::String & GetName() const { return name; }
+      [[nodiscard]] const emp::String & GetDescription() const { return desc; }
       [[nodiscard]] char GetFlag() const { return flag; }
-      [[nodiscard]] const emp::String& GetOption() const { return option; }
+      [[nodiscard]] const emp::String & GetOption() const { return option; }
 
       template <typename T>
-      [[nodiscard]] const T& GetValue() const { return std::get<T>(value); }
+      [[nodiscard]] const T & GetValue() const { return std::get<T>(value); }
 
       /// Set the value; must maintain current type.
       template <typename T>
       void SetValue(T && val) {
         emp_assert(IsType<T>(), name);
         value = std::forward<T>(val);
+        if (action) action(*this);
+      }
+
+      /// If input is a string, convert it to the correct type.
+      void SetFromString(const emp::String& input) {
+        value = ParseFromString(input);
+        if (action) action(*this);
       }
 
       /// Convert to string for display
@@ -117,11 +127,6 @@ namespace emp {
         if (IsDouble()) { return emp::MakeString(std::get<double>(value)); }
         emp_assert(false, "Invalid type in Setting Info", name);
         return "";
-      }
-
-      /// If input is a string, convert it to the correct type.
-      void SetFromString(const emp::String& input) {
-        value = ParseFromString(input);
       }
 
       /// Check the type
@@ -178,10 +183,11 @@ namespace emp {
     [[nodiscard]] const emp::String & GetError() const { return error_note; }
 
     template <typename T>
-    void AddSetting(const emp::String & name, T && value, emp::String desc,
-                    char flag='\0', emp::String option="") {
+    SettingsManager & AddSetting(const emp::String & name, T & value, emp::String desc,
+                                 char flag='\0', emp::String option="") {
       emp_assert(!Has(name), "Trying to add a SettingsManager setting that already exists", name);
-      setting_map.emplace(name, SettingInfo{name, std::forward<T>(value), desc, flag, option});
+      setting_map.emplace(name, SettingInfo{name, value, desc, flag, option});
+      return *this;
     }
 
     void Save(emp::String filename) const {
@@ -200,7 +206,8 @@ namespace emp {
       }
     }
 
-    void Load(emp::String filename) {
+    // Load a specified file; return success.
+    bool Load(const std::string & filename) {
       Lexer lexer;
       const int bool_on_ID = lexer.AddToken("bool_on", "[Oo][Nn]|[Tt][Rr][Uu][Ee]");
       const int bool_off_ID = lexer.AddToken("bool_off", "[Oo][Ff][Ff]|[Ff][Aa][Ll][Ss][Ee]");
@@ -221,26 +228,27 @@ namespace emp {
         const Token name_token = it.Use();
         if (name_token != ident_ID) {
           error_note = "UnexpectedToken '" + name_token.lexeme + "'; expected parameter name.";
-          break;
+          return false;
         }
         const emp::String name = name_token.lexeme;
         if (!setting_map.contains(name)) {
           error_note = "Unknown configuration setting, '" + name + "'.";
-          break;
+          return false;
         }
 
         const Token op_token = it.Use();
         if (op_token != assign_ID) {
           error_note = "UnexpectedToken '" + op_token.lexeme + "'; expected '" + assign_op + "'.";
-          break;
+          return false;
         }
 
         const Token value_token = it.Use();
         if (value_token == ident_ID) {
           // Set equal to another identifier.
           if (!setting_map.contains(value_token.lexeme)) {
-            error_note = "Setting to unknown configuration variable, '" + name + "'.";
-            return;
+            error_note = "Setting to unknown configuration variable, '"
+              + value_token.lexeme + "'.";
+            return false;
           }
           GetInfo(name).SetFromString( GetInfo(value_token.lexeme).AsLiteral() );
           continue;
@@ -253,8 +261,10 @@ namespace emp {
 
         // If we made it this far, we don't know how to do the assignment.
         error_note = "UnexpectedToken '" + value_token.lexeme + "'; expected assignment value.";
-        return;
+        return false;
       }
+
+      return true;
     }
 
   };
