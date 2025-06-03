@@ -60,29 +60,17 @@
  * - ProtectHeaders: None|Pragma|Guards|Both
  */
 
-
-#include <cstring>
+#include <chrono>
 #include <filesystem>
-#include <fstream>
-#include <iostream>
-#include <map>
-#include <optional>
-#include <set>
-#include <string>
-#include <unordered_set>
 
 #include "../../include/emp/base/assert.hpp"
 #include "../../include/emp/base/vector.hpp"
-#include "../../include/emp/config/command_line.hpp"
 #include "../../include/emp/config/FlagManager.hpp"
 #include "../../include/emp/config/SettingsManager.hpp"
-#include "../../include/emp/io/ascii_utils.hpp"
-#include "../../include/emp/io/File.hpp"
-#include "../../include/emp/io/io_utils.hpp"
 #include "../../include/emp/math/sequence_utils.hpp"
 #include "../../include/emp/tools/String.hpp"
-#include "../../include/emp/tools/string_utils.hpp"
 
+#include "FileHandler.hpp"
 #include "helpers.hpp"
 #include "Lexer.hpp"
 #include "ReviewFile.hpp"
@@ -90,40 +78,32 @@
 class Empecable {
 private:
   emp::SettingsManager settings;
+  emp::String copyright =
+    "This file is part of Empirical, https://github.com/devosoft/Empirical\n"
+    "Copyright (C) ${year} Michigan State University\n"
+    "MIT Software license; see doc/LICENSE.md\n\n"
+    "@file ${file_id}\n"
+    "@brief [File Description]";
+  emp::String header_extensions = ".hpp|.h|.H|.hh";
+  emp::String code_extensions = ".cpp|.C|.cc";
+  emp::String header_protections = "Pragma|Guards";
+  bool spell_check = true;
+  bool use_project_dict = true;
+  bool use_file_dict = true;
+  bool track_replacements = true;
+  bool interactive = false;
+  bool remove_illegal_chars = true;
+  bool map_levels = true;
   Mode mode = Mode::Normal;
 
   emp::FlagManager flags;         // Tracker for command-line flags that were set.
-  emp::vector<ReviewFile> files;  // Files to be reviewed.
-  size_t active_file = 0;         // Which file are we working with?
+  FileHandler file_handler;       // Manage all file handing in Empecable.
   size_t total_issues = 0;
-
-  // Lexer information.
-  emplex::Lexer lexer;
-
-  fs::path config_file = "Empecable.cfg";
-  fs::path word_file = "word_list.txt";
-  fs::path replace_file = "replace_list.txt";
-  std::optional<fs::path> emp_dir = std::nullopt; // Put emp_dir here if one is found.
-
-  using word_set_t = std::unordered_set<emp::String>;
-  using word_map_t = std::map<emp::String, emp::String>;
-  word_set_t project_words;   // Dictionary of legal words for this project.
-  word_set_t skip_words;      // Words to skip over for now.
-  word_map_t replacement_map; // Track replacement words to always use.
-  word_map_t suggest_map;     // Track replacement words to suggest.
-
-  // Set up the different menus.
-  emp::ANSIOptionMenu menu_spelling;
-  emp::ANSIOptionMenu menu_tab;
-  emp::ANSIOptionMenu menu_eol_space;
-
-  bool project_changed = false; // Have there been any project-level changes requiring save?
-
 
   // === HELPER FUNCTIONS ===
 
-  ReviewFile & File() { return files[active_file]; }
-  const ReviewFile & File() const { return files[active_file]; }
+  ReviewFile & File() { return file_handler.File(); }
+  const ReviewFile & File() const { return file_handler.File(); }
 
   emplex::Token GetToken() const { return File().GetToken(); }
   emp::String GetLexeme() const { return File().GetLexeme(); }
@@ -132,68 +112,71 @@ private:
   emp::String GetLexeme(size_t pos) const { return File().GetLexeme(pos); }
   size_t GetLineID(size_t pos) const { return File().GetLineID(pos); }
 
-  void ConfigureSettings() {
-    settings.AddSetting("Copyright",
-      "This file is part of Empirical, https://github.com/devosoft/Empirical\n"
-      "Copyright (C) {year} Michigan State University\n"
-      "MIT Software license; see doc/LICENSE.md\n\n"
-      "@file\n"
-      "@brief [File Description]",
-      "Full text of the copyright heading that should be at the top of each file."
-    );
+  void SetupSettings() {
+    settings.AddSetting("Copyright", copyright,
+      "Full text of the copyright heading that should be at the top of each file.");
 
-    settings.AddSetting("HeaderExtensions", ".hpp|.h|.H|.hh",
+    settings.AddSetting("HeaderExtensions", header_extensions,
       "File extensions to assume are C++ headers.");
 
-    settings.AddSetting("CodeExtensions", ".cpp|.C|.cc",
+    settings.AddSetting("CodeExtensions", code_extensions,
       "File extensions to assume are C++ code files.");
 
-    settings.AddSetting("HeaderProtections", "None|Pragma|Guards|Both",
+    settings.AddSetting("HeaderProtections", header_protections,
       "Type of protections against multiple includes to use in headers (None|Pragma|Guards|Both)\n"
       "E.g., if you want either type of protection, but not both, use \"Pragma|Guards\"");
 
-    settings.AddSetting("SpellCheck", true,
+    settings.AddSetting("SpellCheck", spell_check,
       "Count spelling mistakes as errors in a file? (On/Off)");
 
-    settings.AddSetting("ProjectDictionary", true,
+    settings.AddSetting("ProjectDictionary", use_project_dict,
       "Track a master list of legal words in .Empirical/word_list.txt (On/Off)");
 
-    settings.AddSetting("FileDictionary", true,
+    settings.AddSetting("FileDictionary", use_file_dict,
       "Track a local list of legal words in comment at bottom of each file? (On/Off)");
 
-    settings.AddSetting("TrackReplacements", true,
+    settings.AddSetting("TrackReplacements", track_replacements,
       "Track word replacements in .Empirical/replace_list.txt for future suggestions? (On/Off)");
 
-    settings.AddSetting("Interactive", false,
+    settings.AddSetting("Interactive", interactive,
       "Go into interactive mode by default? (On/Off; Use -i flag to activate from command line)");
 
-    settings.AddSetting("RemoveIllegalChars", true,
+    settings.AddSetting("RemoveIllegalChars", remove_illegal_chars,
       "Remove tabs ('\t') and carriage returns ('\r')? (On/Off)");
 
-    settings.AddSetting("MapLevels", true,
+    settings.AddSetting("MapLevels", map_levels,
       "Create a levelization map of header files include each other? (On/Off)");
   }
 
   void SetupOptionFlags() {
     flags.AddGroup("Basic Operation");
-    flags.AddOption('c', "config-file", [this](emp::String filename){ config_file = filename.str(); },
-      "Set the name of the main configuration file to use (Default: '" + config_file.string() + "').");
+    flags.AddOption('c', "config-file", [this](emp::String filename){
+      file_handler.ConfigPath(filename); },
+      "Name of main configuration file (Default: '" + file_handler.ConfigPath().string() + "').");
+    flags.AddOption('d', "debug", [this](){ mode = Mode::DEBUG; },
+      "Print extra information for debugging problems.");
     flags.AddOption('h', "help", [this](){ PrintHelp(); },
       "Get additional information about options.");
     flags.AddOption('i', "interactive", [this](){ mode = Mode::Interactive; },
       "Interactively fix file problems");
-    flags.AddOption('r', "replace_file", [this](emp::String filename){ replace_file = filename.str(); },
-      "Specify the word file to use for spell checks (Default: '" + replace_file.string() + "').");
+    // -r : recursive
+    flags.AddOption('s', "suggest_filename",
+      [this](emp::String filename){ file_handler.ReplacePath(filename); },
+      "Name of file for replacement suggestions (Default: '" +
+      file_handler.ReplacePath().string() + "').");
+    flags.AddOption('S', "silent", [this](){ mode = Mode::Silent; },
+      "Do not allow any output from program.");
     flags.AddOption('v', "verbose", [this](){ mode = Mode::Verbose; },
       "Provide more detailed output");
-    flags.AddOption('w', "word_file", [this](emp::String filename){ word_file = filename.str(); },
-      "Specify the word file to use for spell checks (Default: '" + word_file.string() + "').");
+    flags.AddOption('w', "word_filename",
+      [this](emp::String filename){ file_handler.WordPath(filename); },
+      "Name of word file for spell checks (Default: '" + file_handler.WordPath().string() + "').");
   }
 
   // Check the default key press options that should work from any menu.
   void AddDefaultMenuOptions(emp::ANSIOptionMenu & menu) {
     menu.AddSilent('h', "Help", [&menu](){ menu.PrintHelp(); return false; }).AddAlias('?');
-    menu.AddSilent('s', "Save", [this](){ SaveAll(); return false; });
+    menu.AddSilent('s', "Save", [this](){ file_handler.SaveAll(); return false; });
     menu.AddSilent('q', "Quit", [this](){ Quit(false); return false; }).AddAlias('x');
     menu.AddSilent('Q', "Save & Quit", [this](){ Quit(true); return false; }).AddAlias('X');
     menu.AddSilent('v', "View code around token (5 lines per side)",
@@ -222,199 +205,65 @@ private:
     if (IsVerbose()) { emp::PrintRepeatLn('-',79); }
   }
 
-  void MakeEmpiricalDir(fs::path common_path) {
-    emp_assert(IsInteractive());
 
-    fs::path option_path = common_path;
-    if (!fs::is_directory(option_path)) option_path = option_path.parent_path();
+  void LoadConfig() {
+    SetupSettings();     // Set up the available configuration options that users can set.
+    SetupOptionFlags();  // Set up the available command-line options.
 
-    emp::PrintLn("No config folder found in any parent directory.");
+    // Most flags come AFTER config file (to override); check a few that come first.
+    flags.FindAndProcess("config-file");             // Allow overriding of config file name.
 
-    emp::ANSIOptionMenu menu;
-    menu.SetQuestion("Where should .Empirical/ be created?");
+    flags.FindAndProcess("silent");
+    flags.FindAndProcess("verbose");
+    flags.FindAndProcess("interactive");
+    flags.FindAndProcess("debug");
 
-    for (size_t opt_id = 0;
-        !option_path.empty() && opt_id < 10 && emp::CanWriteToDirectory(option_path);
-        ++opt_id) {
-      menu.AddOption('0' + opt_id, "create " + option_path.string(), [this,option_path](){
-        emp_dir = option_path / ".Empirical";
-        emp::PrintLn("Creating directory: ", *emp_dir);
-        std::filesystem::create_directory(*emp_dir);
-        return true;
-      });
-      if (option_path == option_path.parent_path()) break;
-      option_path = option_path.parent_path();
-    }
-    menu.AddOption('q', "Quit", [this](){ Quit(false); return false; }).AddAlias('x');
-    menu.Run();
-  }
+    const auto & filenames = flags.ProcessExtras();  // Collect files to analyze.
 
-  // Find the sub-path that all test files have in common.
-  fs::path FindCommonPath() {
-    if (files.size() == 0) return {};
-
-    fs::path common_path = files[0].GetPath();
-    for (size_t i=1; i < files.size(); ++i) {
-      common_path = emp::FindCommonPath(common_path, files[i].GetPath());
+    // If there are no files, process the other options and then stop.
+    if (filenames.size() == 0) {
+      flags.Process();
+      emp::PrintLn("No files listed.");
+      emp::PrintLn("Type `", flags[0], " -h` for help.");
+      exit(0);
     }
 
-    return common_path;
-  }
-
-  // Find the .Empirical directory for config files.
-  void SetEMPDir() {
-      fs::path common_path = FindCommonPath();
-      emp_dir = emp::FindFolderInPath(".Empirical", common_path);
-
-      // If the emp_dir does not exist, create one.
-      if (!emp_dir) MakeEmpiricalDir(common_path);
-  }
-
-  void LoadWords() {
-    // Try loading the default word_file.
-    std::ifstream in_file(word_file);
-
-    // If word_file fails to load, look for (or make) a .Empirical/ directory.
-    if (!in_file) {
-      SetEMPDir();
-      word_file = *emp_dir / word_file;
-      in_file.open(word_file);
-
-      // If we have still failed, report the error and abort.
-      if (!in_file) {
-        std::cerr << ToBoldRed("Error:") << " Unable to open file '" << word_file << "'.\n";
-        exit(1);
-      }
-    }
-
-    // Now that we have the file set up, actually load the words!
-    emp::String word;
-    while (std::getline(in_file, word)) {
-      project_words.insert(word);
-    }
-
-    emp::PrintLn("Loaded word file: '", ToFilename(word_file), "'.");
-
-    std::ifstream in_replace_file(replace_file);
-    if (!in_replace_file) {
-      SetEMPDir();
-      replace_file = *emp_dir / replace_file;
-      in_replace_file.open(replace_file);
-
-      // If we have still failed, let the user know, but keep going.
-      if (!in_replace_file) {
-        emp::PrintLn("No word replacement list file found at ", replace_file, ".");
-      }
-    }
-
-    if (in_replace_file) {
-      emp::String translation;
-      while (in_replace_file) {
-        in_replace_file >> word >> translation;
-        // std::getline(in_replace_file, translation); // Grab entire translation, maybe more than one word.
-        suggest_map[word] = translation;
-      }
-      emp::PrintLn("Loaded replacement list file: '", ToFilename(replace_file),
-              "' with ", suggest_map.size(), " suggestions.");
-    }
-
-
-  }
-
-  void SaveCurrentFile() {
-    if (active_file < files.size()) File().Save();
-    else emp::PrintLn("No active file to save.");
-  }
-
-  void SaveProjectConfig() {
-    if (!project_changed) {
-      emp::PrintLn("No changes need to be saved in '", ToFilename(word_file), "'.");
-    } else {
-      emp::PrintLn("Saving '", ToFilename(word_file), "'.");
-
-      // Move the project_words to a vector and sort them.
-      emp::vector<emp::String> out_words;
-      out_words.reserve(project_words.size());
-      for (emp::String word : project_words) out_words.emplace_back(word);
-      std::sort(out_words.begin(), out_words.end());
-
-      // Print the new file
-      std::ofstream file(word_file);
-      for (emp::String word : out_words) file << word << '\n';
-    }
-
-    if (suggest_map.size() || replacement_map.size()) {
-      emp::PrintLn("Saving '", ToFilename(replace_file), "'.");
-      std::ofstream file(replace_file);
-      for (auto [from, to] : suggest_map) {
-        if (to.HasWhitespace()) continue; // Skip saving any suggestions with multiple words.
-        file << from << " " << to << '\n';
-      }
-      // Also record anything in the replacement map that was NOT in the suggestion map.
-      for (auto [from, to] : replacement_map) {
-        if (suggest_map.contains(from) || to.HasWhitespace()) continue;
-        file << from << " " << to << '\n';
-      }
-    } else {
-      emp::PrintLn("No suggestions to save.");
-    }
-  }
-
-  void SaveAll() {
-    SaveCurrentFile();
-    SaveProjectConfig();
+    file_handler.Init(filenames, mode);        // Set up test files and identify config folder
+    settings.Load(file_handler.ConfigPath());  // Load base configuration settings.
+    flags.Process();                           // Remaining flags; may override config settings.
+    file_handler.LoadWords();                  // Load configuration word lists.
   }
 
   [[noreturn]] void Quit(bool save_before_quitting) {
-    if (save_before_quitting || (project_changed && AskYesNo("Save before quitting?"))) {
-      SaveAll();
+    if (save_before_quitting ||
+        (file_handler.HasProjectChange() && AskYesNo("Save before quitting?"))) {
+      file_handler.SaveAll();
     }
 
     exit(0);
   }
 
-  void AddProjectWord(emp::String word) {
-    emp_assert(!emp::Has(project_words, word), word);
-    emp::PrintLn("Added '", word.AsANSICyan(), "' to project dictionary.");
-    project_words.insert(word);
-    project_changed = true;
-  }
-
   void DoReplace(emp::String new_word, bool change_all=false) {
     const emp::String old_word = GetLexeme();
-    suggest_map[old_word] = new_word;
-    if (change_all) replacement_map[old_word] = new_word;
+    file_handler.AddSuggestion(old_word, new_word);
+    if (change_all) file_handler.AddReplacement(old_word, new_word);
     File().SetLexeme(new_word);
     if (IsVerbose()) {
-      emp::PrintLn("Line ", GetLineID(),
-        ": Replacing '", old_word.AsANSICyan(), "' with '", new_word.AsANSICyan(), "'.");
+      if (!change_all) emp::Print("Line ", GetLineID(), ": ");
+      emp::Print("Replacing ");
+      if (change_all) emp::Print(" all instances of ");
+      emp::PrintLn("'", old_word.AsANSICyan(), "' with '", new_word.AsANSICyan(), "'.");
     }
   }
 
   // DoReplace with no replacement word uses the replacement_map.
-  void DoReplace() {
-    const emp::String old_word = GetLexeme();
-    emp_assert(replacement_map.contains(old_word));
-    DoReplace(replacement_map[old_word]);
+  void DoReplace(bool change_all=false) {
+    DoReplace(file_handler.GetReplacement(GetLexeme()), change_all);
   }
 
   void QueryReplace(bool change_all) {
-    emp::String word = GetLexeme();
-
-    emp::Print("Enter replacement word: ");
-    emp::String new_word;
-    std::cin >> new_word;
-
-    // Make change to THIS token.
-    File().SetLexeme(new_word);
-
-    // Record change for future tokens.
-    suggest_map[word] = new_word;
-    if (change_all) replacement_map[word] = new_word;
-
-    emp::Print("Replacing ");
-    if (change_all) emp::Print(" all instances of ");
-    emp::PrintLn("'", word.AsANSICyan(), "' with '", new_word.AsANSICyan(), "'.");
+    emp::String new_word = GetInput("Enter replacement word: ");
+    DoReplace(new_word, change_all);
   }
 
   // Search through available dictionaries to try to find misspellings.
@@ -422,20 +271,19 @@ private:
     emp_assert(max_size > 0);
 
     constexpr double max_word_diff = 3.0;
-    const int target_size = target_word.ssize();
 
     std::vector<emp::String> matches; // Set of matches to suggest to the user.
 
     // If the target word already has a suggestion associated with it, make sure that comes first.
-    emp::String suggestion = suggest_map.contains(target_word) ? suggest_map[target_word] : "";
+    emp::String suggestion = file_handler.GetSuggestion(target_word);
 
     // Score all of the other words in the dictionary (if they're close enough)
     std::vector<std::pair<double, std::string>> scored;
     const emp::String lower_word = target_word.AsLower();
 
-    for (const emp::String & word : project_words) {
+    for (const emp::String & word : file_handler.GetProjectWords()) {
       // Don't consider words that are too different in length.
-      if (std::abs(word.ssize() - target_size) >= max_word_diff) continue;
+      if (std::abs(word.ssize() - target_word.ssize()) >= max_word_diff) continue;
 
       // Don't reconsider an existing suggestion.
       if (word == suggestion) continue;
@@ -458,21 +306,10 @@ private:
 
   // Should we automatically allow the provided word in the file?
   bool IsWordAllowed(const emp::String & word) {
-    // If we have a valid word, return true.
-    if (word.size() <= 2 ||                       // Allow all short (1 or 2 char) words
-        project_words.contains(word) ||           // Check the white list for project
-        File().HasWord(word) ||                   // Check the file-specific white list
-        skip_words.contains(word)) return true;   // Check words to skip.
-
-    // If this word has uppercase, also check the lowercase version.
-    if (word.HasUpper()) {
-      emp::String lower_word = word.AsLower();
-      if (project_words.contains(lower_word) ||
-          File().HasWord(lower_word) ||
-          skip_words.contains(lower_word)) return true;
-    }
-
-    return false; // Word not found as an automatically allowed option.
+    // Words are allowed if they are short (1 or 2 char), are whitelisted, or have
+    // their lowercase versions whitelisted.
+    return word.size() <= 2 || file_handler.HasWord(word) ||
+      (word.HasUpper() && file_handler.HasWord(word.AsLower()));
   }
 
   // If we have a disallowed word that we need to interactively deal with, do so.
@@ -483,10 +320,10 @@ private:
     AddDefaultMenuOptions(menu);
 
     menu.AddOption('a', "Add '" + lower_word.AsANSICyan() + "' to main PROJECT dictionary",
-      [this,lower_word](){ AddProjectWord(lower_word); return true; });
+      [this,lower_word](){ file_handler.AddWord(lower_word); return true; });
     if (word.HasUpper()) {
       menu.AddLinked('A', "add case-sensitive '" + word.AsANSICyan() + "'",
-        [this,word](){ AddProjectWord(word); return true; });
+        [this,word](){ file_handler.AddWord(word); return true; });
     }
 
     menu.AddOption('f', "Add '" + lower_word.AsANSICyan() + "' to this FILE's dictionary",
@@ -500,7 +337,7 @@ private:
       [word](){ emp::PrintLn("Skipping '", word.AsANSICyan(), "'!"); return true; });
     menu.AddLinked('I', "ignore ALL instances",
       [this,word](){ emp::PrintLn("Ignoring all instances of '", word.AsANSICyan(), "'!");
-        skip_words.insert(word); return true; });
+        file_handler.AddSkipWord(word); return true; });
 
     // Come up with word matches (and keep case the same as the original word)
     emp::vector<emp::String> matches = FindWordMatches(word);
@@ -542,7 +379,7 @@ private:
     if (IsWordAllowed(word)) return true;
 
     // See if we already have a replacement set up for this word.
-    if (replacement_map.contains(word)) { DoReplace(); return false; }
+    if (file_handler.HasReplacement(word)) { DoReplace(); return false; }
 
     // Report unknown word.
     File().ReportIssue(emp::MakeString("Unknown word '", word.AsANSICyan(), "'"));
@@ -555,49 +392,28 @@ private:
 
 public:
   Empecable(int argc, char * argv[]) : flags(argc, argv) {
-    ConfigureSettings();
-    SetupOptionFlags();
-    flags.Process();
+    // Load all of the configuration files needed to fun Empecable
+    LoadConfig();
 
-    // Collect the filenames
-    emp::vector<emp::String> filenames = flags.GetExtras();
-    if (filenames.size() == 0) {
-      emp::PrintLn("No files listed.");
-      PrintUsage();
-      exit(0);
-    }
-
-    // Validate the filenames, set up full paths, and save as ReviewFile objects.
-    size_t err_count = 0;
-    for (const std::string & name : filenames) {
-      files.emplace_back(name, mode);
-      if (!files.back().IsValid()) ++err_count;
-    }
-    if (err_count) {
-      std::cerr << err_count << " errors opening files. Exiting.\n";
-      exit(1);
-    }
-
-    LoadWords();
-
-    // Step through all of the files.
-    for (active_file = 0; active_file < filenames.size(); ++active_file) {
+    // Step through all of the files, processing them.
+    for (file_handler.ResetActiveFile(); file_handler.HasActiveFile(); file_handler.NextFile()) {
       ProcessFile();
-      File().Save(); // Will save only if a change has occurred.
     }
-    SaveProjectConfig();
-    std::cout << "\nTotal Issues = " << total_issues << std::endl;
+    file_handler.SaveProjectConfig();
+    if (!IsSilent()) std::cout << "\nTotal Issues = " << total_issues << std::endl;
   }
 
   ~Empecable() { }
 
+  bool IsSilent() const { return mode == Mode::Silent; }
   bool IsVerbose() const { return mode >= Mode::Verbose; }
-  bool IsInteractive() const { return mode == Mode::Interactive; }
+  bool IsInteractive() const { return mode >= Mode::Interactive; }
+  bool IsDebugging() const { return mode >= Mode::DEBUG; }
+
   size_t GetNumIssues() const { return total_issues; }
 
   void PrintUsage() const {
     emp::PrintLn("Usage: ", flags[0], " {options ...} files ...");
-    emp::PrintLn("Type `", flags[0], " -h` for more detailed help.");
   }
 
   void PrintVersion() const {
@@ -613,23 +429,62 @@ public:
     exit(0);
   }
 
-  void ProcessFile() {
-    using namespace emplex;
-    emp::PrintLn("=== File: ", File().GetName().AsANSIBrightCyan(), " ==");
+  // To be called after a new file is open to ensure that the file begins correctly.
+  // Each file should begin with (in order):
+  // - Copyright comment
+  // - Description comment
+  // - Pragma once (if activated)
+  // - Include guards
+  // - STD include block
+  // - EMP include block
+  // - Local include block
+  // - namespace opening
+  void ValidateFileHeading() {
+    // Create a map of specific variables that we might need to substitute in.
+    std::unordered_map<emp::String, emp::String> var_map;
 
-    if (!File().Load(lexer, project_words)) {
-      return; // File failed to load.
+    // Each 'file_id' is a path/name relative to the project.
+    // For example, this file is: 'demos/Empecable/Empecable.cpp'
+    var_map["file_id"] = fs::relative(File().GetPath(), file_handler.FindCommonPath()).string();
+
+    // Default ${year} to the current year.
+    auto now = std::chrono::system_clock::now();
+    std::time_t t = std::chrono::system_clock::to_time_t(now);
+    std::tm * tm_ptr = std::localtime(&t);
+    var_map["year"] = emp::MakeString(tm_ptr->tm_year + 1900);
+
+    using namespace emplex;
+    // Delete any blank lines at the beginning of a file.
+    size_t cur_pos = 0;
+    while (File().GetToken(cur_pos) == Lexer::ID_END_LINE) ++cur_pos;
+    if (cur_pos > 0) {
+      File().ReportIssue("File begins with ", cur_pos, " blank lines.");
+      if (IsInteractive() && AskYesNo("Remove? ")) {
+        File().RemoveToken(0, cur_pos);
+        cur_pos = 0;
+      }
     }
 
-    if (File().NumTokens() && File().GetToken(0) != Lexer::ID_COMMENT_START) {
-      emp::PrintLn("No open comment ('/*') found at beginning of file.");
-      if (IsInteractive() && AskYesNo("Add? ")) {
-        File().InsertToken(0, {Lexer::ID_COMMENT_START,"/*\n",0});
+    // Next should be the copyright.
+    if (File().GetToken(0) != Lexer::ID_COMMENT_START) {
+      File().ReportIssue("No open comment ('/*') found at beginning of file.");
+      if (IsInteractive()) {
+        emp::String file_copyright = copyright.ReplaceVars(var_map).AsANSIGreen();
+        emp::PrintLn(file_copyright);
+        File().PrintFront(3);
+        if (AskYesNo("Should we insert the copyright block? ")) {
+          File().InsertLexeme(0, file_copyright);
+        }
       }
       if (IsVerbose()) { emp::PrintRepeatLn('-',79); }
     }
+  }
 
-    while (File().NextToken()) {
+  // Make sure all tokens throughout the body of a file are valid.
+  void ValidateFileTokens() {
+    using namespace emplex;
+
+    for (File().ResetTokens(); GetToken() != 0; File().NextToken()) {
       switch (GetToken()) {
       case Lexer::ID_WORD:
         if (!TestWordToken() && IsVerbose()) emp::PrintRepeatLn('-',79);
@@ -658,17 +513,37 @@ public:
       }
 
     }
+  }
 
-    emp::PrintLn(ToBoldRed("=== ", File().GetNumIssues(), " issues found ==="));
+  void ProcessFile() {
+    using namespace emplex;
+    if (!IsSilent()) {
+      emp::PrintLn("=== File: ", File().GetName().AsANSIBrightCyan(), " ===");
+    }
+
+    if (!file_handler.LoadActiveFile()) {
+      ++total_issues;
+      return; // File failed to load.
+    }
+
+    ValidateFileHeading();
+    ValidateFileTokens();
+
+    if (!IsSilent()) {
+      emp::PrintLn(ToBoldRed("=== ", File().GetNumIssues(), " issues found ==="));
+    }
     total_issues += File().GetNumIssues();
     if (IsVerbose()) emp::PrintLn();
+
+    File().Save();   // Will save only if a change has occurred.
+    File().Close();  // Clean up current file.
   }
 };
 
 int main(int argc, char * argv[])
 {
-  class Empecable formatter(argc, argv);
-  return formatter.GetNumIssues();
+  Empecable formatter(argc, argv);
+  return std::min<int>(formatter.GetNumIssues(), 255);
 }
 
 // Local settings for Empecable file checker.
