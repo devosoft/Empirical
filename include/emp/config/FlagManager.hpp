@@ -9,7 +9,7 @@
  *  @note Status: ALPHA
  *
  *  The FlagManager class will take command line arguments (either in its constructor or with
- *  the AddFlags() function) and process them appropriately.
+ *  the AddFlags() function) and process all options appropriately.
  *
  *  For setup, a FlagManager instance must be configured by calling AddOption once for each flag
  *  option, providing a the function to call when the option is triggered.  The functions can
@@ -110,11 +110,10 @@ namespace emp {
     }
 
     FlagInfo & _AddOption(String name, std::function<void(const emp::vector<String> &)> fun,
-    FlagInfo & _AddOption(String name, std::function<void(const emp::vector<String> &)> fun,
                    size_t min_args=0, size_t max_args=npos, String desc="") {
       emp_assert(name.size() > 0, "FlagManager cannot take an empty option name.");
       emp_assert(!name.HasWhitespace(), "Option names cannot contain whitespace.");
-      if (!name.HasPrefix("--")) name.insert(0, "--");
+      if (!name.HasPrefix("--")) name.Prepend("--");
       emp_assert(name[2] != '-', name, "Option names cannot begin with a single '-')");
       emp_assert(!emp::Has(flag_options, name), "Duplicate flag option name.", name);
       flag_options[name] = FlagInfo{name, desc, min_args, max_args, fun};
@@ -202,8 +201,13 @@ namespace emp {
       }
     }
 
-    // Process an argument associated with a particular name; return num additional args used.
-    size_t ProcessArg(String name, size_t cur_pos=0) {
+    [[deprecated("ProcessArg has been changed to ProcessOption")]]
+    size_t ProcessArg(String name, size_t cur_pos=0) { return ProcessOption(name, cur_pos); }
+    [[deprecated("ProcessArg has been changed to ProcessOption")]]
+    size_t ProcessArg(char c, size_t cur_pos=0) { return ProcessOption(c, cur_pos); }
+ 
+    // Process an argument associated with a particular option; return num additional args used.
+    size_t ProcessOption(String name, size_t cur_pos) {
       if (!emp::Has(flag_options, name)) {
         emp::notify::Error("Unknown flag '", name , "'.");
         return 0;
@@ -225,20 +229,55 @@ namespace emp {
         flag_args.push_back(args[test_pos]);
       }
       option.Run(flag_args);
-      return option.GetMinArgs();
+      return flag_args.size();
     }
 
-    // Process an argument associated with a particular character; return num additional args used.
-    size_t ProcessArg(char c, size_t cur_pos=0) {
+    // Process an option associated with a particular character; return num additional args used.
+    size_t ProcessOption(char c, size_t cur_pos) {
       if (!emp::Has(shortcuts, c)) { emp::notify::Error("Unknown flag '-", c , "'."); }
-      return ProcessArg(shortcuts[c], cur_pos);
+      return ProcessOption(shortcuts[c], cur_pos);
     }
 
     // Process the argument at a given position.  Return number of additional args consumed.
     size_t ProcessFlagSet(String name, size_t cur_pos=0) {
       size_t offset = 0;
       for (size_t i = 1; i < name.size(); ++i) {
-        offset += ProcessArg(name[i], cur_pos+offset);
+        offset += ProcessOption(name[i], cur_pos+offset);
+      }
+      return offset;
+    }
+
+    // Skip an option associated with a particular name; return num additional args used.
+    size_t SkipOption(String name, size_t cur_pos) {
+      if (!emp::Has(flag_options, name)) {
+        emp::notify::Error("Unknown flag '", name , "'.");
+        return 0;
+      }
+      FlagInfo & option = flag_options[name];
+      size_t arg_count = option.GetMinArgs();
+      if (cur_pos + arg_count >= args.size()) {
+        emp::notify::Error("Insufficient arguments for flag '", name, "'");
+      }
+      for (size_t i = option.GetMinArgs(); i < option.GetMaxArgs(); ++i) {
+        const size_t test_pos = cur_pos+i+1;
+        if (test_pos >= args.size()) break;  // No more args.
+        if (args[test_pos][0] == '-') break; // New flag; stop collecting args for previous.
+        ++arg_count;
+      }
+      return arg_count;
+    }
+
+    // Process an argument associated with a particular character; return num additional args used.
+    size_t SkipOption(char c, size_t cur_pos) {
+      if (!emp::Has(shortcuts, c)) { emp::notify::Error("Unknown flag '-", c , "'."); }
+      return SkipOption(shortcuts[c], cur_pos);
+    }
+
+    // Process the argument at a given position.  Return number of additional args consumed.
+    size_t SkipFlagSet(String name, size_t cur_pos=0) {
+      size_t offset = 0;
+      for (size_t i = 1; i < name.size(); ++i) {
+        offset += SkipOption(name[i], cur_pos+offset);
       }
       return offset;
     }
@@ -246,12 +285,14 @@ namespace emp {
     // Process all of the flag data that we have.
     // Flags should have their effects triggered; non-flags should be collected in "extras"
     void Process() {
+      extras.clear();  // Reset the extras since we are processing again.
+
       // Step through all of the arguments from the command line.
       for (size_t i = 1; i < args.size(); ++i) {
         String & arg = args[i];
         if (arg[0] == '-') {  // We have a flag!
           // If there a two dashes at the front (--) assume we have a single, full option name.
-          if (arg.size() > 1 && arg[1] == '-') i += ProcessArg(arg, i);
+          if (arg.size() > 1 && arg[1] == '-') i += ProcessOption(arg, i);
 
           // Otherwise with a single '-', assume we have one or more option shortcuts.
           else i += ProcessFlagSet(arg, i);
@@ -261,15 +302,52 @@ namespace emp {
     }
 
     /// Process a specific argument, if available (return whether it was found).
-    bool FindAndProcess(emp::String arg_name) {
+    // @CAO - should allow shortcuts to be in found in a block of shortcuts, skipping others.
+    // @CAO - should allow multiple options to be specified at once.
+    bool FindAndProcess(emp::String option_name) {
+      if (!option_name.HasPrefix("--")) option_name.Prepend("--");
+      emp_assert(flag_options.contains(option_name), option_name);
+
+      char shortcut = flag_options[option_name].GetShortcut();
+      emp::String short_name = shortcut ? emp::MakeString('-', shortcut) : "";
+
       // Step through all of the arguments from the command line.
-      for (size_t i = 1; i < args.size(); ++i) {
-        if (args[i] == arg_name) {
-          ProcessArg(arg_name, i);
+      for (size_t cur_pos = 1; cur_pos < args.size(); ++cur_pos) {
+        const emp::String & cur_arg = args[cur_pos];
+        if (cur_arg == option_name) {
+          ProcessOption(option_name, cur_pos);
           return true;
+        }
+        if (shortcut && cur_arg.size() >= 2 && cur_arg[0] == '-' && cur_arg[1] != '-') {
+          size_t offset = 0;
+          for (size_t i = 1; i < cur_arg.size(); ++i) {
+            // Run target option; skip over all others.
+            if (cur_arg[i] == shortcut) offset += ProcessOption(shortcut, cur_pos+offset);
+            else offset += SkipOption(cur_arg[i], cur_pos+offset);
+          }
         }
       }
       return false; // Not found.
+    }
+
+    /// ONLY process to collect the extras; don't trigger any actual flags yet.
+    const emp::vector<String> & ProcessExtras() {
+      extras.clear();  // Reset the extras to collect again (if we have any).
+
+      // Step through all of the arguments from the command line.
+      for (size_t i = 1; i < args.size(); ++i) {
+        String & arg = args[i];
+        if (arg[0] == '-') {  // We have a flag!
+          // If there a two dashes at the front (--) assume we have a single, full option name.
+          if (arg.size() > 1 && arg[1] == '-') i += SkipOption(arg, i);
+
+          // Otherwise with a single '-', assume we have one or more option shortcuts.
+          else i += SkipFlagSet(arg, i);
+        }
+        else extras.push_back(arg);
+      }
+      
+      return extras;
     }
 
     size_t GroupSize(emp::String group_name) const {
