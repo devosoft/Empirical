@@ -12,7 +12,6 @@
 #ifndef EMP_MATH_MATH_HPP_INCLUDE
 #define EMP_MATH_MATH_HPP_INCLUDE
 
-
 #include <algorithm>
 #include <cmath>
 #include <cstdint>

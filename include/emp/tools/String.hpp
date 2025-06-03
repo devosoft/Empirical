@@ -3,18 +3,17 @@
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
  *  date: 2023-2025
  */
+
 /**
  *  @file
  *  @brief Simple class to facilitate string manipulations
  *  @note Status: ALPHA
- *
  *
  *  @todo Make constexpr
  *  @todo Make handle non-'char' strings (i.e., use CharT template parameter)
  *  @todo Make handle allocators
  *  @todo Make work more broadly with string_views
  *  @todo Maybe add special construct types like RESERVE, REPEAT, and TO_STRING for special builds?
- *
  */
 
 #ifndef EMP_TOOLS_STRING_HPP_INCLUDE
@@ -619,6 +618,8 @@ namespace emp {
       std::string::operator+=(std::forward<ARG_T>(arg));
       return *this;
     }
+
+    String & Prepend(const String & in) { return insert(0, in); }
 
     String & PadFront(char padding, size_t target_size) {
       if (size() < target_size) { *this = std::string(target_size - size(), padding) + *this; }

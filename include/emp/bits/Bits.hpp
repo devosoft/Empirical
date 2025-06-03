@@ -49,7 +49,6 @@
 #ifndef EMP_BITS_BITS_HPP_INCLUDE
 #define EMP_BITS_BITS_HPP_INCLUDE
 
-
 #include <bitset>
 #include <cstring>
 #include <initializer_list>
@@ -74,7 +73,6 @@
 #include "Bits_Data.hpp"
 #include "_bitset_helpers.hpp"
 #include "bitset_utils.hpp"
-
 
 namespace emp {
 

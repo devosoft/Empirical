@@ -12,10 +12,6 @@
 #ifndef EMP_MATH_RANDOM_HPP_INCLUDE
 #define EMP_MATH_RANDOM_HPP_INCLUDE
 
-#include "Random_MSWS.hpp"
-#include "Random_Xorshift.hpp"
-#include "Random_Xoshiro256pp.hpp"
-
 #include <cmath>
 #include <concepts>
 #include <cstdint>
@@ -30,6 +26,9 @@
 #include "../bits/bitset_utils.hpp"
 
 #include "constants.hpp"
+#include "Random_MSWS.hpp"
+#include "Random_Xorshift.hpp"
+#include "Random_Xoshiro256pp.hpp"
 #include "Range.hpp"
 
 namespace emp {

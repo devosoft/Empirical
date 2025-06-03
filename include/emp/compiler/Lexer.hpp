@@ -41,13 +41,10 @@
 #include <map>
 #include <stddef.h>
 
-#include "../base/map.hpp"
 #include "../base/vector.hpp"
-#include "../datastructs/map_utils.hpp"
 #include "../tools/String.hpp"
 
 #include "lexer_utils.hpp"
-#include "RegEx.hpp"
 #include "_Token.hpp"
 #include "_TokenStream.hpp"
 #include "_TokenType.hpp"

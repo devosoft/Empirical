@@ -11,7 +11,6 @@
 #ifndef EMP_COMPILER_LEXER_UTILS_HPP_INCLUDE
 #define EMP_COMPILER_LEXER_UTILS_HPP_INCLUDE
 
-
 #include <map>
 #include <stddef.h>
 #include <utility> // std::pair
