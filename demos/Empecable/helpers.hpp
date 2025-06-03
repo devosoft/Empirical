@@ -11,6 +11,7 @@
 
 #include <filesystem>
 
+#include "../../include/emp/io/io_utils.hpp"
 #include "../../include/emp/tools/String.hpp"
 
 #include "Lexer.hpp"
@@ -18,11 +19,25 @@
 namespace fs = std::filesystem;
 
 enum class Mode {
-  Silent,        // No output, just error code.
-  Normal,        // Basic summary output.
+  Silent,        // No output, just error code
+  Normal,        // Basic summary output
   Verbose,       // Full output
-  Interactive    // Full output with questions.
+  Interactive,   // Full output with questions
+  DEBUG          // Extra output for debugging
 };
+
+// ========= Input Helpers =========
+
+emp::String GetInput(const emp::String & prompt) {
+  emp::Print(prompt);
+  emp::String input{};
+
+  while (input.size() == 0) {
+    std::cin >> input;
+    if (input == "\\n" || input.size() == 0) emp::Print("No input found.");
+  }
+  return input;  
+}
 
 // ========= ANSI Output Format Helpers ==========
 
@@ -40,8 +55,8 @@ emp::String ToOptionSet(emp::String keys) {
   return out;
 }
 
-emp::String ToFilename(fs::path filename) {
-  return emp::ANSI::MakeGreen(filename.string());
+emp::String ToFilename(const std::string & filename) {
+  return emp::ANSI::MakeGreen(filename);
 }
 
 template <typename... Ts>
