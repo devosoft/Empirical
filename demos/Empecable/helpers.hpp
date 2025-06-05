@@ -33,10 +33,11 @@ emp::String GetInput(const emp::String & prompt) {
   emp::String input{};
 
   while (input.size() == 0) {
-    std::cin >> input;
+    std::getline(std::cin, input);
+    // std::cin >> input;
     if (input == "\\n" || input.size() == 0) emp::Print("No input found.");
   }
-  return input;  
+  return input;
 }
 
 // ========= ANSI Output Format Helpers ==========
