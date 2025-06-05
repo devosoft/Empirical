@@ -41,9 +41,7 @@ namespace emp {
 
   template <typename... ARG_Ts>
   inline void PrintTo(std::ostream & os, ARG_Ts &&... args) {
-    // If nothing to print, skip.
-    if constexpr (sizeof...(args) == 0) { return; }
-    else (os << ... << std::forward<ARG_Ts>(args));
+    if constexpr (sizeof...(args) > 0) { (os << ... << std::forward<ARG_Ts>(args)); }
   }
 
   template <typename... ARG_Ts>
