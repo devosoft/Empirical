@@ -18,7 +18,7 @@
 EMP_BUILD_CONFIG( EvoSortConfig,
   GROUP(DEFAULT, "Default settings for EvoSorter model"),
   VALUE(SEED, int, 0, "Random number seed (0 for based on time)"),
-  VALUE(POP_SIZE, uint32_t, 200, "Number of organisms in the popoulation."),
+  VALUE(POP_SIZE, uint32_t, 200, "Number of organisms in the population."),
   VALUE(MAX_GENS, uint32_t, 2000, "How many generations should we process?"),
   VALUE(ORG_SIZE, size_t, 100, "Number of comparisons in an organism."),
   VALUE(MUT_SUB_PROB, double, 0.5, "What is the probability for a comparison to be randomized?"),

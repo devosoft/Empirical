@@ -17,12 +17,12 @@ int main()
   std::cout << "Testing" << std::endl;
 
   emp::TriggerExcept("test_fail", "The test failed.  *sob*");
-  emp::TriggerExcept("test_fail2", "The second test failed too.  But it's not quite as aweful.", false);
+  emp::TriggerExcept("test_fail2", "The second test failed too.  But it's not quite as awful.", false);
   emp::TriggerExcept("test_fail2", "The third test is just test 2 again, but worse", true);
 
   std::cout << emp::CountExcepts() << " exceptions found." << std::endl;
   auto except = emp::PopExcept("test_fail2");
-  std::cout << "Poped a test_fail2; now " << emp::CountExcepts() << " exceptions found." << std::endl;
+  std::cout << "Popped a test_fail2; now " << emp::CountExcepts() << " exceptions found." << std::endl;
 
   std::cout << "test_fail2: " << except.desc << std::endl;
 

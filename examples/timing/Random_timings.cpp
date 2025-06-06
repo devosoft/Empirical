@@ -87,7 +87,7 @@ int main()
   TestGetUInt64<emp::RandomBest>();
   TestGetUInt64<emp::Random32>();
   TestGetUInt64<emp::RandomFast>();
-  
+
   TestGetDouble<emp::RandomBest>();
   TestGetDouble<emp::Random32>();
   TestGetDouble<emp::RandomFast>();

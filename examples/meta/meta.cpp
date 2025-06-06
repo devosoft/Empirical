@@ -27,7 +27,7 @@ int main()
 {
   std::cout << "Ping!" << std::endl;
 
-  // Test AdaptTepmplate()
+  // Test AdaptTemplate()
   emp::AdaptTemplate_Arg1< Temp2Type<std::string, std::string>, double > map2;
 
   map2.a = 3.45;

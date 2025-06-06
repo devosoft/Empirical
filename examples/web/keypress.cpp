@@ -41,3 +41,6 @@ int main()
   keypress_manager.AddKeydownCallback('Z', [](){ x=5; other_str=""; doc.Redraw(); });
   keypress_manager.AddKeydownCallback(&OtherKey);
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: evt

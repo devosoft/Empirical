@@ -57,3 +57,6 @@ int main()
 
   motiv.SetSize(100,100);
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: sel motiv

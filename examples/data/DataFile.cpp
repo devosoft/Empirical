@@ -60,3 +60,6 @@ int main()
     std::cout << i << std::endl;
   }
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: fracs dfile

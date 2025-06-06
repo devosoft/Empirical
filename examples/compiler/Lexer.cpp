@@ -52,3 +52,6 @@ int main()
       ;
   file.Write();
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: mbers

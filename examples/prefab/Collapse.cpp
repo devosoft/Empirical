@@ -52,3 +52,6 @@ int main()
 
   std::cout << "end of main... !" << std::endl;
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: btn

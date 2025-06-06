@@ -83,3 +83,6 @@ int main() {
   std::stringstream os;
   doc << "<p>" << emp::text2html(os.str());
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: myvar

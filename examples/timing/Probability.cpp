@@ -73,3 +73,6 @@ int main()
   }
 
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: uni buf msec

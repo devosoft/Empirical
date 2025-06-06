@@ -58,3 +58,6 @@ int main()
     std::cout << "nbi10[" << i << "] = " << nbi10[i] << "\n";
   }
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: nbi

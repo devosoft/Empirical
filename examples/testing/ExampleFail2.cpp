@@ -26,7 +26,7 @@ bool IsPrime(int val) {
 bool IsOdd(int val) { return val % 2; }
 
 // Define the main function like the one below.  You do NOT create main(); that will be done
-// for you and cammand-line arguments will be handled automatically.
+// for you and command-line arguments will be handled automatically.
 
 void emp_test_main()
 {

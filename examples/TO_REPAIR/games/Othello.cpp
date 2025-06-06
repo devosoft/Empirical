@@ -16,7 +16,7 @@ using space_t = emp::Othello::BoardSpace;
 
 int main()
 {
-  // Make a new othello board.
+  // Make a new Othello board.
   emp::Othello othello(BOARD_SIZE);
   std::cout << "---- Initial Board ----" << std::endl;
   othello.Print();
@@ -103,3 +103,6 @@ int main()
 
   return 0;
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: lscore cnt eid wid dscore sid nid othello

@@ -49,3 +49,6 @@ int main()
   TestDFA("b");
 
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: aaa aaaaab aaaaaabb aaaaaab

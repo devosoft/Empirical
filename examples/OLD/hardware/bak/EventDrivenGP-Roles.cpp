@@ -276,7 +276,7 @@ std::function<bool(Agent&, emp::Random&)> simple_mut_fun =
         }
         // Mutate instruction.
         if (random.P(sub_rate)) inst.id = random.GetUInt(program.inst_lib->GetSize());
-        // Mutate arguments (even if they aren't relevent to instruction).
+        // Mutate arguments (even if they aren't relevant to instruction).
         for (size_t k = 0; k < MAX_INST_ARGS; ++k) {
           if (random.P(sub_rate)) inst.args[k] = random.GetInt(MAX_ARG_VAL);
         }
@@ -367,3 +367,6 @@ int main() {
   random.Delete();
   return 0;
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: uids mng ilib cnt rnd uid loc elib aff

@@ -55,3 +55,6 @@ int main()
   std::cout << "  config2.TEST_INT2() = " << config2.TEST_INT2() << std::endl;
   std::cout << "  config2.TEST_DUP() = " << config2.TEST_DUP() << std::endl;
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: ghi

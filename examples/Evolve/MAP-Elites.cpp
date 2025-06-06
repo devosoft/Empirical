@@ -8,7 +8,7 @@
  *  @brief This file explores the MAP-Elites selection scheme.
  *
  *  In this example, we will be evolving 4-digit integers.
- *  The two traits measured are nunmber of bits and value mod 31.
+ *  The two traits measured are number of bits and value mod 31.
  */
 
 #include <iostream>

@@ -20,7 +20,7 @@
 constexpr int RANDOM_SEED = 1;
 constexpr size_t HW_MAX_THREADS = 16;       // Maximum number of execution threads/'cores' that can be active at any one time.
 constexpr size_t HW_MAX_CALL_DEPTH = 128;   // Maximum number of calls that can be active in the call stack at any one time.
-constexpr double HW_MIN_SIM_THRESH = 0.0;   // Minimum similarity threshold required for a referring tag to match with a referrent.
+constexpr double HW_MIN_SIM_THRESH = 0.0;   // Minimum similarity threshold required for a referring tag to match with a referent.
 
 // A few useful aliases:
 using hardware_t = emp::EventDrivenGP_AW<16, emp::vector<double>>;  // SignalGP hardware with 16-bit tags.
@@ -280,3 +280,6 @@ int main() {
     }
   }
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: icnt fcnt cnt aff

@@ -38,3 +38,6 @@ int main()
   std::cout << "emp::Pow(-2,2) = " << emp::Pow(-2,2) << " (expected 4)" << std::endl;
   std::cout << "emp::Pow(3,4) = " << emp::Pow(3,4) << " (expected 81)" << std::endl;
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: setf

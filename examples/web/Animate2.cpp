@@ -81,3 +81,6 @@ int main()
   doc << UI::Text("fps") << "FPS = " << UI::Live( [anim](){return anim->GetStepTime();} ) ;
 
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: poly

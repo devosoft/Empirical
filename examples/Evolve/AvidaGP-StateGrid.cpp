@@ -125,7 +125,7 @@ public:
 
     inst_lib.AddInst("Move",   SGOrg::Inst_Move,   1, "Move forward in state grid.");
     inst_lib.AddInst("Rotate", SGOrg::Inst_Rotate, 1, "Rotate in place in state grid.");
-    inst_lib.AddInst("Scan",   SGOrg::Inst_Scan,   1, "Idenify state of current position in state grid.");
+    inst_lib.AddInst("Scan",   SGOrg::Inst_Scan,   1, "Identify state of current position in state grid.");
 
     // OnPlacement( [this](size_t world_id){
     //   pop[world_id]->SetWorldID(world_id);  // Tell organisms their position in environment.

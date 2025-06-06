@@ -24,3 +24,6 @@ int main(){
   );
   emp::prefab::CloseLoadingModal();
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: btn

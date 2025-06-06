@@ -88,3 +88,6 @@ int main()
     std::cout << print_set << " : " << print_set.GetUInt(0) << std::endl;
   }
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: bsm

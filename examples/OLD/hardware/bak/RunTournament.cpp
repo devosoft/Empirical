@@ -164,7 +164,7 @@ emp::AvidaGP LoadOrgFromFile(std::string filepath) {
             break;
         default:
             std::cout << "Not implemented error. This inst has more than 3 args." <<
-                         " Fix the swtich statement in the interpreter" << std::endl;
+                         " Fix the switch statement in the interpreter" << std::endl;
         }
     }
 

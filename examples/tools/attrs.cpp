@@ -74,3 +74,6 @@ int main() {
 
   std::cout << "New user settings: " << user << std::endl;
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: asdfferaefadfe attrs

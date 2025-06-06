@@ -50,3 +50,6 @@ For example, are multi-line descriptions okay?"),
 )
 
 #endif // #ifndef EXAMPLES_CONFIG_TEST_MACRO_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: ghi

@@ -41,7 +41,7 @@ int main()
   std::cout << std::endl;
 
 
-  // Removeing 3rd value
+  // Removing 3rd value
   v.erase(v.begin() + 3);
   std::cout << "After removing value #3: " << std::endl;
   for (auto x : v) { std::cout << x << ' '; }
@@ -54,7 +54,7 @@ int main()
   for (auto x : v) { std::cout << x << ' '; }
   std::cout << std::endl;
 
-  // Try looking through these BACKWARDS for ptinting.
+  // Try looking through these BACKWARDS for printing.
   std::cout << "\nPrinting in reverse!\n";
   for (emp::vector<int>::reverse_iterator it = v.rbegin(); it < v.rend(); it++) {
     std::cout << *it << " ";

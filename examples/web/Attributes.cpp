@@ -40,3 +40,6 @@ int main()
   listeners.Set("click", std::function<void()>([](){ doc.Text("test2").SetAttr("color", "red"); }));
   listeners.Apply("test2");
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: evt

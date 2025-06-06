@@ -144,3 +144,6 @@ int main()
     return string_map[EMP_STRING_ID("42")];
   });
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: proc
