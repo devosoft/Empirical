@@ -1901,8 +1901,8 @@ TEST_CASE("Test MatchBin", "[matchbin]")
     REQUIRE(bin.GetSelectCount() == 3 + i + 1);
 
     cached = bin.Match(bs, 3);
-    REQUIRE(bin.GetRegulatedCacheSize() == i + 1); //shouldnt change
-    REQUIRE(bin.GetSelectCount() == 3 + i + 1); //shouldnt change
+    REQUIRE(bin.GetRegulatedCacheSize() == i + 1); //do not change
+    REQUIRE(bin.GetSelectCount() == 3 + i + 1); //do not change
 
     REQUIRE(cached == uncached);
   }
@@ -2093,3 +2093,6 @@ TEST_CASE("Test MatchBin", "[matchbin]")
 }
 
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: iarchive recache hibase lobase oarchive xrs hardskew adj rks salut softskew rts

@@ -123,3 +123,6 @@ TEST_CASE("Test FunctionSet", "[functional]")
   REQUIRE(fun_set2.Run(-0.1, test_fun) < 0.01000000001);
   REQUIRE(fun_set2.Run(-0.1, test_fun) > 0.00999999999);
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: funcs

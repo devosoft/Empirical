@@ -74,3 +74,6 @@ TEST_CASE("Another test always_assert", "[tools]")
   // if (emp::assert_fail_info.line_num != __LINE__ - 3) std::cerr << "Failed case 7!" << std::endl;
   // if (emp::assert_fail_info.error != "false") std::cerr << "Failed case 8!" << std::endl;
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: filen

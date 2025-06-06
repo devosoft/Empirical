@@ -259,3 +259,6 @@ TEST_CASE("Small vector, methods2", "[tools]") {
   REQUIRE(myvector[6] == 100);
 
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: myvector bvec elt

@@ -56,3 +56,6 @@ TEST_CASE("Test UnorderedIndexMap", "[datastructs]")
   uim2 += uim;
   REQUIRE(uim2.GetWeight() == 22);
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: ind vecd uim

@@ -121,3 +121,6 @@ int main() {
   emp_assert(!am.UseArg("string3"));
 
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: sneakyspace

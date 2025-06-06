@@ -14,3 +14,6 @@
 TEST_CASE("Test attrs", "[tools]")
 {
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: attrs

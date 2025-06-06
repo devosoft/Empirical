@@ -103,3 +103,6 @@ TEST_CASE("Test Avida GP", "[Hardware]")
   gp.SetOutput(0, 22.0);
   REQUIRE(gp.GetOutput(0) == 22.0);
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: otpts inpts rnd

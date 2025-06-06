@@ -74,3 +74,6 @@ TEST_CASE("Test CountRngTouches", "[math]") {
   }) );
 
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: rnd

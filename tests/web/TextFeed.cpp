@@ -95,7 +95,7 @@ emp::web::MochaTestRunner test_runner;
 
 int main() {
 
-  // MochaTestRunner::Initialize will make sure empirical's web environment is initialized, and will
+  // MochaTestRunner::Initialize will make sure Empirical's web environment is initialized, and will
   // append a set of div elements (with the given string ids) to the HTML document body.
   // Between tests, the MochaTestRunner clears the contents of these div elements.
   // Remember, karma is generating our HTML file, so this is useful for attaching any HTML divs that

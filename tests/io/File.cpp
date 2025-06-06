@@ -160,3 +160,6 @@ TEST_CASE("Test File", "[io]")
   REQUIRE(int_col[0] == 1);
   REQUIRE(int_col[1] == 2);
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: oss aaaaand iss istringstream

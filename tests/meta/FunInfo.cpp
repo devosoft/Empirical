@@ -288,3 +288,6 @@ TEST_CASE("Test FunInfo", "[meta]")
   // CHECK( concat5d() == "<<<==()==>>>" );
 
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: abcdefghijkl fghij bcd abcabcabcabcabcabcabcabcabcabc doubledouble abcabcabcabcabcabc

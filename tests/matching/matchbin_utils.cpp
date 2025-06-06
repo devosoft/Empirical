@@ -943,3 +943,6 @@ TEST_CASE("Test matchbin_utils", "[matchbin]")
 
   }
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: adj salut ndraws unif uniques nrep

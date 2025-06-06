@@ -105,3 +105,6 @@ TEST_CASE("Test Othello", "[games]") {
     }
   }
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: sid wid eid nid othello

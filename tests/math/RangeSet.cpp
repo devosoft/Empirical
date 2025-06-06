@@ -453,7 +453,7 @@ TEST_CASE("Test RangeSet operators to behave like Bits", "[math]")
 
   CHECK(bv.OK() == true);
 
-  // Now some tests with bitvectors longer than one field.
+  // Now some tests with BitVectors longer than one field.
   const set_t bvl80("00110111000101110001011100010111000101110001011100010111000101110001011100010111");
   CHECK( bvl80.GetSize() == 41 );
   CHECK( bvl80 << 1 ==
@@ -484,3 +484,6 @@ TEST_CASE("Test RangeSet operators to behave like Bits", "[math]")
 
   CHECK(bvl80.OK() == true);
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: bvl rsd

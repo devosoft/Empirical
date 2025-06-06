@@ -68,7 +68,7 @@
 #include "emp/tools/string_utils.hpp"
 #include "emp/tools/TypeTracker.hpp"
 
-// currently these have no coveage; we include them so we get metrics on them
+// currently these have no coverage; we include them so we get metrics on them
 // this doesn't actually work--TODO: figure out why this doesn't work
 #include "emp/debug/alert.hpp"
 #include "emp/io/serialize_macros.hpp"
@@ -416,3 +416,6 @@ TEST_CASE("Test MatchBin", "[matchbin]")
   }
 }
 #undef EMP_LOG_MATCHBIN
+
+// Local settings for Empecable file checker.
+// empecable_words: logbuffer

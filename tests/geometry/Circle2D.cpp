@@ -58,3 +58,6 @@ TEST_CASE("Test Circle2D", "[geometry]")
 
 
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: xyr

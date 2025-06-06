@@ -114,7 +114,7 @@ TEST_CASE("Test Lexer with ignore tokens", "[compiler]")
   CHECK(lexer.GetTokenName(lexer.TokenizeNext(ss, line_num)) == "Other");    // !
 }
 
-TEST_CASE("Full tokinization of an entire stream", "[compiler]")
+TEST_CASE("Full tokenization of an entire stream", "[compiler]")
 {
   emp::Lexer lexer;
   lexer.AddToken("Integer", "\\d+");
@@ -135,3 +135,6 @@ TEST_CASE("Full tokinization of an entire stream", "[compiler]")
 
   CHECK(tokens.size() == 5);
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: mbers lxr

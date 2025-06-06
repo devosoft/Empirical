@@ -123,7 +123,7 @@ TEST_CASE("Test more complex regular expressions (RegEx)", "[compiler]")
   CHECK( parens3.Test("a(b((c)))d(ef(g(hi)j)k)") == true );  // More nested 3-deep parens
   CHECK( parens3.Test("(((())))") == false );                // Too deep...
   CHECK( parens3.Test("((()))((()))((()))((()))") == true ); // Lots of parens
-  CHECK( parens3.Test("a(a(a(a(a)a)a)a)a") == false );       // Too deep... with other chartacters
+  CHECK( parens3.Test("a(a(a(a(a)a)a)a)a") == false );       // Too deep... with other characters
   CHECK( parens3.Test("((()())(()()))((()())(()()))") == true ); // Multi parens at each level
 
   emp::NFA nfa = emp::to_NFA(parens3);
@@ -132,3 +132,6 @@ TEST_CASE("Test more complex regular expressions (RegEx)", "[compiler]")
   CHECK( nfa.GetSize() <= 44 );
   CHECK( dfa.GetSize() <= 10 );
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: ghij defghijk xxzzzxx xxxx abcabc xxxxx xxyyxx abcabcd bcd aaaabc xxyxx bcdef abcdefghijklm bcdefg

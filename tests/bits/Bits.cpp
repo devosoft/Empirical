@@ -171,7 +171,7 @@ TEST_CASE("2: Test Bits Assignments", "[bits]"){
   emp::vector< emp::BitSet<128> > b_set;
 
   // For resizable Bits types, try all sizes from 0 to 128.
-  // Lot's of move operators will trigger as vector grows.
+  // Lots of move operators will trigger as vector grows.
   for (size_t i = 0; i <= 128; i++) {
     b_vec.emplace_back(i);
     b_val.emplace_back(i);
@@ -924,7 +924,7 @@ TEST_CASE("9: Test Boolean logic and shifting functions.", "[bits]") {
   CHECK( (bv >> 3) == emp::BitVector("11001000"));
   CHECK( (bv >> 4) == emp::BitVector("10010000"));
 
-  // Now some tests with bitvectors longer than one field.
+  // Now some tests with BitVectors longer than one field.
   const emp::BitVector bvl80 =
     "00110111000101110001011100010111000101110001011100010111000101110001011100010111";
   CHECK( bvl80.GetSize() == 80 );
@@ -2404,7 +2404,7 @@ TEST_CASE("25: Test Boolean logic and shifting functions.", "[bits]") {
 
 
 /**
- * Status booleans (Any, All, None)
+ * Status Boolean (Any, All, None)
  * as well as Clear and SetAll
  */
 void test_status(){
@@ -2772,7 +2772,7 @@ struct ImportExportTester {
       CHECK(dest.Get(i) == 0);
     }
 
-    // using all from_bit's
+    // using all from_bit
     source.Randomize(rand);
     dest.Randomize(rand);
 
@@ -3924,3 +3924,6 @@ TEST_CASE("31: Dynamic Bits", "[tools]") {
   CHECK(bv2 != db2);
 
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: bvl deser sbv sbvl iarchive bal svec sval oarchive

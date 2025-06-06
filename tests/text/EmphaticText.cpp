@@ -76,3 +76,6 @@ TEST_CASE("Testing EmphaticText", "[text]") {
   CHECK(emphatic_text.AsString() == "The `* and `* here should not be converted.");
   CHECK(emphatic_text.Encode() == "The \\`* and \\`* here should `*not`* be converted.");
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: ests

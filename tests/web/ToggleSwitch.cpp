@@ -25,14 +25,14 @@ struct Test_ToggleSwitch_init_on : emp::web::BaseTest {
    * <span id="switch_on" style="clear: none; display: inline;" class="custom-control custom-switch">
    *  <input type="checkbox" onchange="emp.Callback(32, ['checkbox', 'radio'].includes(this.type) ? this.checked.toString() : this.value);" checked="checked" class="custom-control-input">
    *  <label class="custom-control-label" for="[input_id]">
-   *    <span>Switch Defult On</span>
+   *    <span>Switch Default On</span>
    *  </label>
    * </span>
    */
   Test_ToggleSwitch_init_on()
   : BaseTest({"emp_test_container"})
   {
-    emp::prefab::ToggleSwitch on_switch([](std::string val){},"Switch Defult On", true, "switch_on");
+    emp::prefab::ToggleSwitch on_switch([](std::string val){},"Switch Default On", true, "switch_on");
     Doc("emp_test_container") << on_switch;
   }
 
@@ -124,14 +124,14 @@ struct Test_ToggleSwitch_init_off : emp::web::BaseTest {
    * <span id="switch_off" style="clear: none; display: inline;" class="custom-control custom-switch">
    *     <input type="checkbox" onchange="emp.Callback(32, ['checkbox', 'radio'].includes(this.type) ? this.checked.toString() : this.value);" class="custom-control-input">
    *     <label class="custom-control-label">
-   *         <span>Switch Defult Off</span>
+   *         <span>Switch Default Off</span>
    *     </label>
    * </span>
    */
   Test_ToggleSwitch_init_off()
   : BaseTest({"emp_test_container"})
   {
-    emp::prefab::ToggleSwitch off_switch([](std::string val){},"Switch Defult Off", false, "switch_off");
+    emp::prefab::ToggleSwitch off_switch([](std::string val){},"Switch Default Off", false, "switch_off");
     Doc("emp_test_container") << off_switch;
   }
 

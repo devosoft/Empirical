@@ -98,7 +98,7 @@ struct Test_Click : public emp::web::BaseTest {
 
       /*
        * Here, I've staggered the setTimeout times slightly
-       * to ensure that the clicks and their corresponing
+       * to ensure that the clicks and their corresponding
        * asserts occur in the order that I expect.
        */
       describe("First click", function() {
@@ -142,3 +142,6 @@ int main() {
   test_runner.Run();
 
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: btn mmore

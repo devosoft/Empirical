@@ -47,3 +47,6 @@ TEST_CASE("MemoryIStream", "[io]") {
   ) );
 
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: memcmp

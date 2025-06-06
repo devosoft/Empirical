@@ -18,3 +18,6 @@ int main() {
   wm.AddFront(*we);
   we->SetText("<p>This is a <b>TEST</b></p>");
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: mytext

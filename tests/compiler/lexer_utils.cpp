@@ -103,3 +103,6 @@ TEST_CASE("Another Test lexer_utils", "[compiler]")
   CHECK( dfa_all.Next(0, "abcdefghijklmnopqrstuvwxyz") > 0);
   CHECK( dfa_all.Next(0, "ABC-DEF") == -1 );
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: ddef lstate defed edffedf edffed fedfed ffed defdef nxt

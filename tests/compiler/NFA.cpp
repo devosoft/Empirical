@@ -143,3 +143,6 @@ TEST_CASE("Another Test NFA", "[compiler]")
   state2.Next("aaaa");
   REQUIRE(state2.GetSize() == 7);
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: aaaa nxt

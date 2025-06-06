@@ -311,7 +311,7 @@ struct Test_Config_Panel_HTMLLayout : public emp::web::BaseTest {
           });
         });
 
-        // Test that default ranges have been overriden correctly
+        // Test that default ranges have been overridden correctly
         describe("explicit range setting", function() {
           const seed_range = document.getElementById("settings_SEED_view").children[0];
           describe("#settings_SEED's range slider", function() {

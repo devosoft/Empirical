@@ -553,7 +553,7 @@ TEST_CASE("Another Test string_utils", "[tools]")
 }
 
 TEST_CASE("Test to_web_safe_string", "[tools]" ){
-  // requires that angle backets are replaced with &lt or &gt
+  // requires that angle brackets are replaced with &lt or &gt
   CHECK( emp::to_web_safe_string("<h1>hi</h1>" ) == "&lth1&gthi&lt/h1&gt");
   // requires that ampersands are replaced with &amp
   CHECK( emp::to_web_safe_string("one & two" ) == "one &amp two");
@@ -608,3 +608,6 @@ TEST_CASE("Test url-encode", "[tools]") {
   REQUIRE( emp::url_decode("%20+") == " +" );
   REQUIRE( emp::url_decode<true>("%20+") == "  " );
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: aposbye aposone quot risoner english aapnoot lth aapnootmies mies noot ghi isanokaystring quotone azkaban bla okaystring gthi anokaystring alphanum ykty abcabc aap oka abcdefghijklmnop apos youexamplecom empt aaaabaaaa twee aaaaaaaaa qrstuvwxyz aabcccabbcccxxbcbca hel els adg abcdefg nis uvwxyz aabcccabbcccabcbca llo escp

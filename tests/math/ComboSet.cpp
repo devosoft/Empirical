@@ -50,3 +50,6 @@ TEST_CASE("Test combos", "[math]")
   REQUIRE(cid[1] == 1);
   REQUIRE(cid[2] == 2);
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: cid

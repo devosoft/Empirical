@@ -101,3 +101,6 @@ TEST_CASE("Testing HTMLText", "[text]") {
   CHECK(merged.AsString() == "Part 1 of text; And now part 2 of text.");
   CHECK(merged.Encode() == "Part <b>1</b> of text; And now part <b>2</b> of <i>text</i>.");
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: ests

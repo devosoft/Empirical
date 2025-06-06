@@ -129,3 +129,6 @@ TEST_CASE("Test ColorHSV", "[web][color_map]") {
   REQUIRE(emp::ColorHSV(0.8260*360,1.0,0.8000) == "#c300cc");
   REQUIRE(emp::ColorHSV(286,1.0,1.0) == "#c300ff");
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: ecc afaf ffffff hsl

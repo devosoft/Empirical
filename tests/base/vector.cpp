@@ -96,3 +96,6 @@ TEST_CASE("Initializer list with vector", "[base]")
   CHECK(v.size() == 5);
   CHECK(v[1] == 2);
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: bvec itr abca

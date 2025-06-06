@@ -322,3 +322,6 @@ TEST_CASE("Test IsPowerOf2", "[math]") {
   REQUIRE( emp::IsPowerOf2( 10 ) == false );
 
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: sgn szt

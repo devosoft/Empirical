@@ -305,3 +305,6 @@ struct {
 //   // init + a.Get() * b.Get();}, Bar(6) + Foo(7), Bar(11) + Foo(12)),
 //   //                      6 + 7);
 // }
+
+// Local settings for Empecable file checker.
+// empecable_words: ident bazz bitt nocopy ttt

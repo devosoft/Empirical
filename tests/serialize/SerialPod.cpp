@@ -286,3 +286,6 @@ TEST_CASE("Test SerialPod with pointer linkage", "[serialize]")
 TEST_CASE("Test SerialPod with custom linked list", "[serialize]")
 {
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: aaa

@@ -93,3 +93,6 @@ TEST_CASE("Test CharSet", "[tools]")
   CHECK(!cs.HasAny("twitch"));
   CHECK(!cs.HasAny("sarcastic"));
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: alphanum qwertyuiopasdfghjklzxcvbnm uvwxyz

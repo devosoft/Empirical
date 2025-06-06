@@ -56,7 +56,7 @@ int main() {
 
   show.NewSlide("Change Potential");
 
-  show.NewSlide("Novelity Potential");
+  show.NewSlide("Novelty Potential");
 
   show.NewSlide("Complexity Potential");
 
@@ -83,3 +83,6 @@ int main() {
 // Informally open-endedness = “keep doing interesting things”
 // Define “keep doing”
 // Define “interesting things”
+
+// Local settings for Empecable file checker.
+// empecable_words: cvs

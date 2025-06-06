@@ -1222,7 +1222,7 @@ TEST_CASE("Tree balance", "[evo]") {
 
 // Test that MRCA is properly updated when the MRCA is alive and then dies,
 // causing a new taxon to be MRCA
-TEST_CASE("Dieing MRCA", "[evo]") {
+TEST_CASE("Dying MRCA", "[evo]") {
   emp::Systematics<int, int> tree([](const int & i){return i;}, true, true, false, false);
   CHECK(!tree.GetTrackSynchronous());
 
@@ -1678,3 +1678,6 @@ TEST_CASE("Test LoadFromFile and Snapshot behavior") {
   }
 
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: treeclorg treecl Colless vol lin mrca mpd phen Sackin

@@ -156,3 +156,6 @@ TEST_CASE("Another Test IndexMap", "[datastructs]")
   CHECK(imap.Index(7.1) == 0);
   CHECK(imap.Index(75.0) == 7);
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: imap

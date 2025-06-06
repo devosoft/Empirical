@@ -447,7 +447,7 @@ TEST_CASE("Test ArgManager", "[config]")
   {
 
     emp::vector<std::string> arguments = {
-      "command", "help", "--halp"
+      "command", "help", "--help"
     };
 
     std::vector<char*> argv;
@@ -468,7 +468,7 @@ TEST_CASE("Test ArgManager", "[config]")
 
     REQUIRE(
       *am.UseArg("_unknown")
-      == ((emp::vector<std::string>) {"--halp"})
+      == ((emp::vector<std::string>) {"--help"})
     );
 
     REQUIRE(am.UseArg("help") == std::nullopt);
@@ -596,3 +596,6 @@ TEST_CASE("Test ArgManager", "[config]")
   }
 
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: ahi czvf unspec

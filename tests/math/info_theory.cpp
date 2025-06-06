@@ -24,3 +24,6 @@ TEST_CASE("Test info_theory", "[math]")
 
   REQUIRE( emp::Entropy2(0.5) == 1.0 );
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: dweights

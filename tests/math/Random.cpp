@@ -294,7 +294,7 @@ TEST_CASE("Another Test random", "[Random]")
     REQUIRE(actual_prob > flip_prob - 0.01);
 
 
-    // Mimimal test of Choose()
+    // Minimal test of Choose()
     emp::vector<size_t> choices = Choose(rng,100,10);
 
     REQUIRE(choices.size() == 10);
@@ -406,3 +406,6 @@ TEST_CASE("Test 64bit outputs", "[Random]") {
   REQUIRE(high_ave > 94'900'000'000);
   REQUIRE(high_ave < 95'100'000'000);
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: nval observs randfill unif rnd

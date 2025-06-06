@@ -70,3 +70,6 @@ TEST_CASE("Test sequence utils", "[math]")
 
   CHECK((v2 == emp::vector<int>({1,0,0,4,5,6,0,8,0})));
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: adhlmnopqrstuvxy lmnopqrstuv xmnopqrstuvwxyz bcdefghij wxyz abcdefghijklmnopqrstuvw

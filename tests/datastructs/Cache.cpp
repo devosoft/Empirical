@@ -32,3 +32,6 @@ TEST_CASE("Test Cache", "[datastructs]")
   REQUIRE(!cch.Has('b'));
   REQUIRE(cch.Has(c));
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: cch

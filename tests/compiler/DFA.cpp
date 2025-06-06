@@ -94,3 +94,6 @@ TEST_CASE("Another Test DFA", "[compiler]")
   REQUIRE(dfa.Next(0, "aaa") == 0);
   REQUIRE(dfa.Next(0, "b")  == 3);
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: aaa aaaaab aaaaaabb aaaaaab

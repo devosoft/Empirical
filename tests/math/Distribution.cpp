@@ -17,7 +17,7 @@
 
 /// Ensures that
 /// 1) A == B
-/// 2) A and B can be constexprs or non-contexprs.
+/// 2) A and B can be constexprs or non-constexprs.
 /// 3) A and B have the same values regardless of constexpr-ness.
 #define CONSTEXPR_REQUIRE_EQ(A, B)       \
   {                                      \
@@ -158,3 +158,6 @@ TEST_CASE("Test Negative Binomial", "[math]")
   }
 
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: geo

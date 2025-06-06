@@ -169,7 +169,7 @@ struct TestBVAssign<VAL1, VALS...> {
 // Base case for constructors...
 template<> struct TestBVAssign<> { static void Run(){} };
 
-TEST_CASE("2: Test BitSet Assignemnts", "[bits]"){
+TEST_CASE("2: Test BitSet Assignments", "[bits]"){
   // Try a range of BitSet sizes, from 1 to 200.
   TestBVAssign<1,2,7,8,9,15,16,17,31,32,33,63,64,65,127,128,129,191,192,193,200,1023,1024,1025,1000000>::Run();
 }
@@ -436,10 +436,10 @@ TEST_CASE("5: Test Randomize() and variants", "[bits]") {
     // Test the probabilistic CHANGE functions.
     bs.Clear();                     REQUIRE(bs.CountOnes() == 0);   // Set all bits to 0.
 
-    bs.FlipRandom(random, 0.3);     // Exprected: 300 ones (from flipping zeros)
+    bs.FlipRandom(random, 0.3);     // Expected: 300 ones (from flipping zeros)
     num_ones = bs.CountOnes();      REQUIRE(num_ones > 230);  REQUIRE(num_ones < 375);
 
-    bs.FlipRandom(random, 0.3);     // Exprected: 420 ones (hit by ONE but not both flips)
+    bs.FlipRandom(random, 0.3);     // Expected: 420 ones (hit by ONE but not both flips)
     num_ones = bs.CountOnes();      REQUIRE(num_ones > 345);  REQUIRE(num_ones < 495);
 
     bs.SetRandom(random, 0.5);      // Expected: 710 (already on OR newly turned on)
@@ -451,7 +451,7 @@ TEST_CASE("5: Test Randomize() and variants", "[bits]") {
     bs.ClearRandom(random, 0.2);    // Expected 753.6 (20% of those on now off)
     num_ones = bs.CountOnes();      REQUIRE(num_ones > 675);  REQUIRE(num_ones < 825);
 
-    bs.FlipRandom(random, 0.5);     // Exprected: 500 ones (each bit has a 50% chance of flipping)
+    bs.FlipRandom(random, 0.5);     // Expected: 500 ones (each bit has a 50% chance of flipping)
     num_ones = bs.CountOnes();      REQUIRE(num_ones > 425);  REQUIRE(num_ones < 575);
 
 
@@ -845,7 +845,7 @@ TEST_CASE("9: Test Boolean logic and shifting functions.", "[bits]") {
 
 /// Ensures that
 /// 1) A == B
-/// 2) A and B can be constexprs or non-contexprs.
+/// 2) A and B can be constexprs or non-constexprs.
 /// 3) A and B have the same values regardless of constexpr-ness.
 #define CONSTEXPR_REQUIRE_EQ(A, B)       \
   {                                      \
@@ -856,7 +856,7 @@ TEST_CASE("9: Test Boolean logic and shifting functions.", "[bits]") {
 
 
 /**
- * Status booleans (Any, All, None)
+ * Status Boolean tests (Any, All, None)
  * as well as Clear and SetAll
  */
 void test_status(){
@@ -1224,7 +1224,7 @@ struct ImportExportTester {
       REQUIRE(dest.Get(i) == 0);
     }
 
-    // using all from_bit's
+    // using all from_bit
     source.Randomize(rand);
     dest.Randomize(rand);
 
@@ -2386,3 +2386,6 @@ TEST_CASE("Test BitSet string construction", "[tools]") {
   );
 
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: iarchive oarchive deser myspan spraetor bsl

@@ -20,7 +20,7 @@ TEST_CASE("Test graph_utils", "[datastructs]")
 
   // build_graph_ring
   /// comment: this build graph ring doesn't seem to work right
-  /// comment says: Construct a graph where all vertics are degree two and form a single ring.
+  /// comment says: Construct a graph where all vertices are degree two and form a single ring.
   /// but often get outputs like this:
   /// 5 4
   /// 0 1
@@ -151,3 +151,6 @@ TEST_CASE("Test Graph utils", "[datastructs]")
 
   // graph.PrintSym();
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: wgr wgt gru wght dag gcs grc

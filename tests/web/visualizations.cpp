@@ -606,3 +606,6 @@ int main() {
   //
   //   });
   // });
+
+// Local settings for Empecable file checker.
+// empecable_words: viz exampleaxis attrs sel svg
