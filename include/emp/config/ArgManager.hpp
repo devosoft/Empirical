@@ -801,4 +801,4 @@ namespace emp {
 #endif // #ifndef EMP_CONFIG_ARGMANAGER_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: argspec dealias czvf argpack deflag deflagging argspecs deflagged
+// empecable_words: deflagged argspecs deflag argpack deflagging czvf argspec

@@ -386,4 +386,4 @@ namespace web {
 #endif // #ifndef EMP_WEB__MOCHATESTRUNNER_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: chai mochajs
+// empecable_words: mochajs

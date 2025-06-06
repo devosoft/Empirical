@@ -991,4 +991,4 @@ namespace std {
 #endif // #ifndef EMP_DATASTRUCTS_SMALLVECTOR_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: Sizer elts offsetof alignas uninvalidate dtors smallvector memmove elt ctor alignof
+// empecable_words: alignof ctor elt memmove dtors uninvalidate alignas offsetof elts Sizer

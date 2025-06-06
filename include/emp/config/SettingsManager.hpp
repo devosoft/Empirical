@@ -66,7 +66,7 @@ namespace emp {
 
       SettingInfo(emp::String name, emp::String & var, emp::String desc,
                   char flag='\0', emp::String option="")
-        : name(name), value(var), desc(desc), flag(flag), option(option), 
+        : name(name), value(var), desc(desc), flag(flag), option(option),
           action([&var](const SettingInfo & info){ var = info.GetValue<emp::String>(); }) { }
       SettingInfo(emp::String name, bool & var, emp::String desc,
                   char flag='\0', emp::String option="")
@@ -274,4 +274,4 @@ namespace emp {
 #endif // #ifndef EMP_CONFIG_SETTINGS_MANAGER_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: ident ofs
+// empecable_words: ofs ident

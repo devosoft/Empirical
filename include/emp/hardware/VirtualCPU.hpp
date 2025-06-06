@@ -36,7 +36,7 @@
 #include "VirtualCPU_InstLib.hpp"
 
 namespace emp{
-  /// \brief A simple virtual CPU styled after those seen in Avida
+  /// @brief A simple virtual CPU styled after those seen in Avida
   ///
   /// This class represents a single virtual CPU following a genome of assembly-level
   /// instructions.
@@ -58,7 +58,7 @@ namespace emp{
       using nop_vec_t = emp::vector<size_t>;
       using stack_t = emp::vector<data_t>;
 
-      /// \brief Representation of a single instruction in the CPU's genome
+      /// @brief Representation of a single instruction in the CPU's genome
       ///
       /// Only contains the necessary information for which instruction is being represented
       /// as well as any data it needs in the genome.
@@ -847,4 +847,4 @@ namespace emp{
 #endif // #ifndef EMP_HARDWARE_VIRTUALCPU_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: sstr xyzabc
+// empecable_words: xyzabc sstr

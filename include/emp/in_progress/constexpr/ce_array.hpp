@@ -53,11 +53,11 @@ namespace emp {
     constexpr bool Has(const T & t) const { return p1.Has(t) || p2.Has(t); }
 
     template <size_t i> constexpr T & Get() {
-      static_assert(i < N, "ce_array::Get<id> must have inded in range.");
+      static_assert(i < N, "ce_array::Get<id> must have id in range.");
       return (i < p1_size) ? p1.template Get<i>(0) : p2.template Get<i-p1_size>(0);
     }
     template <size_t i> constexpr const T & Get() const {
-      static_assert(i < N, "ce_array::Get<id> must have inded in range.");
+      static_assert(i < N, "ce_array::Get<id> must have index in range.");
       return (i < p1_size) ? p1.template Get<i>(0) : p2.template Get<i-p1_size>(0);
     }
   };
@@ -90,11 +90,11 @@ namespace emp {
     constexpr bool Has(const T & t) const { return m_val == t; }
 
     template <size_t i> constexpr T & Get() {
-      static_assert(i==0, "ce_array::Get<id> must have inded in range.");
+      static_assert(i==0, "ce_array::Get<id> must have index in range.");
       return m_val;
     }
     template <size_t i> constexpr const T & Get() const {
-      static_assert(i==0, "ce_array::Get<id> must have inded in range.");
+      static_assert(i==0, "ce_array::Get<id> must have index in range.");
       return m_val;
     }
   };

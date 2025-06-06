@@ -27,7 +27,7 @@
 #include "./Distribution.hpp"
 
 namespace emp{
-  /// \brief A collection of distributions that allows for pulls from a binomial distribution with arbitrary N while only storing log_2(N) distributions
+  /// @brief A collection of distributions that allows for pulls from a binomial distribution with arbitrary N while only storing log_2(N) distributions
   class CombinedBinomialDistribution{
     protected:
       emp::vector<Binomial> distribution_vec; /**< The collection of binomial distributions

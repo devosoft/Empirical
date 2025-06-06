@@ -107,3 +107,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_IN_PROGRESS_EMPOWER_STRUCTTYPE_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: vinfo tmanager

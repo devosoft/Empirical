@@ -43,7 +43,7 @@ struct PlusCountdownRegulator {
   // ...   | ...
   // -inf  | -= 1.0f
 
-  // countdown timer to reseting state
+  // countdown timer to resetting state
   unsigned char timer{};
 
   /// Apply regulation to a raw match score.
@@ -80,7 +80,7 @@ struct PlusCountdownRegulator {
 
   /// A negative value upregulates the item,
   /// a value of exactly zero is neutral
-  /// and a postive value downregulates the item.
+  /// and a positive value downregulates the item.
   bool Adj(const float& amt) {
     if ( std::isnan( amt ) ) return false;
 
@@ -118,3 +118,6 @@ struct PlusCountdownRegulator {
 } // namespace emp
 
 #endif // #ifndef EMP_MATCHING_REGULATORS_PLUSCOUNTDOWNREGULATOR_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: amt adj deci

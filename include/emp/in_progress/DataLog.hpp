@@ -83,6 +83,3 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_DATA_DATALOG_HPP_INCLUDE
-
-// Local settings for Empecable file checker.
-// empecable_words: dev

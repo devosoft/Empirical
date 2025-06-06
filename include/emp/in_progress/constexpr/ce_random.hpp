@@ -20,13 +20,13 @@
  *    double GetDouble()
  *    double GetDouble(double max)
  *    double GetDouble(double min, double max)
- *      Retrive a random double in the range [min, max).  By default, min=0.0 and max=1.0.
+ *      Retrieve a random double in the range [min, max).  By default, min=0.0 and max=1.0.
  *
  *    int GetInt(int max)
  *    int GetInt(int min, int max)
  *    uint32_t GetUInt(uint32_t max)
  *    uint32_t GetUInt(uint32_t min, uint32_t max)
- *      Retrive a random int or uint in the range [min, max).  By default, min=0.
+ *      Retrieve a random int or uint in the range [min, max).  By default, min=0.
  *
  *    bool P(double p)
  *      Tests a random value [0,1) against a given probability p, and returns true of false.
@@ -351,3 +351,6 @@ namespace emp {
 } // END emp namespace
 
 #endif // #ifndef EMP_IN_PROGRESS_CONSTEXPR_CE_RANDOM_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: olast inextp ofirst inext

@@ -758,4 +758,4 @@ namespace emp {
 #endif // #ifndef EMP_HARDWARE_SIGNALGP_UTILS_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: rnd uset cnt amlalejini locs dels rhead matchbin
+// empecable_words: rhead dels locs amlalejini cnt uset rnd

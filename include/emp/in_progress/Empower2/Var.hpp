@@ -147,3 +147,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_IN_PROGRESS_EMPOWER2_VAR_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: vinfo

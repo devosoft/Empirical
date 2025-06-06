@@ -205,7 +205,7 @@ namespace emp {
     size_t ProcessArg(String name, size_t cur_pos=0) { return ProcessOption(name, cur_pos); }
     [[deprecated("ProcessArg has been changed to ProcessOption")]]
     size_t ProcessArg(char c, size_t cur_pos=0) { return ProcessOption(c, cur_pos); }
- 
+
     // Process an argument associated with a particular option; return num additional args used.
     size_t ProcessOption(String name, size_t cur_pos) {
       if (!emp::Has(flag_options, name)) {
@@ -346,7 +346,7 @@ namespace emp {
         }
         else extras.push_back(arg);
       }
-      
+
       return extras;
     }
 

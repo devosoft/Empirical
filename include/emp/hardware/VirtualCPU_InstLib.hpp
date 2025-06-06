@@ -19,7 +19,7 @@
 
 namespace emp {
 
-  /// \brief A pure-virtual class that defines a series of instructions for VirtualCPU_Base or any of its derived classes.
+  /// @brief A pure-virtual class that defines a series of instructions for VirtualCPU_Base or any of its derived classes.
   template <typename HARDWARE_T, typename ARG_T=size_t, size_t ARG_COUNT=3>
   struct VirtualCPU_InstLib : public InstLib<HARDWARE_T, ARG_T, ARG_COUNT> {
     using hardware_t = HARDWARE_T;
@@ -297,4 +297,4 @@ namespace emp {
 #endif // #ifndef EMP_HARDWARE_VIRTUALCPU_INSTLIB_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: stk jmp mov
+// empecable_words: mov jmp stk

@@ -67,3 +67,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_IN_PROGRESS_CONSTEXPR_CE_STRING_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: grrr

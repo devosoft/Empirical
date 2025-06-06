@@ -35,7 +35,7 @@ namespace emp {
 
     Var & operator=(const Var &) = default;
 
-    /// Restore this variable to its orignal type for direct use.
+    /// Restore this variable to its original type for direct use.
     template <typename T>
     T & Restore() {
       // Make sure function is restoring the correct type.

@@ -1009,4 +1009,4 @@ void load(
 #endif // #ifndef EMP_MATCHING_MATCHBIN_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: amt adj uids matchbin uid logbuffer logentry
+// empecable_words: uid uids adj logentry logbuffer amt

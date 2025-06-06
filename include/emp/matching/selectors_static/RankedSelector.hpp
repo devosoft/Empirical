@@ -118,3 +118,6 @@ struct RankedSelector {
 } // namespace emp
 
 #endif // #ifndef EMP_MATCHING_SELECTORS_STATIC_RANKEDSELECTOR_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: infy

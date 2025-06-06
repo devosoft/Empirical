@@ -2154,4 +2154,4 @@ namespace emp {
 #endif // #ifndef EMP_HARDWARE_EVENTDRIVENGP_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: amlalejini prgm matchbin aff eofun elib eob cnt uids stk stdvectorerase rnd blk ilib adj ext
+// empecable_words: ext adj ilib blk rnd stdvectorerase stk uids cnt eob eofun aff elib prgm amlalejini

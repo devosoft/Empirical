@@ -653,4 +653,4 @@ void empCppCallback(const size_t cb_id) {
 #endif // #ifndef EMP_WEB_JSWRAP_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: bec cmd ecba javascript ret
+// empecable_words: ret javascript ecba bec

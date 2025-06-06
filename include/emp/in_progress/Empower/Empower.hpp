@@ -16,14 +16,14 @@
  *  Var          An instance of a specific variable, with associated data in a memory image.
  *  VarInfo      Information about a variable (type, position, etc) across instances of a struct.
  *
- *  Struct       An agregate type, consisting of a mapping of names to VarInfo
+ *  Struct       An aggregate type, consisting of a mapping of names to VarInfo
  *  Object       A pairing of a Struct with a Memory image of actual variables
- *  Scope        A sinle-instance Object that can have new variables added dynamically
+ *  Scope        A single-instance Object that can have new variables added dynamically
  *
  *  Developer Notes:
  *  @todo After a memory image is locked down, we can optimize it by re-ordering variables, etc.
  *        to group identical types together, or isolate those that are trivially constructable or
- *        destructable.
+ *        destructible.
  *
  *  @todo Setup a template wrapper that adds annotations on to another class using a MemoryImage
  *  @todo Allow multiple memory spaces in Empower; basically scopes or namespaces.
@@ -309,3 +309,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_IN_PROGRESS_EMPOWER_EMPOWER_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: cconstruct dconstruct
