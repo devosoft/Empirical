@@ -127,3 +127,6 @@ NKInterface interface;
 int main()
 {
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: vis

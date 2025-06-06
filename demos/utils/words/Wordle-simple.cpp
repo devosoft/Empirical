@@ -242,7 +242,7 @@ public:
     return options;
   }
 
-  // Slow way to manually call on specific words; brute-force find the entires for each.
+  // Slow way to manually call on specific words; brute-force find the entries for each.
   emp::BitVector AnalyzeGuess(const std::string & guess, const std::string & answer) {
     if (!emp::Has(pos_map, answer)) std::cerr << "UNKNOWN WORD: " << answer << std::endl;
     return AnalyzeGuess(guess, words[pos_map[answer]]);

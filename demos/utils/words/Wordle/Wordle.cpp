@@ -579,3 +579,6 @@ int main(int argc, char* argv[])
   if (args.size() > 1) is_ptr.Delete();
   if (args.size() > 2) os_ptr.Delete();
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: sgb knuth stanford lang

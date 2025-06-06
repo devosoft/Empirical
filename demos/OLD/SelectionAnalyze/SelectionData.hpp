@@ -39,7 +39,7 @@ private:
   emp::BitVector is_dominated;            ///< Is org guaranteed to have a chance?
   emp::BitVector is_active;               ///< Is org non-dominated AND not a duplicate.
 
-  emp::BitVector is_discrim;              ///< Is criterium discrimanatory.
+  emp::BitVector is_discrim;              ///< Is criterion discriminatory.
 
   struct OrgInfo {
     emp::vector< size_t > dup_ids = {};   ///< What OTHER ids are lumped in with this one?
@@ -161,7 +161,7 @@ public:
   }
 
   /// Load a file with fitness data.
-  /// * File is structed as a CSV using '#' for comments.
+  /// * File is structured as a CSV using '#' for comments.
   /// * First row is column headings
   /// * Additional ROWS represent organisms
   /// * COLS represent selection criteria (e.g. fitness function results)
@@ -451,12 +451,12 @@ public:
   const emp::vector<double> & CalcLexicaseProbs(const emp::BitVector & orgs, const emp::BitVector & fits) {
     emp_assert(orgs.Any());  // Must have at lease one organism still in the mix!
 
-    // Look up this set of organisms in the cache and return if found.  Keep a referece to the probailties
+    // Look up this set of organisms in the cache and return if found.  Keep a reference to the probabilities
     // so that it will be automatically updated in the cache for next time we need it.
     emp::vector<double> & out_probs = prob_cache[orgs];
     if (out_probs.size()) return out_probs;
 
-    // We haven't cached out_probs, so calculate it now; inititalize all probs to zero.
+    // We haven't cached out_probs, so calculate it now; initialize all probs to zero.
     out_probs.resize(orgs.GetSize(), 0.0);
 
     // Track the total weight of all the criteria to determine the fraction associated with each.
@@ -596,3 +596,6 @@ public:
 };
 
 #endif // #ifndef DEMOS_OLD_SELECTIONANALYZE_SELECTIONDATA_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: crit discrim

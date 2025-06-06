@@ -162,3 +162,6 @@ int main(int argc, char* argv[])
     std::cout << "]" << std::endl;
   }
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: adj

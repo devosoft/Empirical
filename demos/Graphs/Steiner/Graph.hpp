@@ -204,7 +204,7 @@ public:
 
   void Exclude(size_t id) {
     emp_assert(id <= unknown.size(), id, unknown.size());
-    unknown.Clear(id);    
+    unknown.Clear(id);
   }
 
   bool OptimizeDegrees() {
@@ -353,7 +353,7 @@ public:
       os << "Plus " << node_set.CountOnes() << " included: ";
       for (size_t id = node_set.FindOne(); id < node_set.size(); id = node_set.FindOne(id+1)) {
         os << id << " ";
-      }      
+      }
     }
     os << std::endl;
   }

@@ -105,13 +105,6 @@ private:
   ReviewFile & File() { return file_handler.File(); }
   const ReviewFile & File() const { return file_handler.File(); }
 
-  emplex::Token GetToken() const { return File().GetToken(); }
-  emp::String GetLexeme() const { return File().GetLexeme(); }
-  size_t GetLineID() const { return File().GetLineID(); }
-  emplex::Token GetToken(size_t pos) const { return File().GetToken(pos); }
-  emp::String GetLexeme(size_t pos) const { return File().GetLexeme(pos); }
-  size_t GetLineID(size_t pos) const { return File().GetLineID(pos); }
-
   void SetupSettings() {
     settings.AddSetting("Copyright", copyright,
       "Full text of the copyright heading that should be at the top of each file.");
@@ -244,12 +237,12 @@ private:
   }
 
   void DoReplace(emp::String new_word, bool change_all=false) {
-    const emp::String old_word = GetLexeme();
+    const emp::String old_word = File().GetLexeme();
     file_handler.AddSuggestion(old_word, new_word);
     if (change_all) file_handler.AddReplacement(old_word, new_word);
     File().SetLexeme(new_word);
     if (IsVerbose()) {
-      if (!change_all) emp::Print("Line ", GetLineID(), ": ");
+      if (!change_all) emp::Print("Line ", File().GetLineID(), ": ");
       emp::Print("Replacing ");
       if (change_all) emp::Print(" all instances of ");
       emp::PrintLn("'", old_word.AsANSICyan(), "' with '", new_word.AsANSICyan(), "'.");
@@ -258,7 +251,7 @@ private:
 
   // DoReplace with no replacement word uses the replacement_map.
   void DoReplace(bool change_all=false) {
-    DoReplace(file_handler.GetReplacement(GetLexeme()), change_all);
+    DoReplace(file_handler.GetReplacement(File().GetLexeme()), change_all);
   }
 
   void QueryReplace(bool change_all) {
@@ -374,7 +367,7 @@ private:
 
   // Look at the current token and test if it is allowed, possibly interactively asking user.
   bool TestWordToken() {
-    emp::String word(GetLexeme());
+    emp::String word(File().GetLexeme());
 
     if (IsWordAllowed(word)) return true;
 
@@ -400,7 +393,7 @@ public:
       ProcessFile();
     }
     file_handler.SaveProjectConfig();
-    if (!IsSilent()) std::cout << "\nTotal Issues = " << total_issues << std::endl;
+    if (!IsSilent()) emp::PrintLn("\nTotal Issues = ", total_issues);
   }
 
   ~Empecable() { }
@@ -454,7 +447,7 @@ public:
     var_map["year"] = emp::MakeString(tm_ptr->tm_year + 1900);
 
     using namespace emplex;
-    // Delete any blank lines at the beginning of a file.
+    // Offer to delete any blank lines at the beginning of a file.
     size_t cur_pos = 0;
     while (File().GetToken(cur_pos) == Lexer::ID_END_LINE) ++cur_pos;
     if (cur_pos > 0) {
@@ -465,27 +458,30 @@ public:
       }
     }
 
+    // Scan the copyright block, if one exists, to collect some variables.
+
+
     // Next should be the copyright.
-    if (File().GetToken(0) != Lexer::ID_COMMENT_START) {
-      File().ReportIssue("No open comment ('/*') found at beginning of file.");
-      if (IsInteractive()) {
-        emp::String file_copyright = copyright.ReplaceVars(var_map).AsANSIGreen();
-        emp::PrintLn(file_copyright);
-        File().PrintFront(3);
-        if (AskYesNo("Should we insert the copyright block? ")) {
-          File().InsertLexeme(0, file_copyright);
-        }
-      }
-      if (IsVerbose()) { emp::PrintRepeatLn('-',79); }
-    }
+    // if (File().GetToken(0) != Lexer::ID_COMMENT_START) {
+    //   File().ReportIssue("No open comment ('/*') found at beginning of file.");
+    //   if (IsInteractive()) {
+    //     emp::String file_copyright = copyright.ReplaceVars(var_map).AsANSIGreen();
+    //     emp::PrintLn(file_copyright);
+    //     File().PrintFront(3);
+    //     if (AskYesNo("Should we insert the copyright block? ")) {
+    //       File().InsertLexeme(0, file_copyright);
+    //     }
+    //   }
+    //   if (IsVerbose()) { emp::PrintRepeatLn('-',79); }
+    // }
   }
 
   // Make sure all tokens throughout the body of a file are valid.
   void ValidateFileTokens() {
     using namespace emplex;
 
-    for (File().ResetTokens(); GetToken() != 0; File().NextToken()) {
-      switch (GetToken()) {
+    for (File().ResetTokens(); File().GetToken() != 0; File().NextToken()) {
+      switch (File().GetToken()) {
       case Lexer::ID_WORD:
         if (!TestWordToken() && IsVerbose()) emp::PrintRepeatLn('-',79);
         break;

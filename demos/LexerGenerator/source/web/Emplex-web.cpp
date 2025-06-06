@@ -82,7 +82,7 @@ private:
     "cursor", "pointer",
     "font-size", "16px",
     "transition", "background-color 0.3s ease, transform 0.3s ease" // Smooth transition
-  }; 
+  };
 
   UI::Style table_style {
     "background-color", "white",
@@ -109,7 +109,7 @@ private:
     "cursor", "pointer",
     "font-size", "12px",
     "transition", "background-color 0.3s ease, transform 0.3s ease" // Smooth transition
-  }; 
+  };
 
   // ---- HELPER FUNCTIONS ----
 
@@ -174,7 +174,7 @@ private:
       // token_info.emplace_back(TokenInput(token_id));
       token_info.emplace_back(token_id);
       SetupTableRowCallbacks(token_id);
-    }     
+    }
     auto & row_info = token_info[token_id];
     new_row[0] << row_info.GetNameWidget();
     new_row[1] << row_info.GetRegexWidget();
@@ -268,7 +268,7 @@ private:
         else if (name == "use_token_lexemes") { use_token_lexemes = setting.AsBool(); doc.CheckBox("checkbox_lexemes").SetChecked(use_token_lexemes); }
         else if (name == "use_token_line_num") { use_token_line_num = setting.AsBool(); doc.CheckBox("checkbox_line_nums").SetChecked(use_token_line_num); }
         else if (name == "use_token_column") { use_token_column = setting.AsBool(); doc.CheckBox("checkbox_cols").SetChecked(use_token_column); }
-    
+
       } else { // Must be a token entry.
         AddTableRow(name, setting, ignore);
       }
@@ -290,8 +290,8 @@ private:
       auto & t_info = token_info[line_num];
       emp::String name = t_info.GetName();
       emp::String regex = t_info.GetRegex();
-  
-      if (name.empty() && regex.empty()) continue;  // Completely empty slots can be skipped.      
+
+      if (name.empty() && regex.empty()) continue;  // Completely empty slots can be skipped.
 
       if (name.empty()) {
         Error(line_num, "No name provided for RegEx: ", regex);
@@ -331,7 +331,7 @@ private:
 
     lexer.Reset();
 
-    // Load all of the tokens ino the lexer (since they passed tests, assume they are valid)
+    // Load all of the tokens into the lexer (since they passed tests, assume they are valid)
     for (const auto & t_info : token_info) {
       emp::String name = t_info.GetName();
       emp::String regex = t_info.GetRegex();
@@ -459,7 +459,7 @@ private:
       intro_div << HeadingName("Overview") <<
           "<p>Emplex uses a set of <b>token names</b> and associated <b>regular expressions</b> to "
           "generate C++ code for a fast, table-driven lexer for ASCII input. "
-          "Click on the buttons above to learn more or " << trigger_text << ".</p>"; 
+          "Click on the buttons above to learn more or " << trigger_text << ".</p>";
     } else if (mode == "lexer") {
       doc.Button("lexer_but").SetBackground(active_color);
       intro_div << HeadingName("Lexical analysis") <<
@@ -575,14 +575,14 @@ private:
         "<p>Here are some examples of regular expression techniques:</p>\n"
         "<p><table border=\"2\" cellpadding=\"3\" style=\"background: white; color: black\">\n"
         "<tr><td><code>.*</code></td> <td>Match all characters until the end of the current line.</td></tr>\n"
-        "<tr><td><code>\"if\"|\"while\"|\"for\"</code></td> <td>Match common keywords.</td></tr>\n"      
+        "<tr><td><code>\"if\"|\"while\"|\"for\"</code></td> <td>Match common keywords.</td></tr>\n"
         "<tr><td><code>x0[0-9a-fA-F]+</code></td> <td>Match hexadecimal values</td></tr>\n"
-        "<tr><td><code>(http(s?)\"://\")?\\w+([./]\\w+)+</code></td> <td>A simple URL matcher</td></tr>\n"      
+        "<tr><td><code>(http(s?)\"://\")?\\w+([./]\\w+)+</code></td> <td>A simple URL matcher</td></tr>\n"
         "</table></p>\n"
 
         "<p>Note that traditionally regular expressions will pick the FIRST match that's "
         "possible, but a lexer uses a principle called " <<
-        MakeLink("maximal munch", "https://en.wikipedia.org/wiki/Maximal_munch") << 
+        MakeLink("maximal munch", "https://en.wikipedia.org/wiki/Maximal_munch") <<
         " which means that it will always take the LONGEST match it can find.</p>\n"
         ;
     } else if (mode == "cpp") {
@@ -635,7 +635,7 @@ private:
         "<tr><td><code>Token Use(int type_id, [message])</code>"
         "    <td>Use the current token; give an error if is not the expected type (custom error message is optional)</tr>"
         "<tr><td><code>bool UseIf(int type_id, ...)</code>"
-        "    <td>Use the current token only if it is one of the provided types; return the token's type ID if was used or 0 if it remains unsused.</tr>"
+        "    <td>Use the current token only if it is one of the provided types; return the token's type ID if was used or 0 if it remains unused.</tr>"
         "<tr><td><code>void Rewind(int steps=1)</code>"
         "    <td>Mark a previous token as current again.</tr>"
         "</table>"
@@ -710,7 +710,7 @@ private:
         "<a href=\"https://github.com/mercere99\" target=\"_blank\" rel=\"noopener noreferrer\">"
         "  <img src=\"https://img.shields.io/github/followers/mercere99?label=Github&style=social\" alt=\"Follow on GitHub\">"
         "</a><br>\n"
-        
+
         "<h3>My current To-Do list for the site includes:</h3>\n"
         "<ul>\n"
         "<li>Set up alternate languages to generate to, including Python, Java, C, and Rust.</li>\n"
@@ -729,19 +729,19 @@ private:
 
   void InitializeButtonDiv() {
     button_div << UI::Button([this](){
-      UpdateIntro("home"); intro_div.Redraw(); 
+      UpdateIntro("home"); intro_div.Redraw();
     }, "Home", "home_but").SetCSS(button_style).SetBackground("#0000AA").SetCSS("width", "159px");
     button_div << UI::Button([this](){
-      UpdateIntro("cpp"); intro_div.Redraw(); 
+      UpdateIntro("cpp"); intro_div.Redraw();
     }, "User Guide", "cpp_but").SetCSS(button_style).SetCSS("width", "159px");
     button_div << UI::Button([this](){
-      UpdateIntro("lexer"); intro_div.Redraw(); 
+      UpdateIntro("lexer"); intro_div.Redraw();
     }, "Lexical Analysis", "lexer_but").SetCSS(button_style).SetCSS("width", "159px");
     button_div << UI::Button([this](){
-      UpdateIntro("regex"); intro_div.Redraw(); 
+      UpdateIntro("regex"); intro_div.Redraw();
     }, "Regular Expressions", "regex_but").SetCSS(button_style).SetCSS("width", "180px");
     button_div << UI::Button([this](){
-      UpdateIntro("about"); intro_div.Redraw(); 
+      UpdateIntro("about"); intro_div.Redraw();
     }, "About", "about_but").SetCSS(button_style).SetCSS("width", "159px");
   }
 
@@ -824,7 +824,7 @@ private:
     }, "Row &uarr;"}
       .SetCSS(button_style).SetCSS("float", "right", "padding", "5px 10px")
       .SetTitle("Move active row UP.");
-    
+
 
 
     token_div << "<br>";
@@ -1073,7 +1073,7 @@ private:
       "cursor", "pointer",
       "top", "10px",
       "right", "10px",
-      "border", "none"      
+      "border", "none"
    };
 
     output_div.SetCSS("width", "830px", "position", "relative");
@@ -1130,3 +1130,6 @@ Emplex emplex{};
 
 int emp_main() {
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: dcbeff fabed bfef ffe uarr bgs darr noreferrer empala mycode fff bsky cccccd noopener rel ababababab ofria ab's abab ccd mercere cse aaffc ddddff ffd

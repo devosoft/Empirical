@@ -36,7 +36,7 @@ private:
               << " included:" << graph.GetIncluded()
               << " unknown:" << graph.GetUnknown()
               << " solved:" << graph.IsSolved()
-              << std::endl;    
+              << std::endl;
   }
 
 public:
@@ -101,7 +101,7 @@ public:
     if (solvable) {
       os << best_graph.GetIncluded().CountOnes() << std::endl;
     } else {
-      os << 200 << std::endl;      
+      os << 200 << std::endl;
     }
   }
 };

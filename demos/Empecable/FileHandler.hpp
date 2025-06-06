@@ -174,7 +174,7 @@ public:
 
     project_changed = false;
   }
-  
+
   void SaveAll() {
     SaveCurrentFile();
     SaveProjectConfig();

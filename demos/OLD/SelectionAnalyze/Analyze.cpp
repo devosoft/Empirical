@@ -29,7 +29,7 @@ int main(int argc, char* argv[])
     [&skip_row_headings,&skip_col_headings](){ skip_row_headings=true; skip_col_headings=true; });
   args.AddFlag("--sort", "Sort the output data (rather than keeping org position)", sort_output);
   args.AddFlag("--verbose|-v", "Print out lots of extra details about process.", verbose);
-  args.AddOption("--sample", 3, "Sample reduced orgs & criteria.", "num_orgs", "num_critera", "num_trials");
+  args.AddOption("--sample", 3, "Sample reduced orgs & criteria.", "num_orgs", "num_criteria", "num_trials");
 
   if (args.Process() == false) exit(0);
 

@@ -34,3 +34,6 @@ int main()
 
   std::cout << std::endl;
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: setf

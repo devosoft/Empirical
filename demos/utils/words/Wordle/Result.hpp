@@ -34,7 +34,7 @@ private:
     static emp::array<results_t, NUM_IDS> result_array;
     static bool init = false;
 
-    // If this is our first time requsting the result array, generate it.
+    // If this is our first time requesting the result array, generate it.
     if (!init) {
       init = true;
       for (size_t id = 0; id < NUM_IDS; ++id) {

@@ -79,3 +79,6 @@ int main(int argc, char* argv[])
   std::cout << test_count << " words tested of legal length." << std::endl;
   std::cout << okay_count << " words tested of potential match." << std::endl;
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: posv

@@ -79,7 +79,7 @@ struct ReviewInfo
         << ",Writing"
         << ",Lit Review"
         << ",Methods"
-        << ",Eelevance"
+        << ",Relevance"
         << ",Quality"
         << ",Confidence";
   }
@@ -171,10 +171,10 @@ struct PaperSet {
   size_t cur_line = 0;             // File line being processed.
   int cur_id = -1;                 // Current paper being setup.
 
-  PaperSet(const std::string & review_filename, const std::string & catagory_filename)
+  PaperSet(const std::string & review_filename, const std::string & category_filename)
   {
     ProcessReviewFile(review_filename);
-    ProcessCatagoryFile(catagory_filename);
+    ProcessCategoryFile(category_filename);
   }
 
   // For the moment, summaries are not used - just fast-forward.
@@ -284,7 +284,7 @@ struct PaperSet {
     }
   }
 
-  void ProcessCatagoryFile(const std::string & filename) {
+  void ProcessCategoryFile(const std::string & filename) {
     emp::File file(filename);
 
     // Skip the first line; process the rest.
@@ -323,12 +323,12 @@ struct PaperSet {
 int main(int argc, char * argv[])
 {
   if (argc != 3) {
-    std::cerr << "Format: " << argv[0] << " [review filename] [catagory filename]\n";
+    std::cerr << "Format: " << argv[0] << " [review filename] [category filename]\n";
     exit(1);
   }
 
   std::string review_filename(argv[1]);
-  std::string catagory_filename(argv[2]);
-  PaperSet ps(review_filename, catagory_filename);
+  std::string category_filename(argv[2]);
+  PaperSet ps(review_filename, category_filename);
   ps.PrintCVS();
 }

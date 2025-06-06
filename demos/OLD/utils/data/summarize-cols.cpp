@@ -5,7 +5,7 @@
 */
 /**
  *  @file
- *  @brief This file takes in one or more CSV files with values and, for each, calculates the mnimium,
+ *  @brief This file takes in one or more CSV files with values and, for each, calculates the minimum,
  *  maximum, and average values found in each column.
  */
 

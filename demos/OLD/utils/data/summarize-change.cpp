@@ -109,7 +109,7 @@ int main(int argc, char* argv[])
 
   if (args.size() < 3) {
     std::cerr << "Must provide one column number (starting from 0) and at least one filename!\n"
-      << "Format: " << args[0] << " [options] column_number filename [filnames...]\n"
+      << "Format: " << args[0] << " [options] column_number filename [filenames...]\n"
       << "Options:\n"
       << "  -a Print ALL data, not summary.\n"
       << "  -v Use verbose output.\n"
