@@ -5,7 +5,7 @@
 */
 /**
  *  @file
- *  @brief Handle drawing of axes on D3 graphts.
+ *  @brief Handle drawing of axes on D3 graphs.
  */
 
 #ifndef EMP_WEB_D3_AXIS_HPP_INCLUDE
@@ -41,7 +41,7 @@ namespace D3 {
     /// this axis
     Selection group;
 
-    /// Consruct an axis - this doesn't draw anything yet, but sets up the necessary infrastructure
+    /// Construct an axis - this doesn't draw anything yet, but sets up the necessary infrastructure
     /// to draw it when you call the Draw method. Optionally takes a label to label the axis with.
     /// This label will also be used to create an id for the axis, to make it easier to select it
     /// later. The id will be the same as [label], but with all whitespace removed and "_axis"
@@ -229,7 +229,7 @@ namespace D3 {
       return *this;
     }
 
-    /// Set the format for displaying numbers assoiated with ticks. [format] should be a format
+    /// Set the format for displaying numbers associated with ticks. [format] should be a format
     /// following
     /// [the rules for d3.format()](https://github.com/d3/d3-3.x-api-reference/blob/master/Formatting.md#d3_format)
     Axis& SetTickFormat(std::string format) {
@@ -239,7 +239,7 @@ namespace D3 {
       return *this;
     }
 
-    /// Adjust scale and axis to accomodate the new range of data specified by [new_min],
+    /// Adjust scale and axis to accommodate the new range of data specified by [new_min],
     /// and [new_max]. [svg] is a Selection or Transition containing the current axis. If it's a
     /// transition, then the rescaling will be animated.
     template <typename T>
@@ -272,3 +272,6 @@ namespace D3 {
 }
 
 #endif // #ifndef EMP_WEB_D3_AXIS_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: javascript api percapitamortality svg

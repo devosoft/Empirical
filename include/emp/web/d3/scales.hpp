@@ -21,7 +21,7 @@
 namespace D3 {
 
   /// Scales in D3 are functions that take input values and map them to output based on
-  /// a scaling function. They are often used to map data calues to x, y coordinates in pixels
+  /// a scaling function. They are often used to map data values to x, y coordinates in pixels
   /// describing where on the screen elements should be placed.
   /// This is a base class to inherit from - should never be made stand-alone
   class Scale : public D3_Base {
@@ -72,7 +72,7 @@ namespace D3 {
       return Scale(new_id);
     }
 
-    /// Calculate the ouput for [input], based on the scale's scaling function
+    /// Calculate the output for [input], based on the scale's scaling function
     double ApplyScale(double input) {
       //TODO: make this work for other types
       return EM_ASM_DOUBLE({return js.objects[$0]($1);},this->id, input);
@@ -82,7 +82,7 @@ namespace D3 {
       return EM_ASM_INT({return js.objects[$0]($1);},this->id, input);
     }
 
-    /// Calculate the ouput for [input], based on the scale's scaling function
+    /// Calculate the output for [input], based on the scale's scaling function
     std::string ApplyScaleString(double input) {
       //TODO: make this work for other types
       char * buffer = (char *) EM_ASM_INT({
@@ -281,3 +281,6 @@ namespace D3 {
 }
 
 #endif // #ifndef EMP_WEB_D3_SCALES_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: javascript

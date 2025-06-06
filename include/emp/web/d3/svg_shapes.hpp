@@ -29,7 +29,7 @@ namespace D3 {
   /// describes how you would draw the shape with a pen. You could write them by hand, but that's
   /// rarely desirable (especially when you're trying to systematically represent data). So d3
   /// provides functions for generating functions that will convert data to paths.
-  /// This is a base clase for all objects that manage such functions to inherit from.
+  /// This is a base class for all objects that manage such functions to inherit from.
   /// You probably want to instantiate derived versions, rather than this class directly.
   class SvgShapeGenerator : public D3_Base {
   protected:
@@ -149,7 +149,7 @@ namespace D3 {
 
   };
 
-  /// Base class for generating both cartesian and radial lines
+  /// Base class for generating both Cartesian and radial lines
   /// You don't normally want to instantiate this - use LineGenerator or RadialLineGenerator
   /// instead.
   class BaseLineGenerator : public SvgShapeGenerator {
@@ -158,7 +158,7 @@ namespace D3 {
 
     /// Set the method used to interpolate a curve between points in the line.
     /// For allowed options, see the
-    /// [d3 documntation](https://github.com/d3/d3-3.x-api-reference/blob/master/SVG-Shapes.md#line_interpolate)
+    /// [d3 documentation](https://github.com/d3/d3-3.x-api-reference/blob/master/SVG-Shapes.md#line_interpolate)
     void SetCurve(std::string curve){
       D3_CALLBACK_METHOD_1_ARG(curve,curve.c_str())
     }
@@ -186,7 +186,7 @@ namespace D3 {
     /// @endcond
   };
 
-  /// Generator for regular old (cartesian) lines.
+  /// Generator for regular old (Cartesian) lines.
   class LineGenerator : public BaseLineGenerator {
   public:
     LineGenerator() {
@@ -196,7 +196,7 @@ namespace D3 {
       }, this->id);
     }
 
-    /// Often, when you're drawing cartesion lines, you want to use a scale to transform numbers
+    /// Often, when you're drawing caption lines, you want to use a scale to transform numbers
     /// from range of your data to the range of pixels on your screen. Adding an X scale will
     /// cause the x-coordinates of all points on the line to be passed through that scale function.
     /// This stacks on top of whatever the current function for accessing x is (which means scales
@@ -212,7 +212,7 @@ namespace D3 {
       }, this->id, scale.GetID());
     }
 
-    /// Often, when you're drawing cartesion lines, you want to use a scale to transform numbers
+    /// Often, when you're drawing caption lines, you want to use a scale to transform numbers
     /// from range of your data to the range of pixels on your screen. Adding a Y scale will
     /// cause the y-coordinates of all points on the line to be passed through that scale function.
     /// This stacks on top of whatever the current function for accessing y is (which means scales
@@ -575,3 +575,6 @@ namespace D3 {
 }
 
 #endif // #ifndef EMP_WEB_D3_SVG_SHAPES_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: api sel javascript svg

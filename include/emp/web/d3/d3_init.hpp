@@ -85,7 +85,7 @@ namespace D3 {
     }
 
     D3_Base& operator= (const D3_Base & other) {
-        // std::cout << "Calling assingment: " << this->id << " " << other.id << std::endl;
+        // std::cout << "Calling assignment: " << this->id << " " << other.id << std::endl;
         this->id = other.id;
         EM_ASM_ARGS({js.counts[$0]++;}, this->id);
         return (*this);
@@ -114,7 +114,7 @@ namespace D3 {
     }
   };
 
-  /// Create a tooltup using the d3.tip Javascript library
+  /// Create a tooltip using the d3.tip Javascript library
   class ToolTip : public D3_Base {
   public:
     /// Default constructor - displays whatever data is bound on mouseover
@@ -126,7 +126,7 @@ namespace D3 {
       }, this->id);
     }
 
-    /// Cosntructor that allows you to specify a function that returns the html for the tooltip.
+    /// Constructor that allows you to specify a function that returns the html for the tooltip.
     /// As input, this function should take 3 parameters: the bound data, the index of this item
     /// in the selection (int), and a placeholder (int).
     ///
@@ -229,7 +229,7 @@ namespace D3 {
     JSObject(){;};
 };
 
-  /// Wrapper for creating functions in javascript and calling them there
+  /// Wrapper for creating functions in Javascript and calling them there
   class JSFunction : public D3_Base {
   public:
     JSFunction() {;}

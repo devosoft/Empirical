@@ -283,7 +283,7 @@ namespace D3 {
       the name of a function in d3, emp (such as one created with JSWrap), or the local window.
       If it is a function name, that function will be run, receiving bound data, if any, as input
 
-      There is a third optional argument, a boolean indicating whether you want to give
+      There is a third optional argument, a Boolean indicating whether you want to give
       this setting priority.
       */
 
@@ -388,7 +388,7 @@ namespace D3 {
       ///
       /// Advanced note: This is implemented differently for selection vs transitions. As such,
       /// calling it on a SelectionOrTransition object directly is not supported.
-      // std::string verison
+      // std::string version
       DERIVED& SetProperty(std::string name, std::string value) {return *(static_cast<DERIVED *>(this));}
 
       /// Sets this selection's inner html to the specified string, or the string returned by running the
@@ -683,7 +683,7 @@ namespace D3 {
     /// Value can be a number, function, string, or string naming a Javascript function
     /// See the [d3 documentation](https://github.com/d3/d3-selection#selection_property)
     /// for more information.
-    // std::string verison
+    // std::string version
     Transition& SetProperty(std::string name, std::string value){
       MAIN_THREAD_EM_ASM({
         var arg1 = UTF8ToString($1);                                        \
@@ -965,7 +965,7 @@ namespace D3 {
     };
 
     // Selection& operator= (const Selection & other) {
-    //     std::cout << "Calling assingment: " << this->id << " " << other.id << std::endl;
+    //     std::cout << "Calling assignment: " << this->id << " " << other.id << std::endl;
     //     this->id = other.id;
     //     return (*this);
     // }
@@ -1166,7 +1166,7 @@ namespace D3 {
 
     /// Insert elements of type [name] into current enter selection
     ///
-    /// For more information, see the D3 documention on
+    /// For more information, see the D3 documentation on
     /// [insert](https://github.com/d3/d3-3.x-api-reference/blob/master/Selections.md#insert)
     Selection EnterInsert(std::string name, std::string before=NULL){
       int new_id = NextD3ID();
@@ -1261,7 +1261,7 @@ namespace D3 {
     /// Value can be a number, function, string, or string naming a Javascript function
     /// See the [d3 documentation](https://github.com/d3/d3-selection#selection_property)
     /// for more information.
-    // std::string verison
+    // std::string version
     Selection& SetProperty(std::string name, std::string value){
       D3_CALLBACK_METHOD_2_ARGS(property, name.c_str(), value.c_str())
       return *this;
@@ -1434,7 +1434,7 @@ namespace D3 {
     /// Insert DOM element of type "name" into the current selection before the element selected by
     /// the element specified by the [before] string
     ///
-    /// For more information, see the D3 documention on
+    /// For more information, see the D3 documentation on
     /// [insert](https://github.com/d3/d3-3.x-api-reference/blob/master/Selections.md#insert)
     Selection Insert(std::string name, std::string before=NULL){
       int new_id = NextD3ID();
@@ -1528,7 +1528,7 @@ namespace D3 {
     /// Listen for an event of type [type] and call [listener] when it happens
     /// [listener] can be a string containing the name of a Javascript function, or a C++ function
     ///
-    /// The third paramter for the listener function is the id of a selection containing the
+    /// The third parameter for the listener function is the id of a selection containing the
     /// relevant DOM object.
     ///
     /// To remove an event listener, call On with that type and "null" as the listener (default)
@@ -1612,12 +1612,12 @@ namespace D3 {
     /// @endcond
 
     /** Sort the selection by the given comparator function. The function
-    can be a C++ function or a stirng indicating a function in the d3 namespace,
+    can be a C++ function or a string indicating a function in the d3 namespace,
     the emp namespace (as results from JSWrapping C++ functions), or the
     window namespace. These three options are checked sequentially in that
     order, so a C++ function with the same name as d3 built-in will not
     override the built-in. Similarly, a function declared directly in the
-    window will be overriden by a JSWrapped function with the same name.
+    window will be overridden by a JSWrapped function with the same name.
     */
 
     Selection& Sort(std::string comparator = "ascending"){
@@ -1648,7 +1648,7 @@ namespace D3 {
    }, this->id, tip.GetID());
     }
 
-    //Tell tooltip to appear on mouseover and dissapear on mouseout
+    //Tell tooltip to appear on mouseover and disappear on mouseout
     void BindToolTipMouseover(ToolTip & tip) {
       MAIN_THREAD_EM_ASM({
        js.objects[$0].on("mouseover", js.objects[$1].show)
@@ -1709,3 +1709,6 @@ namespace D3 {
 }
 
 #endif // #ifndef EMP_WEB_D3_SELECTION_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: svg ocks sel api bost javascript

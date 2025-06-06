@@ -204,3 +204,6 @@ namespace D3{
 
 
 #endif // #ifndef EMP_WEB_D3_LAYOUT_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: svg

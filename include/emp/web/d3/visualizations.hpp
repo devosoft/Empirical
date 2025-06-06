@@ -418,7 +418,7 @@ public:
 
     line_gen = new D3::LineGenerator();
 
-    // Set up accessors (for retriving coords from data points)
+    // Set up accessors (for retrieving coords from data points)
     SetXAccessor(return_x);
     SetYAccessor(return_y);
 
@@ -710,7 +710,7 @@ public:
   void DrawData(bool backlog = false) {
 
     //If there's a backlog, then we're only allowed to clear it if this
-    //was called recursively or from javascript (since javascript handles)
+    //was called recursively or from Javascript (since Javascript handles)
     //using this as a callback to asynchronous stuff)
     if ((!backlog && data.size() > 1) || data.size() == 0){
       return;
@@ -1156,3 +1156,6 @@ public:
 }
 
 #endif // #ifndef EMP_WEB_D3_VISUALIZATIONS_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: loc genpath segs vis hcl funcs svg
