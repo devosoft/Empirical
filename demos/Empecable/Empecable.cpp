@@ -83,7 +83,7 @@ private:
     "Copyright (C) ${year} Michigan State University\n"
     "MIT Software license; see doc/LICENSE.md\n\n"
     "@file ${file_id}\n"
-    "@brief [File Description]";
+    "@brief ${brief}";
   emp::String header_extensions = ".hpp|.h|.H|.hh";
   emp::String code_extensions = ".cpp|.C|.cc";
   emp::String header_protections = "Pragma|Guards";
@@ -459,6 +459,8 @@ public:
     }
 
     // Scan the copyright block, if one exists, to collect some variables.
+    if (File().GetToken(0) == Lexer::ID_COMMENT_START) {
+    }
 
 
     // Next should be the copyright.
