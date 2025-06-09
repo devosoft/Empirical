@@ -28,8 +28,9 @@ enum class Mode {
 
 // ========= Input Helpers =========
 
-emp::String GetInput(const emp::String & prompt) {
-  emp::Print(prompt);
+template <typename... Ts>
+emp::String GetInput(Ts &... args) {
+  emp::Print(emp::MakeString(args...));
   emp::String input{};
 
   while (input.size() == 0) {
@@ -88,3 +89,34 @@ inline void InternalError(emplex::Token token, Ts &&... args) {
             << emp::MakeString(args...) << std::endl;
   exit(1);
 }
+
+// Take in a set of mid-comment lines.
+// Strip off stars at the beginning and replace with simple " * "
+emp::String AdjustCommentStars(emp::String comment, const emp::String prefix = " *") {
+  auto lines = comment.Slice('\n', emp::StringSyntax::None());
+
+  // Scan all lines to determine how many chars to clip from the beginning.
+  size_t clip = comment.size();
+  for (auto line : lines) {
+    bool found_star = false;
+    for (size_t pos = 0; pos < line.size() && pos < clip; ++pos) {
+      if (line[pos] == ' ') continue;          // Allow beginning spaces.
+      if (!found_star && line[pos] == '*') {   // Allow ONE star
+        found_star = true;
+        continue;
+      }
+      // If we made it here, we've hit a char on this line that indicates prefix is done!
+      clip = pos;
+    }
+  }
+
+  // Do the clipping!
+  emp::String result;
+  for (auto line : lines) {
+    if (line.size() <= clip) result += prefix + '\n';
+    else { result += prefix + " " + line.erase(0, clip) + '\n'; }
+  }
+
+  return result;
+}
+
