@@ -110,8 +110,8 @@ namespace emp {
     using Syntax = StringSyntax;
 
     static char & NoChar() {
-      static char no_char = '\0';
-      return no_char;
+      static char no_char;
+      return no_char = '\0'; // Always reset NoChar() in case it was changed.
     }
 
     // Convert objects into a string of some kind.
@@ -245,7 +245,7 @@ namespace emp {
     }
 
     // ------ Static Values ------
-    [[nodiscard]] static const String & Empty() {
+    [[nodiscard]] static const String & StaticEmpty() {
       static const String empty = "";
       return empty;
     }
@@ -255,7 +255,7 @@ namespace emp {
     //  char * data();
     //  const char * data() const;
     //  const char * c_str() const;
-    std::string & str() { return *this; }
+    [[nodiscard]] std::string & str() { return *this; }
 
     [[nodiscard]] const std::string & str() const { return *this; }
 
