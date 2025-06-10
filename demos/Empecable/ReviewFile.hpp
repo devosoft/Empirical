@@ -110,6 +110,10 @@ public:
   const emplex::Token & NextToken() { return GetToken(++token_pos); }
   const emplex::Token & PrevToken() { return GetToken(--token_pos); }
 
+  void SkipNewLines() {
+    while (token_pos < tokens.size() && GetToken() == emplex::Lexer::ID_END_LINE) ++token_pos;
+  }
+
   void InsertToken(size_t pos, emplex::Token token) {
     emp_assert(pos <= tokens.size());
     tokens.insert(tokens.begin()+pos, token);
@@ -117,7 +121,7 @@ public:
     save_required = true;
   }
 
-  void InsertLexeme(size_t pos, emp::String lexeme) {
+  void InsertLexeme(size_t pos, const emp::String & lexeme) {
     emp_assert(pos <= tokens.size());
 
     // Determine line number for inserted token.
@@ -127,6 +131,14 @@ public:
     else line_id = tokens[pos-1].line_id+1;
 
     InsertToken(pos, emplex::Token{emplex::Lexer::ID_OTHER, lexeme, line_id});
+  }
+
+  void InsertLexeme(const emp::String & lexeme) {
+    InsertLexeme(token_pos, lexeme);
+  }
+
+  void InsertBack(const emp::String & lexeme) {
+    InsertLexeme(tokens.size(), lexeme);
   }
 
   void RemoveToken(size_t pos, size_t count=1) {
@@ -185,7 +197,7 @@ public:
 
     // Collect the tokens on this line, highlighting the current token.
     emp::String result;
-    emp::String target_word = tokens[token_pos].lexeme;
+    emp::String target_word = GetToken().lexeme;
     for (size_t i = start; i < end; ++i) {
       if (i == token_pos) {
         result += ToBoldRed(tokens[i].lexeme).AsANSIUnderline();
@@ -241,7 +253,7 @@ public:
 
   // Print a range of lines the current token.
   void PrintTokenRange(size_t range=1) const {
-    size_t line_id = tokens[token_pos].line_id;
+    const size_t line_id = GetLineID();
     size_t min_line = (line_id > range) ? (line_id - range) : 0;
     min_line = std::max(min_line, tokens[0].line_id); // Cannot start before beginning of file.
     size_t max_line = (line_id+range <= MaxLineID()) ? line_id+range : MaxLineID();
