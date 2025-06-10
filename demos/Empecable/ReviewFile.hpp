@@ -38,7 +38,7 @@ private:
   static constexpr emplex::Token empty_token{0,"",0};  // Token for out-of-range positions.
 
 public:
-  size_t npos = static_cast<size_t>(-1); // ID for "beyond the end of the file"
+  static constexpr size_t npos = static_cast<size_t>(-1); // ID for "beyond the end of the file"
 
   ReviewFile(emp::String filename, Mode mode)
     : filename(filename), path(fs::absolute(filename.str())), mode(mode)
@@ -168,7 +168,7 @@ public:
     return pos;
   }
 
-
+  // Get the entire line that a particular token is on, highlighting that token.
   emp::String GetTokenLine(size_t line_id) const {
     // Determine the set of tokens to print.
     const size_t start = FindPos_LineStart(line_id);
@@ -187,6 +187,31 @@ public:
       else { result += tokens[i].lexeme; }
     }
     return result;
+  }
+
+  emp::String GetLines(size_t start_line, size_t end_line) {
+    // Determine the set of tokens to print.
+    const size_t start = FindPos_LineStart(start_line);
+    const size_t end = FindPos_LineEnd(end_line);
+
+    // Collect the tokens on this line, highlighting the current token.
+    emp::String result;
+    for (size_t i = start; i < end; ++i) {
+      result += tokens[i].lexeme;
+    }
+    return result;
+  }
+
+  emp::String GetLine(size_t start_line) { return GetLines(start_line, start_line); }
+
+  // Get the remainder of the line from a particular token.
+  emp::String GetLineFrom(size_t pos) {
+    emp::String out;
+    while (pos < tokens.size() && tokens[pos] != emplex::Lexer::ID_END_LINE) {
+      out += tokens[pos].lexeme;
+      ++pos;
+    }
+    return out;
   }
 
   // Print a line near a given token, highlighting that token.
