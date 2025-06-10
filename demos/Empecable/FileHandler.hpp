@@ -1,5 +1,14 @@
-#ifndef EMPECABLE_FILE_HANDLER_HPP_INCLIDE
-#define EMPECABLE_FILE_HANDLER_HPP_INCLIDE
+/**
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2025 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file demos/Empecable/FileHandler.hpp
+ * @brief Class to manage both config files and analyze files in Empecable.
+ */
+
+#ifndef EMPECABLE_FILE_HANDLER_HPP_INCLUDE
+#define EMPECABLE_FILE_HANDLER_HPP_INCLUDE
 
 #include <filesystem>
 
@@ -61,6 +70,9 @@ public:
   bool NextFile() { ++active_file; return HasActiveFile(); }
   [[nodiscard]] ReviewFile & File() { return files[active_file]; }
   [[nodiscard]] const ReviewFile & File() const { return files[active_file]; }
+
+  [[nodiscard]] const fs::path & BasePath() const { return base_path; };
+  [[nodiscard]] const fs::path & EMPPath() const { return emp_path; };
 
   [[nodiscard]] const fs::path & ConfigPath() const { return config_path; }
   void ConfigPath(const std::string & filename) { config_path = filename; }
