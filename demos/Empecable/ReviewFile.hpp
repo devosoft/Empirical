@@ -75,6 +75,9 @@ public:
 
   // ======= Token Management =======
 
+  [[nodiscard]] size_t GetTokenPos() const { return token_pos; }
+  [[nodiscard]] bool AtFront() const { return token_pos == 0; }
+
   [[nodiscard]] const emplex::Token & GetToken(size_t pos) const {
     if (token_pos >= tokens.size()) return empty_token; // Out of range.
     return tokens[pos];
@@ -91,7 +94,7 @@ public:
   [[nodiscard]] size_t NumTokens() const { return tokens.size(); }
 
   void SetTokenPos(size_t pos) {
-    emp_assert(pos < tokens.size(), pos, tokens.size());
+    emp_assert(pos <= tokens.size(), pos, tokens.size());
     token_pos = pos;
   }
 
@@ -110,21 +113,27 @@ public:
   void InsertToken(size_t pos, emplex::Token token) {
     emp_assert(pos <= tokens.size());
     tokens.insert(tokens.begin()+pos, token);
+    if (token_pos >= pos) ++token_pos;  // Make sure active token keeps pointing to same place.
     save_required = true;
   }
 
   void InsertLexeme(size_t pos, emp::String lexeme) {
     emp_assert(pos <= tokens.size());
+
+    // Determine line number for inserted token.
     size_t line_id;
     if (pos == 0) line_id = 0;
     else if (pos < tokens.size()) line_id = tokens[pos].line_id;
     else line_id = tokens[pos-1].line_id+1;
+
     InsertToken(pos, emplex::Token{emplex::Lexer::ID_OTHER, lexeme, line_id});
   }
 
   void RemoveToken(size_t pos, size_t count=1) {
     emp_assert(pos+count <= tokens.size());
     tokens.erase(tokens.begin()+pos, tokens.begin()+pos+count);
+    if (token_pos >= pos+count) token_pos -= count;  // Shift back by deleted count.
+    else if (token_pos >= pos) token_pos = pos;      // Move to beginning of deleted portion.
     save_required = true;
   }
 
@@ -141,7 +150,7 @@ public:
   void SetLexeme(emp::String new_word) { SetLexeme(token_pos, new_word); }
 
   // Find a token anywhere on the target line.
-  size_t FindPos_Line(size_t target_line) const {
+  [[nodiscard]] size_t FindPos_Line(size_t target_line) const {
     emp_assert(target_line >= tokens[0].line_id &&
                target_line <= tokens.back().line_id,
               target_line, tokens[0].line_id, tokens.back().line_id);
@@ -155,21 +164,21 @@ public:
   }
 
   // Find the first token of the target line.
-  size_t FindPos_LineStart(size_t target_line) const {
+  [[nodiscard]] size_t FindPos_LineStart(size_t target_line) const {
     size_t pos = FindPos_Line(target_line);
     while (pos > 0 && tokens[pos-1].line_id == target_line) --pos;
     return pos;
   }
 
   // Find the first token of the target line.
-  size_t FindPos_LineEnd(size_t target_line) const {
+  [[nodiscard]] size_t FindPos_LineEnd(size_t target_line) const {
     size_t pos = FindPos_Line(target_line);
     while (pos+1 < tokens.size() && tokens[pos+1].line_id == target_line) ++pos;
     return pos;
   }
 
   // Get the entire line that a particular token is on, highlighting that token.
-  emp::String GetTokenLine(size_t line_id) const {
+  [[nodiscard]] emp::String GetTokenLine(size_t line_id) const {
     // Determine the set of tokens to print.
     const size_t start = FindPos_LineStart(line_id);
     const size_t end = FindPos_LineEnd(line_id);
@@ -189,23 +198,32 @@ public:
     return result;
   }
 
-  emp::String GetLines(size_t start_line, size_t end_line) {
-    // Determine the set of tokens to print.
-    const size_t start = FindPos_LineStart(start_line);
-    const size_t end = FindPos_LineEnd(end_line);
-
+  // Return a string representing the combined lexemes for the position provided.
+  // (exclusive of end_pos)
+  [[nodiscard]] emp::String GetPosRange(size_t start_pos, size_t end_pos) const {
     // Collect the tokens on this line, highlighting the current token.
     emp::String result;
-    for (size_t i = start; i < end; ++i) {
+    for (size_t i = start_pos; i < end_pos; ++i) {
       result += tokens[i].lexeme;
     }
     return result;
   }
 
-  emp::String GetLine(size_t start_line) { return GetLines(start_line, start_line); }
+  [[nodiscard]] emp::String GetRangeToPos(size_t end_pos) const {
+    return GetPosRange(token_pos, end_pos);
+  }
+
+  // Return a string representing the specific line numbers provided, inclusive.
+  [[nodiscard]] emp::String GetLines(size_t start_line, size_t end_line) const {
+    return GetPosRange(FindPos_LineStart(start_line), FindPos_LineEnd(end_line));
+  }
+
+  [[nodiscard]] emp::String GetLine(size_t start_line) const {
+    return GetLines(start_line, start_line);
+  }
 
   // Get the remainder of the line from a particular token.
-  emp::String GetLineFrom(size_t pos) {
+  [[nodiscard]] emp::String GetLineFrom(size_t pos) const {
     emp::String out;
     while (pos < tokens.size() && tokens[pos] != emplex::Lexer::ID_END_LINE) {
       out += tokens[pos].lexeme;
@@ -337,7 +355,7 @@ public:
 
   // ========== Issue Tracking ==========
 
-  size_t GetNumIssues() const { return issues.size(); }
+  [[nodiscard]] size_t GetNumIssues() const { return issues.size(); }
 
   // Print tokens to the screen with a particular token highlighted in read.
   template <typename... ARG_Ts>

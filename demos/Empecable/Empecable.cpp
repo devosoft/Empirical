@@ -101,8 +101,9 @@ private:
   size_t total_issues = 0;
 
   // Settings for working with file headers.
-  std::unordered_map<emp::String, emp::String> var_map;
-  emp::String new_heading;
+  std::unordered_map<emp::String, emp::String> var_map; // Vars to use in heading
+  size_t cur_year;                                      // Numerical year
+  emp::String new_heading;                              // Heading for current file
 
   // === HELPER FUNCTIONS ===
 
@@ -402,6 +403,12 @@ private:
 
 public:
   Empecable(int argc, char * argv[]) : flags(argc, argv) {
+    // Determine the current year.
+    const auto now = std::chrono::system_clock::now();
+    const std::time_t t = std::chrono::system_clock::to_time_t(now);
+    std::tm * tm_ptr = std::localtime(&t);
+    cur_year = tm_ptr->tm_year + 1900;
+
     // Load all of the configuration files needed to fun Empecable
     LoadConfig();
 
@@ -439,52 +446,71 @@ public:
     exit(0);
   }
 
+  void ResetVarMap() {
+    // Initialize map of specific variables that we might need to substitute in.
+    var_map["brief"] = "";
+    var_map["details"] = "";
+    var_map["year"].Set(cur_year);
+
+    // Each 'file_id' is a path/name relative to the project.
+    // For example, this file is: 'demos/Empecable/Empecable.cpp'
+    var_map["file_id"] = fs::relative(File().GetPath(), file_handler.BasePath());
+
+    // Assume no heading to build from unless one is found.
+    var_map["old_heading"] = "";
+  }
+
   // Scan through the CURRENT file heading to mine information and return its end token.
-  [[nodiscard]] size_t ScanFileHeading(size_t cur_year) {
+  [[nodiscard]] size_t ScanFileHeading() {
     using namespace emplex;
 
-    size_t cur_pos = 0;
-    while (File().GetToken(cur_pos) == Lexer::ID_END_LINE) ++cur_pos; // Skip blank lines
+    const size_t start_pos = File().GetTokenPos();
 
-    if (File().GetToken(cur_pos) == Lexer::ID_COMMENT_START) {
-      size_t end_pos = File().FindTokenPos(Lexer::ID_COMMENT_END, cur_pos);
-      if (end_pos == ReviewFile::npos) { File().ReportIssue("No close comment"); }
-      const size_t brief_pos = File().FindTokenPos(Lexer::ID_DOX_BRIEF, cur_pos);
-      if (brief_pos > end_pos) {
-        // If there is an "@brief" and its after this comment, check if another comment follows.
-        if (File().GetToken(end_pos+1) == Lexer::ID_END_LINE &&
-            File().GetToken(end_pos+2) == Lexer::ID_COMMENT_START) {
-          end_pos = File().FindTokenPos(Lexer::ID_COMMENT_END, end_pos+2);
-          if (end_pos == ReviewFile::npos) { File().ReportIssue("No close comment"); }          
+    // Make sure the initial comment block is good.
+    size_t end_pos = File().FindTokenPos(Lexer::ID_COMMENT_END, start_pos);
+    if (end_pos == ReviewFile::npos) {
+      File().ReportIssue("No close comment");
+      return start_pos;
+    }
+    const size_t brief_pos = File().FindTokenPos(Lexer::ID_DOX_BRIEF, start_pos);
+
+    // If there is a follow-up comment block with an @brief, include it too.
+    if (brief_pos > end_pos) {
+      // If there is an "@brief" and its after this comment, check if another comment follows.
+      if (File().GetToken(end_pos+1) == Lexer::ID_END_LINE &&
+          File().GetToken(end_pos+2) == Lexer::ID_COMMENT_START) {
+        end_pos = File().FindTokenPos(Lexer::ID_COMMENT_END, end_pos+2);
+        if (end_pos == ReviewFile::npos) {
+          File().ReportIssue("No close comment");
+          return start_pos;
         }
       }
+    }
 
-      // Now that we know the start and end of the comment blocks, scan for a year
-      // or year range.
-
-      for (size_t pos = cur_pos; pos < end_pos; ++pos) {
-        if (File().GetToken(pos) == Lexer::ID_NUM) {
-          const size_t start_year = File().GetLexeme(pos).AsULL();
-          // Test if we have a likely candidate for year!
-          if (start_year > 2000 && start_year <= cur_year) {
-            // Now test if it's a range of years.
-            if (File().GetLexeme(pos+1) == "-" && File().GetToken(pos+2) == Lexer::ID_NUM) {
-              size_t end_year = File().GetLexeme(pos+2).AsULL();
-              if (end_year < 100) end_year += 2000; // E.g., make 2013-15 into 2013-2015
-              var_map["year"].Set(start_year, '-', end_year);
-            } else {
-              var_map["year"].Set(start_year);
-            }
-
-            break;  // We have a year; exit the for loop.
+    // Now that we know the start and end of the comment blocks, scan for a year
+    // or year range.
+    for (size_t pos = start_pos; pos < end_pos; ++pos) {
+      if (File().GetToken(pos) == Lexer::ID_NUM) {
+        const size_t start_year = File().GetLexeme(pos).AsULL();
+        // Test if we have a likely candidate for year!
+        if (start_year > 2000 && start_year <= cur_year) {
+          // Now test if it's a range of years.
+          if (File().GetLexeme(pos+1) == "-" && File().GetToken(pos+2) == Lexer::ID_NUM) {
+            size_t end_year = File().GetLexeme(pos+2).AsULL();
+            if (end_year < 100) end_year += 2000; // E.g., make 2013-15 into 2013-2015
+            var_map["year"].Set(start_year, '-', end_year);
+          } else {
+            var_map["year"].Set(start_year);
           }
+
+          break;  // We have a year; exit the for loop.
         }
       }
+    }
 
-      // Set the @brief description, if available.
-      if (brief_pos < end_pos) {
-        var_map["brief"] = File().GetLineFrom(brief_pos+2);
-      }
+    // Set the @brief description, if available.
+    if (brief_pos < end_pos) {
+      var_map["brief"] = File().GetLineFrom(brief_pos+2);
 
       // Save everything after @brief as "details".
       size_t brief_end_pos = File().FindTokenPos(Lexer::ID_END_LINE, brief_pos+2);
@@ -493,58 +519,31 @@ public:
       size_t detail_end_line = File().GetLineID(end_pos)-1;
 
       var_map["details"] = File().GetLines(detail_start_line, detail_end_line);
-
-      return end_pos;
     }
 
-    return 0; // If we made it here, no heading was found.
+    return end_pos;
   }
 
-  // To be called after a new file is open to ensure that the file begins correctly.
-  // Each file should begin with (in order):
-  // - Copyright comment
-  // - Description comment
-  // - Pragma once (if activated)
-  // - Include guards
-  // - STD include block
-  // - EMP include block
-  // - Local include block
-  // - namespace opening
-  void ValidateFileHeading() {
-    // Initialize map of specific variables that we might need to substitute in.
-    var_map["brief"] = "";
-    var_map["details"] = "";
-
-    // Each 'file_id' is a path/name relative to the project.
-    // For example, this file is: 'demos/Empecable/Empecable.cpp'
-    var_map["file_id"] = fs::relative(File().GetPath(), file_handler.BasePath());
-
-    // Default ${year} to the current year.
-    const auto now = std::chrono::system_clock::now();
-    const std::time_t t = std::chrono::system_clock::to_time_t(now);
-    std::tm * tm_ptr = std::localtime(&t);
-    const size_t cur_year = tm_ptr->tm_year + 1900;
-    var_map["year"].Set(cur_year);
-
-    using namespace emplex;
+  // Make sure the file doesn't begin with any blank lines.
+  // Return new start token position.
+  void ValidateFileHeading_RemoveLeadingNewlines() {
     // Offer to delete blank lines at the beginning of a file.
-    size_t cur_pos = 0;
-    while (File().GetToken(cur_pos) == Lexer::ID_END_LINE) ++cur_pos;
-    if (cur_pos > 0) {
-      File().ReportIssue("File begins with ", cur_pos, " blank lines.");
+    while (File().GetToken() == emplex::Lexer::ID_END_LINE) File().NextToken();
+    if (!File().AtFront()) {
+      File().ReportIssue("File begins with ", File().GetTokenPos(), " blank lines.");
       if (IsInteractive() && AskYesNo("Remove? ")) {
-        File().RemoveToken(0, cur_pos);
-        cur_pos = 0;
+        File().RemoveToken(0, File().GetTokenPos());
+        File().ResetTokens();
       }
     }
+  }
 
-    // Scan the current file heading, if one exists, to collect some variables and
-    size_t copyright_end_pos = ScanFileHeading(cur_year);
-
-    // Get what the copyright CURRENTLY looks like.
-    emp::String old_heading = "";
-    if (copyright_end_pos) {
-      old_heading = File().GetLines(File().GetLineID(0), File().GetLineID(copyright_end_pos));
+  void ValidateFileHeading_UpdateCopyrightComment() {
+    ResetVarMap();  // Prepare the var_map for the current file.
+    if (File().GetToken() == emplex::Lexer::ID_COMMENT_START) {
+      size_t copyright_end_pos = ScanFileHeading();
+      var_map["old_heading"] = File().GetRangeToPos(copyright_end_pos+1);
+      File().SetTokenPos(copyright_end_pos+1);
     } else {
       File().ReportIssue("No file heading (with copyright) found!");
     }
@@ -553,9 +552,8 @@ public:
     new_heading = "/**\n" + copyright.AsReplaceVars(var_map)
       + AdjustCommentStars(var_map["details"]) + " */";
 
-
     if (IsInteractive()) {
-      if (copyright_end_pos == 0) { // No copyright found!
+      if (var_map["old_heading"] == "") { // No old heading!
         emp::PrintLn("Do you want to insert this suggested heading?");
         emp::PrintLn(new_heading.AsANSIGreen());
 
@@ -579,8 +577,8 @@ public:
       }
 
       // If these IS a heading, we need to compare to it.
-      else if (old_heading != new_heading) {
-        emp::PrintLn("Current file heading:\n", old_heading.AsANSIRed());
+      else if (var_map["old_heading"] != new_heading) {
+        emp::PrintLn("Current file heading:\n", var_map["old_heading"].AsANSIRed());
         emp::PrintLn("Suggested file heading:\n", new_heading.AsANSIGreen());
 
         emp::PrintLn("Do you want to do the suggested header replacement?");
@@ -592,12 +590,12 @@ public:
         AddHeaderModMenuOption(menu, "year", 'd', "Update date.");
 
         menu.AddOption('n', "Ignore suggestion and move on.", [](){
-          emp::PrintLn("Leaving file without updating heading.");
+          emp::PrintLn("Leaving file with previous heading.");
           return true;
         });
-        menu.AddOption('y', "Replace with suggestion.", [this,copyright_end_pos](){
+        menu.AddOption('y', "Replace with suggestion.", [this](){
           emp::PrintLn("Replacing heading!");
-          File().RemoveToken(0, copyright_end_pos+1);
+          File().RemoveToken(0, File().GetTokenPos());
           File().InsertLexeme(0, new_heading);
           return true;
         });
@@ -606,7 +604,21 @@ public:
       }
 
     }
+  }
 
+  // To be called after a new file is open to ensure that the file begins correctly.
+  // Each file should begin with (in order):
+  // - Copyright / Description comment
+  // - Pragma once (if activated)
+  // - Include guards
+  // - Include blocks, in order (std, emp, local)
+  // - namespace opening
+  void ValidateFileHeading() {
+    using namespace emplex;
+
+    File().ResetTokens();
+    ValidateFileHeading_RemoveLeadingNewlines();
+    ValidateFileHeading_UpdateCopyrightComment();
   }
 
   // Make sure all tokens throughout the body of a file are valid.
@@ -652,7 +664,7 @@ public:
 
     if (!file_handler.LoadActiveFile()) {
       ++total_issues;
-      return; // File failed to load.
+      return; // File failed to load file.
     }
 
     ValidateFileHeading();
