@@ -660,11 +660,17 @@ namespace emp {
       return replace(start, end - start, value);
     }
 
-    // Find any instances of ${X} and replace with dictionary lookup of X.
+    // Find any instances of ${X} and replace with dictionary lookup of X in new variable.
     template <typename MAP_T>
-    String & ReplaceVars(const MAP_T & var_map,
+    String AsReplaceVars(const MAP_T & var_map,
                          const String & symbol = "$",
                          const Syntax & syntax = Syntax::Full());
+    
+    // Find any instances of ${X} and replace with dictionary lookup of X in this variable.
+    template <typename MAP_T>
+    String & SetReplaceVars(const MAP_T & var_map,
+                            const String & symbol = "$",
+                            const Syntax & syntax = Syntax::Full());
 
     // Find any instance of MACRO_NAME(ARGS) and call replace it with return from fun(ARGS).
     template <typename FUN_T>
@@ -2175,9 +2181,18 @@ namespace emp {
     return count;
   }
 
-  /// Find any instances of ${X} and replace with dictionary lookup of X.
+  /// Find any instances of ${X} and replace with dictionary lookup of X in this variable
   template <typename MAP_T>
-  String & String::ReplaceVars(const MAP_T & var_map,
+  String String::AsReplaceVars(const MAP_T & var_map,
+                               const String & symbol,
+                               const Syntax & syntax) {
+    String out(*this);
+    return out.SetReplaceVars(var_map, symbol, syntax);
+  }
+
+  /// Find any instances of ${X} and replace with dictionary lookup of X in this variable
+  template <typename MAP_T>
+  String & String::SetReplaceVars(const MAP_T & var_map,
                                const String & symbol,
                                const Syntax & syntax) {
     for (size_t pos = Find(symbol, 0, syntax);
