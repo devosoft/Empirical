@@ -606,6 +606,40 @@ public:
     }
   }
 
+  // Make sure the appropriate include guards / pragma once are in place.
+  void ValidateFileHeading_UpdateGuards() {
+    using namespace emplex;
+
+    // If this file is not a header, do not worry about guards.
+    if (File().GetPath().extension() != ".hpp") { return; }
+
+    // Check for #pragma once
+    File().SkipNewLines();
+    if (File().GetToken() != Lexer::ID_PRAGMA_ONCE) {
+      File().ReportIssue("Did not find '#pragma once' after heading.");
+      if (IsInteractive() && AskYesNo("Insert it?")) {
+        File().InsertLexeme("#pragma once\n\n");
+      }
+    } else {
+      File().NextToken();
+    }
+
+    // Check for include guards.
+    File().SkipNewLines();
+    emp::String guard_name = fs::relative(File().GetPath(), file_handler.BasePath()).string();
+    guard_name.SetPascalToCaps()                             // Change to ALL_CAPS
+              .ReplaceSet(!emp::AlphanumericCharSet(), '_')  // Change all punctuation to '_'
+              .Append("_GUARD")                              // Make name end in GUARD
+              .Compress('_');                                // Compress multiple '_' to just one
+    if (File().GetToken() != Lexer::ID_IFNDEF) {
+      File().ReportIssue("Did not find include guards: ", guard_name);
+      if (IsInteractive() && AskYesNo("Insert it?")) {
+        File().InsertLexeme("#ifndef " + guard_name + "\n#define " + guard_name + "\n\n");
+        File().InsertBack("\n#endif // #ifndef" + guard_name + "\n");
+      }
+    }
+  }
+
   // To be called after a new file is open to ensure that the file begins correctly.
   // Each file should begin with (in order):
   // - Copyright / Description comment
@@ -619,6 +653,7 @@ public:
     File().ResetTokens();
     ValidateFileHeading_RemoveLeadingNewlines();
     ValidateFileHeading_UpdateCopyrightComment();
+    ValidateFileHeading_UpdateGuards();
   }
 
   // Make sure all tokens throughout the body of a file are valid.
