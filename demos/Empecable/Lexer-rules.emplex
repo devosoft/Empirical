@@ -55,5 +55,8 @@ ENDIF ^[ ]*\#[ ]*"endif"
 INCLUDE_SYS ^[ ]*\#[ ]*"include"[ ]*\<\S*\>
 INCLUDE_LOCAL ^[ ]*\#[ ]*"include"[ ]*\"\S*\"
 
+#Specific Doxygen commands
+DOX_BRIEF "@brief"
+
 # "Other" will represent arbitrary characters OR inserted tokens during fixes.
 OTHER .
