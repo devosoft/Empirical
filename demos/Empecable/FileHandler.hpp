@@ -134,10 +134,8 @@ public:
 
   // Load (and tokenize) the active file; return success.
   bool LoadActiveFile() {
-    if (!File().Load(lexer, project_words)) {
-      if (File().IsValid() == false) return false; // File failed to load.
-    }
-    return true;
+    File().Load(lexer, project_words);
+    return File().IsValid();
   }
 
   void SaveCurrentFile() {
