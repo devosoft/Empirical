@@ -1,16 +1,17 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2023
-*/
 /**
- *  @file
- *  @brief A set of simple functions to manipulate maps.
- *  @note Status: BETA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2023 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/datastructs/map_utils.hpp
+ * @brief A set of simple functions to manipulate maps.
+ * @note Status: BETA
  */
 
-#ifndef EMP_DATASTRUCTS_MAP_UTILS_HPP_INCLUDE
-#define EMP_DATASTRUCTS_MAP_UTILS_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_DATASTRUCTS_MAP_UTILS_HPP_GUARD
+#define INCLUDE_EMP_DATASTRUCTS_MAP_UTILS_HPP_GUARD
 
 #include <algorithm>
 #include <map>
@@ -170,4 +171,4 @@ namespace emp {
 #endif // #ifndef EMP_DATASTRUCTS_MAP_UTILS_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: dst stdmap dval
+// empecable_words: dval stdmap dst

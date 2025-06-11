@@ -1,34 +1,35 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2018
-*/
 /**
- *  @file
- *  @brief Div Widgets maintain an ordered collection of other widgets in an HTML div.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2015-2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  When printed to the web page, these internal widgets are presented in order.
+ * @file include/emp/web/Div.hpp
+ * @brief Div Widgets maintain an ordered collection of other widgets in an HTML div.
  *
- *  To create a Div:
+ * When printed to the web page, these internal widgets are presented in order.
  *
- *    emp::web::Div my_div("name");
+ * To create a Div:
  *
- *  To use a Div:
+ *   emp::web::Div my_div("name");
  *
- *    my_div << "Add this text!"
- *           << emp::web::Image("my_image.png")
- *           << "<br>";
+ * To use a Div:
  *
- *  To register a Div in a Document:
+ *   my_div << "Add this text!"
+ *          << emp::web::Image("my_image.png")
+ *          << "<br>";
  *
- *    my_doc << my_div;
+ * To register a Div in a Document:
  *
- *  @todo Should we move all widget_dict info into Document?
- *  @note Formerly called Slate.h
+ *   my_doc << my_div;
+ *
+ * @todo Should we move all widget_dict info into Document?
+ * @note Formerly called Slate.h
  */
 
-#ifndef EMP_WEB_DIV_HPP_INCLUDE
-#define EMP_WEB_DIV_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_WEB_DIV_HPP_GUARD
+#define INCLUDE_EMP_WEB_DIV_HPP_GUARD
 
 #include "Animate.hpp"
 #include "init.hpp"

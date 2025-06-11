@@ -1,16 +1,17 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2024.
-*/
 /**
- *  @file
- *  @brief Used as part of a branching solver to keep track of the current state.
- *  @note Status: BETA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2024 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/tools/SolveState.hpp
+ * @brief Used as part of a branching solver to keep track of the current state.
+ * @note Status: BETA
  */
 
-#ifndef EMP_TOOLS_SOLVESTATE_HPP_INCLUDE
-#define EMP_TOOLS_SOLVESTATE_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_TOOLS_SOLVE_STATE_HPP_GUARD
+#define INCLUDE_EMP_TOOLS_SOLVE_STATE_HPP_GUARD
 
 #include <stddef.h>
 

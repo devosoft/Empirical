@@ -1,19 +1,20 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2017-2018
-*/
 /**
- *  @file
- *  @brief Handle reflection on organisms to setup reasonable defaults in World.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2017-2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  @note None of the functions defined here should be called from outside the world object;
- *        as such the comments below are not in Doxygen format and should only be used by
- *        LIBRARY developers working on World.
+ * @file include/emp/Evolve/World_reflect.hpp
+ * @brief Handle reflection on organisms to setup reasonable defaults in World.
+ *
+ * @note None of the functions defined here should be called from outside the world object;
+ *       as such the comments below are not in Doxygen format and should only be used by
+ *       LIBRARY developers working on World.
  */
 
-#ifndef EMP_EVOLVE_WORLD_REFLECT_HPP_INCLUDE
-#define EMP_EVOLVE_WORLD_REFLECT_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_EVOLVE_WORLD_REFLECT_HPP_GUARD
+#define INCLUDE_EMP_EVOLVE_WORLD_REFLECT_HPP_GUARD
 
 #include <functional>
 #include <type_traits>

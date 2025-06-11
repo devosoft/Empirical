@@ -1,32 +1,33 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2022-2024
-*/
 /**
- *  @file
- *  @brief Simple functions and tools to manipulate individual characters.
- *  @note Status: BETA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2022-2024 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  Available Class
- *    CharSet - A collection of characters for use in other functions.
+ * @file include/emp/tools/char_utils.hpp
+ * @brief Simple functions and tools to manipulate individual characters.
+ * @note Status: BETA
  *
- *  Available Functions
- *    bool is_whitespace(char test_char)
- *    bool is_upper_letter(char test_char)
- *    bool is_lower_letter(char test_char)
- *    bool is_letter(char test_char)
- *    bool is_digit(char test_char)
- *    bool is_alphanumeric(char test_char)
- *    bool is_idchar(char test_char)
- *    bool is_one_of(char test_char, const std::string & char_set)
- *    bool is_valid(char test_char )
- *    bool is_valid(char test_char, std::function<bool(char)> fun1, FUNS... funs)
+ * Available Class
+ *   CharSet - A collection of characters for use in other functions.
+ *
+ * Available Functions
+ *   bool is_whitespace(char test_char)
+ *   bool is_upper_letter(char test_char)
+ *   bool is_lower_letter(char test_char)
+ *   bool is_letter(char test_char)
+ *   bool is_digit(char test_char)
+ *   bool is_alphanumeric(char test_char)
+ *   bool is_idchar(char test_char)
+ *   bool is_one_of(char test_char, const std::string & char_set)
+ *   bool is_valid(char test_char )
+ *   bool is_valid(char test_char, std::function<bool(char)> fun1, FUNS... funs)
  *
  */
 
-#ifndef EMP_TOOLS_CHAR_UTILS_HPP_INCLUDE
-#define EMP_TOOLS_CHAR_UTILS_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_TOOLS_CHAR_UTILS_HPP_GUARD
+#define INCLUDE_EMP_TOOLS_CHAR_UTILS_HPP_GUARD
 
 #include <functional>
 #include <string>

@@ -1,22 +1,23 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2021
-*/
 /**
- *  @file
- *  @brief The SignalControl class manages all of the signals and actions, linking them together
- *  upon request (by name, base class, or derived class).
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2021 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  Developer notes:
- *  * Right now SignalControl can only link to signals that it creates.  Ideally, external signals
- *    should also be able to be added to it.  The question is, how should this be done?
- *    - They could be copied.  But should we copy existing actions?  How do we provide keys?
- *    - They could use a smart pointer style, so only deleted with final version (slow down?)
+ * @file include/emp/control/SignalControl.hpp
+ * @brief The SignalControl class manages all of the signals and actions, linking them together
+ * upon request (by name, base class, or derived class).
+ *
+ * Developer notes:
+ * * Right now SignalControl can only link to signals that it creates.  Ideally, external signals
+ *   should also be able to be added to it.  The question is, how should this be done?
+ *   - They could be copied.  But should we copy existing actions?  How do we provide keys?
+ *   - They could use a smart pointer style, so only deleted with final version (slow down?)
  */
 
-#ifndef EMP_CONTROL_SIGNALCONTROL_HPP_INCLUDE
-#define EMP_CONTROL_SIGNALCONTROL_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_CONTROL_SIGNAL_CONTROL_HPP_GUARD
+#define INCLUDE_EMP_CONTROL_SIGNAL_CONTROL_HPP_GUARD
 
 #include <cstdint>
 #include <stddef.h>

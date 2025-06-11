@@ -1,18 +1,19 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2018
-*/
 /**
- *  @file
- *  @brief Various versions of the Draw() function to draw images onto a canvas.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2015-2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  Each version of Draw() takes a canvas widget and some form of data to be drawn on the widget,
- *  such as a circle, a bit matrix, or a geometric surface.
+ * @file include/emp/web/canvas_utils.hpp
+ * @brief Various versions of the Draw() function to draw images onto a canvas.
+ *
+ * Each version of Draw() takes a canvas widget and some form of data to be drawn on the widget,
+ * such as a circle, a bit matrix, or a geometric surface.
  */
 
-#ifndef EMP_WEB_CANVAS_UTILS_HPP_INCLUDE
-#define EMP_WEB_CANVAS_UTILS_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_WEB_CANVAS_UTILS_HPP_GUARD
+#define INCLUDE_EMP_WEB_CANVAS_UTILS_HPP_GUARD
 
 #include <stddef.h>
 

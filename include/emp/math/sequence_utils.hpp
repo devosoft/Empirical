@@ -1,19 +1,20 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2020.
-*/
 /**
- *  @file
- *  @brief Functions for analyzing with generic sequence types.
- *  @note Status: BETA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2020 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  A set of functions for analyzing sequences, including distance metrics (Hamming and
- *  Edit/Levenshtein) and alignment.
+ * @file include/emp/math/sequence_utils.hpp
+ * @brief Functions for analyzing with generic sequence types.
+ * @note Status: BETA
+ *
+ * A set of functions for analyzing sequences, including distance metrics (Hamming and
+ * Edit/Levenshtein) and alignment.
  */
 
-#ifndef EMP_MATH_SEQUENCE_UTILS_HPP_INCLUDE
-#define EMP_MATH_SEQUENCE_UTILS_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_MATH_SEQUENCE_UTILS_HPP_GUARD
+#define INCLUDE_EMP_MATH_SEQUENCE_UTILS_HPP_GUARD
 
 #include <stddef.h>
 

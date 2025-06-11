@@ -1,24 +1,25 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2019.
-*/
 /**
- *  @file
- *  @brief A drop-in wrapper for std::vector; adds on bounds checking in debug mode.
- *  @note Status: BETA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2019 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  This class is a drop-in wrapper for std::vector, adding on bounds checking, both for the
- *  indexing operator and for the use of iterators (ensure that iterators do not outlive the
- *  version of vector for which it was created.)
- *  If EMP_NDEBUG is set then it reverts back to std::vector.
+ * @file include/emp/base/vector.hpp
+ * @brief A drop-in wrapper for std::vector; adds on bounds checking in debug mode.
+ * @note Status: BETA
  *
- *  @todo Debug code: member functions that take iterators should also take emp iterators that verify
- *        whether those iterators are valid.
+ * This class is a drop-in wrapper for std::vector, adding on bounds checking, both for the
+ * indexing operator and for the use of iterators (ensure that iterators do not outlive the
+ * version of vector for which it was created.)
+ * If EMP_NDEBUG is set then it reverts back to std::vector.
+ *
+ * @todo Debug code: member functions that take iterators should also take emp iterators that verify
+ *       whether those iterators are valid.
  */
 
-#ifndef EMP_BASE_VECTOR_HPP_INCLUDE
-#define EMP_BASE_VECTOR_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_BASE_VECTOR_HPP_GUARD
+#define INCLUDE_EMP_BASE_VECTOR_HPP_GUARD
 
 
 #include <initializer_list>

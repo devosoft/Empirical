@@ -1,23 +1,24 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2018
-*/
 /**
- *  @file
- *  @brief This file defines a map that is sorted by value, not key.
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  valsort_map is a limited implementation of map that also keeps track of the values set, in
- *  order, as you go.  This is accomplished by keeping a second data structure, a sorted set, of
- *  all of the values maintained in the map.
+ * @file include/emp/datastructs/valsort_map.hpp
+ * @brief This file defines a map that is sorted by value, not key.
+ * @note Status: ALPHA
  *
- *  The member functions cbegin() and cend() work as in map, but cvbegin() and cvend() produce
- *  the same set of results, except in value order.  (reverse versions of each work as well)
+ * valsort_map is a limited implementation of map that also keeps track of the values set, in
+ * order, as you go.  This is accomplished by keeping a second data structure, a sorted set, of
+ * all of the values maintained in the map.
+ *
+ * The member functions cbegin() and cend() work as in map, but cvbegin() and cvend() produce
+ * the same set of results, except in value order.  (reverse versions of each work as well)
  */
 
-#ifndef EMP_DATASTRUCTS_VALSORT_MAP_HPP_INCLUDE
-#define EMP_DATASTRUCTS_VALSORT_MAP_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_DATASTRUCTS_VALSORT_MAP_HPP_GUARD
+#define INCLUDE_EMP_DATASTRUCTS_VALSORT_MAP_HPP_GUARD
 
 #include <map>
 #include <set>

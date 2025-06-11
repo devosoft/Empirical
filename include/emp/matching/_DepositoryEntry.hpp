@@ -1,16 +1,17 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2020
-*/
 /**
- *  @file
- *  @brief Helper struct for MatchDepository.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2020 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/matching/_DepositoryEntry.hpp
+ * @brief Helper struct for MatchDepository.
  *
  */
 
-#ifndef EMP_MATCHING_DEPOSITORYENTRY_HPP_INCLUDE
-#define EMP_MATCHING_DEPOSITORYENTRY_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_MATCHING_DEPOSITORY_ENTRY_HPP_GUARD
+#define INCLUDE_EMP_MATCHING_DEPOSITORY_ENTRY_HPP_GUARD
 
 namespace emp {
 #ifndef DOXYGEN_SHOULD_SKIP_THIS

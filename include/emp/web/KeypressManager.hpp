@@ -1,48 +1,49 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2017
-*/
 /**
- *  @file
- *  @brief KeypressManager is a tracker for keypresses in HTML5 pages.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2015-2017 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  When a KeypressManager is created, it can be given functions to run in response
- *  to different types of key presses via overloaded version of the AddKeydownCallback
- *  method.  Each of these accepts an order parameter that is optional and, if provided,
- *  will indicate the order in which tests should be performed to resolve a keypress.
- *  If order is not provided, tests will occur in the order that they were given to the
- *  manager.
+ * @file include/emp/web/KeypressManager.hpp
+ * @brief KeypressManager is a tracker for keypresses in HTML5 pages.
  *
- *  The specific versions of AddKeydownCallback are:
+ * When a KeypressManager is created, it can be given functions to run in response
+ * to different types of key presses via overloaded version of the AddKeydownCallback
+ * method.  Each of these accepts an order parameter that is optional and, if provided,
+ * will indicate the order in which tests should be performed to resolve a keypress.
+ * If order is not provided, tests will occur in the order that they were given to the
+ * manager.
  *
- *    void AddKeydownCallback(std::function<bool(const emp::web::KeyboardEvent &)> cb_fun,
- *                            int order=-1)
+ * The specific versions of AddKeydownCallback are:
  *
- *      Link a function to the KeypressManager that is called for any unresolved keypress.
- *      The function must take in an emp::web::KeyboardEvent (which includes information about
- *      the specific key pressed as well as any modifiers such as SHIFT or CTRL) and it
- *      must return a Boolean value indicating whether it has resolved the keypress.
+ *   void AddKeydownCallback(std::function<bool(const emp::web::KeyboardEvent &)> cb_fun,
+ *                           int order=-1)
  *
- *    void AddKeydownCallback(char key, std::function<void()> cb_fun, int order=-1)
+ *     Link a function to the KeypressManager that is called for any unresolved keypress.
+ *     The function must take in an emp::web::KeyboardEvent (which includes information about
+ *     the specific key pressed as well as any modifiers such as SHIFT or CTRL) and it
+ *     must return a Boolean value indicating whether it has resolved the keypress.
  *
- *      Link a specific key to a target function to be called when that key is pressed.
- *      The function my return a void and take no arguments.
+ *   void AddKeydownCallback(char key, std::function<void()> cb_fun, int order=-1)
  *
- *    void AddKeydownCallback(const std::string & key_set, std::function<void()> cb_fun,
- *                            int order=-1)
+ *     Link a specific key to a target function to be called when that key is pressed.
+ *     The function my return a void and take no arguments.
  *
- *      Same as the previous method, but will respond to any of the keys in the provided
- *      string.
+ *   void AddKeydownCallback(const std::string & key_set, std::function<void()> cb_fun,
+ *                           int order=-1)
+ *
+ *     Same as the previous method, but will respond to any of the keys in the provided
+ *     string.
  *
  *
- *  @todo Technically we should make sure to remove the event listener in the destructor.
- *        This would require us to keep track of the function that it is calling so that we can
- *        pass it back in to trigger the removal.
+ * @todo Technically we should make sure to remove the event listener in the destructor.
+ *       This would require us to keep track of the function that it is calling so that we can
+ *       pass it back in to trigger the removal.
  */
 
-#ifndef EMP_WEB_KEYPRESSMANAGER_HPP_INCLUDE
-#define EMP_WEB_KEYPRESSMANAGER_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_WEB_KEYPRESS_MANAGER_HPP_GUARD
+#define INCLUDE_EMP_WEB_KEYPRESS_MANAGER_HPP_GUARD
 
 #include <cstdint>
 #include <functional>

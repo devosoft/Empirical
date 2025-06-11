@@ -1,16 +1,17 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2025 (based on Random.hpp)
-*/
 /**
- *  @file
- *  @brief A FAST pseudo-random-number generator that has a short (2^64) period.
- *  Status: RELEASE
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2025 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/math/Random_Xorshift.hpp
+ * @brief A FAST pseudo-random-number generator that has a short (2^64) period.
+ * Status: RELEASE
  */
 
- #ifndef EMP_MATH_RANDOM_XORSHIFT_HPP_INCLUDE
- #define EMP_MATH_RANDOM_XORSHIFT_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_MATH_RANDOM_XORSHIFT_HPP_GUARD
+#define INCLUDE_EMP_MATH_RANDOM_XORSHIFT_HPP_GUARD
 
  #include "../base/assert.hpp"
 

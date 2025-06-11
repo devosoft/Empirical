@@ -1,16 +1,17 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2019
-*/
 /**
- *  @file
- *  @brief Functions for calculating various spatial statistics.
- *  @note Status: BETA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2019 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/math/spatial_stats.hpp
+ * @brief Functions for calculating various spatial statistics.
+ * @note Status: BETA
  */
 
-#ifndef EMP_MATH_SPATIAL_STATS_HPP_INCLUDE
-#define EMP_MATH_SPATIAL_STATS_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_MATH_SPATIAL_STATS_HPP_GUARD
+#define INCLUDE_EMP_MATH_SPATIAL_STATS_HPP_GUARD
 
 #include <algorithm>
 #include <stddef.h>
@@ -123,4 +124,4 @@ namespace emp {
 #endif // #ifndef EMP_MATH_SPATIAL_STATS_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: yid xid
+// empecable_words: xid yid

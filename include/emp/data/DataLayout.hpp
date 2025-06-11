@@ -1,16 +1,17 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2019-2022
-*/
 /**
- *  @file
- *  @brief A mapping of names to variables stored in a MemoryImage.
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2019-2022 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/data/DataLayout.hpp
+ * @brief A mapping of names to variables stored in a MemoryImage.
+ * @note Status: ALPHA
  */
 
-#ifndef EMP_DATA_DATALAYOUT_HPP_INCLUDE
-#define EMP_DATA_DATALAYOUT_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_DATA_DATA_LAYOUT_HPP_GUARD
+#define INCLUDE_EMP_DATA_DATA_LAYOUT_HPP_GUARD
 
 #include <stddef.h>
 #include <string>

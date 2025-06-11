@@ -1,38 +1,39 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2024.
-*/
 /**
- *  @file
- *  @brief A general-purpose, fast lexer.
- *  @note Status: BETA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2024 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  Build a lexer that can convert input strings or streams into a series of provided tokens.
+ * @file include/emp/compiler/Lexer.hpp
+ * @brief A general-purpose, fast lexer.
+ * @note Status: BETA
  *
- *  Use AddToken(name, regex) to provide the relevant tokens.
- *   'name' is the unique name for this token.
- *   'regex' is the regular expression that describes this token.
- *  It will return a unique ID associated with this token that will be used in output Token
- *  objects later.  You may provide additional arguments to indicate of the lexeme should be
- *  saved in a token, whether the token should be saved at all (unsaved token types are
- *  simply left out of the output), and a more detailed description.
+ * Build a lexer that can convert input strings or streams into a series of provided tokens.
  *
- *  IgnoreToken(name, regex) uses the same arguments, but is used for tokens that
- *  should be skipped over during lexical analysis
+ * Use AddToken(name, regex) to provide the relevant tokens.
+ *  'name' is the unique name for this token.
+ *  'regex' is the regular expression that describes this token.
+ * It will return a unique ID associated with this token that will be used in output Token
+ * objects later.  You may provide additional arguments to indicate of the lexeme should be
+ * saved in a token, whether the token should be saved at all (unsaved token types are
+ * simply left out of the output), and a more detailed description.
  *
- *  Names and IDs can be recovered later using GetTokenID(name) and GetTokenName(id).
+ * IgnoreToken(name, regex) uses the same arguments, but is used for tokens that
+ * should be skipped over during lexical analysis
  *
- *  Either strings or streams can be converted into their associated Tokens.
- *    Tokenize(in) returns the entire series of tokens as a TokenStream.
- *    TokenizeNext(in, &line) return the next token only, and updates the line number
- *    Process(in) returns the next token (even if it's normally ignored); does not track line
+ * Names and IDs can be recovered later using GetTokenID(name) and GetTokenName(id).
  *
- *  Finally, GetLexeme() returns the lexeme from the most recent token found.
+ * Either strings or streams can be converted into their associated Tokens.
+ *   Tokenize(in) returns the entire series of tokens as a TokenStream.
+ *   TokenizeNext(in, &line) return the next token only, and updates the line number
+ *   Process(in) returns the next token (even if it's normally ignored); does not track line
+ *
+ * Finally, GetLexeme() returns the lexeme from the most recent token found.
  */
 
-#ifndef EMP_COMPILER_LEXER_HPP_INCLUDE
-#define EMP_COMPILER_LEXER_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_COMPILER_LEXER_HPP_GUARD
+#define INCLUDE_EMP_COMPILER_LEXER_HPP_GUARD
 
 #include <cstdint>
 #include <iostream>
@@ -42,6 +43,7 @@
 #include <stddef.h>
 
 #include "../base/vector.hpp"
+#include "../datastructs/map_utils.hpp"
 #include "../tools/String.hpp"
 
 #include "lexer_utils.hpp"
@@ -59,7 +61,7 @@ namespace emp {
     static constexpr int ERROR_ID = -1;   ///< Code for unknown token ID.
 
     emp::vector<TokenType> token_set{};   ///< List of all active tokens types.
-    emp::map<String, int> token_map{};    ///< Map of token names to id.
+    std::map<String, int> token_map{};    ///< Map of token names to id.
     int cur_token_id = MAX_ID;            ///< ID for next new token (higher has priority)
     mutable bool generate_lexer = false;  ///< Do we need to regenerate the lexer?
     mutable DFA lexer_dfa{};              ///< Table driven lexer implementation.
@@ -720,4 +722,4 @@ namespace emp {
 #endif // #ifndef EMP_COMPILER_LEXER_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: tellg seekg
+// empecable_words: seekg tellg

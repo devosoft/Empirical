@@ -1,18 +1,19 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2018
-*/
 /**
- *  @file
- *  @brief Directly measure a target quality about a type of object.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  These objects are able to measure a specific trait on another object.  They
- *  (will eventually) interface smoothly with DataNodes for data collection.
+ * @file include/emp/data/Trait.hpp
+ * @brief Directly measure a target quality about a type of object.
+ *
+ * These objects are able to measure a specific trait on another object.  They
+ * (will eventually) interface smoothly with DataNodes for data collection.
  */
 
-#ifndef EMP_DATA_TRAIT_HPP_INCLUDE
-#define EMP_DATA_TRAIT_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_DATA_TRAIT_HPP_GUARD
+#define INCLUDE_EMP_DATA_TRAIT_HPP_GUARD
 
 #include <stddef.h>
 #include <string>

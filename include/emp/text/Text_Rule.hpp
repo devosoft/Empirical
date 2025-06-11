@@ -1,16 +1,18 @@
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2024
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2024 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  @file Text_Rule.hpp
- *  @brief Helper struct for managing rules text between a target encoding and Emphatic.
- *  @note Status: ALPHA
+ * @file include/emp/text/Text_Rule.hpp
+ * @brief Helper struct for managing rules text between a target encoding and Emphatic.
+ * @note Status: ALPHA
  *
  */
 
-#ifndef EMP_TEXT_TEXT_RULE_HPP_INCLUDE
-#define EMP_TEXT_TEXT_RULE_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_TEXT_TEXT_RULE_HPP_GUARD
+#define INCLUDE_EMP_TEXT_TEXT_RULE_HPP_GUARD
 
 #include <type_traits>
 #include <unordered_map>

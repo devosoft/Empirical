@@ -1,17 +1,18 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2020
-*/
 /**
- *  @file
- *  @brief The FacetedWidget class is used to access the protected methods of WidgetFacet such
- *          as SetCSS and SetAttr. An example of its use can be found in include/emp/prefab/Collapse.h
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2020 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/web/_FacetedWidget.hpp
+ * @brief The FacetedWidget class is used to access the protected methods of WidgetFacet such
+ * as SetCSS and SetAttr. An example of its use can be found in include/emp/prefab/Collapse.h
  *
  */
 
-#ifndef EMP_WEB__FACETEDWIDGET_HPP_INCLUDE
-#define EMP_WEB__FACETEDWIDGET_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_WEB_FACETED_WIDGET_HPP_GUARD
+#define INCLUDE_EMP_WEB_FACETED_WIDGET_HPP_GUARD
 
 #include "../web/Widget.hpp"
 

@@ -1,31 +1,32 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2024
-*/
 /**
- *  @file
- *  @brief Specs for the Table widget.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2015-2024 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  TableInfo is the core information for a table and has two helper classes:
- *  TableRowInfo and TableDataInfo.  The Table class is a smart pointer to a TableInfo
- *  object.
+ * @file include/emp/web/Table.hpp
+ * @brief Specs for the Table widget.
  *
- *  A Table is composed of a series of rows, each with the same number of columns.
- *  TableDataInfo may be multiple cells wide/tall, masking other cells.
+ * TableInfo is the core information for a table and has two helper classes:
+ * TableRowInfo and TableDataInfo.  The Table class is a smart pointer to a TableInfo
+ * object.
+ *
+ * A Table is composed of a series of rows, each with the same number of columns.
+ * TableDataInfo may be multiple cells wide/tall, masking other cells.
  *
  *
- *  @todo Tables should more directly manage internal slates rather than just adding divs and
- *     then having them filled in.
- *  @todo TextTables should be created that simply use text in cells, radically speeding up
- *     printing of such tables (and covering 80% of use cases).
- *  @todo IDEALLY: Make a single table that will look at what each cell is pointing to (table
- *     or text) and write out what it needs to, in place.
- *  @todo Add a ClearColumn method, as well as other column functionality.
+ * @todo Tables should more directly manage internal slates rather than just adding divs and
+ *    then having them filled in.
+ * @todo TextTables should be created that simply use text in cells, radically speeding up
+ *    printing of such tables (and covering 80% of use cases).
+ * @todo IDEALLY: Make a single table that will look at what each cell is pointing to (table
+ *    or text) and write out what it needs to, in place.
+ * @todo Add a ClearColumn method, as well as other column functionality.
  */
 
-#ifndef EMP_WEB_TABLE_HPP_INCLUDE
-#define EMP_WEB_TABLE_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_WEB_TABLE_HPP_GUARD
+#define INCLUDE_EMP_WEB_TABLE_HPP_GUARD
 
 #include <stddef.h>
 
@@ -876,4 +877,4 @@ namespace web {
 #endif // #ifndef EMP_WEB_TABLE_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: colgroup rowg tbody colg
+// empecable_words: colg tbody rowg colgroup

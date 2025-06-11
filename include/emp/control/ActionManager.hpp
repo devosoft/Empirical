@@ -1,16 +1,17 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2017
-*/
 /**
- *  @file
- *  @brief ActionManager collects sets of Actions to be looked up or manipulated later.
- *  @note Status: Beta
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2017 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/control/ActionManager.hpp
+ * @brief ActionManager collects sets of Actions to be looked up or manipulated later.
+ * @note Status: Beta
  */
 
-#ifndef EMP_CONTROL_ACTIONMANAGER_HPP_INCLUDE
-#define EMP_CONTROL_ACTIONMANAGER_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_CONTROL_ACTION_MANAGER_HPP_GUARD
+#define INCLUDE_EMP_CONTROL_ACTION_MANAGER_HPP_GUARD
 
 #include <stddef.h>
 #include <string>

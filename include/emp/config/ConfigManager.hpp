@@ -1,11 +1,10 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016
-*/
 /**
- *  @file
- *  @brief  The ConfigManager templated class handles the building and configuration of new objects
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/config/ConfigManager.hpp
+ * @brief The ConfigManager templated class handles the building and configuration of new objects
  *  of the target type.
  *
  * The manager is created with two keywords; one for the type of the managed class, and the
@@ -21,8 +20,10 @@
  *     ...
  */
 
-#ifndef EMP_CONFIG_CONFIGMANAGER_HPP_INCLUDE
-#define EMP_CONFIG_CONFIGMANAGER_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_CONFIG_CONFIG_MANAGER_HPP_GUARD
+#define INCLUDE_EMP_CONFIG_CONFIG_MANAGER_HPP_GUARD
 
 #include <functional>
 #include <iostream>

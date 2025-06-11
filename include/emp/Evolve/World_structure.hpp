@@ -1,15 +1,16 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2017-2022
-*/
 /**
- *  @file
- *  @brief Functions for popular world structure methods.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2017-2022 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/Evolve/World_structure.hpp
+ * @brief Functions for popular world structure methods.
  */
 
-#ifndef EMP_EVOLVE_WORLD_STRUCTURE_HPP_INCLUDE
-#define EMP_EVOLVE_WORLD_STRUCTURE_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_EVOLVE_WORLD_STRUCTURE_HPP_GUARD
+#define INCLUDE_EMP_EVOLVE_WORLD_STRUCTURE_HPP_GUARD
 
 #include <cstdint>
 #include <set>

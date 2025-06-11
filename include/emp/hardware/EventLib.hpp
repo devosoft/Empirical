@@ -1,17 +1,18 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2017
-*/
 /**
- *  @file
- *  @brief This file maintains information about events available in virtual hardware.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2017 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  This file is largely based on InstLib.h.
+ * @file include/emp/hardware/EventLib.hpp
+ * @brief This file maintains information about events available in virtual hardware.
+ *
+ * This file is largely based on InstLib.h.
  */
 
-#ifndef EMP_HARDWARE_EVENTLIB_HPP_INCLUDE
-#define EMP_HARDWARE_EVENTLIB_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_HARDWARE_EVENT_LIB_HPP_GUARD
+#define INCLUDE_EMP_HARDWARE_EVENT_LIB_HPP_GUARD
 
 #include <functional>
 #include <iostream>

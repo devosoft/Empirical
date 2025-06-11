@@ -1,16 +1,17 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2025
-*/
 /**
- *  @file
- *  @brief Helper functions for emp::Random for common random tasks.
- *  Status: RELEASE
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2025 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/math/random_utils.hpp
+ * @brief Helper functions for emp::Random for common random tasks.
+ * Status: RELEASE
  */
 
-#ifndef EMP_MATH_RANDOM_UTILS_HPP_INCLUDE
-#define EMP_MATH_RANDOM_UTILS_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_MATH_RANDOM_UTILS_HPP_GUARD
+#define INCLUDE_EMP_MATH_RANDOM_UTILS_HPP_GUARD
 
 #include <functional>
 #include <stddef.h>

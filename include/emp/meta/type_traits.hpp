@@ -1,15 +1,16 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2024.
-*/
 /**
- *  @file
- *  @brief Extensions on the standard library type traits to handle Empirical classes (such as Ptr).
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2024 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/meta/type_traits.hpp
+ * @brief Extensions on the standard library type traits to handle Empirical classes (such as Ptr).
  */
 
-#ifndef EMP_META_TYPE_TRAITS_HPP_INCLUDE
-#define EMP_META_TYPE_TRAITS_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_META_TYPE_TRAITS_HPP_GUARD
+#define INCLUDE_EMP_META_TYPE_TRAITS_HPP_GUARD
 
 
 #include <cstdint>       // uint8_t, uint16_t, etc.

@@ -1,17 +1,18 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2021.
-*/
 /**
- *  @file
- *  @brief A set of values that can be manipulated at compile time (good for metaprogramming)
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2021 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  Any built-in type can be added to ValPack to be manipulated at compile time.
+ * @file include/emp/meta/ValPack.hpp
+ * @brief A set of values that can be manipulated at compile time (good for metaprogramming)
+ *
+ * Any built-in type can be added to ValPack to be manipulated at compile time.
  */
 
-#ifndef EMP_META_VALPACK_HPP_INCLUDE
-#define EMP_META_VALPACK_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_META_VAL_PACK_HPP_GUARD
+#define INCLUDE_EMP_META_VAL_PACK_HPP_GUARD
 
 #include <iostream>
 #include <stddef.h>
@@ -279,4 +280,4 @@ namespace emp {
 #endif // #ifndef EMP_META_VALPACK_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: usort snext rsort pbin spop uniq pnext
+// empecable_words: pnext uniq spop pbin rsort snext usort

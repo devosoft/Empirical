@@ -1,35 +1,36 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2018
-*/
 /**
- *  @file
- *  @brief Create/control an HTML input and call a specified function when it receives input.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  Use example:
+ * @file include/emp/web/Input.hpp
+ * @brief Create/control an HTML input and call a specified function when it receives input.
  *
- *    emp::web::Input my_input(MyFun, "input type", "input Name", "html_id");
+ * Use example:
  *
- *  Where my_input is the C++ object linking to the input, MyFun is the
- *  function you want to call on changes, "Input Name" is the label on the
- *  input itself, and "html_id" is the optional id you want it to use in the
- *  HTML code (otherwise it will generate a unique name on its own.)
+ *   emp::web::Input my_input(MyFun, "input type", "input Name", "html_id");
  *
- *  Member functions to set state:
- *    Input & Callback(const std::function<void()> & in_callback)
- *    Input & Label(const std::string & in_label)
- *    Input & Autofocus(bool in_af)
- *    Input & Disabled(bool in_dis)
+ * Where my_input is the C++ object linking to the input, MyFun is the
+ * function you want to call on changes, "Input Name" is the label on the
+ * input itself, and "html_id" is the optional id you want it to use in the
+ * HTML code (otherwise it will generate a unique name on its own.)
  *
- *  Retrieving current state:
- *    const std::string & GetLabel() const
- *    bool HasAutofocus() const
- *    bool IsDisabled() const
+ * Member functions to set state:
+ *   Input & Callback(const std::function<void()> & in_callback)
+ *   Input & Label(const std::string & in_label)
+ *   Input & Autofocus(bool in_af)
+ *   Input & Disabled(bool in_dis)
+ *
+ * Retrieving current state:
+ *   const std::string & GetLabel() const
+ *   bool HasAutofocus() const
+ *   bool IsDisabled() const
  */
 
-#ifndef EMP_WEB_INPUT_HPP_INCLUDE
-#define EMP_WEB_INPUT_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_WEB_INPUT_HPP_GUARD
+#define INCLUDE_EMP_WEB_INPUT_HPP_GUARD
 
 #include <cstdint>
 
@@ -356,4 +357,4 @@ namespace web {
 #endif // #ifndef EMP_WEB_INPUT_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: evt imdr chriscoyier codepen
+// empecable_words: codepen chriscoyier imdr evt

@@ -1,20 +1,21 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2018
-*/
 /**
- *  @file
- *  @brief Specs for the Text widget.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2015-2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  A representation of text on a web page.  Text Widgets can be included inside of Divs or
- *  Tables to cordon off a section of text (and will be automatically created when text is
- *  streamed into these other widgets).  The primary benefit of explicitly creating your
- *  own text widget is to control the text style.
+ * @file include/emp/web/Text.hpp
+ * @brief Specs for the Text widget.
+ *
+ * A representation of text on a web page.  Text Widgets can be included inside of Divs or
+ * Tables to cordon off a section of text (and will be automatically created when text is
+ * streamed into these other widgets).  The primary benefit of explicitly creating your
+ * own text widget is to control the text style.
  */
 
-#ifndef EMP_WEB_TEXT_HPP_INCLUDE
-#define EMP_WEB_TEXT_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_WEB_TEXT_HPP_GUARD
+#define INCLUDE_EMP_WEB_TEXT_HPP_GUARD
 
 #include <stddef.h>
 

@@ -1,16 +1,16 @@
-/*
-
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2017
-*/
 /**
- *  @file
- *  @brief A specialized version of InstLib to handle AvidaCPU Instructions.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2017 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/hardware/AvidaCPU_InstLib.hpp
+ * @brief A specialized version of InstLib to handle AvidaCPU Instructions.
  */
 
-#ifndef EMP_HARDWARE_AVIDACPU_INSTLIB_HPP_INCLUDE
-#define EMP_HARDWARE_AVIDACPU_INSTLIB_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_HARDWARE_AVIDA_CPU_INST_LIB_HPP_GUARD
+#define INCLUDE_EMP_HARDWARE_AVIDA_CPU_INST_LIB_HPP_GUARD
 
 #include <stddef.h>
 

@@ -1,15 +1,16 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2021-2022
-*/
 /**
- *  @file
- *  @brief UI framework for live statistic readouts.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2021-2022 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/prefab/ReadoutPanel.hpp
+ * @brief UI framework for live statistic readouts.
  */
 
-#ifndef EMP_PREFAB_READOUTPANEL_HPP_INCLUDE
-#define EMP_PREFAB_READOUTPANEL_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_PREFAB_READOUT_PANEL_HPP_GUARD
+#define INCLUDE_EMP_PREFAB_READOUT_PANEL_HPP_GUARD
 
 #include "../tools/string_utils.hpp"
 #include "../web/Animate.hpp"
@@ -224,4 +225,4 @@ namespace emp::prefab {
 #endif // #ifndef EMP_PREFAB_READOUTPANEL_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: lvd liv
+// empecable_words: liv lvd

@@ -1,15 +1,17 @@
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2024
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2024 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  @file SubsetSolver.hpp
- *  @brief A brute-force solving tool to find an optimal subset.
- *  @note Status: BETA
+ * @file include/emp/in_progress/SubsetSolver.hpp
+ * @brief A brute-force solving tool to find an optimal subset.
+ * @note Status: BETA
  */
 
-#ifndef EMP_TOOLS_SUBSET_SOLVER_HPP_INCLUDE
-#define EMP_TOOLS_SUBSET_SOLVER_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_IN_PROGRESS_SUBSET_SOLVER_HPP_GUARD
+#define INCLUDE_EMP_IN_PROGRESS_SUBSET_SOLVER_HPP_GUARD
 
 #include <functional>
 #include <stddef.h>

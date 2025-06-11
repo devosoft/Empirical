@@ -1,52 +1,53 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2024.
-*/
 /**
- *  @file
- *  @brief Basic regular expression handler.
- *  @note Status: BETA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2024 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  A fully (well, mostly) functional regular expression processor.
+ * @file include/emp/compiler/RegEx.hpp
+ * @brief Basic regular expression handler.
+ * @note Status: BETA
  *
- *  Special chars:
- *   |       - or
- *   *       - zero or more of previous
- *   +       - one or more of previous
- *   ?       - previous is optional
- *   ^       - match the beginning of the line (no chars)
- *   $       - match the end of the line (no chars)
- *   .       - match any character except \n
- *   \d      - match any digit (\D for anything EXCEPT a digit)
- *   \l      - match any letter (\L for anything EXCEPT a letter)
- *   \s      - match any whiteSpace (\S for anything EXCEPT whitespace)
- *   \w      - match any identifier (word) char (\W for anything EXCEPT an identifier char)
+ * A fully (well, mostly) functional regular expression processor.
  *
- *  Plus the following group contents (and change may translation rules)
- *   (...)   - group contents
- *   "..."   - ignore special characters in contents (internal quotes must be escaped)
- *   [...]   - character set -- choose ONE character from the set.
- *                '^' as first char negates contents
- *                '-' indicates range UNLESS first or last.
- *   {n}     - match the previous entry exactly n times.
- *   {n,}    - match the previous entry at least n times.
- *   {m,n}   - match the previous entry at least m, but no more than n times
+ * Special chars:
+ *  |       - or
+ *  *       - zero or more of previous
+ *  +       - one or more of previous
+ *  ?       - previous is optional
+ *  ^       - match the beginning of the line (no chars)
+ *  $       - match the end of the line (no chars)
+ *  .       - match any character except \n
+ *  \d      - match any digit (\D for anything EXCEPT a digit)
+ *  \l      - match any letter (\L for anything EXCEPT a letter)
+ *  \s      - match any whiteSpace (\S for anything EXCEPT whitespace)
+ *  \w      - match any identifier (word) char (\W for anything EXCEPT an identifier char)
  *
- *  Additional overloads for functions in lexer_utils.h:
+ * Plus the following group contents (and change may translation rules)
+ *  (...)   - group contents
+ *  "..."   - ignore special characters in contents (internal quotes must be escaped)
+ *  [...]   - character set -- choose ONE character from the set.
+ *               '^' as first char negates contents
+ *               '-' indicates range UNLESS first or last.
+ *  {n}     - match the previous entry exactly n times.
+ *  {n,}    - match the previous entry at least n times.
+ *  {m,n}   - match the previous entry at least m, but no more than n times
  *
- *    static NFA to_NFA(const RegEx & regex, int stop_id=1);
- *    static DFA to_DFA(const RegEx & regex);
+ * Additional overloads for functions in lexer_utils.h:
+ *
+ *   static NFA to_NFA(const RegEx & regex, int stop_id=1);
+ *   static DFA to_DFA(const RegEx & regex);
  *
  *
- *  @todo Implement / to separate a regex from another regex that must follow it
- *  @todo Consider a separator (maybe backtick?) to divide up a regex expression;
- *        the result can be returned by each section as a vector of strings.
- *  @todo Consolidate most errors to a single pre-processing checker (perhaps using a lexer?)
+ * @todo Implement / to separate a regex from another regex that must follow it
+ * @todo Consider a separator (maybe backtick?) to divide up a regex expression;
+ *       the result can be returned by each section as a vector of strings.
+ * @todo Consolidate most errors to a single pre-processing checker (perhaps using a lexer?)
  */
 
-#ifndef EMP_COMPILER_REGEX_HPP_INCLUDE
-#define EMP_COMPILER_REGEX_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_COMPILER_REG_EX_HPP_GUARD
+#define INCLUDE_EMP_COMPILER_REG_EX_HPP_GUARD
 
 
 #include <ostream>

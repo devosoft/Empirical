@@ -1,36 +1,37 @@
 /**
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2023-2025
- */
-/**
- *  @file FlagManager.hpp
- *  @brief This file contains tools for dealing with command-line flags (from argv and argc).
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2023-2025 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  The FlagManager class will take command line arguments (either in its constructor or with
- *  the AddFlags() function) and process all options appropriately.
+ * @file include/emp/config/FlagManager.hpp
+ * @brief This file contains tools for dealing with command-line flags (from argv and argc).
+ * @note Status: ALPHA
  *
- *  For setup, a FlagManager instance must be configured by calling AddOption once for each flag
- *  option, providing a the function to call when the option is triggered.  The functions can
- *  take zero, one, or two Strings as arguments OR they can take a vector of Strings and the
- *  range of allowed arguments should be specified.
+ * The FlagManager class will take command line arguments (either in its constructor or with
+ * the AddFlags() function) and process all options appropriately.
  *
- *  When Process() is run, the appropriate function will be called on each and any invalid
- *  arguments will trigger an error.
+ * For setup, a FlagManager instance must be configured by calling AddOption once for each flag
+ * option, providing a the function to call when the option is triggered.  The functions can
+ * take zero, one, or two Strings as arguments OR they can take a vector of Strings and the
+ * range of allowed arguments should be specified.
  *
- *  Flags are expected to begin with a '--' followed by at least one non dash, non whitespace
- *  character.  If a shortcut character is provided, it must be called with a single '-'.
+ * When Process() is run, the appropriate function will be called on each and any invalid
+ * arguments will trigger an error.
  *
- *  If a single dash is followed by multiple characters, each will be processed independently.
- *  So, "-abc" will be the same as "-a -b -c".
+ * Flags are expected to begin with a '--' followed by at least one non dash, non whitespace
+ * character.  If a shortcut character is provided, it must be called with a single '-'.
  *
- *  Extra command line arguments will be saved as a vector of strings called "extras" and must
- *  be processed manually.  They can be retrieved with GetExtras().
+ * If a single dash is followed by multiple characters, each will be processed independently.
+ * So, "-abc" will be the same as "-a -b -c".
+ *
+ * Extra command line arguments will be saved as a vector of strings called "extras" and must
+ * be processed manually.  They can be retrieved with GetExtras().
  */
 
-#ifndef EMP_CONFIG_FLAGMANAGER_HPP_INCLUDE
-#define EMP_CONFIG_FLAGMANAGER_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_CONFIG_FLAG_MANAGER_HPP_GUARD
+#define INCLUDE_EMP_CONFIG_FLAG_MANAGER_HPP_GUARD
 
 #include <functional>
 #include <iostream>

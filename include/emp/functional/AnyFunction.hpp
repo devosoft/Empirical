@@ -1,18 +1,19 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2019
-*/
 /**
- *  @file
- *  @brief Based on std::function, but with a generic base class.
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2019 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  (Built from GenericFunction.h)
+ * @file include/emp/functional/AnyFunction.hpp
+ * @brief Based on std::function, but with a generic base class.
+ * @note Status: ALPHA
+ *
+ * (Built from GenericFunction.h)
  */
 
-#ifndef EMP_FUNCTIONAL_ANYFUNCTION_HPP_INCLUDE
-#define EMP_FUNCTIONAL_ANYFUNCTION_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_FUNCTIONAL_ANY_FUNCTION_HPP_GUARD
+#define INCLUDE_EMP_FUNCTIONAL_ANY_FUNCTION_HPP_GUARD
 
 #include <functional>
 #include <stddef.h>

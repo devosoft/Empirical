@@ -1,15 +1,16 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2018
-*/
 /**
- *  @file
- *  @brief DataFile objects use DataNode objects to dynamically fill out file contents.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/data/DataFile.hpp
+ * @brief DataFile objects use DataNode objects to dynamically fill out file contents.
  */
 
-#ifndef EMP_DATA_DATAFILE_HPP_INCLUDE
-#define EMP_DATA_DATAFILE_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_DATA_DATA_FILE_HPP_GUARD
+#define INCLUDE_EMP_DATA_DATA_FILE_HPP_GUARD
 
 #include <cstdint>
 #include <fstream>
@@ -704,4 +705,4 @@ namespace emp {
 #endif // #ifndef EMP_DATA_DATAFILE_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: dfile pct cstart
+// empecable_words: cstart pct dfile

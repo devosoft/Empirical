@@ -1,20 +1,21 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2021.
-*/
 /**
- *  @file
- *  @brief An Array of a fixed number of bits; similar to std::bitset, but with extra bit magic.
- *  Status: RELEASE
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2021 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  @todo Some of the functions allow a start bit and end bit; each of these should be checked
- *        to make sure that they will work if the start and end are part of the same byte.  One
- *        option is to do this well ONCE with a macro that properly fills in the details.
+ * @file include/emp/bits/BitArray.hpp
+ * @brief An Array of a fixed number of bits; similar to std::bitset, but with extra bit magic.
+ * Status: RELEASE
+ *
+ * @todo Some of the functions allow a start bit and end bit; each of these should be checked
+ *       to make sure that they will work if the start and end are part of the same byte.  One
+ *       option is to do this well ONCE with a macro that properly fills in the details.
  */
 
-#ifndef EMP_BITS_BITARRAY_HPP_INCLUDE
-#define EMP_BITS_BITARRAY_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_BITS_BIT_ARRAY_HPP_GUARD
+#define INCLUDE_EMP_BITS_BIT_ARRAY_HPP_GUARD
 
 
 #include <bitset>
@@ -2106,4 +2107,4 @@ namespace std
 #endif // #ifndef EMP_BITS_BITARRAY_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: ing msse coeff
+// empecable_words: coeff msse ing

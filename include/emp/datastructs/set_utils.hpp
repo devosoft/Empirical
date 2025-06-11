@@ -1,16 +1,17 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2018
-*/
 /**
- *  @file
- *  @brief Tools to save and load data from classes.
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/datastructs/set_utils.hpp
+ * @brief Tools to save and load data from classes.
+ * @note Status: ALPHA
  */
 
-#ifndef EMP_DATASTRUCTS_SET_UTILS_HPP_INCLUDE
-#define EMP_DATASTRUCTS_SET_UTILS_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_DATASTRUCTS_SET_UTILS_HPP_GUARD
+#define INCLUDE_EMP_DATASTRUCTS_SET_UTILS_HPP_GUARD
 
 
 #include <algorithm>

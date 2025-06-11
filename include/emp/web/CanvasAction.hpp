@@ -1,25 +1,26 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2018
-*/
 /**
- *  @file
- *  @brief Define a base class for all actions that can be done to widgets, plus simple actions.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2015-2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  CanvasAction objects modify the appearance of a canvas and can be tracked to reconstruct the
- *  state of the canvas from scratch.
+ * @file include/emp/web/CanvasAction.hpp
+ * @brief Define a base class for all actions that can be done to widgets, plus simple actions.
  *
- *  Other, more specific actions defined here are:
- *    CanvasStrokeColor
- *    CanvasRotate
- *    CanvasFont
+ * CanvasAction objects modify the appearance of a canvas and can be tracked to reconstruct the
+ * state of the canvas from scratch.
  *
- *  See also CanvasShape.h for more actions.
+ * Other, more specific actions defined here are:
+ *   CanvasStrokeColor
+ *   CanvasRotate
+ *   CanvasFont
+ *
+ * See also CanvasShape.h for more actions.
  */
 
-#ifndef EMP_WEB_CANVASACTION_HPP_INCLUDE
-#define EMP_WEB_CANVASACTION_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_WEB_CANVAS_ACTION_HPP_GUARD
+#define INCLUDE_EMP_WEB_CANVAS_ACTION_HPP_GUARD
 
 
 #include <string>

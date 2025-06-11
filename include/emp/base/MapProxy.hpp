@@ -1,16 +1,17 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2019
-*/
 /**
- *  @file
- *  @brief A proxy for indices returned from any map type to ensure they are initialized.
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2019 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/base/MapProxy.hpp
+ * @brief A proxy for indices returned from any map type to ensure they are initialized.
+ * @note Status: ALPHA
  */
 
-#ifndef EMP_BASE_MAPPROXY_HPP_INCLUDE
-#define EMP_BASE_MAPPROXY_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_BASE_MAP_PROXY_HPP_GUARD
+#define INCLUDE_EMP_BASE_MAP_PROXY_HPP_GUARD
 
 #include "assert.hpp"
 

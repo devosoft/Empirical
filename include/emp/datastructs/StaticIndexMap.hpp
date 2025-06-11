@@ -1,17 +1,17 @@
-/*
-
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2025.
-*/
 /**
- *  @file
- *  @brief A fast version of IndexMap where weights cannot individually change.
- *  @note Status: BETA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2025 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/datastructs/StaticIndexMap.hpp
+ * @brief A fast version of IndexMap where weights cannot individually change.
+ * @note Status: BETA
  */
 
-#ifndef EMP_DATASTRUCTS_STATICINDEXMAP_HPP_INCLUDE
-#define EMP_DATASTRUCTS_STATICINDEXMAP_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_DATASTRUCTS_STATIC_INDEX_MAP_HPP_GUARD
+#define INCLUDE_EMP_DATASTRUCTS_STATIC_INDEX_MAP_HPP_GUARD
 
 #include "../base/array.hpp"
 

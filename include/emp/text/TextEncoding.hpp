@@ -1,21 +1,22 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2023-2024
-*/
 /**
- *  @file
- *  @brief Plugs into emp::Text with the specification of a given encoding.
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2023-2024 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  DEVELOPER NOTES:
- *  - Right now a close tag of "\n" is special; it will end ALL styles it is associated with.
- *    Perhaps we should have configurable rules for how common end tags work?  For example,
- *    there could be "no duplicates allowed", "close most recent", or "close all"
+ * @file include/emp/text/TextEncoding.hpp
+ * @brief Plugs into emp::Text with the specification of a given encoding.
+ * @note Status: ALPHA
+ *
+ * DEVELOPER NOTES:
+ * - Right now a close tag of "\n" is special; it will end ALL styles it is associated with.
+ *   Perhaps we should have configurable rules for how common end tags work?  For example,
+ *   there could be "no duplicates allowed", "close most recent", or "close all"
  */
 
-#ifndef EMP_TEXT_TEXTENCODING_HPP_INCLUDE
-#define EMP_TEXT_TEXTENCODING_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_TEXT_TEXT_ENCODING_HPP_GUARD
+#define INCLUDE_EMP_TEXT_TEXT_ENCODING_HPP_GUARD
 
 #include <set>
 #include <string>

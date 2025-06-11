@@ -1,17 +1,18 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2020
-*/
 /**
- *  @file
- *  @brief Store key value pairs in a fixed-sized array, bumping out the oldest
- *  value when full. Optimized for small N. Requires N < 256.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2020 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/datastructs/SmallFifoMap.hpp
+ * @brief Store key value pairs in a fixed-sized array, bumping out the oldest
+ * value when full. Optimized for small N. Requires N < 256.
  *
  */
 
-#ifndef EMP_DATASTRUCTS_SMALLFIFOMAP_HPP_INCLUDE
-#define EMP_DATASTRUCTS_SMALLFIFOMAP_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_DATASTRUCTS_SMALL_FIFO_MAP_HPP_GUARD
+#define INCLUDE_EMP_DATASTRUCTS_SMALL_FIFO_MAP_HPP_GUARD
 
 #include <algorithm>
 #include <stddef.h>

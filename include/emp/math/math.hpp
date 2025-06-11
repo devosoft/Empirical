@@ -1,16 +1,17 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2024.
-*/
 /**
- *  @file
- *  @brief Useful mathematical functions (that are constexpr when possible.)
- *  @note Status: BETA (though new functions are added frequently)
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2024 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/math/math.hpp
+ * @brief Useful mathematical functions (that are constexpr when possible.)
+ * @note Status: BETA (though new functions are added frequently)
  */
 
-#ifndef EMP_MATH_MATH_HPP_INCLUDE
-#define EMP_MATH_MATH_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_MATH_MATH_HPP_GUARD
+#define INCLUDE_EMP_MATH_MATH_HPP_GUARD
 
 #include <algorithm>
 #include <cmath>
@@ -392,4 +393,4 @@ namespace emp {
 #endif // #ifndef EMP_MATH_MATH_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: bools lst sgn
+// empecable_words: sgn lst bools

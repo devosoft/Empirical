@@ -1,16 +1,17 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2017
-*/
 /**
- *  @file
- *  @brief A simple, fast class for managing vertices (nodes) and edges.
- *  @note Status: BETA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2017 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/datastructs/Graph.hpp
+ * @brief A simple, fast class for managing vertices (nodes) and edges.
+ * @note Status: BETA
  */
 
-#ifndef EMP_DATASTRUCTS_GRAPH_HPP_INCLUDE
-#define EMP_DATASTRUCTS_GRAPH_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_DATASTRUCTS_GRAPH_HPP_GUARD
+#define INCLUDE_EMP_DATASTRUCTS_GRAPH_HPP_GUARD
 
 #include <iostream>
 #include <stddef.h>

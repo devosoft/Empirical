@@ -1,15 +1,16 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2018
-*/
 /**
- *  @file
- *  @brief DataInterface is a *generic* interface to a DataNode.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/data/DataInterface.hpp
+ * @brief DataInterface is a *generic* interface to a DataNode.
  */
 
-#ifndef EMP_DATA_DATAINTERFACE_HPP_INCLUDE
-#define EMP_DATA_DATAINTERFACE_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_DATA_DATA_INTERFACE_HPP_GUARD
+#define INCLUDE_EMP_DATA_DATA_INTERFACE_HPP_GUARD
 
 #include <stddef.h>
 

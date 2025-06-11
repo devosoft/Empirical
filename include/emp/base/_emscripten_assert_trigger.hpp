@@ -1,16 +1,17 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2020-2024.
-*/
 /**
- *  @file
- *  @brief Assert trigger implementation.
- *  @note For internal use.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2020-2024 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/base/_emscripten_assert_trigger.hpp
+ * @brief Assert trigger implementation.
+ * @note For internal use.
  */
 
-#ifndef EMP_BASE_EMSCRIPTEN_ASSERT_TRIGGER_HPP_INCLUDE
-#define EMP_BASE_EMSCRIPTEN_ASSERT_TRIGGER_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_BASE_EMSCRIPTEN_ASSERT_TRIGGER_HPP_GUARD
+#define INCLUDE_EMP_BASE_EMSCRIPTEN_ASSERT_TRIGGER_HPP_GUARD
 
 #include <iostream>
 #include <sstream>

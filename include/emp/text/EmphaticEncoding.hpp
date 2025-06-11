@@ -1,17 +1,18 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2022-2024
-*/
 /**
- *  @file
- *  @brief Plugs into emp::Text, setting up inputs and output to be Emphatic encoded.
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2022-2024 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/text/EmphaticEncoding.hpp
+ * @brief Plugs into emp::Text, setting up inputs and output to be Emphatic encoded.
+ * @note Status: ALPHA
  *
  */
 
-#ifndef EMP_TEXT_EMPHATICENCODING_HPP_INCLUDE
-#define EMP_TEXT_EMPHATICENCODING_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_TEXT_EMPHATIC_ENCODING_HPP_GUARD
+#define INCLUDE_EMP_TEXT_EMPHATIC_ENCODING_HPP_GUARD
 
 #include <set>
 #include <string>
@@ -150,4 +151,4 @@ namespace emp {
 #endif // #ifndef EMP_TEXT_EMPHATICENCODING_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: rrrr ooooo oooo rrrrr ooo aaaaa rrr aaaa aaa rjustify ljustify
+// empecable_words: ljustify rjustify aaa aaaa rrr aaaaa ooo rrrrr oooo ooooo rrrr

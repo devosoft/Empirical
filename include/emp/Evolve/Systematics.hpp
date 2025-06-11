@@ -1,27 +1,27 @@
-/*
-
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2024
-*/
 /**
- *  @file
- *  @brief Track genotypes, species, clades, or lineages of organisms in a world.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2024 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  Note that this file powers the Python library phylotrackpy. The main consequence
- *  is that we should generally prefer emp_optional_throw to emp_assert in any circumstance
- *  where user input could trigger an error. emp_assert will trigger a segfault in Python
- *  (killing the whole interpreter), whereas emp_optional_throw will raise a Python exception.
+ * @file include/emp/Evolve/Systematics.hpp
+ * @brief Track genotypes, species, clades, or lineages of organisms in a world.
  *
- *  @todo We should provide an option to back up systematics data to a file so that it doesn't all
- *        need to be kept in memory, especially if we're only doing post-analysis.
- *  @todo This inheritance system makes adding new systematics-related data tracking kind of a pain.
- *        Over time, this will probably become a maintainability problem. We could make the inheritance
- *        go away and just use signals, but then the emp::World could not maintain systematics managers.
+ * Note that this file powers the Python library phylotrackpy. The main consequence
+ * is that we should generally prefer emp_optional_throw to emp_assert in any circumstance
+ * where user input could trigger an error. emp_assert will trigger a segfault in Python
+ * (killing the whole interpreter), whereas emp_optional_throw will raise a Python exception.
+ *
+ * @todo We should provide an option to back up systematics data to a file so that it doesn't all
+ *       need to be kept in memory, especially if we're only doing post-analysis.
+ * @todo This inheritance system makes adding new systematics-related data tracking kind of a pain.
+ *       Over time, this will probably become a maintainability problem. We could make the inheritance
+ *       go away and just use signals, but then the emp::World could not maintain systematics managers.
  */
 
-#ifndef EMP_EVOLVE_SYSTEMATICS_HPP_INCLUDE
-#define EMP_EVOLVE_SYSTEMATICS_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_EVOLVE_SYSTEMATICS_HPP_GUARD
+#define INCLUDE_EMP_EVOLVE_SYSTEMATICS_HPP_GUARD
 
 #include <fstream>
 #include <iostream>
@@ -2435,4 +2435,4 @@ namespace emp {
 #endif // #ifndef EMP_EVOLVE_SYSTEMATICS_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: Colless Sackin phylotrackpy sackin phen mrca unifurcations distj mir trifurcations multifurcating disti
+// empecable_words: disti multifurcating trifurcations mir distj unifurcations mrca phen sackin phylotrackpy Sackin Colless

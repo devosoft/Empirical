@@ -1,16 +1,17 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2019
-*/
 /**
- *  @file
- *  @brief A function that memorizes previous results to speed up any repeated calls.
- *  @note Status: BETA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2019 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/functional/memo_function.hpp
+ * @brief A function that memorizes previous results to speed up any repeated calls.
+ * @note Status: BETA
  */
 
-#ifndef EMP_FUNCTIONAL_MEMO_FUNCTION_HPP_INCLUDE
-#define EMP_FUNCTIONAL_MEMO_FUNCTION_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_FUNCTIONAL_MEMO_FUNCTION_HPP_GUARD
+#define INCLUDE_EMP_FUNCTIONAL_MEMO_FUNCTION_HPP_GUARD
 
 #include <stddef.h>
 #include <unordered_map>

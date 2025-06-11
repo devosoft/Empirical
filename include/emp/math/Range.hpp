@@ -1,16 +1,17 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2023
-*/
 /**
- *  @file
- *  @brief A simple way to track value ranges
- *  @note Status: BETA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2023 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/math/Range.hpp
+ * @brief A simple way to track value ranges
+ * @note Status: BETA
  */
 
-#ifndef EMP_MATH_RANGE_HPP_INCLUDE
-#define EMP_MATH_RANGE_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_MATH_RANGE_HPP_GUARD
+#define INCLUDE_EMP_MATH_RANGE_HPP_GUARD
 
 #include <limits>
 #include <stddef.h>

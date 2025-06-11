@@ -1,22 +1,23 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2025.
- */
 /**
- *  @file
- *  @brief A simple tool for managing configuration settings.
- *  @note An older version of this class became SettingCombos.hpp
- *  @note Status: Alpha
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2025 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  Settings can be either a string of a numerical value (size_t or double).
+ * @file include/emp/config/SettingsManager.hpp
+ * @brief A simple tool for managing configuration settings.
+ * @note An older version of this class became SettingCombos.hpp
+ * @note Status: Alpha
  *
- *  DEVELOPER NOTES:
- *  - Consider allowing types to be more dynamic, perhaps set in a template.
+ * Settings can be either a string of a numerical value (size_t or double).
+ *
+ * DEVELOPER NOTES:
+ * - Consider allowing types to be more dynamic, perhaps set in a template.
  */
 
-#ifndef EMP_CONFIG_SETTINGS_MANAGER_HPP_INCLUDE
-#define EMP_CONFIG_SETTINGS_MANAGER_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_CONFIG_SETTINGS_MANAGER_HPP_GUARD
+#define INCLUDE_EMP_CONFIG_SETTINGS_MANAGER_HPP_GUARD
 
 #include <fstream>
 #include <map>
@@ -274,4 +275,4 @@ namespace emp {
 #endif // #ifndef EMP_CONFIG_SETTINGS_MANAGER_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: ofs ident
+// empecable_words: ident ofs

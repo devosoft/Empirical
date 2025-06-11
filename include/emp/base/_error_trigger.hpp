@@ -1,16 +1,17 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2021.
-*/
 /**
- *  @file
- *  @brief Error trigger implementation selector
- *  @note For internal use.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2021 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/base/_error_trigger.hpp
+ * @brief Error trigger implementation selector
+ * @note For internal use.
  */
 
-#ifndef EMP_BASE_ERROR_TRIGGER_HPP_INCLUDE
-#define EMP_BASE_ERROR_TRIGGER_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_BASE_ERROR_TRIGGER_HPP_GUARD
+#define INCLUDE_EMP_BASE_ERROR_TRIGGER_HPP_GUARD
 
 /// TDEBUG should trigger its EMP equivalent.
 #ifdef TDEBUG

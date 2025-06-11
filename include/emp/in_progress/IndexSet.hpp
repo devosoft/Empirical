@@ -1,16 +1,17 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2023
-*/
 /**
- *  @file
- *  @brief Collection of indices, ideally optimized for memory size.
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2023 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/in_progress/IndexSet.hpp
+ * @brief Collection of indices, ideally optimized for memory size.
+ * @note Status: ALPHA
  */
 
-#ifndef EMP_DATASTRUCTS_INDEXSET_HPP_INCLUDE
-#define EMP_DATASTRUCTS_INDEXSET_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_IN_PROGRESS_INDEX_SET_HPP_GUARD
+#define INCLUDE_EMP_IN_PROGRESS_INDEX_SET_HPP_GUARD
 
 #include "../base/Ptr.hpp"
 #include "../bits/BitVector.hpp"

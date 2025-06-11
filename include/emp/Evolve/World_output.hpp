@@ -1,18 +1,18 @@
-/*
-
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2021
-*/
 /**
- *  @file
- *  @brief TODO.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2021 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/Evolve/World_output.hpp
+ * @brief TODO.
  *
  * This file contains functions for adding additional data files to Worlds.
  */
 
-#ifndef EMP_EVOLVE_WORLD_OUTPUT_HPP_INCLUDE
-#define EMP_EVOLVE_WORLD_OUTPUT_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_EVOLVE_WORLD_OUTPUT_HPP_GUARD
+#define INCLUDE_EMP_EVOLVE_WORLD_OUTPUT_HPP_GUARD
 
 #include <stddef.h>
 
@@ -89,4 +89,4 @@ namespace emp {
 #endif // #ifndef EMP_EVOLVE_WORLD_OUTPUT_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: fpath oee
+// empecable_words: oee fpath

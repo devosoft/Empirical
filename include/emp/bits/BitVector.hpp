@@ -1,33 +1,34 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2022.
-*/
 /**
- *  @file
- *  @brief A drop-in replacement for std::vector<bool>, with additional bitwise logic features.
- *  Status: RELEASE
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2022 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  @note Compile with -O3 and -msse4.2 for fast bit counting.
+ * @file include/emp/bits/BitVector.hpp
+ * @brief A drop-in replacement for std::vector<bool>, with additional bitwise logic features.
+ * Status: RELEASE
  *
- *  @todo Most of the operators don't check to make sure that both BitVectors are the same size.
- *        We should create versions (Intersection() and Union()?) that adjust sizes if needed.
+ * @note Compile with -O3 and -msse4.2 for fast bit counting.
  *
- *  @todo Do small BitVector optimization.  Currently we have number of bits (8 bytes) and a
- *        pointer to the memory for the bitset (another 8 bytes), but we could use those 16 bytes
- *        as 1 byte of size info followed by 15 bytes of bitset (120 bits!)
- *  @todo For large BitVectors we can use a factory to preserve/adjust bit info.  That should be
- *        just as efficient than a reserve, but without the need to store extra in-class info.
- *  @todo Implement append(), resize(), push_bit(), insert(), remove()
- *  @todo Think about how iterators should work for BitVector.  It should probably go bit-by-bit,
- *        but there are very few circumstances where that would be useful.  Going through the
- *        positions of all ones would be more useful, but perhaps less intuitive.
+ * @todo Most of the operators don't check to make sure that both BitVectors are the same size.
+ *       We should create versions (Intersection() and Union()?) that adjust sizes if needed.
  *
- *  @note This class is 15-20% slower than emp::BitSet, but more flexible & run-time configurable.
+ * @todo Do small BitVector optimization.  Currently we have number of bits (8 bytes) and a
+ *       pointer to the memory for the bitset (another 8 bytes), but we could use those 16 bytes
+ *       as 1 byte of size info followed by 15 bytes of bitset (120 bits!)
+ * @todo For large BitVectors we can use a factory to preserve/adjust bit info.  That should be
+ *       just as efficient than a reserve, but without the need to store extra in-class info.
+ * @todo Implement append(), resize(), push_bit(), insert(), remove()
+ * @todo Think about how iterators should work for BitVector.  It should probably go bit-by-bit,
+ *       but there are very few circumstances where that would be useful.  Going through the
+ *       positions of all ones would be more useful, but perhaps less intuitive.
+ *
+ * @note This class is 15-20% slower than emp::BitSet, but more flexible & run-time configurable.
  */
 
-#ifndef EMP_BITS_BITVECTOR_HPP_INCLUDE
-#define EMP_BITS_BITVECTOR_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_BITS_BIT_VECTOR_HPP_GUARD
+#define INCLUDE_EMP_BITS_BIT_VECTOR_HPP_GUARD
 
 
 #include <bitset>

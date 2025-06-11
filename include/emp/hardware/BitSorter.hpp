@@ -1,15 +1,16 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2018
-*/
 /**
- *  @file
- *  @brief A quick series of comparisons intended for sorting bits.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/hardware/BitSorter.hpp
+ * @brief A quick series of comparisons intended for sorting bits.
  */
 
-#ifndef EMP_HARDWARE_BITSORTER_HPP_INCLUDE
-#define EMP_HARDWARE_BITSORTER_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_HARDWARE_BIT_SORTER_HPP_GUARD
+#define INCLUDE_EMP_HARDWARE_BIT_SORTER_HPP_GUARD
 
 #include <cstdint>
 #include <stddef.h>
@@ -200,4 +201,4 @@ namespace std {
 #endif // #ifndef EMP_HARDWARE_BITSORTER_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: bitsort svals
+// empecable_words: svals bitsort

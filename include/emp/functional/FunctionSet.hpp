@@ -1,16 +1,17 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2017
-*/
 /**
- *  @file
- *  @brief Setup a collection of functions, all with the same signature, that can be run as a group.
- *  @note Status: BETA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2017 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/functional/FunctionSet.hpp
+ * @brief Setup a collection of functions, all with the same signature, that can be run as a group.
+ * @note Status: BETA
  */
 
-#ifndef EMP_FUNCTIONAL_FUNCTIONSET_HPP_INCLUDE
-#define EMP_FUNCTIONAL_FUNCTIONSET_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_FUNCTIONAL_FUNCTION_SET_HPP_GUARD
+#define INCLUDE_EMP_FUNCTIONAL_FUNCTION_SET_HPP_GUARD
 
 #include <functional>
 #include <stddef.h>

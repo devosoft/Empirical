@@ -1,27 +1,28 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2024.
-*/
 /**
- *  @file
- *  @brief A Non-deterministic Finite Automata simulator
- *  @note Status: BETA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2024 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  To build a standard NFA, use emp::NFA.  If you want to have more symbols or more stop states,
- *  use emp::tNFA<S,T> where S is the number of symbols and T is the type used for stop.
- *  (defaults are 128 for ASCII-128 and uint8_t respectively.)
+ * @file include/emp/compiler/NFA.hpp
+ * @brief A Non-deterministic Finite Automata simulator
+ * @note Status: BETA
  *
- *  The constructor can take as parameters the number of states and the id of the start state (both
- *  default to 0)
+ * To build a standard NFA, use emp::NFA.  If you want to have more symbols or more stop states,
+ * use emp::tNFA<S,T> where S is the number of symbols and T is the type used for stop.
+ * (defaults are 128 for ASCII-128 and uint8_t respectively.)
  *
- *  @note DFA's use SetTransition(), but NFA's use AddTransition.  This distinction is intentional
- *        since in a DFA a second SetTransition with the same start state and symbol will override
- *        first, while in an NFA a second AddTransition will always add a new option.
+ * The constructor can take as parameters the number of states and the id of the start state (both
+ * default to 0)
+ *
+ * @note DFA's use SetTransition(), but NFA's use AddTransition.  This distinction is intentional
+ *       since in a DFA a second SetTransition with the same start state and symbol will override
+ *       first, while in an NFA a second AddTransition will always add a new option.
  */
 
-#ifndef EMP_COMPILER_NFA_HPP_INCLUDE
-#define EMP_COMPILER_NFA_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_COMPILER_NFA_HPP_GUARD
+#define INCLUDE_EMP_COMPILER_NFA_HPP_GUARD
 
 
 #include <cstdint>

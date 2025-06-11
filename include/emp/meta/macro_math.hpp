@@ -1,52 +1,53 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2018
-*/
 /**
- *  @file
- *  @brief Macros to build a pre-processor calculator system.
- *  Status: RELEASE
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  Working macros include:
- *   EMP_INC(A)    : converts to result of A+1
- *   EMP_DEC(A)    : converts to result of A-1
- *   EMP_SHIFTL(A) : converts to result of A*2
- *   EMP_SHIFTR(A) : converts to result of A/2
+ * @file include/emp/meta/macro_math.hpp
+ * @brief Macros to build a pre-processor calculator system.
+ * Status: RELEASE
  *
- *   EMP_ADD(A,B)  : converts to result of A+B
- *   EMP_SUB(A,B)  : converts to result of A-B
- *   EMP_MULT(A,B) : converts to result of A*B
- *   EMP_DIV(A,B)  : converts to result of A/B
- *   EMP_MOD(A,B)  : converts to result of A%B
- *   EMP_LOG2(A)   : converts to (int) log2(A)
+ * Working macros include:
+ *  EMP_INC(A)    : converts to result of A+1
+ *  EMP_DEC(A)    : converts to result of A-1
+ *  EMP_SHIFTL(A) : converts to result of A*2
+ *  EMP_SHIFTR(A) : converts to result of A/2
  *
- *   EMP_NOT(X)     : Logical NOT
- *   EMP_AND(X, Y)  : Logical AND
- *   EMP_OR(X, Y)   : Logical OR
- *   EMP_NAND(X, Y) : Logical NAND
- *   EMP_NOR(X, Y)  : Logical NOR
- *   EMP_XOR(X, Y)  : Logical XOR
+ *  EMP_ADD(A,B)  : converts to result of A+B
+ *  EMP_SUB(A,B)  : converts to result of A-B
+ *  EMP_MULT(A,B) : converts to result of A*B
+ *  EMP_DIV(A,B)  : converts to result of A/B
+ *  EMP_MOD(A,B)  : converts to result of A%B
+ *  EMP_LOG2(A)   : converts to (int) log2(A)
  *
- *   EMP_COUNT_ONES(A) : count the number of ones in the binary representation of A
+ *  EMP_NOT(X)     : Logical NOT
+ *  EMP_AND(X, Y)  : Logical AND
+ *  EMP_OR(X, Y)   : Logical OR
+ *  EMP_NAND(X, Y) : Logical NAND
+ *  EMP_NOR(X, Y)  : Logical NOR
+ *  EMP_XOR(X, Y)  : Logical XOR
  *
- *   EMP_IF(TEST, T, F) examines the first argument; if it's 0, it resolves to the third
- *   argument, otherwise it resolves to the second argument.
+ *  EMP_COUNT_ONES(A) : count the number of ones in the binary representation of A
  *
- *  The core idea behind these macros is that we can use brute-force to convert numbers
- *  to binary, but once there we can easily perform math on them, or convert them to
- *  yet other forms.
+ *  EMP_IF(TEST, T, F) examines the first argument; if it's 0, it resolves to the third
+ *  argument, otherwise it resolves to the second argument.
  *
- *  Representations include:
- *   DEC - Standard decimal values (e.g., 91)
- *   BIN - Binary numbers, with bits separated by commas (e.g.  0, 0, 0,  1, 0,  1, 1, 0, 1, 1 )
- *   SUM - Like BIN, but stored as zero or magnitude.    (e.g., 0, 0, 0, 64, 0, 16, 8, 0, 2, 1 )
- *   PACK - Like SUM, but without zeros and in parens    (e.g., (64,16,8,2,1) )
- *   HEX - Hexadecimal representation (e.g., 0x5B)  [todo]
+ * The core idea behind these macros is that we can use brute-force to convert numbers
+ * to binary, but once there we can easily perform math on them, or convert them to
+ * yet other forms.
+ *
+ * Representations include:
+ *  DEC - Standard decimal values (e.g., 91)
+ *  BIN - Binary numbers, with bits separated by commas (e.g.  0, 0, 0,  1, 0,  1, 1, 0, 1, 1 )
+ *  SUM - Like BIN, but stored as zero or magnitude.    (e.g., 0, 0, 0, 64, 0, 16, 8, 0, 2, 1 )
+ *  PACK - Like SUM, but without zeros and in parens    (e.g., (64,16,8,2,1) )
+ *  HEX - Hexadecimal representation (e.g., 0x5B)  [todo]
  */
 
-#ifndef EMP_META_MACRO_MATH_HPP_INCLUDE
-#define EMP_META_MACRO_MATH_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_META_MACRO_MATH_HPP_GUARD
+#define INCLUDE_EMP_META_MACRO_MATH_HPP_GUARD
 
 /// @cond MACROS
 

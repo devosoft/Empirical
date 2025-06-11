@@ -1,20 +1,21 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2022
-*/
 /**
- *  @file
- *  @brief This file defines a Random Access Map template.
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2022 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  A random access map allows for simple traversal by index and a guarantee that a value at a
- *  given index will always be at that index unless any map element is deleted.  This allows
- *  storage of indices for maps with a fixed layout, resulting in easy access.
+ * @file include/emp/datastructs/ra_map.hpp
+ * @brief This file defines a Random Access Map template.
+ * @note Status: ALPHA
+ *
+ * A random access map allows for simple traversal by index and a guarantee that a value at a
+ * given index will always be at that index unless any map element is deleted.  This allows
+ * storage of indices for maps with a fixed layout, resulting in easy access.
  */
 
-#ifndef EMP_DATASTRUCTS_RA_MAP_HPP_INCLUDE
-#define EMP_DATASTRUCTS_RA_MAP_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_DATASTRUCTS_RA_MAP_HPP_GUARD
+#define INCLUDE_EMP_DATASTRUCTS_RA_MAP_HPP_GUARD
 
 #include <map>
 

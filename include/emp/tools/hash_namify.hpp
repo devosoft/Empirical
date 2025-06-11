@@ -1,15 +1,16 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2020.
-*/
 /**
- *  @file
- *  @brief A method for mapping hash values to intuitive names.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2020 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/tools/hash_namify.hpp
+ * @brief A method for mapping hash values to intuitive names.
  */
 
-#ifndef EMP_TOOLS_HASH_NAMIFY_HPP_INCLUDE
-#define EMP_TOOLS_HASH_NAMIFY_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_TOOLS_HASH_NAMIFY_HPP_GUARD
+#define INCLUDE_EMP_TOOLS_HASH_NAMIFY_HPP_GUARD
 
 #include <stddef.h>
 #include <string>
@@ -2736,4 +2737,4 @@ namespace internal {
 #endif // #ifndef EMP_TOOLS_HASH_NAMIFY_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: yacare whimbrel turaco tsessebe titi tinamou thrip tenrec spurfowl tegula tayra adhoc tamanduas tamandua sungazer springhaas francolin siskin wryneck quoll galago phalarope palawan murex mara pollan morpho loerie markhor vendace locifera shelduck pinscher woylie legaan laridae langur kudu kongoni paca cygini kea katipo ibisbill kinkajou hoopoe guanaco gourami toco wambenger hamerkop agouti genet duiker gemsbok gayal dassie lottia gastrotrich phascogale dobermann cusimanse dik chital kori flufy corncrake lechwe gentoo capercaillie british chiton sheathbill caecilian bettong roborovski budgrerigar chickaree prevost dugong bulbul hawaiian binturong combinatory magellanic bengal degu balanus addax moa hyrax seriema gharial gerenuk jerboa credal
+// empecable_words: credal jerboa gerenuk gharial seriema addax balanus degu combinatory binturong hawaiian bulbul dugong chickaree budgrerigar roborovski bettong caecilian british corncrake flufy kori sheathbill chital dik cusimanse dobermann gastrotrich lottia phascogale dassie gayal genet agouti hamerkop gemsbok duiker wambenger guanaco pollan hoopoe kinkajou thrip katipo paca kea shelduck cygini ibisbill kongoni langur laridae gentoo woylie legaan pinscher vendace loerie yacare morpho mara murex phalarope galago palawan prevost francolin wryneck siskin tamandua springhaas toco tamanduas sungazer markhor locifera magellanic tenrec spurfowl lechwe adhoc tegula titi quoll kudu bengal tinamou hyrax moa whimbrel gourami turaco tayra chiton capercaillie tsessebe

@@ -1,93 +1,94 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2018-2022.
-*/
 /**
- *  @file
- *  @brief A DataMap links names to arbitrary object types.
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2018-2022 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  A DataMap links data names to arbitrary object types.  Each data map is composed of a
- *  MemoryImage (that holds a set of values) and a DataLayout (that maps names and other info
- *  to those values.)
+ * @file include/emp/data/DataMap.hpp
+ * @brief A DataMap links names to arbitrary object types.
+ * @note Status: ALPHA
  *
- *  AddVar<type>("name", value, ["desc"], ["notes"])
- *   Includes a new data entry into the DataMap and returns its unique ID.
+ * A DataMap links data names to arbitrary object types.  Each data map is composed of a
+ * MemoryImage (that holds a set of values) and a DataLayout (that maps names and other info
+ * to those values.)
  *
- *  Get<type>("name")   - retrieve a reference to a value in the DataMap slowly.
- *  Get<type>(ID)       - retrieve a reference more quickly.
- *  GetID("name")       - convert a name into a unique ID.
- *  Set(name|id, value) - change a value in the DataMap
- *    (you may also use Get() followed by an assignment.)
+ * AddVar<type>("name", value, ["desc"], ["notes"])
+ *  Includes a new data entry into the DataMap and returns its unique ID.
  *
- *  New data entries can be added to a DataMap, but never removed (for efficiency purposes).
- *  When a DataMap is copied, all data entries are also copied (relatively fast).
- *  As long as a DataMaps layout doesn't change, all copied maps will share the same layout (fast).
+ * Get<type>("name")   - retrieve a reference to a value in the DataMap slowly.
+ * Get<type>(ID)       - retrieve a reference more quickly.
+ * GetID("name")       - convert a name into a unique ID.
+ * Set(name|id, value) - change a value in the DataMap
+ *   (you may also use Get() followed by an assignment.)
  *
- *  A layout can also be locked with LockLayout(), which will throw an error if there is an attempt
- *  to modify that layout again.  A lock can be checked with IsLocked().
+ * New data entries can be added to a DataMap, but never removed (for efficiency purposes).
+ * When a DataMap is copied, all data entries are also copied (relatively fast).
+ * As long as a DataMaps layout doesn't change, all copied maps will share the same layout (fast).
  *
- *  Specialty versions of Get and Set exist if you don't want to use templates for simple types.
- *  They are GetValue(*), SetValue(*), GetString(*), and SetString(*).  Values are all represented
- *  as doubles.
+ * A layout can also be locked with LockLayout(), which will throw an error if there is an attempt
+ * to modify that layout again.  A lock can be checked with IsLocked().
+ *
+ * Specialty versions of Get and Set exist if you don't want to use templates for simple types.
+ * They are GetValue(*), SetValue(*), GetString(*), and SetString(*).  Values are all represented
+ * as doubles.
  *
  *
- *  DEVELOPER NOTES:
- *  - Each entry can have a one-byte control block immediately proceeding it in memory.  Each
- *    bit would be associated with additional information about the entry.  Options include:
- *    1. The memory is a POINTER not an instance.  This would allow entries to behave like
- *       references, potentially eliminating the need to copy larger data structures into the
- *       memory image.
- *    2. The entry has a non-trivial (or user-provided) COPY/MOVE CONSTRUCTOR or DESTRUCTOR
- *    3. The entry has a function to call for a Get instead of a value in memory.  The space
- *       reserved is used for the function pointer (incompatible with bit 1...)
- *    4. The entry has a function to call when it is set.  Effectively this can implement SIGNAL
- *       monitoring it that should be notified whenever it changes.  The signal itself would need
- *       to be stored elsewhere (presumably in the memory image, but possibly in the layout.)
- *    5. The memory is a LOG of values, not a single value.  This allows for quick identification
- *       of when something special needs to be done.
- *    6-8. Limited type information (7 types that can be handled more effectively?)
+ * DEVELOPER NOTES:
+ * - Each entry can have a one-byte control block immediately proceeding it in memory.  Each
+ *   bit would be associated with additional information about the entry.  Options include:
+ *   1. The memory is a POINTER not an instance.  This would allow entries to behave like
+ *      references, potentially eliminating the need to copy larger data structures into the
+ *      memory image.
+ *   2. The entry has a non-trivial (or user-provided) COPY/MOVE CONSTRUCTOR or DESTRUCTOR
+ *   3. The entry has a function to call for a Get instead of a value in memory.  The space
+ *      reserved is used for the function pointer (incompatible with bit 1...)
+ *   4. The entry has a function to call when it is set.  Effectively this can implement SIGNAL
+ *      monitoring it that should be notified whenever it changes.  The signal itself would need
+ *      to be stored elsewhere (presumably in the memory image, but possibly in the layout.)
+ *   5. The memory is a LOG of values, not a single value.  This allows for quick identification
+ *      of when something special needs to be done.
+ *   6-8. Limited type information (7 types that can be handled more effectively?)
  *
- *  - We should be able to keep a series of values, not just a single one.  This can be done with
- *    a series of new functions:
- *      AddLog() instead of AddVar() when new variable is created.
- *      Get() should still work for latest value.  Ideally keep latest in first position.
- *      Change non-const Get() to GetRef() which cannot be used for a log.
- *      Add GetAve() function for logs as well as GetLog() for the full series (as std::span?).
+ * - We should be able to keep a series of values, not just a single one.  This can be done with
+ *   a series of new functions:
+ *     AddLog() instead of AddVar() when new variable is created.
+ *     Get() should still work for latest value.  Ideally keep latest in first position.
+ *     Change non-const Get() to GetRef() which cannot be used for a log.
+ *     Add GetAve() function for logs as well as GetLog() for the full series (as std::span?).
  *
- *  - Settings for all entries should have more information on how they are dealt with, such as if
- *    they should be included in output and how.  Perhaps a system of tags for dynamic use?
+ * - Settings for all entries should have more information on how they are dealt with, such as if
+ *   they should be included in output and how.  Perhaps a system of tags for dynamic use?
  *
- *  - After everything else is working, build a LocalDataMap<size_t> that locks in the size at
- *    compile time, providing more localized memory.  Otherwise DataMap as a whole can be built
- *    on a templated class that takes an IMAGE_T as an argument.
+ * - After everything else is working, build a LocalDataMap<size_t> that locks in the size at
+ *   compile time, providing more localized memory.  Otherwise DataMap as a whole can be built
+ *   on a templated class that takes an IMAGE_T as an argument.
  *
- *  - Default values should be saved in the layout allowing any MemoryImage to be easily reset to
- *    factory settings.
+ * - Default values should be saved in the layout allowing any MemoryImage to be easily reset to
+ *   factory settings.
  *
- *  - A user should be able to override copy constructors (though probably not move constructors
- *    or destructors?).  Then the copy process can be more customizable, for example having some
- *    settings return to the default value or be further processed.  It's also possible to have
- *    multiple types of copies, so if we indicate a "Copy birth" we get the above, but if we
- *    indicate a "Copy clone" or "Copy inject" we do something different.  We also probably need
- *    to allow for multiple parents...
+ * - A user should be able to override copy constructors (though probably not move constructors
+ *   or destructors?).  Then the copy process can be more customizable, for example having some
+ *   settings return to the default value or be further processed.  It's also possible to have
+ *   multiple types of copies, so if we indicate a "Copy birth" we get the above, but if we
+ *   indicate a "Copy clone" or "Copy inject" we do something different.  We also probably need
+ *   to allow for multiple parents...
  *
- *  - An OptimizeLayout() function that can reorder entries so that they are somehow more sensible?
- *    Does DataMap need to worry about memory alignment?
+ * - An OptimizeLayout() function that can reorder entries so that they are somehow more sensible?
+ *   Does DataMap need to worry about memory alignment?
  *
- *  - A MemoryImage factory to speed up allocation and deallocation if we're using the same size
- *    images repeatedly.
+ * - A MemoryImage factory to speed up allocation and deallocation if we're using the same size
+ *   images repeatedly.
  *
- *  - Some way of grouping memory across DataMaps so that a particular entry for many maps has all
- *    of its instances consecutive in memory?  This seems really tricky to pull off, but if we can
- *    do it, the improvement in cache performance could be dramatic.
+ * - Some way of grouping memory across DataMaps so that a particular entry for many maps has all
+ *   of its instances consecutive in memory?  This seems really tricky to pull off, but if we can
+ *   do it, the improvement in cache performance could be dramatic.
  *
- *  - Rename DataLayout and MemoryImage to DataMap_Layout and DataMap_Memory?
+ * - Rename DataLayout and MemoryImage to DataMap_Layout and DataMap_Memory?
  */
 
-#ifndef EMP_DATA_DATAMAP_HPP_INCLUDE
-#define EMP_DATA_DATAMAP_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_DATA_DATA_MAP_HPP_GUARD
+#define INCLUDE_EMP_DATA_DATA_MAP_HPP_GUARD
 
 #include <cstring>        // For std::memcpy
 #include <span>

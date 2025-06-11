@@ -1,42 +1,43 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2021-2024
-*/
 /**
- *  @file
- *  @brief Tools to alert users of messages (including errors and warnings) in a consistent manner.
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2021-2024 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/base/notify.hpp
+ * @brief Tools to alert users of messages (including errors and warnings) in a consistent manner.
+ * @note Status: ALPHA
  *
  *
- *  There are a handful of notification types to consider:
- *  - Message: A simple notification.
- *  - Verbose: Optional messages that can be activated by category.
- *  - Warning: Something looks suspicious, but is not technically a problem (don't exit)
- *  - Error: Something has gone horribly wrong and is impossible to recover from (exit)
- *  - Exception: Something didn't go the way we expected, but we can still recover (exit if not handled)
- *  - Debug: A simple notification that should only be printed when NDEBUG is not set (don't exit)
+ * There are a handful of notification types to consider:
+ * - Message: A simple notification.
+ * - Verbose: Optional messages that can be activated by category.
+ * - Warning: Something looks suspicious, but is not technically a problem (don't exit)
+ * - Error: Something has gone horribly wrong and is impossible to recover from (exit)
+ * - Exception: Something didn't go the way we expected, but we can still recover (exit if not handled)
+ * - Debug: A simple notification that should only be printed when NDEBUG is not set (don't exit)
  *
- *  Messages default to "standard out"; all of the other default to "standard error".  Handling of
- *  these notifications can all be overridden by either whole category or by specific tag.
+ * Messages default to "standard out"; all of the other default to "standard error".  Handling of
+ * these notifications can all be overridden by either whole category or by specific tag.
  *
- *  There are three possible recipients for all errors/warnings.
- *  - The end-user if the problem stems from inputs they provided to the executable.
- *  - The library user if the problem is due to mis-use of library functionality.
- *  - The library developers if something that should be impossible occurs.
+ * There are three possible recipients for all errors/warnings.
+ * - The end-user if the problem stems from inputs they provided to the executable.
+ * - The library user if the problem is due to mis-use of library functionality.
+ * - The library developers if something that should be impossible occurs.
  *
- *  The content of this file primarily targets the first group; developers should prefer asserts
- *  to ensure that supposedly "impossible" situations do not occur.
+ * The content of this file primarily targets the first group; developers should prefer asserts
+ * to ensure that supposedly "impossible" situations do not occur.
  *
- *  NOTES:
- *  - Whenever possible, exceptions should be preferred.  They are more specific than warnings
- *    and can be responded to rather than automatically halting execution like errors.
- *  - Warnings should always detail what should be done differently to suppress that warning.
+ * NOTES:
+ * - Whenever possible, exceptions should be preferred.  They are more specific than warnings
+ *   and can be responded to rather than automatically halting execution like errors.
+ * - Warnings should always detail what should be done differently to suppress that warning.
  *
  */
 
-#ifndef EMP_BASE_NOTIFY_HPP_INCLUDE
-#define EMP_BASE_NOTIFY_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_BASE_NOTIFY_HPP_GUARD
+#define INCLUDE_EMP_BASE_NOTIFY_HPP_GUARD
 
 #include <any>
 #include <array>

@@ -1,15 +1,16 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2021
-*/
 /**
- *  @file
- *  @brief UI sub-component for ConfigPanel and ReadoutPanel.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2021 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/prefab/ValueBox.hpp
+ * @brief UI sub-component for ConfigPanel and ReadoutPanel.
  */
 
-#ifndef EMP_PREFAB_VALUEBOX_HPP_INCLUDE
-#define EMP_PREFAB_VALUEBOX_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_PREFAB_VALUE_BOX_HPP_GUARD
+#define INCLUDE_EMP_PREFAB_VALUE_BOX_HPP_GUARD
 
 #include <cmath>
 
@@ -324,4 +325,4 @@ namespace emp::prefab {
 #endif // #ifndef EMP_PREFAB_VALUEBOX_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: fmax det btn descr
+// empecable_words: descr btn det fmax

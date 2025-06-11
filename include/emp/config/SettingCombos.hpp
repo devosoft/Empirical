@@ -1,16 +1,17 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2020-2024
-*/
 /**
- *  @file
- *  @brief A tool for exploring all parameter combinations
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2020-2024 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/config/SettingCombos.hpp
+ * @brief A tool for exploring all parameter combinations
+ * @note Status: ALPHA
  */
 
-#ifndef EMP_CONFIG_SETTINGCOMBOS_HPP_INCLUDE
-#define EMP_CONFIG_SETTINGCOMBOS_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_CONFIG_SETTING_COMBOS_HPP_GUARD
+#define INCLUDE_EMP_CONFIG_SETTING_COMBOS_HPP_GUARD
 
 #include <sstream>
 #include <stddef.h>

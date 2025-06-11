@@ -1,15 +1,16 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2020
-*/
 /**
- *  @file
- *  @brief Sets up a collapsible DOM element.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2020 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/prefab/Collapse.hpp
+ * @brief Sets up a collapsible DOM element.
  */
 
-#ifndef EMP_PREFAB_COLLAPSE_HPP_INCLUDE
-#define EMP_PREFAB_COLLAPSE_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_PREFAB_COLLAPSE_HPP_GUARD
+#define INCLUDE_EMP_PREFAB_COLLAPSE_HPP_GUARD
 
 #include "../tools/string_utils.hpp"
 #include "../web/Div.hpp"

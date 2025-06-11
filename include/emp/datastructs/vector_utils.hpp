@@ -1,20 +1,21 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2017-2021.
-*/
 /**
- *  @file
- *  @brief A set of simple functions to manipulate emp::vector
- *  @note Status: BETA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2017-2021 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/datastructs/vector_utils.hpp
+ * @brief A set of simple functions to manipulate emp::vector
+ * @note Status: BETA
  *
  *
- *  @todo consider adding a work-around to avoid vector<bool> ?
- *  @todo speed up Append to count all additions at once, resize, and fill them in.
+ * @todo consider adding a work-around to avoid vector<bool> ?
+ * @todo speed up Append to count all additions at once, resize, and fill them in.
  */
 
-#ifndef EMP_DATASTRUCTS_VECTOR_UTILS_HPP_INCLUDE
-#define EMP_DATASTRUCTS_VECTOR_UTILS_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_DATASTRUCTS_VECTOR_UTILS_HPP_GUARD
+#define INCLUDE_EMP_DATASTRUCTS_VECTOR_UTILS_HPP_GUARD
 
 #include <algorithm>
 #include <functional>

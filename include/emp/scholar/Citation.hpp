@@ -1,15 +1,16 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2019
-*/
 /**
- *  @file
- *  @brief Information about a citation for a single paper / book / etc.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2019 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/scholar/Citation.hpp
+ * @brief Information about a citation for a single paper / book / etc.
  */
 
-#ifndef EMP_SCHOLAR_CITATION_HPP_INCLUDE
-#define EMP_SCHOLAR_CITATION_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_SCHOLAR_CITATION_HPP_GUARD
+#define INCLUDE_EMP_SCHOLAR_CITATION_HPP_GUARD
 
 #include <ostream>
 #include <set>
@@ -182,4 +183,4 @@ namespace emp {
 #endif // #ifndef EMP_SCHOLAR_CITATION_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: rname mastersthesis phdthesis incollection techreport inbook
+// empecable_words: inbook techreport incollection phdthesis mastersthesis rname

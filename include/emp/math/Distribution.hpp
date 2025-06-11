@@ -1,32 +1,33 @@
 /**
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2018-2024
- */
-/**
- *  @file
- *  @brief A set of pre-calculated discrete distributions that can quickly generate random values.
- *  @note Status: BETA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2018-2024 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  A Distribution is a pre-calculated set of probabilities to quickly pick a whole-number result.
- *  These should be used when either we need to draw from the same distribution many time (and
- *  hence the extra time to pre-calculate it is amortized away) -or- in functions that we want to
- *  call with a range of distributions that we may not know ahead of time.
+ * @file include/emp/math/Distribution.hpp
+ * @brief A set of pre-calculated discrete distributions that can quickly generate random values.
+ * @note Status: BETA
  *
- *  Currently, we have:
+ * A Distribution is a pre-calculated set of probabilities to quickly pick a whole-number result.
+ * These should be used when either we need to draw from the same distribution many time (and
+ * hence the extra time to pre-calculate it is amortized away) -or- in functions that we want to
+ * call with a range of distributions that we may not know ahead of time.
  *
- *    Uniform - All values in a range are equally likely to be picked.
- *    Binomial - How many successes with p probability will occur in N attempts?
- *    NegativeBinomial - How many attempts to reach N successes, with p probability per attempt?
+ * Currently, we have:
+ *
+ *   Uniform - All values in a range are equally likely to be picked.
+ *   Binomial - How many successes with p probability will occur in N attempts?
+ *   NegativeBinomial - How many attempts to reach N successes, with p probability per attempt?
  *
  *
- *  Developer Notes:
- *  - We should setup an offset in the base Distribution class to ignore "impossible" low values.
+ * Developer Notes:
+ * - We should setup an offset in the base Distribution class to ignore "impossible" low values.
  *
  */
 
-#ifndef EMP_MATH_DISTRIBUTION_HPP_INCLUDE
-#define EMP_MATH_DISTRIBUTION_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_MATH_DISTRIBUTION_HPP_GUARD
+#define INCLUDE_EMP_MATH_DISTRIBUTION_HPP_GUARD
 
 #include <stddef.h>
 

@@ -1,23 +1,24 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2017
-*/
 /**
- *  @file
- *  @brief Event handlers
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2015-2017 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  @todo Events can be further sub-divided and built up (similar to DataNode objects) so that we
- *    save only the information that we're planning to use.  This may be slightly faster (given
- *    how frequently some of these like mouse move might be used), but likely to be more complex.
- *  @todo An alternative speed-up might be to save the current event somewhere in emp_i on the
- *    Javascript side, and then just request the information that we might need.  This approach
- *    should be easier to implement, but since everything would be copied anyway in such as case,
- *    it might not actually be a speedup.
+ * @file include/emp/web/events.hpp
+ * @brief Event handlers
+ *
+ * @todo Events can be further sub-divided and built up (similar to DataNode objects) so that we
+ *   save only the information that we're planning to use.  This may be slightly faster (given
+ *   how frequently some of these like mouse move might be used), but likely to be more complex.
+ * @todo An alternative speed-up might be to save the current event somewhere in emp_i on the
+ *   Javascript side, and then just request the information that we might need.  This approach
+ *   should be easier to implement, but since everything would be copied anyway in such as case,
+ *   it might not actually be a speedup.
  */
 
-#ifndef EMP_WEB_EVENTS_HPP_INCLUDE
-#define EMP_WEB_EVENTS_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_WEB_EVENTS_HPP_GUARD
+#define INCLUDE_EMP_WEB_EVENTS_HPP_GUARD
 
 #include <stddef.h>
 #include <utility>

@@ -1,19 +1,20 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2018
-*/
 /**
- *  @file
- *  @brief emp::Angle maintains an angle on a 2D surface.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  The internal representation uses an int to represent angles.
- *  First two bytes are number of full circles.
- *  Last two bytes represent angle angles.
+ * @file include/emp/geometry/Angle2D.hpp
+ * @brief emp::Angle maintains an angle on a 2D surface.
+ *
+ * The internal representation uses an int to represent angles.
+ * First two bytes are number of full circles.
+ * Last two bytes represent angle angles.
  */
 
-#ifndef EMP_GEOMETRY_ANGLE2D_HPP_INCLUDE
-#define EMP_GEOMETRY_ANGLE2D_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_GEOMETRY_ANGLE2D_HPP_GUARD
+#define INCLUDE_EMP_GEOMETRY_ANGLE2D_HPP_GUARD
 
 #include <cmath>
 #include <compare>

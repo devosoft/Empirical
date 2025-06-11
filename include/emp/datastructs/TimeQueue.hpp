@@ -1,51 +1,52 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2020
-*/
 /**
- *  @file
- *  @brief A priority queue for timings, always marching forward.
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2020 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  A TimeQueue maintains a fast priority queue where a user inserts a set of items with a time
- *  that they should be triggered and can request information of which comes next.
+ * @file include/emp/datastructs/TimeQueue.hpp
+ * @brief A priority queue for timings, always marching forward.
+ * @note Status: ALPHA
  *
- *  Create a TimeQueue with:
+ * A TimeQueue maintains a fast priority queue where a user inserts a set of items with a time
+ * that they should be triggered and can request information of which comes next.
  *
- *    TimeQueue time_queue;
+ * Create a TimeQueue with:
  *
- *  By default TimeQueue operates on unsigned integers (of type size_t), but you can specify a
- *  different type with a template parameter, such as:
+ *   TimeQueue time_queue;
  *
- *    TimeQueue<std::string> my_string_queue;
+ * By default TimeQueue operates on unsigned integers (of type size_t), but you can specify a
+ * different type with a template parameter, such as:
  *
- *  Once a TimeQueue is created, you can insert items with their trigger time specified as a
- *  double value, such as:
+ *   TimeQueue<std::string> my_string_queue;
  *
- *    time_queue.Insert(0, 130.0);
- *    time_queue.Insert(1, 150.0);
- *    time_queue.Insert(2, 140.0);
+ * Once a TimeQueue is created, you can insert items with their trigger time specified as a
+ * double value, such as:
  *
- *  The internal time of a time_queue starts at 0.0.  Whenever you want to know what happens next
- *  you can run:
+ *   time_queue.Insert(0, 130.0);
+ *   time_queue.Insert(1, 150.0);
+ *   time_queue.Insert(2, 140.0);
  *
- *    size_t next_id = time_queue.Next();
+ * The internal time of a time_queue starts at 0.0.  Whenever you want to know what happens next
+ * you can run:
  *
- *  This will set next_id to the earliest occurring event, removing that event from the queue
- *  and updating the current time to the time of that event.  You can check the current
- *  time with:
+ *   size_t next_id = time_queue.Next();
  *
- *    double cur_time = time_queue.GetTime();
+ * This will set next_id to the earliest occurring event, removing that event from the queue
+ * and updating the current time to the time of that event.  You can check the current
+ * time with:
  *
- *  Important note for EFFICIENCY: You must always insert events for after the current time,
- *  but the longer after the current time (and the more other insertions that occur between
- *  each insertion and its trigger) the faster the TimeQueue will run.  If an item will be
- *  triggered immediately, you should try to avoid putting it in the TimeQueue.
+ *   double cur_time = time_queue.GetTime();
+ *
+ * Important note for EFFICIENCY: You must always insert events for after the current time,
+ * but the longer after the current time (and the more other insertions that occur between
+ * each insertion and its trigger) the faster the TimeQueue will run.  If an item will be
+ * triggered immediately, you should try to avoid putting it in the TimeQueue.
  */
 
-#ifndef EMP_DATASTRUCTS_TIMEQUEUE_HPP_INCLUDE
-#define EMP_DATASTRUCTS_TIMEQUEUE_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_DATASTRUCTS_TIME_QUEUE_HPP_GUARD
+#define INCLUDE_EMP_DATASTRUCTS_TIME_QUEUE_HPP_GUARD
 
 
 #include <limits>

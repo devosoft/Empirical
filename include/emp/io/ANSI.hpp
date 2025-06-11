@@ -1,16 +1,17 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2025
-*/
 /**
- *  @file
- *  @brief Simple functions to manipulate strings.
- *  Status: RELEASE
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2025 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/io/ANSI.hpp
+ * @brief Simple functions to manipulate strings.
+ * Status: RELEASE
  */
 
-#ifndef EMP_TOOLS_ANSI_HPP_INCLUDE
-#define EMP_TOOLS_ANSI_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_IO_ANSI_HPP_GUARD
+#define INCLUDE_EMP_IO_ANSI_HPP_GUARD
 
 #include <string>
 #include <string_view>

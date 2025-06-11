@@ -1,22 +1,23 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2023
-*/
 /**
- *  @file
- *  @brief String helper class to specify syntax for quotes and paren.
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2023 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/tools/_StringSyntax.hpp
+ * @brief String helper class to specify syntax for quotes and paren.
+ * @note Status: ALPHA
  *
  *
- *  @todo Set up with regular expressions to handle less trivial syntax structures.
- *  @todo Make constexpr
- *  @todo Make handle non-'char' strings (i.e., use CharT template parameter)
+ * @todo Set up with regular expressions to handle less trivial syntax structures.
+ * @todo Make constexpr
+ * @todo Make handle non-'char' strings (i.e., use CharT template parameter)
  *
  */
 
-#ifndef EMP_TOOLS_STRINGSYNTAX_HPP_INCLUDE
-#define EMP_TOOLS_STRINGSYNTAX_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_TOOLS_STRING_SYNTAX_HPP_GUARD
+#define INCLUDE_EMP_TOOLS_STRING_SYNTAX_HPP_GUARD
 
 
 #include <sstream>

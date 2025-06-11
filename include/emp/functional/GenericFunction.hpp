@@ -1,19 +1,20 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2017-2019
-*/
 /**
- *  @file
- *  @brief Based on std::function, but with a common base class.
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2017-2019 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  @todo Need to setup Call on emp::GenericFunction to just take a function signature as a
- *    template argument, rather than listing all types.
+ * @file include/emp/functional/GenericFunction.hpp
+ * @brief Based on std::function, but with a common base class.
+ * @note Status: ALPHA
+ *
+ * @todo Need to setup Call on emp::GenericFunction to just take a function signature as a
+ *   template argument, rather than listing all types.
  */
 
-#ifndef EMP_FUNCTIONAL_GENERICFUNCTION_HPP_INCLUDE
-#define EMP_FUNCTIONAL_GENERICFUNCTION_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_FUNCTIONAL_GENERIC_FUNCTION_HPP_GUARD
+#define INCLUDE_EMP_FUNCTIONAL_GENERIC_FUNCTION_HPP_GUARD
 
 #include <functional>
 #include <stddef.h>

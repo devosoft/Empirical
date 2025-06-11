@@ -1,16 +1,17 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2018
-*/
 /**
- *  @file
- *  @brief similar to an std::unordered_map, but all lookups come with a function to generate the result should the lookup fail.
- *  @note Status: BETA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/datastructs/Cache.hpp
+ * @brief similar to an std::unordered_map, but all lookups come with a function to generate the result should the lookup fail.
+ * @note Status: BETA
  */
 
-#ifndef EMP_DATASTRUCTS_CACHE_HPP_INCLUDE
-#define EMP_DATASTRUCTS_CACHE_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_DATASTRUCTS_CACHE_HPP_GUARD
+#define INCLUDE_EMP_DATASTRUCTS_CACHE_HPP_GUARD
 
 #include <functional>
 #include <stddef.h>

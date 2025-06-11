@@ -1,15 +1,16 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2017
-*/
 /**
- *  @file
- *  @brief A collection of extra details about HTML Widgets (attributes, style, listeners)
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2015-2017 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/web/WidgetExtras.hpp
+ * @brief A collection of extra details about HTML Widgets (attributes, style, listeners)
  */
 
-#ifndef EMP_WEB_WIDGETEXTRAS_HPP_INCLUDE
-#define EMP_WEB_WIDGETEXTRAS_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_WEB_WIDGET_EXTRAS_HPP_GUARD
+#define INCLUDE_EMP_WEB_WIDGET_EXTRAS_HPP_GUARD
 
 #include "Attributes.hpp"
 #include "init.hpp"

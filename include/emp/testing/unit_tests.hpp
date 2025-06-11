@@ -1,22 +1,23 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2019
-*/
 /**
- *  @file
- *  @brief Macros to facilitate unit testing.
- *  @note Status: RESURGENT (Was deprecated; now back to ALPHA)
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2015-2019 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  @todo Setup proper command line color handling (probably in its own file.)
- *  @todo Add EMP_TEST_BELOW, EMP_TEST_ABOVE, and EMP_TEST_RANGE to ensure that a
- *        value is in a certain range.
- *  @todo Consider adding EMP_TEST_ASSERT to ensure that the contained value is true.
- *  @todo Consider adding EMP_TEST_APPROX to compare within a tolerance level.
+ * @file include/emp/testing/unit_tests.hpp
+ * @brief Macros to facilitate unit testing.
+ * @note Status: RESURGENT (Was deprecated; now back to ALPHA)
+ *
+ * @todo Setup proper command line color handling (probably in its own file.)
+ * @todo Add EMP_TEST_BELOW, EMP_TEST_ABOVE, and EMP_TEST_RANGE to ensure that a
+ *       value is in a certain range.
+ * @todo Consider adding EMP_TEST_ASSERT to ensure that the contained value is true.
+ * @todo Consider adding EMP_TEST_APPROX to compare within a tolerance level.
  */
 
-#ifndef EMP_TESTING_UNIT_TESTS_HPP_INCLUDE
-#define EMP_TESTING_UNIT_TESTS_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_TESTING_UNIT_TESTS_HPP_GUARD
+#define INCLUDE_EMP_TESTING_UNIT_TESTS_HPP_GUARD
 
 #include <iostream>
 #include <sstream>

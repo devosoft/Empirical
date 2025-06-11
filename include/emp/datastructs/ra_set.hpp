@@ -1,16 +1,17 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2017-2019
-*/
 /**
- *  @file
- *  @brief A Random Access Set template.
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2017-2019 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/datastructs/ra_set.hpp
+ * @brief A Random Access Set template.
+ * @note Status: ALPHA
  */
 
-#ifndef EMP_DATASTRUCTS_RA_SET_HPP_INCLUDE
-#define EMP_DATASTRUCTS_RA_SET_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_DATASTRUCTS_RA_SET_HPP_GUARD
+#define INCLUDE_EMP_DATASTRUCTS_RA_SET_HPP_GUARD
 
 #include <map>
 #include <stddef.h>

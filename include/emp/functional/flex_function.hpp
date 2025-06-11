@@ -1,16 +1,17 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2017
-*/
 /**
- *  @file
- *  @brief Based on std::function, but holds default parameter values for calls with fewer args.
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2017 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/functional/flex_function.hpp
+ * @brief Based on std::function, but holds default parameter values for calls with fewer args.
+ * @note Status: ALPHA
  */
 
-#ifndef EMP_FUNCTIONAL_FLEX_FUNCTION_HPP_INCLUDE
-#define EMP_FUNCTIONAL_FLEX_FUNCTION_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_FUNCTIONAL_FLEX_FUNCTION_HPP_GUARD
+#define INCLUDE_EMP_FUNCTIONAL_FLEX_FUNCTION_HPP_GUARD
 
 
 #include <functional>

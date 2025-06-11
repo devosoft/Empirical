@@ -1,32 +1,33 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2021
-*/
 /**
- *  @file
- *  @brief This file defines a templated class to represent a 2D surface capable of maintaining data
- *  about which 2D bodies are currently on that surface and rapidly identifying if they are
- *  overlapping.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2021 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  BODY_TYPE is the class that represents the body geometry.
- *  BODY_INFO represents the internal information about the body, including the controller.
+ * @file include/emp/geometry/Surface2D.hpp
+ * @brief This file defines a templated class to represent a 2D surface capable of maintaining data
+ * about which 2D bodies are currently on that surface and rapidly identifying if they are
+ * overlapping.
  *
- *  Member functions include:
- *   Surface2D(double _width, double _height);
- *   const Point & GetMaxPosition() const;
- *   emp::vector<BODY_TYPE *> & GetBodySet();
- *   const emp::vector<BODY_TYPE *> & GetConstBodySet() const;
- *   Surface2D<BODY_TYPE, BODY_INFO> & AddBody(BODY_TYPE * new_body);
- *   void TestCollisions(std::function<bool(BODY_TYPE &, BODY_TYPE &)> collide_fun);
+ * BODY_TYPE is the class that represents the body geometry.
+ * BODY_INFO represents the internal information about the body, including the controller.
+ *
+ * Member functions include:
+ *  Surface2D(double _width, double _height);
+ *  const Point & GetMaxPosition() const;
+ *  emp::vector<BODY_TYPE *> & GetBodySet();
+ *  const emp::vector<BODY_TYPE *> & GetConstBodySet() const;
+ *  Surface2D<BODY_TYPE, BODY_INFO> & AddBody(BODY_TYPE * new_body);
+ *  void TestCollisions(std::function<bool(BODY_TYPE &, BODY_TYPE &)> collide_fun);
  *
  *
- *  Development notes:
- *  * Need a good function to remove a body; now we have to use GetBodySet() and modify it.
+ * Development notes:
+ * * Need a good function to remove a body; now we have to use GetBodySet() and modify it.
  */
 
-#ifndef EMP_GEOMETRY_SURFACE2D_HPP_INCLUDE
-#define EMP_GEOMETRY_SURFACE2D_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_GEOMETRY_SURFACE2D_HPP_GUARD
+#define INCLUDE_EMP_GEOMETRY_SURFACE2D_HPP_GUARD
 
 #include <functional>
 

@@ -1,25 +1,25 @@
-/*
-
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2017-2018.
- */
 /**
- *  @file
- *  @brief StateGrid maintains a rectilinear grid that agents can traverse.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2017-2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  State grids are a matrix of values, representing states of a 2D environment that an organism
- *  can traverse.
+ * @file include/emp/Evolve/StateGrid.hpp
+ * @brief StateGrid maintains a rectilinear grid that agents can traverse.
  *
- *  @todo Functions such as Load() should throw exceptions (or equiv.), not use asserts.
- *  @todo Need to figure out a default mapping for how outputs translate to moves around a
- *    state grid.  -1 = Back up ; 0 = Turn left ; 1 = Move fast-forwards ; 2 = Turn right
- *  @todo Allow StateGridInfo to be built inside of StateGrid (change reference to pointer and
- *    possible ownership)
+ * State grids are a matrix of values, representing states of a 2D environment that an organism
+ * can traverse.
+ *
+ * @todo Functions such as Load() should throw exceptions (or equiv.), not use asserts.
+ * @todo Need to figure out a default mapping for how outputs translate to moves around a
+ *   state grid.  -1 = Back up ; 0 = Turn left ; 1 = Move fast-forwards ; 2 = Turn right
+ * @todo Allow StateGridInfo to be built inside of StateGrid (change reference to pointer and
+ *   possible ownership)
  */
 
-#ifndef EMP_EVOLVE_STATEGRID_HPP_INCLUDE
-#define EMP_EVOLVE_STATEGRID_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_EVOLVE_STATE_GRID_HPP_GUARD
+#define INCLUDE_EMP_EVOLVE_STATE_GRID_HPP_GUARD
 
 
 #include <map>

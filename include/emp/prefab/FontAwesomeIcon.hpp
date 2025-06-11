@@ -1,15 +1,16 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2021
-*/
 /**
- *  @file
- *  @brief Wraps Font Awesome's icons.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2021 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/prefab/FontAwesomeIcon.hpp
+ * @brief Wraps Font Awesome's icons.
  */
 
-#ifndef EMP_PREFAB_FONTAWESOMEICON_HPP_INCLUDE
-#define EMP_PREFAB_FONTAWESOMEICON_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_PREFAB_FONT_AWESOME_ICON_HPP_GUARD
+#define INCLUDE_EMP_PREFAB_FONT_AWESOME_ICON_HPP_GUARD
 
 #include "../tools/string_utils.hpp"
 #include "../web/Div.hpp"
@@ -53,4 +54,4 @@ namespace prefab {
 #endif // #ifndef EMP_PREFAB_FONTAWESOMEICON_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: fontawesome Awesome's
+// empecable_words: Awesome's fontawesome

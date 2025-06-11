@@ -1,16 +1,17 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2017-2018
-*/
 /**
- *  @file
- *  @brief Library of commonly used distance functions
- *  @note Status: BETA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2017-2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/math/distances.hpp
+ * @brief Library of commonly used distance functions
+ * @note Status: BETA
  */
 
-#ifndef EMP_MATH_DISTANCES_HPP_INCLUDE
-#define EMP_MATH_DISTANCES_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_MATH_DISTANCES_HPP_GUARD
+#define INCLUDE_EMP_MATH_DISTANCES_HPP_GUARD
 
 #include <stddef.h>
 

@@ -1,16 +1,17 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2020
-*/
 /**
- *  @file
- *  @brief A representation of text on a web page optimized for rapid appends.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2020 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/web/TextFeed.hpp
+ * @brief A representation of text on a web page optimized for rapid appends.
  *
  */
 
-#ifndef EMP_WEB_TEXTFEED_HPP_INCLUDE
-#define EMP_WEB_TEXTFEED_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_WEB_TEXT_FEED_HPP_GUARD
+#define INCLUDE_EMP_WEB_TEXT_FEED_HPP_GUARD
 
 #include <cstddef>
 #include <deque>

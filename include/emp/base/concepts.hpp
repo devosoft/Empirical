@@ -1,20 +1,22 @@
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2023-24.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2023-2024 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  @file concepts.hpp
- *  @brief Useful concepts that are not trivially available in the C++20 standard library.
+ * @file include/emp/base/concepts.hpp
+ * @brief Useful concepts that are not trivially available in the C++20 standard library.
  *
- *  The concepts available here are:
+ * The concepts available here are:
  *
- *    canStreamTo<STREAM_T, OBJECT_T>
- *    canStreamFrom<STREAM_T, OBJECT_T>
+ *   canStreamTo<STREAM_T, OBJECT_T>
+ *   canStreamFrom<STREAM_T, OBJECT_T>
  *
  */
 
-#ifndef EMP_BASE_CONCEPTS_HPP_INCLUDE
-#define EMP_BASE_CONCEPTS_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_BASE_CONCEPTS_HPP_GUARD
+#define INCLUDE_EMP_BASE_CONCEPTS_HPP_GUARD
 
 
 #include <cstdint>       // uint8_t, uint16_t, etc.

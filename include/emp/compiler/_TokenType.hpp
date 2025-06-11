@@ -1,15 +1,17 @@
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2024.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2024 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  @file _TokenType.hpp
- *  @brief Information about a particular type of token (helper struct for Lexer.hpp)
- *  @note Status: BETA
+ * @file include/emp/compiler/_TokenType.hpp
+ * @brief Information about a particular type of token (helper struct for Lexer.hpp)
+ * @note Status: BETA
  */
 
-#ifndef EMP_COMPILER_TOKEN_TYPE_HPP_INCLUDE
-#define EMP_COMPILER_TOKEN_TYPE_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_COMPILER_TOKEN_TYPE_HPP_GUARD
+#define INCLUDE_EMP_COMPILER_TOKEN_TYPE_HPP_GUARD
 
 #include "../tools/String.hpp"
 

@@ -1,19 +1,20 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2020.
-*/
 /**
- *  @file
- *  @brief Audited implementation of std::optional.
- *  Status: RELEASE
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2020 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  Drop-in replacements for std::optional.
- *  In debug mode, operator * and operator-> value accesses are checked for undefined behavior.
+ * @file include/emp/base/optional.hpp
+ * @brief Audited implementation of std::optional.
+ * Status: RELEASE
+ *
+ * Drop-in replacements for std::optional.
+ * In debug mode, operator * and operator-> value accesses are checked for undefined behavior.
  */
 
-#ifndef EMP_BASE_OPTIONAL_HPP_INCLUDE
-#define EMP_BASE_OPTIONAL_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_BASE_OPTIONAL_HPP_GUARD
+#define INCLUDE_EMP_BASE_OPTIONAL_HPP_GUARD
 
 #include <optional>
 #include <stddef.h>

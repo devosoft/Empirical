@@ -1,16 +1,17 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2019
-*/
 /**
- *  @file
- *  @brief Useful for streaming data to contiguous memory.
- *  Status: RELEASE
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2019 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/io/ContiguousStream.hpp
+ * @brief Useful for streaming data to contiguous memory.
+ * Status: RELEASE
  */
 
-#ifndef EMP_IO_CONTIGUOUSSTREAM_HPP_INCLUDE
-#define EMP_IO_CONTIGUOUSSTREAM_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_IO_CONTIGUOUS_STREAM_HPP_GUARD
+#define INCLUDE_EMP_IO_CONTIGUOUS_STREAM_HPP_GUARD
 
 #include <iostream>
 #include <stddef.h>
@@ -190,4 +191,4 @@ namespace emp {
 #endif // #ifndef EMP_IO_CONTIGUOUSSTREAM_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: sputc streambufs andreoffringa nateriz isi pbase huy pbump uvector onlinedocs ujv cplusplus epptr setp pptr
+// empecable_words: pptr setp epptr cplusplus ujv pbump uvector onlinedocs huy isi pbase nateriz sputc andreoffringa streambufs

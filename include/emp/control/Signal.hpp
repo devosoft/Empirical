@@ -1,19 +1,20 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2018
-*/
 /**
- *  @file
- *  @brief Allow functions to be bundled (as Actions) and triggered all.
- *  @note Status: Beta
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  @todo Setup easier mechanism to control the order in which actions are triggered.
- *  @todo Signals should have default parameters so not all need be supplied when triggered.
+ * @file include/emp/control/Signal.hpp
+ * @brief Allow functions to be bundled (as Actions) and triggered all.
+ * @note Status: Beta
+ *
+ * @todo Setup easier mechanism to control the order in which actions are triggered.
+ * @todo Signals should have default parameters so not all need be supplied when triggered.
  */
 
-#ifndef EMP_CONTROL_SIGNAL_HPP_INCLUDE
-#define EMP_CONTROL_SIGNAL_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_CONTROL_SIGNAL_HPP_GUARD
+#define INCLUDE_EMP_CONTROL_SIGNAL_HPP_GUARD
 
 
 #include <cstdint>

@@ -1,17 +1,18 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2023
-*/
 /**
- *  @file
- *  @brief Handles a single, potentially formatted character from emp::Text.
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2023 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/text/_TextCharRef.hpp
+ * @brief Handles a single, potentially formatted character from emp::Text.
+ * @note Status: ALPHA
  *
  */
 
-#ifndef EMP_TEXT_TEXTCHARREF_HPP_INCLUDE
-#define EMP_TEXT_TEXTCHARREF_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_TEXT_TEXT_CHAR_REF_HPP_GUARD
+#define INCLUDE_EMP_TEXT_TEXT_CHAR_REF_HPP_GUARD
 
 #include <type_traits>  // std::conditional
 

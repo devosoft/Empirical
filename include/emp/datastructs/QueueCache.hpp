@@ -1,17 +1,18 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2020-23
-*/
 /**
- *  @file
- *  @brief A simple implementation of a Least-Recently Used Cache.
- *    It orders elements by access time and removes the stalest ones in case
- *    maximum capacity is reached.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2020-2023 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/datastructs/QueueCache.hpp
+ * @brief A simple implementation of a Least-Recently Used Cache.
+ * It orders elements by access time and removes the stalest ones in case
+ * maximum capacity is reached.
  */
 
-#ifndef EMP_DATASTRUCTS_QUEUECACHE_HPP_INCLUDE
-#define EMP_DATASTRUCTS_QUEUECACHE_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_DATASTRUCTS_QUEUE_CACHE_HPP_GUARD
+#define INCLUDE_EMP_DATASTRUCTS_QUEUE_CACHE_HPP_GUARD
 
 #include <functional>
 #include <limits>

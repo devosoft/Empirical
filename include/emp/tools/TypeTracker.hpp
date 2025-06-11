@@ -1,26 +1,27 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2018
-*/
 /**
- *  @file
- *  @brief Track class types abstractly to dynamically call correct function overloads.
- *  @note Status: BETA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  TypeTracker is a templated class that must be declared with all of the types that can
- *  possibly be tracked.  For example:
+ * @file include/emp/tools/TypeTracker.hpp
+ * @brief Track class types abstractly to dynamically call correct function overloads.
+ * @note Status: BETA
  *
- *      emp::TypeTracker<int, std::string, double> tt;
+ * TypeTracker is a templated class that must be declared with all of the types that can
+ * possibly be tracked.  For example:
  *
- *  ...would create a TypeTracker that can manage the three types listed and convert back.
+ *     emp::TypeTracker<int, std::string, double> tt;
  *
- *  @todo Should use std::is_convertible<X,Y>::value to determine if casting on base type is allowed.
- *  @todo Functions should be able to have fixed type values mixed in.
+ * ...would create a TypeTracker that can manage the three types listed and convert back.
+ *
+ * @todo Should use std::is_convertible<X,Y>::value to determine if casting on base type is allowed.
+ * @todo Functions should be able to have fixed type values mixed in.
  */
 
-#ifndef EMP_TOOLS_TYPETRACKER_HPP_INCLUDE
-#define EMP_TOOLS_TYPETRACKER_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_TOOLS_TYPE_TRACKER_HPP_GUARD
+#define INCLUDE_EMP_TOOLS_TYPE_TRACKER_HPP_GUARD
 
 #include <stddef.h>
 #include <unordered_map>

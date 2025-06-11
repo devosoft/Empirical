@@ -1,15 +1,17 @@
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2016-2024.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2024 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  @file lexer_utils.hpp
- *  @brief A set of utilities to convert between NFAs and DFAs
- *  @note Status: BETA
+ * @file include/emp/compiler/lexer_utils.hpp
+ * @brief A set of utilities to convert between NFAs and DFAs
+ * @note Status: BETA
  */
 
-#ifndef EMP_COMPILER_LEXER_UTILS_HPP_INCLUDE
-#define EMP_COMPILER_LEXER_UTILS_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_COMPILER_LEXER_UTILS_HPP_GUARD
+#define INCLUDE_EMP_COMPILER_LEXER_UTILS_HPP_GUARD
 
 #include <map>
 #include <stddef.h>

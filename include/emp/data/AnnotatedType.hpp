@@ -1,17 +1,18 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2021
-*/
 /**
- *  @file
- *  @brief A base class to provide a DataMap and accessors to derived classes.
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2021 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/data/AnnotatedType.hpp
+ * @brief A base class to provide a DataMap and accessors to derived classes.
+ * @note Status: ALPHA
  *
  */
 
-#ifndef EMP_DATA_ANNOTATEDTYPE_HPP_INCLUDE
-#define EMP_DATA_ANNOTATEDTYPE_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_DATA_ANNOTATED_TYPE_HPP_GUARD
+#define INCLUDE_EMP_DATA_ANNOTATED_TYPE_HPP_GUARD
 
 #include "../base/assert.hpp"
 #include "../meta/TypeID.hpp"

@@ -1,22 +1,23 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2019-2020.
-*/
 /**
- *  @file
- *  @brief A drop-in wrapper for std::map and std:multimap; makes sure we create vars on access.
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2019-2020 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  This class is a drop-in wrapper for std::map, adding on debugging where the indexing operator
- *  [square brackets] returns a proxy.  That proxy can either be assigned to OR convert an
- *  existing value ONLY if it exists.  This mechanism ensures that we don't accidentally write
- *  a default value to a map when all we meant to do was read from it, but had a typo.
- *  If EMP_NDEBUG is set then it reverts back to std::map.
+ * @file include/emp/base/map.hpp
+ * @brief A drop-in wrapper for std::map and std:multimap; makes sure we create vars on access.
+ * @note Status: ALPHA
+ *
+ * This class is a drop-in wrapper for std::map, adding on debugging where the indexing operator
+ * [square brackets] returns a proxy.  That proxy can either be assigned to OR convert an
+ * existing value ONLY if it exists.  This mechanism ensures that we don't accidentally write
+ * a default value to a map when all we meant to do was read from it, but had a typo.
+ * If EMP_NDEBUG is set then it reverts back to std::map.
  */
 
-#ifndef EMP_BASE_MAP_HPP_INCLUDE
-#define EMP_BASE_MAP_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_BASE_MAP_HPP_GUARD
+#define INCLUDE_EMP_BASE_MAP_HPP_GUARD
 
 #include <initializer_list>
 #include <map>

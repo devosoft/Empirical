@@ -1,28 +1,28 @@
-/*
-
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2018-2021.
-*/
 /**
- *  @file
- *  @brief An std::unordered_map wrapper that deals smoothly with strings and fast compile-time optimizations.
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2018-2021 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  StringMap is setup to be a generic dictionary that can link strings to objects of any other
- *  designated type.  It is more powerful than std::unordered_map because it will accept strings wrapped in
- *  the EMP_STRING_ID macro, which is hashed at compile-time instead of run-time.
+ * @file include/emp/datastructs/StringMap.hpp
+ * @brief An std::unordered_map wrapper that deals smoothly with strings and fast compile-time optimizations.
+ * @note Status: ALPHA
  *
- *  \@CO2:
- *  StringMap = PAdictionary   (PA = Perfectly accurate)
- *  StringMap = HIDL (HIDL = having an identification of linking)
- *  SMID = String.Map…e112th][string (SMID = StringMap identification)
- *  a StringMap is a dictionary that actually looks like a dictionary with at least 100 pages and does not
- *  map anything. It links and has like 500 words like a dictionary. A StringMap is basically a dictionary.
+ * StringMap is setup to be a generic dictionary that can link strings to objects of any other
+ * designated type.  It is more powerful than std::unordered_map because it will accept strings wrapped in
+ * the EMP_STRING_ID macro, which is hashed at compile-time instead of run-time.
+ *
+ * \@CO2:
+ * StringMap = PAdictionary   (PA = Perfectly accurate)
+ * StringMap = HIDL (HIDL = having an identification of linking)
+ * SMID = String.Map…e112th][string (SMID = StringMap identification)
+ * a StringMap is a dictionary that actually looks like a dictionary with at least 100 pages and does not
+ * map anything. It links and has like 500 words like a dictionary. A StringMap is basically a dictionary.
  */
 
-#ifndef EMP_DATASTRUCTS_STRINGMAP_HPP_INCLUDE
-#define EMP_DATASTRUCTS_STRINGMAP_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_DATASTRUCTS_STRING_MAP_HPP_GUARD
+#define INCLUDE_EMP_DATASTRUCTS_STRING_MAP_HPP_GUARD
 
 #include <stddef.h>
 

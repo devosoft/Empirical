@@ -1,20 +1,21 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2017-2021.
-*/
 /**
- *  @file
- *  @brief This file defines iterators for use with emp::World objects.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2017-2021 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  @note Originally called PopulationIterator.h
- *  @todo Add a const iterator.
- *  @todo Currently we do MakeValid after every change AND before many accesses.  Pick one?
- *  @todo Fix operator-- which can go off of the beginning of the world.
+ * @file include/emp/Evolve/World_iterator.hpp
+ * @brief This file defines iterators for use with emp::World objects.
+ *
+ * @note Originally called PopulationIterator.h
+ * @todo Add a const iterator.
+ * @todo Currently we do MakeValid after every change AND before many accesses.  Pick one?
+ * @todo Fix operator-- which can go off of the beginning of the world.
  */
 
-#ifndef EMP_EVOLVE_WORLD_ITERATOR_HPP_INCLUDE
-#define EMP_EVOLVE_WORLD_ITERATOR_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_EVOLVE_WORLD_ITERATOR_HPP_GUARD
+#define INCLUDE_EMP_EVOLVE_WORLD_ITERATOR_HPP_GUARD
 
 #include <stddef.h>
 

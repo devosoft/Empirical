@@ -1,28 +1,29 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2021.
-*/
 /**
- *  @file
- *  @brief Tools to calculate Information Theory metrics.
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2021 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  Info-theory formulas:
- *    H(X)   = -SUM(X: p[x] log2 p[x])
- *    H(X|Y) = H(XY) - H(Y)
- *    I(X:Y) = H(X) - H(X|Y)
- *    H2(p)  = -p log2(p) - (1-p)log2(1-p)  = H({p, 1-p})
+ * @file include/emp/math/info_theory.hpp
+ * @brief Tools to calculate Information Theory metrics.
+ * @note Status: ALPHA
  *
- *  Developer notes:
- *  - Input may come as WEIGHTS or as ELEMENTS (or both!).
- *    ELEMENTS need to be converted to WEIGHTS for calculations.
- *  - Want basic info theory functions, as well as tools (for channels, error-correction,
- *    compression, etc.)
+ * Info-theory formulas:
+ *   H(X)   = -SUM(X: p[x] log2 p[x])
+ *   H(X|Y) = H(XY) - H(Y)
+ *   I(X:Y) = H(X) - H(X|Y)
+ *   H2(p)  = -p log2(p) - (1-p)log2(1-p)  = H({p, 1-p})
+ *
+ * Developer notes:
+ * - Input may come as WEIGHTS or as ELEMENTS (or both!).
+ *   ELEMENTS need to be converted to WEIGHTS for calculations.
+ * - Want basic info theory functions, as well as tools (for channels, error-correction,
+ *   compression, etc.)
  */
 
-#ifndef EMP_MATH_INFO_THEORY_HPP_INCLUDE
-#define EMP_MATH_INFO_THEORY_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_MATH_INFO_THEORY_HPP_GUARD
+#define INCLUDE_EMP_MATH_INFO_THEORY_HPP_GUARD
 
 #include "../base/vector.hpp"
 

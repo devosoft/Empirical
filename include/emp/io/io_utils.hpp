@@ -1,17 +1,18 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2025
-*/
 /**
- *  @file
- *  @brief Tools to simplify IO, such as with a command line
- *  @note Status: BETA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2025 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/io/io_utils.hpp
+ * @brief Tools to simplify IO, such as with a command line
+ * @note Status: BETA
  *
  */
 
-#ifndef EMP_IO_IO_UTILS_HPP_INCLUDE
-#define EMP_IO_IO_UTILS_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_IO_IO_UTILS_HPP_GUARD
+#define INCLUDE_EMP_IO_IO_UTILS_HPP_GUARD
 
 #include <compare>
 #include <filesystem>
@@ -271,4 +272,4 @@ namespace emp {
 #endif // #ifndef EMP_IO_IO_UTILS_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: termios tcgetattr lflag tcsetattr getch ofs
+// empecable_words: lflag tcsetattr ofs getch tcgetattr termios

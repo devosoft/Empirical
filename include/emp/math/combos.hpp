@@ -1,25 +1,26 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2017-2024
-*/
 /**
- *  @file
- *  @brief Tools to step through combinations of items.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2017-2024 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  Step through all combinations of size k from a set of N values.  For ComboIDs just return the
- *  indices (the specific of the container don't matter).  Other versions will directly wrapper
- *  containers.
+ * @file include/emp/math/combos.hpp
+ * @brief Tools to step through combinations of items.
  *
- *  @todo Allow a minimum and maximum combo size, not just a fixed combo size.  If no sizes are
- *        specified, all sizes should be explored (all possible combinations).
- *  @todo Create a ComboGenerator template to take a container and generate all combinations
- *  @todo Create a combos function that will build a ComboGenerator for the container type
- *        passed in.
+ * Step through all combinations of size k from a set of N values.  For ComboIDs just return the
+ * indices (the specific of the container don't matter).  Other versions will directly wrapper
+ * containers.
+ *
+ * @todo Allow a minimum and maximum combo size, not just a fixed combo size.  If no sizes are
+ *       specified, all sizes should be explored (all possible combinations).
+ * @todo Create a ComboGenerator template to take a container and generate all combinations
+ * @todo Create a combos function that will build a ComboGenerator for the container type
+ *       passed in.
  */
 
-#ifndef EMP_MATH_COMBOS_HPP_INCLUDE
-#define EMP_MATH_COMBOS_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_MATH_COMBOS_HPP_GUARD
+#define INCLUDE_EMP_MATH_COMBOS_HPP_GUARD
 
 #include <iostream>
 #include <stddef.h>

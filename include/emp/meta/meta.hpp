@@ -1,20 +1,21 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2021
-*/
 /**
- *  @file
- *  @brief A bunch of C++ Template Meta-programming tricks.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2021 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  Developer notes:
- *  * Right now test_type<> returns false if a template can't resolve, but if it's true it checks
- *    if a value field is present; if so that determines success.  The reason for this choice was
- *    to make sure that true_type and false_type are handled correctly (with built-in type_traits)
+ * @file include/emp/meta/meta.hpp
+ * @brief A bunch of C++ Template Meta-programming tricks.
+ *
+ * Developer notes:
+ * * Right now test_type<> returns false if a template can't resolve, but if it's true it checks
+ *   if a value field is present; if so that determines success.  The reason for this choice was
+ *   to make sure that true_type and false_type are handled correctly (with built-in type_traits)
  */
 
-#ifndef EMP_META_META_HPP_INCLUDE
-#define EMP_META_META_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_META_META_HPP_GUARD
+#define INCLUDE_EMP_META_META_HPP_GUARD
 
 #include <functional>
 #include <stddef.h>
@@ -371,4 +372,4 @@ namespace emp {
 #endif // #ifndef EMP_META_META_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: schizofreni Varshavchik tcall
+// empecable_words: tcall Varshavchik schizofreni

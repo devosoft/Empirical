@@ -1,44 +1,45 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2018
-*/
 /**
- *  @file
- *  @brief Tools to help manage various problems in command-line or Emscripten-based applications.
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  There are three possible recipients for all errors/warnings.
- *  - The end-user if the problem stems from inputs they provided to the executable.
- *  - The library user if the problem is due to mis-use of library functionality.
- *  - The library developers if something that should be impossible occurs.
+ * @file include/emp/base/errors.hpp
+ * @brief Tools to help manage various problems in command-line or Emscripten-based applications.
+ * @note Status: ALPHA
  *
- *  There are also three types of problems to notify about:
- *  - Warnings if something looks suspicious, but isn't technically a problem.
- *  - Errors if something has gone so horribly wrong that it is impossible to recover from.
- *  - Exceptions if something didn't go the way we expected, but we can still recover.
+ * There are three possible recipients for all errors/warnings.
+ * - The end-user if the problem stems from inputs they provided to the executable.
+ * - The library user if the problem is due to mis-use of library functionality.
+ * - The library developers if something that should be impossible occurs.
  *
- *  In general, most of the content of this file is targeted at providing useful tools for library
- *  users; end-users should receive more customized messages and asserts should capture
- *  supposedly "impossible" situations that none-the-less occur in the library itself.
+ * There are also three types of problems to notify about:
+ * - Warnings if something looks suspicious, but isn't technically a problem.
+ * - Errors if something has gone so horribly wrong that it is impossible to recover from.
+ * - Exceptions if something didn't go the way we expected, but we can still recover.
  *
- *  NOTES:
- *  - Whenever possible, exceptions should be preferred.  They are more specific than warnings,
- *    but don't halt execution like errors.
- *  - Warnings should always detail what should be done differently to suppress the warning.
+ * In general, most of the content of this file is targeted at providing useful tools for library
+ * users; end-users should receive more customized messages and asserts should capture
+ * supposedly "impossible" situations that none-the-less occur in the library itself.
+ *
+ * NOTES:
+ * - Whenever possible, exceptions should be preferred.  They are more specific than warnings,
+ *   but don't halt execution like errors.
+ * - Warnings should always detail what should be done differently to suppress the warning.
  *
  *
- *  @todo We should move over to a pure replacement for exceptions.
- *    - Different types of exceptions can trigger a signal.  Actions should return a bool
- *      indicating whether the exception was fixed.
- *    - Remaining exceptions are recorded and passed back up the chain to (hopefully) be caught.
- *    - Uncaught exceptions should have a default behavior when Resolved.  Exceptions could have
- *      various resolve times: Next exception added, Next exception check, when ResolveExceptions()
- *      is run, End of program, or ASAP. (perhaps)
+ * @todo We should move over to a pure replacement for exceptions.
+ *   - Different types of exceptions can trigger a signal.  Actions should return a bool
+ *     indicating whether the exception was fixed.
+ *   - Remaining exceptions are recorded and passed back up the chain to (hopefully) be caught.
+ *   - Uncaught exceptions should have a default behavior when Resolved.  Exceptions could have
+ *     various resolve times: Next exception added, Next exception check, when ResolveExceptions()
+ *     is run, End of program, or ASAP. (perhaps)
  */
 
-#ifndef EMP_BASE_ERRORS_HPP_INCLUDE
-#define EMP_BASE_ERRORS_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_BASE_ERRORS_HPP_GUARD
+#define INCLUDE_EMP_BASE_ERRORS_HPP_GUARD
 
 #include <iostream>
 #include <map>

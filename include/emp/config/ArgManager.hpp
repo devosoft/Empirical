@@ -1,16 +1,17 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2019
-*/
 /**
- *  @file
- *  @brief A tool for synthesizing command-line arguments, URL query params, and config files.
- *  @note Status: BETA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2019 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/config/ArgManager.hpp
+ * @brief A tool for synthesizing command-line arguments, URL query params, and config files.
+ * @note Status: BETA
  */
 
-#ifndef EMP_CONFIG_ARGMANAGER_HPP_INCLUDE
-#define EMP_CONFIG_ARGMANAGER_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_CONFIG_ARG_MANAGER_HPP_GUARD
+#define INCLUDE_EMP_CONFIG_ARG_MANAGER_HPP_GUARD
 
 #include <algorithm>
 #include <cstdlib>
@@ -801,4 +802,4 @@ namespace emp {
 #endif // #ifndef EMP_CONFIG_ARGMANAGER_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: deflagged argspecs deflag argpack deflagging czvf argspec
+// empecable_words: argspec czvf deflagging argpack deflag argspecs deflagged

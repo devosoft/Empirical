@@ -1,44 +1,45 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2023
-*/
 /**
- *  @file
- *  @brief Wrap a C++ function and convert it to an integer that can be called from Javascript
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2015-2023 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  To wrap a function, call:
+ * @file include/emp/web/JSWrap.hpp
+ * @brief Wrap a C++ function and convert it to an integer that can be called from Javascript
  *
- *     `uint32_t fun_id = emp::JSWrap(FunctionToBeWrapped, "JS_Function_Name");`
+ * To wrap a function, call:
  *
- *  To manually callback a function from Javascript, first set `emp_i.cb_args` to an array of
- *  function arguments, then call `empCppCallback( fun_id );`   This all happens automatically
- *  if you use the `emp.Callback(fun_id, args...)` function from Javascript.
+ *    `uint32_t fun_id = emp::JSWrap(FunctionToBeWrapped, "JS_Function_Name");`
  *
- *  The JS_Function_Name string is optional, but if you use it, the appropriate function will
- *  be automatically generated in Javascript by JSWrap, in the emp class.
+ * To manually callback a function from Javascript, first set `emp_i.cb_args` to an array of
+ * function arguments, then call `empCppCallback( fun_id );`   This all happens automatically
+ * if you use the `emp.Callback(fun_id, args...)` function from Javascript.
  *
- *  For example, if you have:
+ * The JS_Function_Name string is optional, but if you use it, the appropriate function will
+ * be automatically generated in Javascript by JSWrap, in the emp class.
  *
- *     `int AddPair(int x, int y) { return x + y; }``
+ * For example, if you have:
  *
- *  You can wrap it with:
+ *    `int AddPair(int x, int y) { return x + y; }``
  *
- *     `size_t fun_id = emp::JSWrap(AddPair, "AddPair");`
+ * You can wrap it with:
  *
- *  And then in Javascript, you can simply call it as:
+ *    `size_t fun_id = emp::JSWrap(AddPair, "AddPair");`
  *
- *     `emp.AddPair(4, 5); // will return 9.`
+ * And then in Javascript, you can simply call it as:
+ *
+ *    `emp.AddPair(4, 5); // will return 9.`
  *
  *
- *  @todo Add a JSWrap that takes an object and method and does the bind automatically.
- *  @todo Build a non-emscripten version; it should still be callable from the C++ side, but
- *        mostly to be able to test programs without Emscripten.
+ * @todo Add a JSWrap that takes an object and method and does the bind automatically.
+ * @todo Build a non-emscripten version; it should still be callable from the C++ side, but
+ *       mostly to be able to test programs without Emscripten.
  *
  */
 
-#ifndef EMP_WEB_JSWRAP_HPP_INCLUDE
-#define EMP_WEB_JSWRAP_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_WEB_JSWRAP_HPP_GUARD
+#define INCLUDE_EMP_WEB_JSWRAP_HPP_GUARD
 
 #include <array>
 #include <cstdint>
@@ -653,4 +654,4 @@ void empCppCallback(const size_t cb_id) {
 #endif // #ifndef EMP_WEB_JSWRAP_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: ret javascript ecba bec
+// empecable_words: bec ecba javascript ret

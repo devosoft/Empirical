@@ -1,15 +1,16 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2018
-*/
 /**
- *  @file
- *  @brief Easily load an image and place it in a document.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2015-2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/web/Image.hpp
+ * @brief Easily load an image and place it in a document.
  */
 
-#ifndef EMP_WEB_IMAGE_HPP_INCLUDE
-#define EMP_WEB_IMAGE_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_WEB_IMAGE_HPP_GUARD
+#define INCLUDE_EMP_WEB_IMAGE_HPP_GUARD
 
 
 #include "Widget.hpp"

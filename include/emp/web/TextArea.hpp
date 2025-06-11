@@ -1,18 +1,19 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2024
-*/
 /**
- *  @file
- *  @brief Specs for the TextArea widget.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2015-2024 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/web/TextArea.hpp
+ * @brief Specs for the TextArea widget.
  *
  *
  * @todo Callback does a lot of string-copies at the moment; should be streamlined.
  */
 
-#ifndef EMP_WEB_TEXTAREA_HPP_INCLUDE
-#define EMP_WEB_TEXTAREA_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_WEB_TEXT_AREA_HPP_GUARD
+#define INCLUDE_EMP_WEB_TEXT_AREA_HPP_GUARD
 
 #include <cstdint>
 

@@ -1,29 +1,30 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2025.
-*/
 /**
- *  @file
- *  @brief DataNode objects track a specific type of data over the course of a run.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2025 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  Collection: New data can be pushed or pulled.
- *   Add(VAL... v) pushes data to a node
- *   AddDatum(VAL v) pushes just one datum, but can be used as an action for a signal.
+ * @file include/emp/data/DataNode.hpp
+ * @brief DataNode objects track a specific type of data over the course of a run.
  *
- *  Process: What should happen on Reset() ?
- *   * Trigger an action to process the prior update's data stored.
- *   * Clear all data.
- *   * Send data to a stream
- *     (or stats automatically have a stream that, if non-null data is sent to?)
+ * Collection: New data can be pushed or pulled.
+ *  Add(VAL... v) pushes data to a node
+ *  AddDatum(VAL v) pushes just one datum, but can be used as an action for a signal.
  *
- *  @todo: The Archive data node should have Log as a requisite and then copy the current vals into the
- *         archive on reset.  This change will also make it so that the size of the archive correctly
- *         reflects the number of resets.
+ * Process: What should happen on Reset() ?
+ *  * Trigger an action to process the prior update's data stored.
+ *  * Clear all data.
+ *  * Send data to a stream
+ *    (or stats automatically have a stream that, if non-null data is sent to?)
+ *
+ * @todo: The Archive data node should have Log as a requisite and then copy the current vals into the
+ *        archive on reset.  This change will also make it so that the size of the archive correctly
+ *        reflects the number of resets.
  */
 
-#ifndef EMP_DATA_DATANODE_HPP_INCLUDE
-#define EMP_DATA_DATANODE_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_DATA_DATA_NODE_HPP_GUARD
+#define INCLUDE_EMP_DATA_DATA_NODE_HPP_GUARD
 
 #include <algorithm>
 #include <limits>
@@ -843,4 +844,4 @@ namespace emp {
 #endif // #ifndef EMP_DATA_DATANODE_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: johndcook usort pct
+// empecable_words: pct usort johndcook

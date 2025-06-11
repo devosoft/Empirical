@@ -1,17 +1,18 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2020
-*/
 /**
- *  @file
- *  @brief Tools for working with ascii output.
- *  @note  Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2020 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/io/ascii_utils.hpp
+ * @brief Tools for working with ascii output.
+ * @note  Status: ALPHA
  *
  */
 
-#ifndef EMP_IO_ASCII_UTILS_HPP_INCLUDE
-#define EMP_IO_ASCII_UTILS_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_IO_ASCII_UTILS_HPP_GUARD
+#define INCLUDE_EMP_IO_ASCII_UTILS_HPP_GUARD
 
 #include <functional>
 #include <iostream>

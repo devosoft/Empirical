@@ -1,31 +1,32 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2019.
-*/
 /**
- *  @file
- *  @brief A general-purpose, fast parser.
- *  @note Status: DEVELOPMENT
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2019 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  @todo Patterns should include functions that are called when that point of rule is triggered.
- *  @todo Make sure to warn if a symbol has no patterns associated with it.
- *  @todo Make sure to warn if a symbol has no path to terminals.
- *  @todo Make sure to warn if a symbol is never use in another pattern (and is not a start state)
- *  @todo Should we change Parser to a template that takes in the type for the lexer?
+ * @file include/emp/in_progress/Parser.hpp
+ * @brief A general-purpose, fast parser.
+ * @note Status: DEVELOPMENT
  *
- *  OTHER NOTES:
- *  Setup -> and | and || operators on Parse symbol to all do the same thing: take a pattern of
- *  either string or int (or ideally mixed??) and add a new rule.
+ * @todo Patterns should include functions that are called when that point of rule is triggered.
+ * @todo Make sure to warn if a symbol has no patterns associated with it.
+ * @todo Make sure to warn if a symbol has no path to terminals.
+ * @todo Make sure to warn if a symbol is never use in another pattern (and is not a start state)
+ * @todo Should we change Parser to a template that takes in the type for the lexer?
  *
- *    parser("expression") -> { "literal_int" }
- *                         |  { "expression", "+", "expression"}
- *                         |  { "expression", "*", "expression"}
- *                         |  { "(", "expression", ")"}
+ * OTHER NOTES:
+ * Setup -> and | and || operators on Parse symbol to all do the same thing: take a pattern of
+ * either string or int (or ideally mixed??) and add a new rule.
+ *
+ *   parser("expression") -> { "literal_int" }
+ *                        |  { "expression", "+", "expression"}
+ *                        |  { "expression", "*", "expression"}
+ *                        |  { "(", "expression", ")"}
  */
 
-#ifndef EMP_IN_PROGRESS_PARSER_HPP_INCLUDE
-#define EMP_IN_PROGRESS_PARSER_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_IN_PROGRESS_PARSER_HPP_GUARD
+#define INCLUDE_EMP_IN_PROGRESS_PARSER_HPP_GUARD
 
 #include <set>
 #include <stddef.h>
@@ -222,4 +223,4 @@ namespace emp {
 #endif // #ifndef EMP_IN_PROGRESS_PARSER_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: tid spos sid
+// empecable_words: sid spos tid

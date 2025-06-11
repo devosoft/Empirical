@@ -1,15 +1,16 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2017-2024.
-*/
 /**
- *  @file
- *  @brief This file maintains information about instructions available in virtual hardware.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2017-2024 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/hardware/InstLib.hpp
+ * @brief This file maintains information about instructions available in virtual hardware.
  */
 
-#ifndef EMP_HARDWARE_INSTLIB_HPP_INCLUDE
-#define EMP_HARDWARE_INSTLIB_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_HARDWARE_INST_LIB_HPP_GUARD
+#define INCLUDE_EMP_HARDWARE_INST_LIB_HPP_GUARD
 
 #include <map>
 #include <stddef.h>

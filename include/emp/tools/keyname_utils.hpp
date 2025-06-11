@@ -1,18 +1,19 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2019-2023
-*/
 /**
- *  @file
- *  @brief Utility functions that support the keyname file naming convention.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2019-2023 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  Plays nice with the Python package keyname.
- *  https://github.com/mmore500/keyname
+ * @file include/emp/tools/keyname_utils.hpp
+ * @brief Utility functions that support the keyname file naming convention.
+ *
+ * Plays nice with the Python package keyname.
+ * https://github.com/mmore500/keyname
  */
 
-#ifndef EMP_TOOLS_KEYNAME_UTILS_HPP_INCLUDE
-#define EMP_TOOLS_KEYNAME_UTILS_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_TOOLS_KEYNAME_UTILS_HPP_GUARD
+#define INCLUDE_EMP_TOOLS_KEYNAME_UTILS_HPP_GUARD
 
 
 #include <algorithm>
@@ -114,4 +115,4 @@ namespace emp::keyname {
 #endif // #ifndef EMP_TOOLS_KEYNAME_UTILS_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: strs ext mmore
+// empecable_words: mmore ext strs

@@ -1,32 +1,33 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2023
-*/
 /**
- *  @file
- *  @brief A more dynamic replacement for standard library asserts.
- *  @note Status: RELEASE
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2023 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  A replacement for the system-level assert.h, called "emp_always_assert"
- *  Added functionality:
- *   - If compiled with Emscripten, will provide pop-up alerts in a web browser.
- *   - emp_assert can take additional arguments.  If the assert is triggered,
- *     those extra arguments will be evaluated and printed.
- *   - if EMP_TDEBUG is defined, emp_assert() goes into test mode and records
- *     failures, but does not abort.  (useful for unit tests of asserts)
+ * @file include/emp/base/always_assert_warning.hpp
+ * @brief A more dynamic replacement for standard library asserts.
+ * @note Status: RELEASE
  *
- *  Example:
+ * A replacement for the system-level assert.h, called "emp_always_assert"
+ * Added functionality:
+ *  - If compiled with Emscripten, will provide pop-up alerts in a web browser.
+ *  - emp_assert can take additional arguments.  If the assert is triggered,
+ *    those extra arguments will be evaluated and printed.
+ *  - if EMP_TDEBUG is defined, emp_assert() goes into test mode and records
+ *    failures, but does not abort.  (useful for unit tests of asserts)
  *
- *     int a = 6;
- *     emp_always_assert(a==5, a);
+ * Example:
  *
- *  Unlike "emp_assert_warning", "emp_always_assert_warning" will trigger an
- *  assertion error whether compiled in debug mode or not.
+ *    int a = 6;
+ *    emp_always_assert(a==5, a);
+ *
+ * Unlike "emp_assert_warning", "emp_always_assert_warning" will trigger an
+ * assertion error whether compiled in debug mode or not.
  */
 
-#ifndef EMP_BASE_ALWAYS_ASSERT_WARNING_HPP_INCLUDE
-#define EMP_BASE_ALWAYS_ASSERT_WARNING_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_BASE_ALWAYS_ASSERT_WARNING_HPP_GUARD
+#define INCLUDE_EMP_BASE_ALWAYS_ASSERT_WARNING_HPP_GUARD
 
 #include <cstdlib>
 

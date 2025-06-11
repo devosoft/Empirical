@@ -1,18 +1,19 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2024
-*/
 /**
- *  @file
- *  @brief A version of emp_assert that throws a runtime error if compiled with -DEMP_OPTIONAL_THROW_ON.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2024 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  This is useful if you want the option to throw a runtime error outside of debug mode. A common use
- *  case is wrapping C++ code in Python, since segfaults kill the entire Python interpreter.
+ * @file include/emp/base/optional_throw.hpp
+ * @brief A version of emp_assert that throws a runtime error if compiled with -DEMP_OPTIONAL_THROW_ON.
+ *
+ * This is useful if you want the option to throw a runtime error outside of debug mode. A common use
+ * case is wrapping C++ code in Python, since segfaults kill the entire Python interpreter.
  */
 
-#ifndef EMP_BASE_OPTIONAL_THROW_HPP_INCLUDE
-#define EMP_BASE_OPTIONAL_THROW_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_BASE_OPTIONAL_THROW_HPP_GUARD
+#define INCLUDE_EMP_BASE_OPTIONAL_THROW_HPP_GUARD
 
 #include "assert.hpp"
 

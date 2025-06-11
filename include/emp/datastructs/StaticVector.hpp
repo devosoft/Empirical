@@ -1,16 +1,17 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2025.
-*/
 /**
- *  @file
- *  @brief A simple replacement for std::vector when maximum size is known at compile time.
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2025 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/datastructs/StaticVector.hpp
+ * @brief A simple replacement for std::vector when maximum size is known at compile time.
+ * @note Status: ALPHA
  */
 
-#ifndef EMP_DATASTRUCT_STATIC_VECTOR_HPP_INCLUDE
-#define EMP_DATASTRUCT_STATIC_VECTOR_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_DATASTRUCTS_STATIC_VECTOR_HPP_GUARD
+#define INCLUDE_EMP_DATASTRUCTS_STATIC_VECTOR_HPP_GUARD
 
 
 #include <initializer_list>

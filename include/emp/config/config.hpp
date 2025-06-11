@@ -1,43 +1,44 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2019.
-*/
 /**
- *  @file
- *  @brief Maintains a set of configuration options.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2019 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  This file defines a master configuration option Config, whose values can be loaded
- *  at runtime or else set as constant values throughout the code.
+ * @file include/emp/config/config.hpp
+ * @brief Maintains a set of configuration options.
  *
- *  Assuming you have an emp::Config object called config, you can:
+ * This file defines a master configuration option Config, whose values can be loaded
+ * at runtime or else set as constant values throughout the code.
  *
- *  access a setting value:            config.SETTING_NAME()
- *  adjust a setting value:            config.SETTING_NAME(new_value)
- *  determine if a setting is locked:  config.SETTING_NAME_is_const()
- *  lookup a setting dynamically:      config("SETTING_NAME")
- *  adjust a setting dynamically:      config("SETTING_NAME", "new_value")
+ * Assuming you have an emp::Config object called config, you can:
  *
- *  load settings from a stream:       config.Read(stream);
- *  load settings from a file:         config.Read(filename);
- *  save settings to a stream:         config.Write(stream);
- *  save settings to a file:           config.Write(filename);
- *  generate a query string:           config.WriteUrlQueryString(stream);
+ * access a setting value:            config.SETTING_NAME()
+ * adjust a setting value:            config.SETTING_NAME(new_value)
+ * determine if a setting is locked:  config.SETTING_NAME_is_const()
+ * lookup a setting dynamically:      config("SETTING_NAME")
+ * adjust a setting dynamically:      config("SETTING_NAME", "new_value")
  *
- *  write settings macros to a stream: config.WriteMacros(stream);
- *  write settings macros to a file:   config.WriteMacros(filename);
+ * load settings from a stream:       config.Read(stream);
+ * load settings from a file:         config.Read(filename);
+ * save settings to a stream:         config.Write(stream);
+ * save settings to a file:           config.Write(filename);
+ * generate a query string:           config.WriteUrlQueryString(stream);
+ *
+ * write settings macros to a stream: config.WriteMacros(stream);
+ * write settings macros to a file:   config.WriteMacros(filename);
  *
  *
- *  The configuration files generated can use the following keywords in order to
- *  configure this object:
- *   include OTHER_FILENAME         -- Load in all data from another file.
- *   set SETTING_NAME VALUE         -- Set a basic configuration setting.
- *   new OBJECT_TYPE OBJECT_NAME    -- Create a new config object of a managed class.
- *   use OBJECT_TYPE OBJECT_NAME    -- Use a previously created configuration object.
+ * The configuration files generated can use the following keywords in order to
+ * configure this object:
+ *  include OTHER_FILENAME         -- Load in all data from another file.
+ *  set SETTING_NAME VALUE         -- Set a basic configuration setting.
+ *  new OBJECT_TYPE OBJECT_NAME    -- Create a new config object of a managed class.
+ *  use OBJECT_TYPE OBJECT_NAME    -- Use a previously created configuration object.
  */
 
-#ifndef EMP_CONFIG_CONFIG_HPP_INCLUDE
-#define EMP_CONFIG_CONFIG_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_CONFIG_CONFIG_HPP_GUARD
+#define INCLUDE_EMP_CONFIG_CONFIG_HPP_GUARD
 
 #include <fstream>
 #include <functional>

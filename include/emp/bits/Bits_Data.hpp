@@ -1,19 +1,20 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2022-23
-*/
 /**
- *  @file
- *  @brief Helper class to handle memory management for Bits objects.
- *  @note Status: BETA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2022-2023 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  Bits_Data handles the actual bits inside of the Bits class.  Bits itself provides many tools
- *  to operate on that data.
+ * @file include/emp/bits/Bits_Data.hpp
+ * @brief Helper class to handle memory management for Bits objects.
+ * @note Status: BETA
+ *
+ * Bits_Data handles the actual bits inside of the Bits class.  Bits itself provides many tools
+ * to operate on that data.
  */
 
-#ifndef EMP_BITS_BITS_DATA_HPP_INCLUDE
-#define EMP_BITS_BITS_DATA_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_BITS_BITS_DATA_HPP_GUARD
+#define INCLUDE_EMP_BITS_BITS_DATA_HPP_GUARD
 
 
 #include <span>

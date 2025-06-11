@@ -1,15 +1,16 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2017
-*/
 /**
- *  @file
- *  @brief Specialized, useful function for Empirical.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2015-2017 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/web/emfunctions.hpp
+ * @brief Specialized, useful function for Empirical.
  */
 
-#ifndef EMP_WEB_EMFUNCTIONS_HPP_INCLUDE
-#define EMP_WEB_EMFUNCTIONS_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_WEB_EMFUNCTIONS_HPP_GUARD
+#define INCLUDE_EMP_WEB_EMFUNCTIONS_HPP_GUARD
 
 #include <cstdint>
 #include <functional>
@@ -170,3 +171,6 @@ namespace emp {
 }
 
 #endif // #ifndef EMP_WEB_EMFUNCTIONS_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: emfunctions

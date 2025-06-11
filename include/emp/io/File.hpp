@@ -1,19 +1,19 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2018-2022.
-*/
 /**
- *  @file
- *  @brief The File object maintains a simple, in-memory file.
- *  @note Status: BETA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2018-2022 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  @todo We need to modify this code so that File can work with Emscripten.
+ * @file include/emp/io/File.hpp
+ * @brief The File object maintains a simple, in-memory file.
+ * @note Status: BETA
  *
+ * @todo We need to modify this code so that File can work with Emscripten.
  */
 
-#ifndef EMP_IO_FILE_HPP_INCLUDE
-#define EMP_IO_FILE_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_IO_FILE_HPP_GUARD
+#define INCLUDE_EMP_IO_FILE_HPP_GUARD
 
 
 #include <fstream>
@@ -428,7 +428,7 @@ namespace emp {
 
       // Get the very next line.
       const String & Read() {
-        if (line > file.size()) return String::Empty();
+        if (line > file.size()) return String::StaticEmpty();
         return file[line++];
       }
 

@@ -1,37 +1,38 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2025
-*/
 /**
- *  @file
- *  @brief Widgets maintain individual components on a web page and link to Elements
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2015-2025 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  Each HTML Widget has all of its details stored in a WidgetInfo object; Multiple Widgets can
- *  be attached to the same WidgetInfo, simplifying the usage.  All the library user needs to
- *  worry about is the Widget object itself; the WidgetInfo will be managed behind the scenes.
+ * @file include/emp/web/Widget.hpp
+ * @brief Widgets maintain individual components on a web page and link to Elements
  *
- *  WidgetInfo contains the basic information for all Widgets
- *  Widget is a generic base class, with a shared pointer to WidgetInfo
- *  WidgetFacet is a template that allows Set* methods to return derived return-type.
+ * Each HTML Widget has all of its details stored in a WidgetInfo object; Multiple Widgets can
+ * be attached to the same WidgetInfo, simplifying the usage.  All the library user needs to
+ * worry about is the Widget object itself; the WidgetInfo will be managed behind the scenes.
  *
- *  In other files, Widgets will be used to define specific elements.
- *  ELEMENTInfo maintains information about the specific widget (derived from WidgetInfo)
- *  ELEMENT interfaces to ELEMENTInfo so multiple elements use same core; derived from WidgetFacet
+ * WidgetInfo contains the basic information for all Widgets
+ * Widget is a generic base class, with a shared pointer to WidgetInfo
+ * WidgetFacet is a template that allows Set* methods to return derived return-type.
  *
- *  Library users should not need to access Widgets directly, only specific derived types.
+ * In other files, Widgets will be used to define specific elements.
+ * ELEMENTInfo maintains information about the specific widget (derived from WidgetInfo)
+ * ELEMENT interfaces to ELEMENTInfo so multiple elements use same core; derived from WidgetFacet
  *
- *  Tips for using widgets:
+ * Library users should not need to access Widgets directly, only specific derived types.
  *
- *  1. If you are about to make a lot of changes at once, run Freeze(), make the changes, and
- *     then run Activate() again.  Freeze prevents widgets from being updated immediately.
+ * Tips for using widgets:
  *
- *  2. Trust the Widget to handle all of the manipulation behind the scenes
+ * 1. If you are about to make a lot of changes at once, run Freeze(), make the changes, and
+ *    then run Activate() again.  Freeze prevents widgets from being updated immediately.
+ *
+ * 2. Trust the Widget to handle all of the manipulation behind the scenes
  *
  */
 
-#ifndef EMP_WEB_WIDGET_HPP_INCLUDE
-#define EMP_WEB_WIDGET_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_WEB_WIDGET_HPP_GUARD
+#define INCLUDE_EMP_WEB_WIDGET_HPP_GUARD
 
 
 #include <stddef.h>

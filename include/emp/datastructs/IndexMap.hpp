@@ -1,28 +1,29 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2022
-*/
 /**
- *  @file
- *  @brief A simple class to weight items differently within a container and return the correct index.
- *  @note Status: BETA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2015-2022 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  An IndexMap is a container where each item has a specified weight (specified as a double).
- *  The total weight of the container determines the max index point.  When indexing into the
- *  container, each item is represented by a range of values equal to it's weight.  Randomly
- *  indexing into the container will provide either item with a probability proportional to its
- *  weight.
+ * @file include/emp/datastructs/IndexMap.hpp
+ * @brief A simple class to weight items differently within a container and return the correct index.
+ * @note Status: BETA
  *
- *  In this regular IndexMap, all items are kept in order (so the map starts at 0, then 1, then
- *  2, etc.)  If order is not required, UnorderedIndexMap is slightly faster.
+ * An IndexMap is a container where each item has a specified weight (specified as a double).
+ * The total weight of the container determines the max index point.  When indexing into the
+ * container, each item is represented by a range of values equal to it's weight.  Randomly
+ * indexing into the container will provide either item with a probability proportional to its
+ * weight.
  *
- *  @todo Convert to a template that acts as a glorified vector, simplifying random selection?
- *  @todo Make Raw*() function private.
+ * In this regular IndexMap, all items are kept in order (so the map starts at 0, then 1, then
+ * 2, etc.)  If order is not required, UnorderedIndexMap is slightly faster.
+ *
+ * @todo Convert to a template that acts as a glorified vector, simplifying random selection?
+ * @todo Make Raw*() function private.
  */
 
-#ifndef EMP_DATASTRUCTS_INDEXMAP_HPP_INCLUDE
-#define EMP_DATASTRUCTS_INDEXMAP_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_DATASTRUCTS_INDEX_MAP_HPP_GUARD
+#define INCLUDE_EMP_DATASTRUCTS_INDEX_MAP_HPP_GUARD
 
 #include <stddef.h>
 

@@ -1,23 +1,24 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2022.
-*/
 /**
- *  @file
- *  @brief A drop-in wrapper for std::array; adds on bounds checking in debug mode.
- *  Status: RELEASE
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2022 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  If EMP_NDEBUG is set, emp::array is just an alias for std::array.
- *  Otherwise, every time an array is accessed, tests are done to make sure that the
- *  access is legal.
+ * @file include/emp/base/array.hpp
+ * @brief A drop-in wrapper for std::array; adds on bounds checking in debug mode.
+ * Status: RELEASE
  *
- *  @todo Add tests in array::front and array::back to ensure not empty.
- *  @todo Add tests for get.
+ * If EMP_NDEBUG is set, emp::array is just an alias for std::array.
+ * Otherwise, every time an array is accessed, tests are done to make sure that the
+ * access is legal.
+ *
+ * @todo Add tests in array::front and array::back to ensure not empty.
+ * @todo Add tests for get.
  */
 
-#ifndef EMP_BASE_ARRAY_HPP_INCLUDE
-#define EMP_BASE_ARRAY_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_BASE_ARRAY_HPP_GUARD
+#define INCLUDE_EMP_BASE_ARRAY_HPP_GUARD
 
 #include <array>
 #include <initializer_list>

@@ -1,20 +1,21 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2022
-*/
 /**
- *  @file
- *  @brief Management of pre-calculated distributions with different input values.
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2022 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  A DistributionSet manages a set of pre-calculated distributions.  When input values are
- *  provided, the correct distribution is identified, and the associated value is drawn.
+ * @file include/emp/math/DistributionSet.hpp
+ * @brief Management of pre-calculated distributions with different input values.
+ * @note Status: ALPHA
+ *
+ * A DistributionSet manages a set of pre-calculated distributions.  When input values are
+ * provided, the correct distribution is identified, and the associated value is drawn.
  *
  */
 
-#ifndef EMP_MATH_DISTRIBUTIONSET_HPP_INCLUDE
-#define EMP_MATH_DISTRIBUTIONSET_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_MATH_DISTRIBUTION_SET_HPP_GUARD
+#define INCLUDE_EMP_MATH_DISTRIBUTION_SET_HPP_GUARD
 
 #include "Distribution.hpp"
 

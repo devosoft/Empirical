@@ -1,15 +1,16 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2024.
-*/
 /**
- *  @file
- *  @brief  Tools for all puzzle-analysis techniques.
-*/
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2024 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/games/Puzzle.hpp
+ * @brief Tools for all puzzle-analysis techniques.
+ */
 
-#ifndef EMP_GAMES_PUZZLE_HPP
-#define EMP_GAMES_PUZZLE_HPP
+#pragma once
+
+#ifndef INCLUDE_EMP_GAMES_PUZZLE_HPP_GUARD
+#define INCLUDE_EMP_GAMES_PUZZLE_HPP_GUARD
 
 #include <iostream>
 

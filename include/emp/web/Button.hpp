@@ -1,35 +1,36 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2018.
-*/
 /**
- *  @file
- *  @brief Create/control an HTML button and call a specified function when that button is clicked.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2015-2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  Use example:
+ * @file include/emp/web/Button.hpp
+ * @brief Create/control an HTML button and call a specified function when that button is clicked.
  *
- *    emp::web::Button my_button(MyFun, "Button Name", "html_id");
+ * Use example:
  *
- *  Where my_button is the C++ object linking to the button, MyFun is the
- *  function you want to call on clicks, "Button Name" is the label on the
- *  button itself, and "html_id" is the optional id you want it to use in the
- *  HTML code (otherwise it will generate a unique name on its own.)
+ *   emp::web::Button my_button(MyFun, "Button Name", "html_id");
  *
- *  Member functions to set state:
- *    Button & SetCallback(const std::function<void()> & in_callback)
- *    Button & SetLabel(const std::string & in_label)
- *    Button & SetAutofocus(bool in_af)
- *    Button & SetDisabled(bool in_dis)
+ * Where my_button is the C++ object linking to the button, MyFun is the
+ * function you want to call on clicks, "Button Name" is the label on the
+ * button itself, and "html_id" is the optional id you want it to use in the
+ * HTML code (otherwise it will generate a unique name on its own.)
  *
- *  Retrieving current state:
- *    const std::string & GetLabel() const
- *    bool HasAutofocus() const
- *    bool IsDisabled() const
+ * Member functions to set state:
+ *   Button & SetCallback(const std::function<void()> & in_callback)
+ *   Button & SetLabel(const std::string & in_label)
+ *   Button & SetAutofocus(bool in_af)
+ *   Button & SetDisabled(bool in_dis)
+ *
+ * Retrieving current state:
+ *   const std::string & GetLabel() const
+ *   bool HasAutofocus() const
+ *   bool IsDisabled() const
  */
 
-#ifndef EMP_WEB_BUTTON_HPP_INCLUDE
-#define EMP_WEB_BUTTON_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_WEB_BUTTON_HPP_GUARD
+#define INCLUDE_EMP_WEB_BUTTON_HPP_GUARD
 
 #include <cstdint>
 

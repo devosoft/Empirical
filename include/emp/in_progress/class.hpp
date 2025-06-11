@@ -1,58 +1,59 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016
-*/
 /**
- *  @file
- *  @brief A re-engineering of tuple_struct.h, intended to be usable throughout Empirical.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  The EMP_CLASS macro builds an inexpensive class that
- *  * Can fully reflect on its contents. (todo)
- *  * Is easily serializable (todo)
- *  * Can be effortlessly moved between C++ and Javascript (todo)
+ * @file include/emp/in_progress/class.hpp
+ * @brief A re-engineering of tuple_struct.h, intended to be usable throughout Empirical.
  *
- *  EMP_CLASS( NAME,
- *             TYPE1, ID1, DEFAULT1,
- *             TYPE2, ID2, DEFAULT2,
- *             etc... )
+ * The EMP_CLASS macro builds an inexpensive class that
+ * * Can fully reflect on its contents. (todo)
+ * * Is easily serializable (todo)
+ * * Can be effortlessly moved between C++ and Javascript (todo)
  *
- *  If you want to just build member functions inside of a user-defined class, you
- *  can alternatively use:
+ * EMP_CLASS( NAME,
+ *            TYPE1, ID1, DEFAULT1,
+ *            TYPE2, ID2, DEFAULT2,
+ *            etc... )
  *
- *  EMP_MEMBERS( TYPE1, ID1,
- *               TYPE2, ID2,
- *               etc... )
+ * If you want to just build member functions inside of a user-defined class, you
+ * can alternatively use:
  *
- *  Further, if you make the members private and need to add accessors, you can use:
+ * EMP_MEMBERS( TYPE1, ID1,
+ *              TYPE2, ID2,
+ *              etc... )
  *
- *  EMP_ACCESSORS( NAME,
- *                 TYPE1, ID1,
- *                 TYPE2, ID2,
- *                 etc... )
+ * Further, if you make the members private and need to add accessors, you can use:
  *
- *  Finally, if you want it to build a specialized constructor for only these elements
- *  (which should be rare, since if you're not adding more to the class, you should just
- *   trigger EMP_CLASS), you can use:
+ * EMP_ACCESSORS( NAME,
+ *                TYPE1, ID1,
+ *                TYPE2, ID2,
+ *                etc... )
  *
- *  EMP_CONSTRUCTOR( NAME,
- *                   TYPE1, ID1, DEFAULT1,
- *                   TYPE2, ID2, DEFAULT2,
- *                   etc... )
+ * Finally, if you want it to build a specialized constructor for only these elements
+ * (which should be rare, since if you're not adding more to the class, you should just
+ *  trigger EMP_CLASS), you can use:
+ *
+ * EMP_CONSTRUCTOR( NAME,
+ *                  TYPE1, ID1, DEFAULT1,
+ *                  TYPE2, ID2, DEFAULT2,
+ *                  etc... )
  *
  *
- *  Developer notes:
- *  Goal: Make it trivial to build a class that has self-reflection.
- *        As such, it should interact will with serialization and Javascript conversion.
+ * Developer notes:
+ * Goal: Make it trivial to build a class that has self-reflection.
+ *       As such, it should interact will with serialization and Javascript conversion.
  *
- *  An alternative option is to do something similar to the config object.  In order to build
- *  a dynamic class, one would just create a file with a full set of macro calls.  They would
- *  need to be included several times -- it might not be possible, but if it is it would allow
- *  an arbitrarily large class definition.
+ * An alternative option is to do something similar to the config object.  In order to build
+ * a dynamic class, one would just create a file with a full set of macro calls.  They would
+ * need to be included several times -- it might not be possible, but if it is it would allow
+ * an arbitrarily large class definition.
  */
 
-#ifndef EMP_IN_PROGRESS_CLASS_HPP_INCLUDE
-#define EMP_IN_PROGRESS_CLASS_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_IN_PROGRESS_CLASS_HPP_GUARD
+#define INCLUDE_EMP_IN_PROGRESS_CLASS_HPP_GUARD
 
 // EMP_MEMBERS expects a series of type/id pairs to setup.
 #define EMP_CLASS_MEMBER_DECLARE(TYPE, ID) TYPE ID;

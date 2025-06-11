@@ -1,15 +1,16 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2021
-*/
 /**
- *  @file
- *  @brief Interfaces with emp::config objects to provide UI configuration.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2021 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/prefab/ConfigPanel.hpp
+ * @brief Interfaces with emp::config objects to provide UI configuration.
  */
 
-#ifndef EMP_PREFAB_CONFIGPANEL_HPP_INCLUDE
-#define EMP_PREFAB_CONFIGPANEL_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_PREFAB_CONFIG_PANEL_HPP_GUARD
+#define INCLUDE_EMP_PREFAB_CONFIG_PANEL_HPP_GUARD
 
 #include <set>
 #include <stddef.h>

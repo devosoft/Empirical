@@ -1,9 +1,9 @@
 /**
- * @note This file is part of Empirical, https://github.com/devosoft/Empirical
- * @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- * @date 2023-24.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2023-2024 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- * @file SerialPod.hpp
+ * @file include/emp/serialize/SerialPod.hpp
  * @brief Tools to save and load data from classes.
  * @note Status: ALPHA
  *
@@ -40,8 +40,10 @@
  *  Regular streaming is used only when no other options exist.
  */
 
-#ifndef EMP_SERIALIZE_SERIALPOD_HPP_INCLUDE
-#define EMP_SERIALIZE_SERIALPOD_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_SERIALIZE_SERIAL_POD_HPP_GUARD
+#define INCLUDE_EMP_SERIALIZE_SERIAL_POD_HPP_GUARD
 
 #include <iostream>
 #include <map>

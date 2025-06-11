@@ -1,19 +1,19 @@
-/*
-
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2018
-*/
 /**
- *  @file
- *  @brief A simple Othello game state handler limited to an 8x8 board.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  @todo Add Hash for boards to be able to cache moves.
- *  @todo Setup OPTIONAL caching of expensive board measures.
+ * @file include/emp/games/Othello8.hpp
+ * @brief A simple Othello game state handler limited to an 8x8 board.
+ *
+ * @todo Add Hash for boards to be able to cache moves.
+ * @todo Setup OPTIONAL caching of expensive board measures.
  */
 
-#ifndef EMP_GAMES_OTHELLO8_HPP_INCLUDE
-#define EMP_GAMES_OTHELLO8_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_GAMES_OTHELLO8_HPP_GUARD
+#define INCLUDE_EMP_GAMES_OTHELLO8_HPP_GUARD
 
 #include <cstdint>
 #include <fstream>
@@ -418,4 +418,4 @@ namespace emp {
 #endif // #ifndef EMP_GAMES_OTHELLO8_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: opp othello
+// empecable_words: othello opp

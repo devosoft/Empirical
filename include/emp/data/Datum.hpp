@@ -1,20 +1,21 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2021-2024
-*/
 /**
- *  @file
- *  @brief A single piece of data, either a value or an emp::String.
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2021-2024 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  DEVELOPER NOTES:
- *  - For now, using unions, but this creates complications with non-trivial constructor/destructor
- *    for strings, so could try shifting over.
+ * @file include/emp/data/Datum.hpp
+ * @brief A single piece of data, either a value or an emp::String.
+ * @note Status: ALPHA
+ *
+ * DEVELOPER NOTES:
+ * - For now, using unions, but this creates complications with non-trivial constructor/destructor
+ *   for strings, so could try shifting over.
  */
 
-#ifndef EMP_DATA_DATUM_HPP_INCLUDE
-#define EMP_DATA_DATUM_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_DATA_DATUM_HPP_GUARD
+#define INCLUDE_EMP_DATA_DATUM_HPP_GUARD
 
 #include "../base/assert.hpp"
 #include "../base/notify.hpp"

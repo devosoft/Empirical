@@ -1,16 +1,18 @@
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2024
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2024 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  @file Bimap.hpp
- *  @brief A two-way unordered map; simply two maps linked together.
- *  @note Status: ALPHA
+ * @file include/emp/in_progress/bimap.hpp
+ * @brief A two-way unordered map; simply two maps linked together.
+ * @note Status: ALPHA
  *
  */
 
-#ifndef EMP_DATASTRUCTS_BIMAP_HPP_INCLUDE
-#define EMP_DATASTRUCTS_BIMAP_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_IN_PROGRESS_BIMAP_HPP_GUARD
+#define INCLUDE_EMP_IN_PROGRESS_BIMAP_HPP_GUARD
 
 
 #include <unordered_map>

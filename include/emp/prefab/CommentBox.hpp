@@ -1,11 +1,10 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2021
-*/
 /**
- *  @file
- *  @brief Create a light grey "comment bubble."
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2021 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/prefab/CommentBox.hpp
+ * @brief Create a light grey "comment bubble."
  *
  * TODO: When prefab tools for adding mobile only and desktop only
  * content are created, remove AddMobileContent(), desktop_content
@@ -13,8 +12,10 @@
  * AddContent() should stream into all_content div.
  */
 
-#ifndef EMP_PREFAB_COMMENTBOX_HPP_INCLUDE
-#define EMP_PREFAB_COMMENTBOX_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_PREFAB_COMMENT_BOX_HPP_GUARD
+#define INCLUDE_EMP_PREFAB_COMMENT_BOX_HPP_GUARD
 
 #include "../tools/string_utils.hpp"
 #include "../web/Div.hpp"

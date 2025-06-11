@@ -1,17 +1,18 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2022
-*/
 /**
- *  @file
- *  @brief Similar to Ptr, but memory is tracked and managed elsewhere, such as smart pointers.
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2022 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/in_progress/TrackedPtr.hpp
+ * @brief Similar to Ptr, but memory is tracked and managed elsewhere, such as smart pointers.
+ * @note Status: ALPHA
  *
  */
 
-#ifndef EMP_IN_PROGRESS_TRACKEDPTR_HPP_INCLUDE
-#define EMP_IN_PROGRESS_TRACKEDPTR_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_IN_PROGRESS_TRACKED_PTR_HPP_GUARD
+#define INCLUDE_EMP_IN_PROGRESS_TRACKED_PTR_HPP_GUARD
 
 #include "Ptr.hpp"
 

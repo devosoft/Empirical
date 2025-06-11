@@ -1,15 +1,16 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2020.
-*/
 /**
- *  @file
- *  @brief An internal Empirical class with tools to build collections of bits.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2020 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/bits/_bitset_helpers.hpp
+ * @brief An internal Empirical class with tools to build collections of bits.
  */
 
-#ifndef EMP_BITS_BITSET_HELPERS_HPP_INCLUDE
-#define EMP_BITS_BITSET_HELPERS_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_BITS_BITSET_HELPERS_HPP_GUARD
+#define INCLUDE_EMP_BITS_BITSET_HELPERS_HPP_GUARD
 
 #include <stddef.h>
 

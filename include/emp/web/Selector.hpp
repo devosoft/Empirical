@@ -1,29 +1,30 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2018
-*/
 /**
- *  @file
- *  @brief Specs for the Selector widget.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2015-2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  A Selector widget provides the user with a pull-down menu.  It can be
- *  examined at any time (via GetSelectID()) or else alerts call a designated
- *  function when a particular option is chosen.
+ * @file include/emp/web/Selector.hpp
+ * @brief Specs for the Selector widget.
  *
- *     UI::Selector sel("sel");
+ * A Selector widget provides the user with a pull-down menu.  It can be
+ * examined at any time (via GetSelectID()) or else alerts call a designated
+ * function when a particular option is chosen.
  *
- *     sel.SetOption("Option 1");
- *     sel.SetOption("Option B", TriggerB) ;
- *     sel.SetOption("Option the Third", [](){ emp::Alert("3 chosen!"} );
- *     sel.SetOption("Option IV");
+ *    UI::Selector sel("sel");
  *
- *  In this example, the second option will call TriggerB when it is chosen,
- *  while the third option will call the provided lambda function.
+ *    sel.SetOption("Option 1");
+ *    sel.SetOption("Option B", TriggerB) ;
+ *    sel.SetOption("Option the Third", [](){ emp::Alert("3 chosen!"} );
+ *    sel.SetOption("Option IV");
+ *
+ * In this example, the second option will call TriggerB when it is chosen,
+ * while the third option will call the provided lambda function.
  */
 
-#ifndef EMP_WEB_SELECTOR_HPP_INCLUDE
-#define EMP_WEB_SELECTOR_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_WEB_SELECTOR_HPP_GUARD
+#define INCLUDE_EMP_WEB_SELECTOR_HPP_GUARD
 
 #include <stddef.h>
 

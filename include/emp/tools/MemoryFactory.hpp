@@ -1,17 +1,18 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2022
-*/
 /**
- *  @file
- *  @brief Recycles memory of a given size rather than continuously re-allocating.
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2022 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/tools/MemoryFactory.hpp
+ * @brief Recycles memory of a given size rather than continuously re-allocating.
+ * @note Status: ALPHA
  *
  */
 
-#ifndef EMP_TOOLS_MEMORYFACTORY_HPP_INCLUDE
-#define EMP_TOOLS_MEMORYFACTORY_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_TOOLS_MEMORY_FACTORY_HPP_GUARD
+#define INCLUDE_EMP_TOOLS_MEMORY_FACTORY_HPP_GUARD
 
 #include <span>
 #include <type_traits>

@@ -1,16 +1,17 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2020
-*/
 /**
- *  @file
- *  @brief A container that supports flexible tag-based lookup. .
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2020 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/matching/MatchBin.hpp
+ * @brief A container that supports flexible tag-based lookup. .
  *
  */
 
-#ifndef EMP_MATCHING_MATCHBIN_HPP_INCLUDE
-#define EMP_MATCHING_MATCHBIN_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_MATCHING_MATCH_BIN_HPP_GUARD
+#define INCLUDE_EMP_MATCHING_MATCH_BIN_HPP_GUARD
 
 // the default log filename can be set by passing
 // '-D filename.csv' to the compiler
@@ -1009,4 +1010,4 @@ void load(
 #endif // #ifndef EMP_MATCHING_MATCHBIN_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: uid uids adj logentry logbuffer amt
+// empecable_words: amt logbuffer logentry adj uids uid

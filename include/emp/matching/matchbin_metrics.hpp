@@ -1,16 +1,17 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2019-2022.
-*/
 /**
- *  @file
- *  @brief Metric structs that can be plugged into MatchBin.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2019-2022 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/matching/matchbin_metrics.hpp
+ * @brief Metric structs that can be plugged into MatchBin.
  *
  */
 
-#ifndef EMP_MATCHING_MATCHBIN_METRICS_HPP_INCLUDE
-#define EMP_MATCHING_MATCHBIN_METRICS_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_MATCHING_MATCHBIN_METRICS_HPP_GUARD
+#define INCLUDE_EMP_MATCHING_MATCHBIN_METRICS_HPP_GUARD
 
 
 #include <algorithm>
@@ -1231,4 +1232,4 @@ namespace emp {
 #endif // #ifndef EMP_MATCHING_MATCHBIN_METRICS_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: uniformified unif distn isocpp askamathematician downing's bino cumu ctors lcrypto hashme bernoulli shactx amt cumsum srtate cmp uncg lssl antilog sha thasher qhasher
+// empecable_words: qhasher thasher sha antilog lssl uncg cmp srtate cumsum amt shactx bernoulli hashme ctors lcrypto downing's uniformified askamathematician distn cumu bino unif isocpp

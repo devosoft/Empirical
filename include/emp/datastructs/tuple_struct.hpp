@@ -1,12 +1,10 @@
-/*
-
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2021
-*/
 /**
- *  @file
- *  @brief These macros will build a tuple and accessors to that tuple's members inside of a
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2021 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/datastructs/tuple_struct.hpp
+ * @brief These macros will build a tuple and accessors to that tuple's members inside of a
  * class definition.
  *
  *  @note Status: ALPHA
@@ -68,8 +66,10 @@
  * all members of a tuple.
  */
 
-#ifndef EMP_DATASTRUCTS_TUPLE_STRUCT_HPP_INCLUDE
-#define EMP_DATASTRUCTS_TUPLE_STRUCT_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_DATASTRUCTS_TUPLE_STRUCT_HPP_GUARD
+#define INCLUDE_EMP_DATASTRUCTS_TUPLE_STRUCT_HPP_GUARD
 
 #include <tuple>
 #include <typeindex>

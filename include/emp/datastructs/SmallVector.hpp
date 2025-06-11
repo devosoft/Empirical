@@ -1,24 +1,24 @@
-/*
-
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2020
-*/
 /**
- *  @file
- *  @brief A drop-in replacement for std::vector with optimization to handle
- *  small vector sizes without dynamic allocation. It contains some number of
- *  elements in-place, which allows it to avoid heap allocation when the actual
- *  number of elements is below that threshold. This allows normal "small"
- *  cases to be fast without losing generality for large inputs.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2020 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  @note Adapted from the LLVM Project, under the Apache License v2.0 with
- *  LLVM Exceptions. See https://llvm.org/LICENSE.txt for license information.
- *  SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+ * @file include/emp/datastructs/SmallVector.hpp
+ * @brief A drop-in replacement for std::vector with optimization to handle
+ * small vector sizes without dynamic allocation. It contains some number of
+ * elements in-place, which allows it to avoid heap allocation when the actual
+ * number of elements is below that threshold. This allows normal "small"
+ * cases to be fast without losing generality for large inputs.
+ *
+ * @note Adapted from the LLVM Project, under the Apache License v2.0 with
+ * LLVM Exceptions. See https://llvm.org/LICENSE.txt for license information.
+ * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
  */
 
-#ifndef EMP_DATASTRUCTS_SMALLVECTOR_HPP_INCLUDE
-#define EMP_DATASTRUCTS_SMALLVECTOR_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_DATASTRUCTS_SMALL_VECTOR_HPP_GUARD
+#define INCLUDE_EMP_DATASTRUCTS_SMALL_VECTOR_HPP_GUARD
 
 #include <algorithm>
 #include <cassert>
@@ -991,4 +991,4 @@ namespace std {
 #endif // #ifndef EMP_DATASTRUCTS_SMALLVECTOR_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: alignof ctor elt memmove dtors uninvalidate alignas offsetof elts Sizer
+// empecable_words: Sizer elts offsetof alignas uninvalidate dtors memmove elt ctor alignof

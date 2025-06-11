@@ -1,20 +1,21 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2018
-*/
 /**
- *  @file
- *  @brief Manage animations on a web site.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2015-2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  To build an animation, you must provide a function to be run repeatedly.  When Start()
- *  is triggered, the function will be called 60 time per second (or as close as possible),
- *  until Stop() is called.
+ * @file include/emp/web/Animate.hpp
+ * @brief Manage animations on a web site.
+ *
+ * To build an animation, you must provide a function to be run repeatedly.  When Start()
+ * is triggered, the function will be called 60 time per second (or as close as possible),
+ * until Stop() is called.
  *
  */
 
-#ifndef EMP_WEB_ANIMATE_HPP_INCLUDE
-#define EMP_WEB_ANIMATE_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_WEB_ANIMATE_HPP_GUARD
+#define INCLUDE_EMP_WEB_ANIMATE_HPP_GUARD
 
 #include <functional>
 #include <stddef.h>

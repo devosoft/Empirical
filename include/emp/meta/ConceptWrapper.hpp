@@ -1,102 +1,103 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2018-2021.
-*/
 /**
- *  @file
- *  @brief A template wrapper that will either enforce functionality or provide default functions.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2018-2021 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  Starting in future versions of C++, a concept is a set of requirements for a class to be used
- *  in a template.  This wrapper around a class is slightly more powerful than that.  It can
- *  either REQUIRE or marks as OPTIONAL specific member functions, variables or types for a
- *  wrapped class.  REQUIRE-d members must be available in the internal class.  OPTIONAL members
- *  are giving a default that will be used for classes where that member is missing.
+ * @file include/emp/meta/ConceptWrapper.hpp
+ * @brief A template wrapper that will either enforce functionality or provide default functions.
  *
- *  Use the EMP_BUILD_CONCEPT macro to create a new concept wrapper.  Provide it with the wrapper
- *  name, and all of the rules.  Note that since we are setting up an interface here, all of the
- *  members below are public unless otherwise stated.  The allowable rule types are:
+ * Starting in future versions of C++, a concept is a set of requirements for a class to be used
+ * in a template.  This wrapper around a class is slightly more powerful than that.  It can
+ * either REQUIRE or marks as OPTIONAL specific member functions, variables or types for a
+ * wrapped class.  REQUIRE-d members must be available in the internal class.  OPTIONAL members
+ * are giving a default that will be used for classes where that member is missing.
  *
- *  REQUIRED_FUN ( FUNCTION_NAME, ERROR_MESSAGE, RETURN_TYPE, ARG_TYPES... )
- *    Setup a member function called FUNCTION_NAME that is required to already be defined in the
- *    wrapped class.  If it does not exist there, trigger the ERROR_MESSAGE during compilation.
- *    The function signature is needed to automate testing if the member function exists.
+ * Use the EMP_BUILD_CONCEPT macro to create a new concept wrapper.  Provide it with the wrapper
+ * name, and all of the rules.  Note that since we are setting up an interface here, all of the
+ * members below are public unless otherwise stated.  The allowable rule types are:
  *
- *  OPTIONAL_FUN ( FUNCTION_NAME, DEFAULT_ACTION, RETURN_TYPE, ARG_TYPES... )
- *    Setup a member function called FUNCTION_NAME.  If it already exists in the wrapped class,
- *    redirect to that version when called.  If it does not already exist, perform the
- *    DEFAULT_ACTION instead (using arg1, arg2, etc as the arguments).
- *    The function signature is needed to automate testing if the member function exists.
+ * REQUIRED_FUN ( FUNCTION_NAME, ERROR_MESSAGE, RETURN_TYPE, ARG_TYPES... )
+ *   Setup a member function called FUNCTION_NAME that is required to already be defined in the
+ *   wrapped class.  If it does not exist there, trigger the ERROR_MESSAGE during compilation.
+ *   The function signature is needed to automate testing if the member function exists.
  *
- *  REQUIRED_OVERLOAD_FUN ( FUNCTION_NAME, ERROR_MESSAGE, RETURN_TYPE, ARG1_TYPES, OTHER_ARGS... )
- *    Setup a set of overloaded member functions called FUNCTION_NAME that varies the first
- *    parameter (and may have additional parameters with fixed types.  ARG1_TYPES must be an
- *    emp::TypePack that includes the full set of types to be used for the first parameter.
- *    Zero or more additional parameters may be included in OTHER_ARGS.  The wrapped class must
- *    already define the full set of overloaded functions by the correct name and with the correct
- *    RETURN_TYPE or else the ERROR_MESSAGE will be triggered.
- *    Example:
- *      REQUIRED_OVERLOAD_FUN ( CountValues, "Missing templated CountValues!",
- *                              int, emp::TypePack<int, char, double> );
- *    This will allow CountValues to be correctly redirected if called with any of the three
- *    specified types as its one parameter.
+ * OPTIONAL_FUN ( FUNCTION_NAME, DEFAULT_ACTION, RETURN_TYPE, ARG_TYPES... )
+ *   Setup a member function called FUNCTION_NAME.  If it already exists in the wrapped class,
+ *   redirect to that version when called.  If it does not already exist, perform the
+ *   DEFAULT_ACTION instead (using arg1, arg2, etc as the arguments).
+ *   The function signature is needed to automate testing if the member function exists.
  *
- *  REQUIRED_TYPE ( TYPE_NAME, ERROR_MESSAGE )
- *    Setup a member type called TYPE_NAME that is required to be defined in the wrapped class.
- *    If it does not exist there, trigger the ERROR_MESSAGE during compilation.
+ * REQUIRED_OVERLOAD_FUN ( FUNCTION_NAME, ERROR_MESSAGE, RETURN_TYPE, ARG1_TYPES, OTHER_ARGS... )
+ *   Setup a set of overloaded member functions called FUNCTION_NAME that varies the first
+ *   parameter (and may have additional parameters with fixed types.  ARG1_TYPES must be an
+ *   emp::TypePack that includes the full set of types to be used for the first parameter.
+ *   Zero or more additional parameters may be included in OTHER_ARGS.  The wrapped class must
+ *   already define the full set of overloaded functions by the correct name and with the correct
+ *   RETURN_TYPE or else the ERROR_MESSAGE will be triggered.
+ *   Example:
+ *     REQUIRED_OVERLOAD_FUN ( CountValues, "Missing templated CountValues!",
+ *                             int, emp::TypePack<int, char, double> );
+ *   This will allow CountValues to be correctly redirected if called with any of the three
+ *   specified types as its one parameter.
  *
- *  OPTIONAL_TYPE ( TYPE_NAME, DEFAULT_TYPE )
- *    Setup a member type called TYPE_NAME.  If it already exists in the wrapped class, use that
- *    version.  Otherwise set it to DEFAULT_TYPE provided.
+ * REQUIRED_TYPE ( TYPE_NAME, ERROR_MESSAGE )
+ *   Setup a member type called TYPE_NAME that is required to be defined in the wrapped class.
+ *   If it does not exist there, trigger the ERROR_MESSAGE during compilation.
  *
- *  PRIVATE ( CODE )
- *    All code provided will appear in the private portion of the wrapper.  Any identifiers
- *    defined in this code will shadow public defined in the class being wrapped.
+ * OPTIONAL_TYPE ( TYPE_NAME, DEFAULT_TYPE )
+ *   Setup a member type called TYPE_NAME.  If it already exists in the wrapped class, use that
+ *   version.  Otherwise set it to DEFAULT_TYPE provided.
  *
- *  PROTECTED ( CODE )
- *    All code provided will appear in the protected portion of the wrapper.  Any identifiers
- *    defined in this code will shadow public defined in the class being wrapped.
+ * PRIVATE ( CODE )
+ *   All code provided will appear in the private portion of the wrapper.  Any identifiers
+ *   defined in this code will shadow public defined in the class being wrapped.
  *
- *  PUBLIC ( CODE )
- *    All code provided will appear in the public portion of the wrapper.  Any identifiers
- *    defined in this code will shadow public defined in the class being wrapped.
+ * PROTECTED ( CODE )
+ *   All code provided will appear in the protected portion of the wrapper.  Any identifiers
+ *   defined in this code will shadow public defined in the class being wrapped.
  *
- *
- *  ----------------
- *  DEVELOPER NOTES:
- *    Internally, the base class declares all required and optional functions a pure virtual.
- *
- *    The wrapper is a templated class that takes in the wrapped class and inherits from BOTH
- *    the base class and the wrapped class.
- *
- *    When a function is called in the base class, it automatically redirects to the derived
- *    class (via normal virtual functionality), which will then either redirect the call to the
- *    wrapped class or (if optional and not implemented in the wrapped class) executes the default
- *    code.
+ * PUBLIC ( CODE )
+ *   All code provided will appear in the public portion of the wrapper.  Any identifiers
+ *   defined in this code will shadow public defined in the class being wrapped.
  *
  *
- *  @note: Requires C++-17 to function properly!
+ * ----------------
+ * DEVELOPER NOTES:
+ *   Internally, the base class declares all required and optional functions a pure virtual.
  *
- *  @todo: Add the ability to rename functions from the base class.
- *  @todo: Add the ability to list several functions, requiring only one to exist.
- *         (This can be done by surrounding all names in parens to build a pack)
+ *   The wrapper is a templated class that takes in the wrapped class and inherits from BOTH
+ *   the base class and the wrapped class.
+ *
+ *   When a function is called in the base class, it automatically redirects to the derived
+ *   class (via normal virtual functionality), which will then either redirect the call to the
+ *   wrapped class or (if optional and not implemented in the wrapped class) executes the default
+ *   code.
  *
  *
- *  Currently not implementing vars (to encourage accessor-based interface), but it would look like:
+ * @note: Requires C++-17 to function properly!
  *
- *  REQUIRED_VAR ( VAR_NAME, ERROR_MESSAGE, TYPE )
- *    Setup a member variable called VAR_NAME that is required to already be declared in the
- *    wrapped class.  If it does not exist there, trigger the ERROR_MESSAGE during compilation.
+ * @todo: Add the ability to rename functions from the base class.
+ * @todo: Add the ability to list several functions, requiring only one to exist.
+ *        (This can be done by surrounding all names in parens to build a pack)
  *
- *  OPTIONAL_VAR ( VAR_NAME, DEFAULT_VALUE, TYPE )
- *    Setup a member variable called VAR_NAME.  If it already exists in the wrapped class, use
- *    that version.  If it does not already exist, create it with the provided TYPE and set it to
- *    the DEFAULT_VALUE provided.
+ *
+ * Currently not implementing vars (to encourage accessor-based interface), but it would look like:
+ *
+ * REQUIRED_VAR ( VAR_NAME, ERROR_MESSAGE, TYPE )
+ *   Setup a member variable called VAR_NAME that is required to already be declared in the
+ *   wrapped class.  If it does not exist there, trigger the ERROR_MESSAGE during compilation.
+ *
+ * OPTIONAL_VAR ( VAR_NAME, DEFAULT_VALUE, TYPE )
+ *   Setup a member variable called VAR_NAME.  If it already exists in the wrapped class, use
+ *   that version.  If it does not already exist, create it with the provided TYPE and set it to
+ *   the DEFAULT_VALUE provided.
  *
  */
 
-#ifndef EMP_META_CONCEPTWRAPPER_HPP_INCLUDE
-#define EMP_META_CONCEPTWRAPPER_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_META_CONCEPT_WRAPPER_HPP_GUARD
+#define INCLUDE_EMP_META_CONCEPT_WRAPPER_HPP_GUARD
 
 #include <stddef.h>
 #include <string>

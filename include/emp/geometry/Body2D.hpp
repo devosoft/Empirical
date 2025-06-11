@@ -1,29 +1,29 @@
-/*
-
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2018
-*/
 /**
- *  @file
- *  @brief  This file defines classes to represent bodies that exist on a 2D surface.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  Each class should be able to:
- *   * Maintain a pointer to information about the full organism associated with this body.
- *   * provide a circular perimeter of the body (for phase1 of collision detection)
- *   * Provide body an anchor point and center point of the body (typically the same)
+ * @file include/emp/geometry/Body2D.hpp
+ * @brief This file defines classes to represent bodies that exist on a 2D surface.
  *
- *  Currently, the only type of body we have is:
+ * Each class should be able to:
+ *  * Maintain a pointer to information about the full organism associated with this body.
+ *  * provide a circular perimeter of the body (for phase1 of collision detection)
+ *  * Provide body an anchor point and center point of the body (typically the same)
  *
- *    CircleBody2D - One individual circular object in the 2D world.
+ * Currently, the only type of body we have is:
+ *
+ *   CircleBody2D - One individual circular object in the 2D world.
  *
  *
- *  Development notes:
- *  * If we are going to have a lot of links, we may want a better data structure than vector.
+ * Development notes:
+ * * If we are going to have a lot of links, we may want a better data structure than vector.
  */
 
-#ifndef EMP_GEOMETRY_BODY2D_HPP_INCLUDE
-#define EMP_GEOMETRY_BODY2D_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_GEOMETRY_BODY2D_HPP_GUARD
+#define INCLUDE_EMP_GEOMETRY_BODY2D_HPP_GUARD
 
 #include <cstdint>
 #include <stddef.h>

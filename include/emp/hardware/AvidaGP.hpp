@@ -1,23 +1,24 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2017-2024.
-*/
 /**
- *  @file
- *  @brief This is a simple, efficient CPU for an argument-based Avida genome.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2017-2024 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  @todo Should we save a copy of the original genome?  (or create a new "memory" member)
- *  @todo We should clean up how we handle scope; the root scope is zero, so the arg-based
- *    scopes are 1-16 (or however many).  Right now we increment the value in various places
- *    and should be more consistent.
- *  @todo How should Avida-GP organisms take an action?  Options include sending ALL outputs and
- *    picking the maximum field; sending a single output and using its value; having specialized
- *    commands...
+ * @file include/emp/hardware/AvidaGP.hpp
+ * @brief This is a simple, efficient CPU for an argument-based Avida genome.
+ *
+ * @todo Should we save a copy of the original genome?  (or create a new "memory" member)
+ * @todo We should clean up how we handle scope; the root scope is zero, so the arg-based
+ *   scopes are 1-16 (or however many).  Right now we increment the value in various places
+ *   and should be more consistent.
+ * @todo How should Avida-GP organisms take an action?  Options include sending ALL outputs and
+ *   picking the maximum field; sending a single output and using its value; having specialized
+ *   commands...
  */
 
-#ifndef EMP_HARDWARE_AVIDAGP_HPP_INCLUDE
-#define EMP_HARDWARE_AVIDAGP_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_HARDWARE_AVIDA_GP_HPP_GUARD
+#define INCLUDE_EMP_HARDWARE_AVIDA_GP_HPP_GUARD
 
 
 #include <fstream>

@@ -1,32 +1,32 @@
-/*
-
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2019
-*/
 /**
- *  @file
- *  @brief A set of macros to track how many instances of specific classes are made.
- *  @note Status: BETA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2015-2019 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  One way of tracking memory leaks is to simply count instances of classes.  The macros here
- *  simplify this process.
+ * @file include/emp/debug/mem_track.hpp
+ * @brief A set of macros to track how many instances of specific classes are made.
+ * @note Status: BETA
  *
- *  To setup, every constructor for a class must include EMP_TRACK_CONSTRUCT(CLASS_NAME),
- *  and every destructor must have EMP_TRACK_DESTRUCT(CLASS_NAME).  Make sure to avoid
- *  implicit constructors/destructors or counts will be off.
+ * One way of tracking memory leaks is to simply count instances of classes.  The macros here
+ * simplify this process.
  *
- *  To collect information, EMP_TRACK_COUNT(CLASS_NAME) will provide the current count
- *  for a specific class, and EMP_TRACK_STATUS will translate into a string providing
- *  information about all available classes.
+ * To setup, every constructor for a class must include EMP_TRACK_CONSTRUCT(CLASS_NAME),
+ * and every destructor must have EMP_TRACK_DESTRUCT(CLASS_NAME).  Make sure to avoid
+ * implicit constructors/destructors or counts will be off.
  *
- *  Developer notes:
- *  @todo Currently having issues with the memory map corruption.  Perhaps it needs to use onload?
- *   Also, can try using JS maps instead?  (only when using Emscripten.)
+ * To collect information, EMP_TRACK_COUNT(CLASS_NAME) will provide the current count
+ * for a specific class, and EMP_TRACK_STATUS will translate into a string providing
+ * information about all available classes.
+ *
+ * Developer notes:
+ * @todo Currently having issues with the memory map corruption.  Perhaps it needs to use onload?
+ *  Also, can try using JS maps instead?  (only when using Emscripten.)
  */
 
-#ifndef EMP_DEBUG_MEM_TRACK_HPP_INCLUDE
-#define EMP_DEBUG_MEM_TRACK_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_DEBUG_MEM_TRACK_HPP_GUARD
+#define INCLUDE_EMP_DEBUG_MEM_TRACK_HPP_GUARD
 
 
 // If EMP_NDEBUG is turned on, turn off mem checks.

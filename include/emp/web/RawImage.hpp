@@ -1,15 +1,16 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2018
-*/
 /**
- *  @file
- *  @brief Handle the fundamental loading of an image (without Widget tracking)
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2015-2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/web/RawImage.hpp
+ * @brief Handle the fundamental loading of an image (without Widget tracking)
  */
 
-#ifndef EMP_WEB_RAWIMAGE_HPP_INCLUDE
-#define EMP_WEB_RAWIMAGE_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_WEB_RAW_IMAGE_HPP_GUARD
+#define INCLUDE_EMP_WEB_RAW_IMAGE_HPP_GUARD
 
 #include <functional>
 #include <map>

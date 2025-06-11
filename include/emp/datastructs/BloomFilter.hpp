@@ -1,11 +1,10 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2021
-*/
 /**
- *  @file
- *  @brief A Bloom filter implementation
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2021 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/datastructs/BloomFilter.hpp
+ * @brief A Bloom filter implementation
  *
  *  @note This file is included in Empirical (https://github.com/devosoft/Empirical) for convenience.
  * The Bloom filter class was written by Arash Partow (http://www.partow.net/programming/hashfunctions/index.html)
@@ -13,8 +12,10 @@
  * @copyright Arash Partow, 2000 (modified slightly by Emily Dolson)
  */
 
-#ifndef EMP_DATASTRUCTS_BLOOMFILTER_HPP_INCLUDE
-#define EMP_DATASTRUCTS_BLOOMFILTER_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_DATASTRUCTS_BLOOM_FILTER_HPP_GUARD
+#define INCLUDE_EMP_DATASTRUCTS_BLOOM_FILTER_HPP_GUARD
 
 /*
  *                           Open Bloom Filter                       *
@@ -792,4 +793,4 @@ private:
 #endif // #ifndef EMP_DATASTRUCTS_BLOOMFILTER_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: tbl fpp predef optp itr hashfunctions Partow partow srand Arash
+// empecable_words: Arash srand partow Partow hashfunctions itr optp predef fpp tbl

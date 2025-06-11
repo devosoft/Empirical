@@ -1,17 +1,18 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2021.
-*/
 /**
- *  @file
- *  @brief Helper macros for building proper assert commands.
- *  Status: RELEASE
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2021 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/base/_assert_macros.hpp
+ * @brief Helper macros for building proper assert commands.
+ * Status: RELEASE
  *
  */
 
-#ifndef EMP_BASE_ASSERT_MACROS_HPP_INCLUDE
-#define EMP_BASE_ASSERT_MACROS_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_BASE_ASSERT_MACROS_HPP_GUARD
+#define INCLUDE_EMP_BASE_ASSERT_MACROS_HPP_GUARD
 
 /// Basic helper macros...
 #define emp_assert_STRINGIFY(...) emp_assert_STRINGIFY_IMPL(__VA_ARGS__)

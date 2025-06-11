@@ -1,47 +1,48 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2022-2024
-*/
 /**
- *  @file
- *  @brief Functionality similar to emp::String, but tracks text formatting for easy conversion.
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2022-2024 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  Text should be functionally interchangeable with string, but can easily convert to
- *  HTML, Latex, RTF, or other formats that support bold, italic, super/sub-scripting, fonts,
- *  etc.
+ * @file include/emp/text/Text.hpp
+ * @brief Functionality similar to emp::String, but tracks text formatting for easy conversion.
+ * @note Status: ALPHA
  *
- *  The main Text class tracks a string of text (called simply "text") and any special styles
- *  associated with each text position (in "style_map").  The current TextEncoding class helps
- *  guide the conversion from one text encoding to another.
+ * Text should be functionally interchangeable with string, but can easily convert to
+ * HTML, Latex, RTF, or other formats that support bold, italic, super/sub-scripting, fonts,
+ * etc.
  *
- *  Internally, styles that all encodings should be able to handle (or at least be aware of) are:
- *    BASIC FORMATS :
- *     "bold"
- *     "code"
- *     "italic"
- *     "strike"
- *     "subscript"
- *     "superscript"
- *     "underline"
- *     "no_break"
- *     "color:NAME"
- *     "font:NAME"
- *     "size:POINT_SIZE"
+ * The main Text class tracks a string of text (called simply "text") and any special styles
+ * associated with each text position (in "style_map").  The current TextEncoding class helps
+ * guide the conversion from one text encoding to another.
  *
- *    STRUCTURAL :
- *     "heading:1" through "heading:6" different levels of headings.
- *     "blockquote"
- *     "bullet:1" through "bullet:6" (only on character after bulleted; stops an newline)
- *     "indent:1" through "indent:6" (same as bullet, but no bullet)
- *     "ordered:1" through "ordered:6" (numbers; reset less-tabbed structure is used)
- *     "link:URL" (create a link to the specified URL)
- *     "image:URL" (include in the specified image)
+ * Internally, styles that all encodings should be able to handle (or at least be aware of) are:
+ *   BASIC FORMATS :
+ *    "bold"
+ *    "code"
+ *    "italic"
+ *    "strike"
+ *    "subscript"
+ *    "superscript"
+ *    "underline"
+ *    "no_break"
+ *    "color:NAME"
+ *    "font:NAME"
+ *    "size:POINT_SIZE"
+ *
+ *   STRUCTURAL :
+ *    "heading:1" through "heading:6" different levels of headings.
+ *    "blockquote"
+ *    "bullet:1" through "bullet:6" (only on character after bulleted; stops an newline)
+ *    "indent:1" through "indent:6" (same as bullet, but no bullet)
+ *    "ordered:1" through "ordered:6" (numbers; reset less-tabbed structure is used)
+ *    "link:URL" (create a link to the specified URL)
+ *    "image:URL" (include in the specified image)
  */
 
-#ifndef EMP_TEXT_TEXT_HPP_INCLUDE
-#define EMP_TEXT_TEXT_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_TEXT_TEXT_HPP_GUARD
+#define INCLUDE_EMP_TEXT_TEXT_HPP_GUARD
 
 #include <map>
 #include <type_traits>

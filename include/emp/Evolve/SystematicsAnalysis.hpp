@@ -1,16 +1,17 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2018-2023
-*/
 /**
- *  @file
- *  @brief TODO.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2018-2023 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/Evolve/SystematicsAnalysis.hpp
+ * @brief TODO.
  *
  */
 
-#ifndef EMP_EVOLVE_SYSTEMATICSANALYSIS_HPP_INCLUDE
-#define EMP_EVOLVE_SYSTEMATICSANALYSIS_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_EVOLVE_SYSTEMATICS_ANALYSIS_HPP_GUARD
+#define INCLUDE_EMP_EVOLVE_SYSTEMATICS_ANALYSIS_HPP_GUARD
 
 #include "../base/Ptr.hpp"
 

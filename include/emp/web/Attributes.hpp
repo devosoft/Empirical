@@ -1,15 +1,16 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2017
-*/
 /**
- *  @file
- *  @brief An Attributes class for tracking non-style features about HTML objects
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2015-2017 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/web/Attributes.hpp
+ * @brief An Attributes class for tracking non-style features about HTML objects
  */
 
-#ifndef EMP_WEB_ATTRIBUTES_HPP_INCLUDE
-#define EMP_WEB_ATTRIBUTES_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_WEB_ATTRIBUTES_HPP_GUARD
+#define INCLUDE_EMP_WEB_ATTRIBUTES_HPP_GUARD
 
 
 #ifdef __EMSCRIPTEN__

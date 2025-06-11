@@ -1,35 +1,36 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2025.
- */
 /**
- *  @file
- *  @brief A wrapper for pointers that does careful memory tracking (but only in debug mode).
- *  @note Status: BETA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2025 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  Ptr objects behave as normal pointers under most conditions.  However, if a program is
- *  compiled with EMP_TRACK_MEM set, then these pointers perform extra tests to ensure that
- *  they point to valid memory and that memory is freed before pointers are released.
+ * @file include/emp/base/Ptr.hpp
+ * @brief A wrapper for pointers that does careful memory tracking (but only in debug mode).
+ * @note Status: BETA
  *
- *  If you want to prevent pointers to pointers (a common source of errors, but MAY be done
- *  intentionally) you can define EMP_NO_PTR_TO_PTR
+ * Ptr objects behave as normal pointers under most conditions.  However, if a program is
+ * compiled with EMP_TRACK_MEM set, then these pointers perform extra tests to ensure that
+ * they point to valid memory and that memory is freed before pointers are released.
  *
- *  If you trip an assert, you can re-do the run a track a specific pointer by defining
- *  EMP_ABORT_PTR_NEW or EMP_ABORT_PTR_DELETE to the ID of the pointer in question.
+ * If you want to prevent pointers to pointers (a common source of errors, but MAY be done
+ * intentionally) you can define EMP_NO_PTR_TO_PTR
  *
- *  For example: -DEMP_ABORT_PTR_NEW=1691
+ * If you trip an assert, you can re-do the run a track a specific pointer by defining
+ * EMP_ABORT_PTR_NEW or EMP_ABORT_PTR_DELETE to the ID of the pointer in question.
  *
- *  This will allow you to track the pointer more easily in a debugger.
+ * For example: -DEMP_ABORT_PTR_NEW=1691
  *
- *  @todo Track information about emp::vector and emp::array objects to make sure we don't
- *    point directly into them? (A resize() could make such pointers invalid!) Or better, warn
- *    it vector memory could have moved.
- *  @todo Get working with threads
+ * This will allow you to track the pointer more easily in a debugger.
+ *
+ * @todo Track information about emp::vector and emp::array objects to make sure we don't
+ *   point directly into them? (A resize() could make such pointers invalid!) Or better, warn
+ *   it vector memory could have moved.
+ * @todo Get working with threads
  */
 
-#ifndef EMP_BASE_PTR_HPP_INCLUDE
-#define EMP_BASE_PTR_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_BASE_PTR_HPP_GUARD
+#define INCLUDE_EMP_BASE_PTR_HPP_GUARD
 
 #include <concepts>
 #include <cstddef>

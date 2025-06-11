@@ -1,19 +1,20 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2017
-*/
 /**
- *  @file
- *  @brief A mechanism to abstract functions from their underlying type and provide run-time names.
- *  @note Status: Beta
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2017 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  @todo Create an ActionDefaults class that can take fewer args than expected and fill in rest.
- *  @todo Allow for named arguments to facilitate interpreted functions.
+ * @file include/emp/control/Action.hpp
+ * @brief A mechanism to abstract functions from their underlying type and provide run-time names.
+ * @note Status: Beta
+ *
+ * @todo Create an ActionDefaults class that can take fewer args than expected and fill in rest.
+ * @todo Allow for named arguments to facilitate interpreted functions.
  */
 
-#ifndef EMP_CONTROL_ACTION_HPP_INCLUDE
-#define EMP_CONTROL_ACTION_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_CONTROL_ACTION_HPP_GUARD
+#define INCLUDE_EMP_CONTROL_ACTION_HPP_GUARD
 
 #include <functional>
 #include <stddef.h>

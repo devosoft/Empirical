@@ -1,17 +1,18 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2020
-*/
 /**
- *  @file
- *  @brief A container for tag-based lookup, optimized for situations where
- *  tags are not removed from the lookup set.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2020 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/matching/MatchDepository.hpp
+ * @brief A container for tag-based lookup, optimized for situations where
+ * tags are not removed from the lookup set.
  *
  */
 
-#ifndef EMP_MATCHING_MATCHDEPOSITORY_HPP_INCLUDE
-#define EMP_MATCHING_MATCHDEPOSITORY_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_MATCHING_MATCH_DEPOSITORY_HPP_GUARD
+#define INCLUDE_EMP_MATCHING_MATCH_DEPOSITORY_HPP_GUARD
 
 #include <algorithm>
 #include <limits>
@@ -237,4 +238,4 @@ public:
 #endif // #ifndef EMP_MATCHING_MATCHDEPOSITORY_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: amt adj uid
+// empecable_words: uid adj amt

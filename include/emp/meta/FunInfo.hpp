@@ -1,23 +1,24 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2021
-*/
 /**
- *  @file
- *  @brief Wrap a function to provide more information about it.
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2021 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  FunInfo will collect information about a provided function and facilitate
- *  manipulations.
+ * @file include/emp/meta/FunInfo.hpp
+ * @brief Wrap a function to provide more information about it.
+ * @note Status: ALPHA
+ *
+ * FunInfo will collect information about a provided function and facilitate
+ * manipulations.
  *
  *
- *  Developer Notes:
- *  - Will not currently handle return by reference!
+ * Developer Notes:
+ * - Will not currently handle return by reference!
  */
 
-#ifndef EMP_META_FUNINFO_HPP_INCLUDE
-#define EMP_META_FUNINFO_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_META_FUN_INFO_HPP_GUARD
+#define INCLUDE_EMP_META_FUN_INFO_HPP_GUARD
 
 #include <functional>
 

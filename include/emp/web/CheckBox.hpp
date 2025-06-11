@@ -1,35 +1,36 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2024
-*/
 /**
- *  @file
- *  @brief Create/control an HTML checkbox and call a specified function when it changes.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2024 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  Use example:
+ * @file include/emp/web/CheckBox.hpp
+ * @brief Create/control an HTML checkbox and call a specified function when it changes.
  *
- *    emp::web::CheckBox my_checkbox(MyFun, "html_id");
+ * Use example:
  *
- *  Where:
- *   - my_checkbox is the C++ object linking to the checkbox
- *   - MyFun takes a bool argument and is called every time the checkbox status changes
- *   - "html_id" is the optional id you want it to use in the HTML code
- *     (otherwise it will generate a unique name on its own.)
+ *   emp::web::CheckBox my_checkbox(MyFun, "html_id");
  *
- *  Member functions to set state:
- *    CheckBox & SetCallback(const std::function<void(bool)> & in_callback)
- *    CheckBox & SetAutofocus(bool in_af)
- *    CheckBox & SetDisabled(bool in_dis)
+ * Where:
+ *  - my_checkbox is the C++ object linking to the checkbox
+ *  - MyFun takes a bool argument and is called every time the checkbox status changes
+ *  - "html_id" is the optional id you want it to use in the HTML code
+ *    (otherwise it will generate a unique name on its own.)
  *
- *  Retrieving current state:
- *    bool IsSet() const
- *    bool HasAutofocus() const
- *    bool IsDisabled() const
+ * Member functions to set state:
+ *   CheckBox & SetCallback(const std::function<void(bool)> & in_callback)
+ *   CheckBox & SetAutofocus(bool in_af)
+ *   CheckBox & SetDisabled(bool in_dis)
+ *
+ * Retrieving current state:
+ *   bool IsSet() const
+ *   bool HasAutofocus() const
+ *   bool IsDisabled() const
  */
 
-#ifndef EMP_WEB_CHECKBOX_HPP_INCLUDE
-#define EMP_WEB_CHECKBOX_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_WEB_CHECK_BOX_HPP_GUARD
+#define INCLUDE_EMP_WEB_CHECK_BOX_HPP_GUARD
 
 #include <cstdint>
 

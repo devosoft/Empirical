@@ -1,28 +1,29 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2018-2022
-*/
 /**
- *  @file
- *  @brief A means of quickly generating binomial random variables while only storing a small number of distributions.
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2018-2022 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  Quick check for theory: https://math.stackexchange.com/questions/1176385/sum-of-two-independent-binomial-variables
+ * @file include/emp/math/CombinedBinomialDistribution.hpp
+ * @brief A means of quickly generating binomial random variables while only storing a small number of distributions.
+ * @note Status: ALPHA
  *
- *  If we want to generate binomial random variables of various trial counts (n's) using the
- *  Distribution class, we'd have to create a new Distribution for each unique trial count.
+ * Quick check for theory: https://math.stackexchange.com/questions/1176385/sum-of-two-independent-binomial-variables
  *
- *  This class leverages the fact that B(n, p) + B(m, p) = B(n + m, p) to calculate binomial
- *  draws with arbitrary trail counts without storing N distributions.
- *  By storing distributions for powers of 2, we only store log_2(N) distributions.
+ * If we want to generate binomial random variables of various trial counts (n's) using the
+ * Distribution class, we'd have to create a new Distribution for each unique trial count.
  *
- *  Developer Notes:
- *    - We should come up with a more informative name for the file/class
+ * This class leverages the fact that B(n, p) + B(m, p) = B(n + m, p) to calculate binomial
+ * draws with arbitrary trail counts without storing N distributions.
+ * By storing distributions for powers of 2, we only store log_2(N) distributions.
+ *
+ * Developer Notes:
+ *   - We should come up with a more informative name for the file/class
  */
 
-#ifndef EMP_MATH_COMBINEDBINOMIALDISTRIBUTION_HPP_INCLUDE
-#define EMP_MATH_COMBINEDBINOMIALDISTRIBUTION_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_MATH_COMBINED_BINOMIAL_DISTRIBUTION_HPP_GUARD
+#define INCLUDE_EMP_MATH_COMBINED_BINOMIAL_DISTRIBUTION_HPP_GUARD
 
 #include "./Distribution.hpp"
 

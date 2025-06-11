@@ -1,15 +1,16 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2021
-*/
 /**
- *  @file
- *  @brief TODO.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2021 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/hardware/EventDrivenGP.hpp
+ * @brief TODO.
  */
 
-#ifndef EMP_HARDWARE_EVENTDRIVENGP_HPP_INCLUDE
-#define EMP_HARDWARE_EVENTDRIVENGP_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_HARDWARE_EVENT_DRIVEN_GP_HPP_GUARD
+#define INCLUDE_EMP_HARDWARE_EVENT_DRIVEN_GP_HPP_GUARD
 
 #include <algorithm>
 #include <deque>
@@ -2154,4 +2155,4 @@ namespace emp {
 #endif // #ifndef EMP_HARDWARE_EVENTDRIVENGP_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: ext adj ilib blk rnd stdvectorerase stk uids cnt eob eofun aff elib prgm amlalejini
+// empecable_words: amlalejini prgm elib aff eofun eob cnt uids stk stdvectorerase rnd blk ilib adj ext

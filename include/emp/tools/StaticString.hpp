@@ -1,21 +1,22 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2022-2023
-*/
 /**
- *  @file
- *  @brief String substitute with a fixed max character count and always in place.
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2022-2023 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  A fixed number of chars are reserved for the string; errors will trigger for longer attempts.
- *  The last allocated byte stores the number of unused positions in the string; this naturally
- *  becomes zero (the final character in a string) when all positions are used.
+ * @file include/emp/tools/StaticString.hpp
+ * @brief String substitute with a fixed max character count and always in place.
+ * @note Status: ALPHA
+ *
+ * A fixed number of chars are reserved for the string; errors will trigger for longer attempts.
+ * The last allocated byte stores the number of unused positions in the string; this naturally
+ * becomes zero (the final character in a string) when all positions are used.
  *
  */
 
-#ifndef EMP_TOOLS_STATICSTRING_HPP_INCLUDE
-#define EMP_TOOLS_STATICSTRING_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_TOOLS_STATIC_STRING_HPP_GUARD
+#define INCLUDE_EMP_TOOLS_STATIC_STRING_HPP_GUARD
 
 #include <algorithm>
 #include <string>

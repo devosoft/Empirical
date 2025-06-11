@@ -1,15 +1,16 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2021
-*/
 /**
- *  @file
- *  @brief A simple mancala game state handler.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2021 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/games/Mancala.hpp
+ * @brief A simple mancala game state handler.
  */
 
-#ifndef EMP_GAMES_MANCALA_HPP_INCLUDE
-#define EMP_GAMES_MANCALA_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_GAMES_MANCALA_HPP_GUARD
+#define INCLUDE_EMP_GAMES_MANCALA_HPP_GUARD
 
 #include <fstream>
 #include <iomanip>
@@ -28,7 +29,7 @@ namespace emp {
   private:
     using side_t = emp::array<size_t, 7>;
 
-    side_t boardA;        // Current board state for side A.
+    side_t boardA;        // Current board state for sideA.
     side_t boardB;        // Current board state for side B.
     size_t turn_count;    // How many turns has this game been played?
     bool over = false;    // Has the game ended?

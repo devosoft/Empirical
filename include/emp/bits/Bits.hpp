@@ -1,53 +1,54 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2022-24
-*/
 /**
- *  @file
- *  @brief A generic bit-handler to replace vector<bool>, etc +additional bitwise logic features.
- *  @note Status: RELEASE
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2022-2024 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  The Bits template allows the user to recreate the functionality of std::vector<bool>,
- *  array<bool>, std::bitset, and other such bit-handling classes.
+ * @file include/emp/bits/Bits.hpp
+ * @brief A generic bit-handler to replace vector<bool>, etc +additional bitwise logic features.
+ * @note Status: RELEASE
  *
- *  This class stores an arbitrary number of bits in a set of "fields" (typically 32 bits or 64
- *  bits per field, depending on which should be faster.)  Individual bits can be extracted,
- *  -or- bitwise logic (including more complex bit magic) can be used on the groups of bits.
+ * The Bits template allows the user to recreate the functionality of std::vector<bool>,
+ * array<bool>, std::bitset, and other such bit-handling classes.
  *
- *  The template parameters are:
- *    DATA_T : How is memory managed?
- *    ZERO_LEFT : Should the index of zero be the left-most bit? (right-most if false)
+ * This class stores an arbitrary number of bits in a set of "fields" (typically 32 bits or 64
+ * bits per field, depending on which should be faster.)  Individual bits can be extracted,
+ * -or- bitwise logic (including more complex bit magic) can be used on the groups of bits.
  *
- *  Specializations are:
- *    BitVector       : A replacement for std::vector<bool> (index 0 is on left)
- *    BitValue        : Like BitVector, but index 0 is on the right
- *    StaticBitVector : Like Bitvector, but max size and fixed memory.
- *    StaticBitValue  : Like BitValue, but max size and fixed memory.
- *    BitArray        : A replacement for std::array<bool> (index 0 is on left)
- *    BitSet          : A replacement for std::bitset (index 0 is on right)
- *    DynamicBits     : A collection of bits that automatically resize when used.
+ * The template parameters are:
+ *   DATA_T : How is memory managed?
+ *   ZERO_LEFT : Should the index of zero be the left-most bit? (right-most if false)
  *
- *  In the case of replacements, the aim was for identical functionality, but many additional
- *  features, especially associated with bitwise logic operations.
+ * Specializations are:
+ *   BitVector       : A replacement for std::vector<bool> (index 0 is on left)
+ *   BitValue        : Like BitVector, but index 0 is on the right
+ *   StaticBitVector : Like Bitvector, but max size and fixed memory.
+ *   StaticBitValue  : Like BitValue, but max size and fixed memory.
+ *   BitArray        : A replacement for std::array<bool> (index 0 is on left)
+ *   BitSet          : A replacement for std::bitset (index 0 is on right)
+ *   DynamicBits     : A collection of bits that automatically resize when used.
  *
- *  @note Compile with -O3 and -msse4.2 for fast bit counting.
+ * In the case of replacements, the aim was for identical functionality, but many additional
+ * features, especially associated with bitwise logic operations.
+ *
+ * @note Compile with -O3 and -msse4.2 for fast bit counting.
  *
  *
- *  @todo Make sure that all operations check that both Bit groups are the same size, as needed.
- *  @todo Several functions have alternatives that ignore size; e.g., Include() rather than Set(),
- *        Has() instead of Get(), etc.  We should add more, such as Intersection() and Union()
- *        instead of & and |.
- *  @todo Do small BitVector optimization.  Currently we have number of bits (8 bytes) and a
- *        pointer to the memory for the bitset (another 8 bytes), but we could use those 16 bytes
- *        as 1 byte of size info followed by 15 bytes of bitset (120 bits!)
- *  @todo Consider moving ZERO_LEFT into Bits_Data so Bits can have a cleaner interface.
- *  @todo For large BitVectors we can use a factory to preserve/adjust bit info.  That should be
- *        just as efficient as a reserve, but without the need to store extra in-class info.
+ * @todo Make sure that all operations check that both Bit groups are the same size, as needed.
+ * @todo Several functions have alternatives that ignore size; e.g., Include() rather than Set(),
+ *       Has() instead of Get(), etc.  We should add more, such as Intersection() and Union()
+ *       instead of & and |.
+ * @todo Do small BitVector optimization.  Currently we have number of bits (8 bytes) and a
+ *       pointer to the memory for the bitset (another 8 bytes), but we could use those 16 bytes
+ *       as 1 byte of size info followed by 15 bytes of bitset (120 bits!)
+ * @todo Consider moving ZERO_LEFT into Bits_Data so Bits can have a cleaner interface.
+ * @todo For large BitVectors we can use a factory to preserve/adjust bit info.  That should be
+ *       just as efficient as a reserve, but without the need to store extra in-class info.
  */
 
-#ifndef EMP_BITS_BITS_HPP_INCLUDE
-#define EMP_BITS_BITS_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_BITS_BITS_HPP_GUARD
+#define INCLUDE_EMP_BITS_BITS_HPP_GUARD
 
 #include <bitset>
 #include <cstring>
@@ -2800,4 +2801,4 @@ namespace std {
 #endif // #ifndef EMP_BITS_BITS_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: zero'd ing msse
+// empecable_words: msse ing zero'd

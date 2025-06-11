@@ -1,19 +1,20 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2019
-*/
 /**
- *  @file
- *  @brief Element Widgets maintain an ordered collection of other widgets
- *  in a HTML element with any tag (e.g., div, footer, header, p, etc.)
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2019 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  When printed to the web page, these internal widgets are presented in order.
+ * @file include/emp/web/Element.hpp
+ * @brief Element Widgets maintain an ordered collection of other widgets
+ * in a HTML element with any tag (e.g., div, footer, header, p, etc.)
+ *
+ * When printed to the web page, these internal widgets are presented in order.
  *
  */
 
-#ifndef EMP_WEB_ELEMENT_HPP_INCLUDE
-#define EMP_WEB_ELEMENT_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_WEB_ELEMENT_HPP_GUARD
+#define INCLUDE_EMP_WEB_ELEMENT_HPP_GUARD
 
 
 #include "Animate.hpp"

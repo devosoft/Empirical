@@ -1,21 +1,22 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2017
-*/
 /**
- *  @file
- *  @brief Define simple shapes to draw on a canvas.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2015-2017 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  Canvas shapes can be defined in detail, describing how they modify a canvas.
+ * @file include/emp/web/CanvasShape.hpp
+ * @brief Define simple shapes to draw on a canvas.
  *
- *  Other, more specific actions defined here are:
- *    CanvasCircle
- *    CanvasRect
+ * Canvas shapes can be defined in detail, describing how they modify a canvas.
+ *
+ * Other, more specific actions defined here are:
+ *   CanvasCircle
+ *   CanvasRect
  */
 
-#ifndef EMP_WEB_CANVASSHAPE_HPP_INCLUDE
-#define EMP_WEB_CANVASSHAPE_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_WEB_CANVAS_SHAPE_HPP_GUARD
+#define INCLUDE_EMP_WEB_CANVAS_SHAPE_HPP_GUARD
 
 #include <stddef.h>
 #include <string>

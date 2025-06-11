@@ -1,43 +1,44 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2024.
-*/
 /**
- *  @file
- *  @brief Basic regular expression handler.
- *  @note Status: BETA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2024 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  A fully (well, mostly) functional regular expression processor.
+ * @file include/emp/in_progress/RegEx-devel.hpp
+ * @brief Basic regular expression handler.
+ * @note Status: BETA
  *
- *  Special chars:
- *   '|'          - or
- *   '*'          - zero or more of previous
- *   '+'          - one or more of previous
- *   '?'          - previous is optional
- *   '.'          - Match any character except \n
+ * A fully (well, mostly) functional regular expression processor.
  *
- *  Plus the following group contents (and change may translation rules)
- *   '(' and ')'  - group contents
- *   '"'          - Ignore special characters in contents (quotes still need to be escaped)
- *   '[' and ']'  - character set -- choose ONE character
- *                  '^' as first char negates contents
- *                  '-' indicates range UNLESS first or last.
+ * Special chars:
+ *  '|'          - or
+ *  '*'          - zero or more of previous
+ *  '+'          - one or more of previous
+ *  '?'          - previous is optional
+ *  '.'          - Match any character except \n
  *
- *  Additional overloads for functions in lexer_utils.h:
+ * Plus the following group contents (and change may translation rules)
+ *  '(' and ')'  - group contents
+ *  '"'          - Ignore special characters in contents (quotes still need to be escaped)
+ *  '[' and ']'  - character set -- choose ONE character
+ *                 '^' as first char negates contents
+ *                 '-' indicates range UNLESS first or last.
  *
- *    static NFA to_NFA(const RegEx & regex, int stop_id=1);
- *    static DFA to_DFA(const RegEx & regex);
+ * Additional overloads for functions in lexer_utils.h:
+ *
+ *   static NFA to_NFA(const RegEx & regex, int stop_id=1);
+ *   static DFA to_DFA(const RegEx & regex);
  *
  *
- *  @todo Implement  ^ and $ (beginning and end of line)
- *  @todo Implement {n}, {n,} and {n,m} (exactly n, at least n, and n-m copies, respectively)
- *  @todo Consider a separator (maybe backtick?) to divide up a regex expression;
- *        the result can be returned by each section as a vector of strings.
+ * @todo Implement  ^ and $ (beginning and end of line)
+ * @todo Implement {n}, {n,} and {n,m} (exactly n, at least n, and n-m copies, respectively)
+ * @todo Consider a separator (maybe backtick?) to divide up a regex expression;
+ *       the result can be returned by each section as a vector of strings.
  */
 
-#ifndef EMP_COMPILER_REGEX_HPP_INCLUDE
-#define EMP_COMPILER_REGEX_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_IN_PROGRESS_REG_EX_DEVEL_HPP_GUARD
+#define INCLUDE_EMP_IN_PROGRESS_REG_EX_DEVEL_HPP_GUARD
 
 
 #include <algorithm>
@@ -1061,4 +1062,4 @@ namespace emp {
 #endif // #ifndef EMP_COMPILER_REGEX_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: re's disjoin mergeable
+// empecable_words: mergeable disjoin re's

@@ -1,27 +1,28 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2018
-*/
 /**
- *  @file
- *  @brief Manage an entire document.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2015-2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  The Document class is built off of Div, but initializes the EMP web framework, if
- *  needed, and activates itself.  It also provides quick ways to add and lookup
- *  widgets.
+ * @file include/emp/web/Document.hpp
+ * @brief Manage an entire document.
  *
- *  For example, you can use doc.AddButton(...) to add a new button to the document,
- *  where the ... can be any of the mechanisms to build a new button.  This technique
- *  works for any widget type.
+ * The Document class is built off of Div, but initializes the EMP web framework, if
+ * needed, and activates itself.  It also provides quick ways to add and lookup
+ * widgets.
  *
- *  You can also look up any widget by name.  For example, if you previously created a
- *  Canvas widget with the HTML id "my_canvas", you can look it up later by using
- *  doc.Canvas("my_canvas")
+ * For example, you can use doc.AddButton(...) to add a new button to the document,
+ * where the ... can be any of the mechanisms to build a new button.  This technique
+ * works for any widget type.
+ *
+ * You can also look up any widget by name.  For example, if you previously created a
+ * Canvas widget with the HTML id "my_canvas", you can look it up later by using
+ * doc.Canvas("my_canvas")
  */
 
-#ifndef EMP_WEB_DOCUMENT_HPP_INCLUDE
-#define EMP_WEB_DOCUMENT_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_WEB_DOCUMENT_HPP_GUARD
+#define INCLUDE_EMP_WEB_DOCUMENT_HPP_GUARD
 
 #include "events.hpp"
 

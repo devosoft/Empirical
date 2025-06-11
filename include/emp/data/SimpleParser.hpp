@@ -1,27 +1,28 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2021-2024
-*/
 /**
- *  @file
- *  @brief Parser to convert function descriptions to lambdas using maps for variable lookup.
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2021-2024 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  A fully functional parser that will convert a string-description of a function to a C++
- *  lambda.  A map-typed object should be passed in to provide values associated with variables.
- *  Allowed map types include std::map<emp::String,T>, std::unordered_map<emp::String,T>,
- *  emp::DataMap, and (soon) derivations from emp::AnnotatedType.  For standard maps, T must be
- *  convertible to emp::Datum.
+ * @file include/emp/data/SimpleParser.hpp
+ * @brief Parser to convert function descriptions to lambdas using maps for variable lookup.
+ * @note Status: ALPHA
  *
- *  Developer TODO:
- *  - Setup operator RegEx to be built dynamically
- *  - Setup LVALUES as a type, and allow assignment
- *  - Allow types other than Datum (string and double)?
+ * A fully functional parser that will convert a string-description of a function to a C++
+ * lambda.  A map-typed object should be passed in to provide values associated with variables.
+ * Allowed map types include std::map<emp::String,T>, std::unordered_map<emp::String,T>,
+ * emp::DataMap, and (soon) derivations from emp::AnnotatedType.  For standard maps, T must be
+ * convertible to emp::Datum.
+ *
+ * Developer TODO:
+ * - Setup operator RegEx to be built dynamically
+ * - Setup LVALUES as a type, and allow assignment
+ * - Allow types other than Datum (string and double)?
  */
 
-#ifndef EMP_DATA_SIMPLEPARSER_HPP_INCLUDE
-#define EMP_DATA_SIMPLEPARSER_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_DATA_SIMPLE_PARSER_HPP_GUARD
+#define INCLUDE_EMP_DATA_SIMPLE_PARSER_HPP_GUARD
 
 #include <cmath>
 #include <map>

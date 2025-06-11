@@ -1,16 +1,17 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2020.
-*/
 /**
- *  @file
- *  @brief A collection of tools to help measure timing of code.
- *  @note Status: BETA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2020 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/tools/timing.hpp
+ * @brief A collection of tools to help measure timing of code.
+ * @note Status: BETA
  */
 
-#ifndef EMP_TOOLS_TIMING_HPP_INCLUDE
-#define EMP_TOOLS_TIMING_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_TOOLS_TIMING_HPP_GUARD
+#define INCLUDE_EMP_TOOLS_TIMING_HPP_GUARD
 
 #include <ctime>
 #include <functional>

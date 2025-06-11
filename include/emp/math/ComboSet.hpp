@@ -1,17 +1,18 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2024.
-*/
 /**
- *  @file
- *  @brief Tools to step through combinations of items where size is known a compile time.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2024 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  Step through all combinations of size K from a set of N values.
+ * @file include/emp/math/ComboSet.hpp
+ * @brief Tools to step through combinations of items where size is known a compile time.
+ *
+ * Step through all combinations of size K from a set of N values.
  */
 
-#ifndef EMP_MATH_COMBO_SET_HPP_INCLUDE
-#define EMP_MATH_COMBO_SET_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_MATH_COMBO_SET_HPP_GUARD
+#define INCLUDE_EMP_MATH_COMBO_SET_HPP_GUARD
 
 #include <iostream>
 #include <stddef.h>

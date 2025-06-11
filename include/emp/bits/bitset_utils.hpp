@@ -1,16 +1,17 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2023.
-*/
 /**
- *  @file
- *  @brief A set of simple functions to manipulate bitsets.
- *  @note Status: BETA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2023 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/bits/bitset_utils.hpp
+ * @brief A set of simple functions to manipulate bitsets.
+ * @note Status: BETA
  */
 
-#ifndef EMP_BITS_BITSET_UTILS_HPP_INCLUDE
-#define EMP_BITS_BITSET_UTILS_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_BITS_BITSET_UTILS_HPP_GUARD
+#define INCLUDE_EMP_BITS_BITSET_UTILS_HPP_GUARD
 
 #include <algorithm>
 #include <cstdint>       // uint8_t, uint16_t, etc.

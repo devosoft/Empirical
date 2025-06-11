@@ -1,18 +1,19 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2020-2021.
-*/
 /**
- *  @file
- *  @brief The StreamManager object links names to files or other streams.
- *  @note  Status: BETA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2020-2021 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  @todo  Ideally should also work with emp::File
+ * @file include/emp/io/StreamManager.hpp
+ * @brief The StreamManager object links names to files or other streams.
+ * @note  Status: BETA
+ *
+ * @todo  Ideally should also work with emp::File
  */
 
-#ifndef EMP_IO_STREAMMANAGER_HPP_INCLUDE
-#define EMP_IO_STREAMMANAGER_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_IO_STREAM_MANAGER_HPP_GUARD
+#define INCLUDE_EMP_IO_STREAM_MANAGER_HPP_GUARD
 
 
 #include <fstream>

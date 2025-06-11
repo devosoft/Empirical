@@ -1,11 +1,10 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2018.
-*/
 /**
- *  @file
- *  @brief Define Initialize() and other functions to set up Empirical to build Emscripten projects.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2015-2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/web/init.hpp
+ * @brief Define Initialize() and other functions to set up Empirical to build Emscripten projects.
  *
  * Init.hpp should always be included if you are compiling Empirical's web tools with Emscripten. It
  * handles making sure that behind the scenes stuff is all set up properly. It also defines some
@@ -14,8 +13,10 @@
  * for avoiding confusion in linters and IDEs.
  */
 
-#ifndef EMP_WEB_INIT_HPP_INCLUDE
-#define EMP_WEB_INIT_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_WEB_INIT_HPP_GUARD
+#define INCLUDE_EMP_WEB_INIT_HPP_GUARD
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS // This file is just going to confuse doxygen
 
@@ -239,4 +240,4 @@ namespace emp {
 #endif // #ifndef EMP_WEB_INIT_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: lolwat globalthis mathiasbynens bitmaprenderer moz
+// empecable_words: moz bitmaprenderer mathiasbynens globalthis lolwat

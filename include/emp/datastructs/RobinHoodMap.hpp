@@ -1,16 +1,17 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2025
-*/
 /**
- *  @file
- *  @brief Robin Hood hashing - minimize how "wrong" a position can be in a hash table.
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2025 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/datastructs/RobinHoodMap.hpp
+ * @brief Robin Hood hashing - minimize how "wrong" a position can be in a hash table.
+ * @note Status: ALPHA
  */
 
-#ifndef EMP_DATASTRUCTS_ROBIN_HOOD_MAP_HPP_INCLUDE
-#define EMP_DATASTRUCTS_ROBIN_HOOD_MAP_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_DATASTRUCTS_ROBIN_HOOD_MAP_HPP_GUARD
+#define INCLUDE_EMP_DATASTRUCTS_ROBIN_HOOD_MAP_HPP_GUARD
 
 #include "../base/vector.hpp"
 

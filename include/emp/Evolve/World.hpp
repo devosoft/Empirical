@@ -1,30 +1,30 @@
-/*
-
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2017-2025.
-*/
 /**
- *  @file
- *  @brief Definition of a base class for a World template for use in evolutionary algorithms.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2017-2025 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  A definition of the emp::World template, linking in specialized file handling, iterators,
- *  and selection techniques for evolutionary computation applications.
+ * @file include/emp/Evolve/World.hpp
+ * @brief Definition of a base class for a World template for use in evolutionary algorithms.
+ *
+ * A definition of the emp::World template, linking in specialized file handling, iterators,
+ * and selection techniques for evolutionary computation applications.
  *
  *
- *  @todo Make sure when mutations occur before placement into the population we can control
- *        whether or not they also affect injected organisms.  (Right now they always do!!)
- *  @todo We should Specialize World so that ANOTHER world can be used as an ORG, with proper
- *        delegation to facilitate demes, pools, islands, etc.
- *  @todo Add a signal for DoBirth() for when a birth fails.
- *  @todo Add a signal for population Reset() (and possibly Clear?)
- *  @todo Add a feature to maintain population sorted by each phenotypic trait.  This will allow
- *        us to more rapidly find phenotypic neighbors and know the current extremes for each
- *        phenotype.
+ * @todo Make sure when mutations occur before placement into the population we can control
+ *       whether or not they also affect injected organisms.  (Right now they always do!!)
+ * @todo We should Specialize World so that ANOTHER world can be used as an ORG, with proper
+ *       delegation to facilitate demes, pools, islands, etc.
+ * @todo Add a signal for DoBirth() for when a birth fails.
+ * @todo Add a signal for population Reset() (and possibly Clear?)
+ * @todo Add a feature to maintain population sorted by each phenotypic trait.  This will allow
+ *       us to more rapidly find phenotypic neighbors and know the current extremes for each
+ *       phenotype.
  */
 
-#ifndef EMP_EVOLVE_WORLD_HPP_INCLUDE
-#define EMP_EVOLVE_WORLD_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_EVOLVE_WORLD_HPP_GUARD
+#define INCLUDE_EMP_EVOLVE_WORLD_HPP_GUARD
 
 #include <functional>
 #include <map>

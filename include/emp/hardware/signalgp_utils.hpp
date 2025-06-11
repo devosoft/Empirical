@@ -1,17 +1,18 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2018-2022
-*/
 /**
- *  @file
- *  @brief Helper functions for working with SignalGP virtual hardware/programs.
- *  @todo Mutator class
- *  @todo tests
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2018-2022 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/hardware/signalgp_utils.hpp
+ * @brief Helper functions for working with SignalGP virtual hardware/programs.
+ * @todo Mutator class
+ * @todo tests
  */
 
-#ifndef EMP_HARDWARE_SIGNALGP_UTILS_HPP_INCLUDE
-#define EMP_HARDWARE_SIGNALGP_UTILS_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_HARDWARE_SIGNALGP_UTILS_HPP_GUARD
+#define INCLUDE_EMP_HARDWARE_SIGNALGP_UTILS_HPP_GUARD
 
 #include <algorithm>
 #include <cstdint>
@@ -758,4 +759,4 @@ namespace emp {
 #endif // #ifndef EMP_HARDWARE_SIGNALGP_UTILS_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: rhead dels locs amlalejini cnt uset rnd
+// empecable_words: rhead cnt dels locs amlalejini signalgp uset rnd

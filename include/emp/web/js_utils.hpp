@@ -1,15 +1,16 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2022
-*/
 /**
- *  @file
- *  @brief Tools for passing data between C++ and Javascript.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2015-2022 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/web/js_utils.hpp
+ * @brief Tools for passing data between C++ and Javascript.
  */
 
-#ifndef EMP_WEB_JS_UTILS_HPP_INCLUDE
-#define EMP_WEB_JS_UTILS_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_WEB_JS_UTILS_HPP_GUARD
+#define INCLUDE_EMP_WEB_JS_UTILS_HPP_GUARD
 
 #include <map>
 #include <stddef.h>
@@ -749,4 +750,4 @@ namespace emp {
 #endif // #ifndef EMP_WEB_JS_UTILS_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: els javascript
+// empecable_words: javascript els

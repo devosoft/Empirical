@@ -1,19 +1,20 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2022.
-*/
 /**
- *  @file
- *  @brief A simple class to weight items differently within a container and return the correct index.
- *  @note Status: BETA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2015-2022 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  @todo Convert to a template that acts as a glorified vector, simplifying random selection?
- *  @todo Should operator[] index by element count or by weight?
+ * @file include/emp/datastructs/UnorderedIndexMap.hpp
+ * @brief A simple class to weight items differently within a container and return the correct index.
+ * @note Status: BETA
+ *
+ * @todo Convert to a template that acts as a glorified vector, simplifying random selection?
+ * @todo Should operator[] index by element count or by weight?
  */
 
-#ifndef EMP_DATASTRUCTS_UNORDEREDINDEXMAP_HPP_INCLUDE
-#define EMP_DATASTRUCTS_UNORDEREDINDEXMAP_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_DATASTRUCTS_UNORDERED_INDEX_MAP_HPP_GUARD
+#define INCLUDE_EMP_DATASTRUCTS_UNORDERED_INDEX_MAP_HPP_GUARD
 
 #include <stddef.h>
 

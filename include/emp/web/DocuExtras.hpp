@@ -1,17 +1,18 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2019
-*/
 /**
- *  @file
- *  @brief Control the styling and attributes of an existing div without nuking
-*   the content inside it.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2015-2019 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/web/DocuExtras.hpp
+ * @brief Control the styling and attributes of an existing div without nuking
+ * the content inside it.
  *
  */
 
-#ifndef EMP_WEB_DOCUEXTRAS_HPP_INCLUDE
-#define EMP_WEB_DOCUEXTRAS_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_WEB_DOCU_EXTRAS_HPP_GUARD
+#define INCLUDE_EMP_WEB_DOCU_EXTRAS_HPP_GUARD
 
 #include "Animate.hpp"
 #include "Text.hpp"

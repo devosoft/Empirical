@@ -1,33 +1,34 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2020.
-*/
 /**
- *  @file
- *  @brief A more dynamic replacement for standard library asserts.
- *  Status: RELEASE
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2020 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  A replacement for the system-level assert.h, called "emp_assert"
- *  Added functionality:
- *   - If compiled with Emscripten, will provide pop-up alerts in a web browser.
- *   - emp_assert can take additional arguments.  If the assert is triggered, those extra
- *     arguments will be evaluated and printed.
- *   - if NDEBUG -or- EMP_NDEBUG is defined, the expression in emp_assert() is not evaluated.
- *   - if EMP_TDEBUG is defined, emp_assert() goes into test mode and records failures, but
- *     does not abort.  (useful for unit tests of asserts)
+ * @file include/emp/base/assert.hpp
+ * @brief A more dynamic replacement for standard library asserts.
+ * Status: RELEASE
  *
- *  Example:
+ * A replacement for the system-level assert.h, called "emp_assert"
+ * Added functionality:
+ *  - If compiled with Emscripten, will provide pop-up alerts in a web browser.
+ *  - emp_assert can take additional arguments.  If the assert is triggered, those extra
+ *    arguments will be evaluated and printed.
+ *  - if NDEBUG -or- EMP_NDEBUG is defined, the expression in emp_assert() is not evaluated.
+ *  - if EMP_TDEBUG is defined, emp_assert() goes into test mode and records failures, but
+ *    does not abort.  (useful for unit tests of asserts)
  *
- *     int a = 6;
- *     emp_assert(a==5, a);
+ * Example:
  *
- *  When compiled in debug mode (i.e. without the -DNDEBUG flag), this will
- *  trigger an assertion error and print the value of a.
+ *    int a = 6;
+ *    emp_assert(a==5, a);
+ *
+ * When compiled in debug mode (i.e. without the -DNDEBUG flag), this will
+ * trigger an assertion error and print the value of a.
  */
 
-#ifndef EMP_BASE_ASSERT_HPP_INCLUDE
-#define EMP_BASE_ASSERT_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_BASE_ASSERT_HPP_GUARD
+#define INCLUDE_EMP_BASE_ASSERT_HPP_GUARD
 
 #include "always_assert.hpp"
 

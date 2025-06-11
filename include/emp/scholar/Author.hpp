@@ -1,21 +1,22 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2017
-*/
 /**
- *  @file
- *  @brief Basic information about an author.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2017 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  Developer notes:
- *    * Prefixes (Dr., Prof., etc) and Suffixes (Jr., Sr., III, etc.) should be allowed.
- *    * Most parts of names can be auto-detected.
- *    * GetName() (with formatting) needs to be implemented (notes below)
- *    * Consider using ce_string for inputs?  And making other aspects const expression?
+ * @file include/emp/scholar/Author.hpp
+ * @brief Basic information about an author.
+ *
+ * Developer notes:
+ *   * Prefixes (Dr., Prof., etc) and Suffixes (Jr., Sr., III, etc.) should be allowed.
+ *   * Most parts of names can be auto-detected.
+ *   * GetName() (with formatting) needs to be implemented (notes below)
+ *   * Consider using ce_string for inputs?  And making other aspects const expression?
  */
 
-#ifndef EMP_SCHOLAR_AUTHOR_HPP_INCLUDE
-#define EMP_SCHOLAR_AUTHOR_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_SCHOLAR_AUTHOR_HPP_GUARD
+#define INCLUDE_EMP_SCHOLAR_AUTHOR_HPP_GUARD
 
 #include <stddef.h>
 #include <string>
@@ -181,4 +182,4 @@ namespace emp {
 #endif // #ifndef EMP_SCHOLAR_AUTHOR_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: fml inits lfml
+// empecable_words: lfml inits fml

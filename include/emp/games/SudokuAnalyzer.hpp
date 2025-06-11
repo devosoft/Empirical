@@ -1,19 +1,20 @@
-/*
-
- *  @note This file is part of MABE, https://github.com/mercere99/MABE2
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2024.
+/**
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2024 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  @file
- *  @brief  Analyzes a sudoku instance to determine the solving experience for a human player.
+ * @file include/emp/games/SudokuAnalyzer.hpp
+ * @brief Analyzes a sudoku instance to determine the solving experience for a human player.
  *
- *  DEVELOPER NOTES:
- *   For the moment, we will assume that all boards are 9x9 with a standard Sudoku layout.
- *   In the future, we should make the board configuration more flexible.
-*/
+ * DEVELOPER NOTES:
+ *  For the moment, we will assume that all boards are 9x9 with a standard Sudoku layout.
+ *  In the future, we should make the board configuration more flexible.
+ */
 
-#ifndef EMP_GAMES_SUDOKU_ANALYZER_HPP
-#define EMP_GAMES_SUDOKU_ANALYZER_HPP
+#pragma once
+
+#ifndef INCLUDE_EMP_GAMES_SUDOKU_ANALYZER_HPP_GUARD
+#define INCLUDE_EMP_GAMES_SUDOKU_ANALYZER_HPP_GUARD
 
 #include <array>
 #include <fstream>

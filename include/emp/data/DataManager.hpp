@@ -1,15 +1,16 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2017-2018
-*/
 /**
- *  @file
- *  @brief DataManager handles a set of DataNode objects with the same tracking settings.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2017-2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/data/DataManager.hpp
+ * @brief DataManager handles a set of DataNode objects with the same tracking settings.
  */
 
-#ifndef EMP_DATA_DATAMANAGER_HPP_INCLUDE
-#define EMP_DATA_DATAMANAGER_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_DATA_DATA_MANAGER_HPP_GUARD
+#define INCLUDE_EMP_DATA_DATA_MANAGER_HPP_GUARD
 
 #include <map>
 #include <stddef.h>

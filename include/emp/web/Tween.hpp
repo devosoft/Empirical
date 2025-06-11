@@ -1,37 +1,38 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2017
-*/
 /**
- *  @file
- *  @brief A Tween manages the gradual shift in properties of one or more widgets over time.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2015-2017 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  To create a Tween, a duration must be specified, along with an optional default
- *  target.  Once a Tween is setup, paths can be added to it, which represent the
- *  changes that should occur over the specified duration.
+ * @file include/emp/web/Tween.hpp
+ * @brief A Tween manages the gradual shift in properties of one or more widgets over time.
  *
- *  A path can be a function to call (with the 0.0 to 1.0 fraction of the time that's
- *  gone by) or a variable to set to the current fraction.  Dependants can also be set
- *  to refresh with each Tween update.
+ * To create a Tween, a duration must be specified, along with an optional default
+ * target.  Once a Tween is setup, paths can be added to it, which represent the
+ * changes that should occur over the specified duration.
  *
- *  Available methods include:
- *   Tween & AddPath(std::function<void(double)> set_fun,
- *                   double start_val, double end_val, std::function<double(double)> timing=LINEAR);
- *   Tween & AddPath(double & set_var,
- *                   double start_val, double end_val, std::function<double(double)> timing=LINEAR);
- *   Tween & AddDependant(Widget w);
- *   void Start();
- *   void Stop();
+ * A path can be a function to call (with the 0.0 to 1.0 fraction of the time that's
+ * gone by) or a variable to set to the current fraction.  Dependants can also be set
+ * to refresh with each Tween update.
+ *
+ * Available methods include:
+ *  Tween & AddPath(std::function<void(double)> set_fun,
+ *                  double start_val, double end_val, std::function<double(double)> timing=LINEAR);
+ *  Tween & AddPath(double & set_var,
+ *                  double start_val, double end_val, std::function<double(double)> timing=LINEAR);
+ *  Tween & AddDependant(Widget w);
+ *  void Start();
+ *  void Stop();
  *
  *
- *  @todo Need to setup an AddPath that actually uses widgets and properties (stub in place).
- *  @todo Need a Reverse(), which swaps start and end positions.
- *  @todo Need a Reset()
+ * @todo Need to setup an AddPath that actually uses widgets and properties (stub in place).
+ * @todo Need a Reverse(), which swaps start and end positions.
+ * @todo Need a Reset()
  */
 
-#ifndef EMP_WEB_TWEEN_HPP_INCLUDE
-#define EMP_WEB_TWEEN_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_WEB_TWEEN_HPP_GUARD
+#define INCLUDE_EMP_WEB_TWEEN_HPP_GUARD
 
 #include <stddef.h>
 

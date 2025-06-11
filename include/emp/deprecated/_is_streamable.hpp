@@ -1,17 +1,18 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2020.
-*/
 /**
- *  @file
- *  @brief Test at compile time whether a type can be streamed.
- *  @note This header is for internal use to preserve levelization.
- *  Include meta/type_traits.hpp to use is_streamable.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2020 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/deprecated/_is_streamable.hpp
+ * @brief Test at compile time whether a type can be streamed.
+ * @note This header is for internal use to preserve levelization.
+ * Include meta/type_traits.hpp to use is_streamable.
  */
 
-#ifndef EMP_BASE__IS_STREAMABLE_HPP_INCLUDE
-#define EMP_BASE__IS_STREAMABLE_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_DEPRECATED_IS_STREAMABLE_HPP_GUARD
+#define INCLUDE_EMP_DEPRECATED_IS_STREAMABLE_HPP_GUARD
 
 namespace emp {
 

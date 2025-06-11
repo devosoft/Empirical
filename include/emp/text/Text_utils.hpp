@@ -1,16 +1,18 @@
 /**
- *  @note This file is part of Empirical, https://github.com/devosoft/Empirical
- *  @copyright Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  @date 2024
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2024 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  @file Text_utils.hpp
- *  @brief Helper functions for building Text objects with different encodings.
- *  @note Status: ALPHA
+ * @file include/emp/text/Text_utils.hpp
+ * @brief Helper functions for building Text objects with different encodings.
+ * @note Status: ALPHA
  *
  */
 
-#ifndef EMP_TEXT_TEXT_UTILS_HPP_INCLUDE
-#define EMP_TEXT_TEXT_UTILS_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_TEXT_TEXT_UTILS_HPP_GUARD
+#define INCLUDE_EMP_TEXT_TEXT_UTILS_HPP_GUARD
 
 #include <map>
 #include <type_traits>
@@ -482,4 +484,4 @@ namespace emp {
 #endif // #ifndef EMP_TEXT_TEXT_UTILS_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: rfloor otimes oplus nsub equiv congurent ang radic lowast isin nabla forall crarr harr darr rarr permil sbquo rsquo ndash lrm infin zwj rceil zwnj larr upsih thetasym circ uarr fnof notin mdash longfs hellip emsp zcaron zdot zacute diaeres ycirc uogon uring ubreve wcirc tstrok scedil scirc eth abreve ncedil rcaron rcedil udblac racute napos obreve ncaron oelig lcaron lcedil diams tcaron lacute eng rlm kcedil jcirc ijlig sigmaf imath imacr itilde ucirc hstrok dcaron gdot gbreve rdquo ecaron omacr sacute eogon ccirc ebreve lceil ldquo caron loz ccaron ogonek plusmn oslash oline yuml amacr cacute lsaquo eacute lfloor aelig gcedil cdot sdot brvbar uml lmidot nacute asymp yacute ouml ecirc bdquo uacute aogon ugrave otilde kgreen thinsp tcedil jlig ocirc oacute odblac cong igrave laquo elig icirc emacr umacr scaron ibreve ntilde atilde iacute szlig perp aring sube acirc idot curren edot auml iquest egrave ensp gcirc ordf aacute iogon agrave utilde ccedil kra iuml euml piv dstrok cedil raquo hcirc ograve lstrok supe ordm rsaquo uuml mille macr lsquo deg iexcl
+// empecable_words: iexcl deg lsquo macr mille uuml rsaquo ordm supe lstrok ograve hcirc raquo cedil dstrok piv euml iuml kra ccedil utilde agrave iogon aacute ordf gcirc ensp egrave iquest auml edot curren idot acirc sube aring perp szlig iacute atilde ntilde ibreve scaron umacr emacr icirc elig laquo igrave cong odblac oacute ocirc jlig tcedil thinsp kgreen otilde ugrave aogon uacute bdquo ecirc ouml yacute asymp nacute lmidot uml brvbar sdot cdot gcedil aelig lfloor eacute lsaquo cacute oline yuml amacr plusmn oslash ogonek ccaron loz ldquo caron lceil eogon omacr sacute rdquo ecaron gbreve dcaron gdot hstrok ucirc itilde imacr sigmaf imath ijlig kcedil rlm diams lacute tcaron lcedil napos obreve racute udblac rcedil oelig rcaron ncedil abreve eth scirc permil uring uogon upsih larr ycirc diaeres ndash wcirc tstrok zacute notin longfs mdash jcirc uarr fnof ebreve ccirc radic zcaron hellip emsp thetasym eng scedil rfloor ncaron rsquo infin zwj sbquo ubreve otimes darr harr crarr circ zwnj rceil nsub congurent lowast zdot lcaron rarr isin ang equiv lrm forall nabla oplus

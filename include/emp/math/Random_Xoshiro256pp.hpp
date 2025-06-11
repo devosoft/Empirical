@@ -1,16 +1,17 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2025
-*/
 /**
- *  @file
- *  @brief A high-quality and fast pseudo-random-number generator engine.
- *  Status: RELEASE
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2025 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/math/Random_Xoshiro256pp.hpp
+ * @brief A high-quality and fast pseudo-random-number generator engine.
+ * Status: RELEASE
  */
 
-#ifndef EMP_MATH_RANDOM_XOSHIRO256PP_HPP_INCLUDE
-#define EMP_MATH_RANDOM_XOSHIRO256PP_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_MATH_RANDOM_XOSHIRO256PP_HPP_GUARD
+#define INCLUDE_EMP_MATH_RANDOM_XOSHIRO256PP_HPP_GUARD
 
 #include "../base/array.hpp"
 #include "../base/assert.hpp"
@@ -18,7 +19,7 @@
 namespace emp {
 
   // The xoshiro256++ PRNG engine is based on XOR shifts, rotations, and simple arithmetic.
-  // In: PRNGs by Blackman & Vigna
+  // Described in: PRNGs by Blackman & Vigna
   struct Random_Xoshiro256pp {
     emp::array<uint64_t, 4> state;  // Internal state for RNG
 
@@ -70,4 +71,4 @@ namespace emp {
 #endif // #ifndef EMP_MATH_RANDOM_XOSHIRO256PP_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: splitmix Vigna Blackman xoshiro
+// empecable_words: xoshiro Blackman Vigna splitmix

@@ -1,17 +1,18 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2019-2022
-*/
 /**
- *  @file
- *  @brief A managed set of Bytes to store any kind of data.
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2019-2022 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/data/MemoryImage.hpp
+ * @brief A managed set of Bytes to store any kind of data.
+ * @note Status: ALPHA
  *
  */
 
-#ifndef EMP_DATA_MEMORYIMAGE_HPP_INCLUDE
-#define EMP_DATA_MEMORYIMAGE_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_DATA_MEMORY_IMAGE_HPP_GUARD
+#define INCLUDE_EMP_DATA_MEMORY_IMAGE_HPP_GUARD
 
 #include <cstring>        // For std::memcpy
 #include <new>            // For placement new

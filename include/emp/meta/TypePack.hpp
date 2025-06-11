@@ -1,74 +1,75 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2021.
-*/
 /**
- *  @file
- *  @brief A set of types that can be manipulated at compile time (good for metaprogramming)
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2021 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  TypePacks are static structures that provide a large set of mechanisms to access and adjust
- *  the included types.
+ * @file include/emp/meta/TypePack.hpp
+ * @brief A set of types that can be manipulated at compile time (good for metaprogramming)
  *
- *  To create a TypePack, just pass in zero or more types into the TypePack template.
+ * TypePacks are static structures that provide a large set of mechanisms to access and adjust
+ * the included types.
  *
- *    using my_pack = emp::TypePack<int, std::string, double>;
+ * To create a TypePack, just pass in zero or more types into the TypePack template.
  *
- *  After manipulations, you can apply a type pack using the apply<> member template.  E.g.,
+ *   using my_pack = emp::TypePack<int, std::string, double>;
  *
- *    my_pack::resize<5,char>::reverse::apply<std::tuple> my_tuple;
+ * After manipulations, you can apply a type pack using the apply<> member template.  E.g.,
  *
- *  ...would create a variable of type std::tuple<char, char, double, std::string, int>.
+ *   my_pack::resize<5,char>::reverse::apply<std::tuple> my_tuple;
  *
- *
- *  Member functions include (all of which are constexpr):
- *    Has<T>()           - Return true/false: Is T is part of the pack?
- *    Count<T>()         - Return number of times T is in the pack.
- *    GetID<T>()         - Return first position of T in the pack, (or -1 if none).
- *    GetSize()          - Return total number of types in this pack.
- *    IsEmpty()          - Return true/false: Is this pack empty?
- *    IsUnique()         - Return true/false: are all types in pack are distinct?
- *
- *  Type accessors:
- *    get<POS>           - Type at position POS in the pack.
- *    first_t            - Type of first position in the pack.
- *    last_t             - Type of last position in the pack.
- *    select<Ps...>      - Create a new pack with types from selected positions.
- *
- *  Type manipulations:
- *    set<POS, T>        - Change type at position POS to T.
- *    push_front<Ts...>  - Add any number of types Ts to the front of the pack.
- *    push_back<Ts...>   - Add any number of types Ts to the back of the pack.
- *    pop                - Pack with first type missing.
- *    popN<N>            - Pack with first N types missing.
- *    shrink<N>          - Pack with ONLY first N types.
- *    resize<N,D>        - Resize pack to N types; if N greater than current size, pad with D.
- *    merge<P>           - Append all of pack P to the end of this pack.
- *    find_union<P>      - Join this pack to P, keeping only one of each type.
- *    find_intersect<P>  - Limit to only common types between this pack and P
- *    reverse            - Reverse the order of types in this pack.
- *    rotate             - Move the first type in pack to the end.
- *
- *  Applications:
- *    apply<T>           - Take template T and apply these types as its arguments.
- *    to_function_t<T>   - Convert to a function type, with return type T and arg types from pack.
- *    filter<FILTER>     - Keep only those types, T, that can legally form FILTER<T> and does not
- *                         have a FILTER<T>::value == false.
- *    filter_out<FILTER> - Remove those types, T, that can legally form FILTER<T> and do not have
- *                         a FILTER<T>::value == false.
- *    find<FILTER>       - Convert to first type, T, that can legally form FILTER<T> and does not
- *                         have a FILTER<T>::value == false.
- *    remove_t<T>        - Remove type T from anywhere in the pack.
- *    make_unique        - Remove all type duplications.
- *    wrap<WRAPPER>      - Convert to TypePack where all members are run through WRAPPER
+ * ...would create a variable of type std::tuple<char, char, double, std::string, int>.
  *
  *
- *  Developer notes:
- *    - GetIDPack could return an ValPack of ALL ID's for a type that appears more than once.
+ * Member functions include (all of which are constexpr):
+ *   Has<T>()           - Return true/false: Is T is part of the pack?
+ *   Count<T>()         - Return number of times T is in the pack.
+ *   GetID<T>()         - Return first position of T in the pack, (or -1 if none).
+ *   GetSize()          - Return total number of types in this pack.
+ *   IsEmpty()          - Return true/false: Is this pack empty?
+ *   IsUnique()         - Return true/false: are all types in pack are distinct?
+ *
+ * Type accessors:
+ *   get<POS>           - Type at position POS in the pack.
+ *   first_t            - Type of first position in the pack.
+ *   last_t             - Type of last position in the pack.
+ *   select<Ps...>      - Create a new pack with types from selected positions.
+ *
+ * Type manipulations:
+ *   set<POS, T>        - Change type at position POS to T.
+ *   push_front<Ts...>  - Add any number of types Ts to the front of the pack.
+ *   push_back<Ts...>   - Add any number of types Ts to the back of the pack.
+ *   pop                - Pack with first type missing.
+ *   popN<N>            - Pack with first N types missing.
+ *   shrink<N>          - Pack with ONLY first N types.
+ *   resize<N,D>        - Resize pack to N types; if N greater than current size, pad with D.
+ *   merge<P>           - Append all of pack P to the end of this pack.
+ *   find_union<P>      - Join this pack to P, keeping only one of each type.
+ *   find_intersect<P>  - Limit to only common types between this pack and P
+ *   reverse            - Reverse the order of types in this pack.
+ *   rotate             - Move the first type in pack to the end.
+ *
+ * Applications:
+ *   apply<T>           - Take template T and apply these types as its arguments.
+ *   to_function_t<T>   - Convert to a function type, with return type T and arg types from pack.
+ *   filter<FILTER>     - Keep only those types, T, that can legally form FILTER<T> and does not
+ *                        have a FILTER<T>::value == false.
+ *   filter_out<FILTER> - Remove those types, T, that can legally form FILTER<T> and do not have
+ *                        a FILTER<T>::value == false.
+ *   find<FILTER>       - Convert to first type, T, that can legally form FILTER<T> and does not
+ *                        have a FILTER<T>::value == false.
+ *   remove_t<T>        - Remove type T from anywhere in the pack.
+ *   make_unique        - Remove all type duplications.
+ *   wrap<WRAPPER>      - Convert to TypePack where all members are run through WRAPPER
+ *
+ *
+ * Developer notes:
+ *   - GetIDPack could return an ValPack of ALL ID's for a type that appears more than once.
  */
 
-#ifndef EMP_META_TYPEPACK_HPP_INCLUDE
-#define EMP_META_TYPEPACK_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_META_TYPE_PACK_HPP_GUARD
+#define INCLUDE_EMP_META_TYPE_PACK_HPP_GUARD
 
 #include <stddef.h>
 

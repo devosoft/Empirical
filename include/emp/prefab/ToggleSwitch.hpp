@@ -1,15 +1,16 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2021
-*/
 /**
- *  @file
- *  @brief Wraps Bootstrap's toggle switch.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2021 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/prefab/ToggleSwitch.hpp
+ * @brief Wraps Bootstrap's toggle switch.
  */
 
-#ifndef EMP_PREFAB_TOGGLESWITCH_HPP_INCLUDE
-#define EMP_PREFAB_TOGGLESWITCH_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_PREFAB_TOGGLE_SWITCH_HPP_GUARD
+#define INCLUDE_EMP_PREFAB_TOGGLE_SWITCH_HPP_GUARD
 
 #include "../tools/string_utils.hpp"
 #include "../web/Element.hpp"
@@ -72,4 +73,4 @@ namespace prefab {
 #endif // #ifndef EMP_PREFAB_TOGGLESWITCH_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: usr Bootstrap's
+// empecable_words: Bootstrap's usr

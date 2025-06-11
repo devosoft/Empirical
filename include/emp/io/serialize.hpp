@@ -1,57 +1,58 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2021.
-*/
 /**
- *  @file
- *  @brief Tools to save and load data from classes.
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2015-2021 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  All of the important information about a class is stored in a DataPod, which can be
- *  used to restore the class at a later time.
+ * @file include/emp/io/serialize.hpp
+ * @brief Tools to save and load data from classes.
+ * @note Status: ALPHA
  *
- *  Why is this better than other serialization techniques?
- *  1. Only one line of code is added to a custom class to make it serializable.
- *  2. Serialized objects do not need a default constructor (a DataPod constructor is added)
- *  3. Serialized objects can be const since they get rebuilt during construction.
- *  4. Synergistic interactions with other EMP classes, such as config and tuple_struct
+ * All of the important information about a class is stored in a DataPod, which can be
+ * used to restore the class at a later time.
  *
- *  In order to setup a target class to be able to be serialized into a pod, you must
- *  add a macro to include the needed functionality.  For a basic class, use:
+ * Why is this better than other serialization techniques?
+ * 1. Only one line of code is added to a custom class to make it serializable.
+ * 2. Serialized objects do not need a default constructor (a DataPod constructor is added)
+ * 3. Serialized objects can be const since they get rebuilt during construction.
+ * 4. Synergistic interactions with other EMP classes, such as config and tuple_struct
  *
- *   EMP_SETUP_DATAPOD(ClassName, var1, var2, ...)
+ * In order to setup a target class to be able to be serialized into a pod, you must
+ * add a macro to include the needed functionality.  For a basic class, use:
  *
- *  Where ClassName is the target class' name and var1, var2, etc are the names of the
- *  member variables that also need to be stored.  Note that member variables can be
- *  either built-in types or custom types that have also had DataPods setup in them.
+ *  EMP_SETUP_DATAPOD(ClassName, var1, var2, ...)
  *
- *  If the target class is a derived class, you must use either:
+ * Where ClassName is the target class' name and var1, var2, etc are the names of the
+ * member variables that also need to be stored.  Note that member variables can be
+ * either built-in types or custom types that have also had DataPods setup in them.
  *
- *   EMP_SETUP_DATAPOD_D(ClassName, BassClassName, var1, var2, ...)
+ * If the target class is a derived class, you must use either:
  *
- *     -or-
+ *  EMP_SETUP_DATAPOD_D(ClassName, BassClassName, var1, var2, ...)
  *
- *   EMP_SETUP_DATAPOD_D2(ClassName, BassClass1Name, BaseClass2Name, var1, var2, ...)
+ *    -or-
  *
- *  ...depending on how many base classes it was derived from (currently max 2).
+ *  EMP_SETUP_DATAPOD_D2(ClassName, BassClass1Name, BaseClass2Name, var1, var2, ...)
  *
- *  Note also that this macro must either go in the public section of the target class
- *  definition, or the target class must be made a friend to the emp::serialize::DataPod
- *  class.
+ * ...depending on how many base classes it was derived from (currently max 2).
+ *
+ * Note also that this macro must either go in the public section of the target class
+ * definition, or the target class must be made a friend to the emp::serialize::DataPod
+ * class.
  *
  *
- *  @todo Build custom load/store function for more STL objects (especially containers)
- *  @todo To deal with pointers we should recurse, but keep map to new pointer locations.
- *  @todo Setup a more robust method for dealing with arbitrary strings so we don't have
- *        to worry about collisions in streams (JSon format??)
- *  @todo Setup a (compressed) binary save format in DataPods in addition to JSon.
- *  @todo Setup promised synergistic interactions with config and tuple_struct to auto
- *        store and load without any additional effort on the part of the library user.
+ * @todo Build custom load/store function for more STL objects (especially containers)
+ * @todo To deal with pointers we should recurse, but keep map to new pointer locations.
+ * @todo Setup a more robust method for dealing with arbitrary strings so we don't have
+ *       to worry about collisions in streams (JSon format??)
+ * @todo Setup a (compressed) binary save format in DataPods in addition to JSon.
+ * @todo Setup promised synergistic interactions with config and tuple_struct to auto
+ *       store and load without any additional effort on the part of the library user.
  */
 
-#ifndef EMP_IO_SERIALIZE_HPP_INCLUDE
-#define EMP_IO_SERIALIZE_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_IO_SERIALIZE_HPP_GUARD
+#define INCLUDE_EMP_IO_SERIALIZE_HPP_GUARD
 
 #include <cstdint>
 #include <iostream>

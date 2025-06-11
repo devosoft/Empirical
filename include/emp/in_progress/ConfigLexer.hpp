@@ -1,18 +1,19 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2018
-*/
 /**
- *  @file
- *  @brief A simple lexer for the Empirical configuration language.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  Development notes: Initially building the lexer to be language specific, but a
- *  more general lexer will be a good addition to Empirical.
+ * @file include/emp/in_progress/ConfigLexer.hpp
+ * @brief A simple lexer for the Empirical configuration language.
+ *
+ * Development notes: Initially building the lexer to be language specific, but a
+ * more general lexer will be a good addition to Empirical.
  */
 
-#ifndef EMP_IN_PROGRESS_CONFIGLEXER_HPP_INCLUDE
-#define EMP_IN_PROGRESS_CONFIGLEXER_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_IN_PROGRESS_CONFIG_LEXER_HPP_GUARD
+#define INCLUDE_EMP_IN_PROGRESS_CONFIG_LEXER_HPP_GUARD
 
 #include <iostream>
 #include <map>

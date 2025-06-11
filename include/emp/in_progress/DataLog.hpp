@@ -1,20 +1,20 @@
-/*
-
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2020
-*/
 /**
- *  @file
- *  @brief Tools for processing a single set of data.
- *  @note  Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2020 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  A DataLog takes in a continuous series of data and allows for easy analysis, both by
- *  performing calculations on those values and by outputting ascii histograms, etc.
+ * @file include/emp/in_progress/DataLog.hpp
+ * @brief Tools for processing a single set of data.
+ * @note  Status: ALPHA
+ *
+ * A DataLog takes in a continuous series of data and allows for easy analysis, both by
+ * performing calculations on those values and by outputting ascii histograms, etc.
  */
 
-#ifndef EMP_DATA_DATALOG_HPP_INCLUDE
-#define EMP_DATA_DATALOG_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_IN_PROGRESS_DATA_LOG_HPP_GUARD
+#define INCLUDE_EMP_IN_PROGRESS_DATA_LOG_HPP_GUARD
 
 #include <iostream>
 #include <ostream>

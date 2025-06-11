@@ -1,21 +1,22 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015
-*/
 /**
- *  @file
- *  @brief A comprehensive (ideally) fixed-point number representation.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2015 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  Type-name: emp::fixed
+ * @file include/emp/in_progress/fixed.hpp
+ * @brief A comprehensive (ideally) fixed-point number representation.
  *
- *  Representation: sign (1 bit), int value (21 bits), frac value (10 bits)
- *  Max value:  2097151.999
- *  Min value: -2097152.999 (@CAO or .000?)
+ * Type-name: emp::fixed
+ *
+ * Representation: sign (1 bit), int value (21 bits), frac value (10 bits)
+ * Max value:  2097151.999
+ * Min value: -2097152.999 (@CAO or .000?)
  */
 
-#ifndef EMP_IN_PROGRESS_FIXED_HPP_INCLUDE
-#define EMP_IN_PROGRESS_FIXED_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_IN_PROGRESS_FIXED_HPP_GUARD
+#define INCLUDE_EMP_IN_PROGRESS_FIXED_HPP_GUARD
 
 #include <iostream>
 

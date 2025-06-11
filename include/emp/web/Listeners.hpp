@@ -1,15 +1,16 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2017
-*/
 /**
- *  @file
- *  @brief A class for tracking font event listeners for Widgets
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2015-2017 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/web/Listeners.hpp
+ * @brief A class for tracking font event listeners for Widgets
  */
 
-#ifndef EMP_WEB_LISTENERS_HPP_INCLUDE
-#define EMP_WEB_LISTENERS_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_WEB_LISTENERS_HPP_GUARD
+#define INCLUDE_EMP_WEB_LISTENERS_HPP_GUARD
 
 
 

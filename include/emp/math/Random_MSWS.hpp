@@ -1,16 +1,17 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2025
-*/
 /**
- *  @file
- *  @brief A versatile and non-patterned pseudo-random-number generator.
- *  Status: RELEASE
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2025 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/math/Random_MSWS.hpp
+ * @brief A versatile and non-patterned pseudo-random-number generator.
+ * Status: RELEASE
  */
 
-#ifndef EMP_MATH_RANDOM_MSWS_HPP_INCLUDE
-#define EMP_MATH_RANDOM_MSWS_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_MATH_RANDOM_MSWS_HPP_GUARD
+#define INCLUDE_EMP_MATH_RANDOM_MSWS_HPP_GUARD
 
 #include "../base/assert.hpp"
 
@@ -97,4 +98,4 @@ namespace emp {
 #endif // #ifndef EMP_MATH_RANDOM_MSWS_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
-// empecable_words: nonswap msws weyl
+// empecable_words: weyl msws nonswap

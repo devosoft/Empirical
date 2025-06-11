@@ -1,24 +1,24 @@
-/*
-
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2018
-*/
 /**
- *  @file
- *  @brief This file provides code to build NK-based algorithms.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  Two version of landscapes are provided.  NKLandscape pre-calculates the entire landscape, for
- *  easy lookup.  NKLandscapeMemo does lazy evaluation, memorizing values when they're first used.
- *  NKLandscape is faster, but goes up in memory size exponentially with K.  NKLandscapeMemo is
- *  slightly slower, but can handle arbitrarily large landscapes.
+ * @file include/emp/Evolve/NK.hpp
+ * @brief This file provides code to build NK-based algorithms.
  *
- *  @todo Right now we make the library user decide between NKLandscape and NKLandscapeMemo.
- *    Based on K value, we should be able to do this automatically, so we could merge the two.
+ * Two version of landscapes are provided.  NKLandscape pre-calculates the entire landscape, for
+ * easy lookup.  NKLandscapeMemo does lazy evaluation, memorizing values when they're first used.
+ * NKLandscape is faster, but goes up in memory size exponentially with K.  NKLandscapeMemo is
+ * slightly slower, but can handle arbitrarily large landscapes.
+ *
+ * @todo Right now we make the library user decide between NKLandscape and NKLandscapeMemo.
+ *   Based on K value, we should be able to do this automatically, so we could merge the two.
  */
 
-#ifndef EMP_EVOLVE_NK_HPP_INCLUDE
-#define EMP_EVOLVE_NK_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_EVOLVE_NK_HPP_GUARD
+#define INCLUDE_EMP_EVOLVE_NK_HPP_GUARD
 
 #include <array>
 #include <stddef.h>

@@ -1,23 +1,24 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2021
-*/
 /**
- *  @file
- *  @brief Common parser functionality with custom plugins for variables and functions.
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2021 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  Developer TODO:
- *  - Make ${ ... } actually work
- *  - Setup operator RegEx to be built dynamically
- *  - Allow new operators to be added externally
- *  - Setup LVALUES as a type, and allow assignment
- *  - Add in a type system (String, double, vectors, etc.)
+ * @file include/emp/in_progress/SimpleParser.hpp
+ * @brief Common parser functionality with custom plugins for variables and functions.
+ * @note Status: ALPHA
+ *
+ * Developer TODO:
+ * - Make ${ ... } actually work
+ * - Setup operator RegEx to be built dynamically
+ * - Allow new operators to be added externally
+ * - Setup LVALUES as a type, and allow assignment
+ * - Add in a type system (String, double, vectors, etc.)
  */
 
-#ifndef EMP_IN_PROGRESS_SIMPLEPARSER_HPP_INCLUDE
-#define EMP_IN_PROGRESS_SIMPLEPARSER_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_IN_PROGRESS_SIMPLE_PARSER_HPP_GUARD
+#define INCLUDE_EMP_IN_PROGRESS_SIMPLE_PARSER_HPP_GUARD
 
 #include <cmath>
 #include <string>
