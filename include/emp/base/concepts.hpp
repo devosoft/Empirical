@@ -34,7 +34,7 @@ namespace emp {
 #ifdef NDEBUG
   template <typename T, typename... Ts>
   using vector = std::vector<T, Ts...>;
-#else  // #ifdef NDEBUG
+#else   // #ifdef NDEBUG
   template <typename T, typename... Ts>
   class vector;
 #endif  // #ifdef NDEBUG : #else

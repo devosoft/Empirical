@@ -234,7 +234,6 @@ namespace emp {
         emp_assert(OK(), ErrorCode());
         return wrapped_t::operator[](offset);
       }
-
     };
 
     using iterator               = iterator_wrapper<typename stdv_t::iterator>;
@@ -389,7 +388,7 @@ namespace emp {
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   template <typename... Ts>
   class vector<bool, Ts...> : public std::vector<bool, Ts...> {
-#else  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
+#else   // #ifndef DOXYGEN_SHOULD_SKIP_THIS
   template <typename t>
   class vector<bool> {
 #endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS : #else

@@ -203,7 +203,7 @@ namespace emp { namespace notify {
           alert(msg);
         },
         msg.c_str());
-#else  // #if defined(__EMSCRIPTEN__)
+#else   // #if defined(__EMSCRIPTEN__)
       if (to_cerr) {
         std::cerr << msg << std::endl;
       } else {
@@ -223,7 +223,7 @@ namespace emp { namespace notify {
         .Add(
 #ifdef NDEBUG
           [](id_arg_t, message_arg_t) { return true; }
-#else  // #ifdef NDEBUG
+#else   // #ifdef NDEBUG
           [](id_arg_t, message_arg_t msg) {
             const std::string tag = ColorTypeID(Type::DEBUG);
             DefaultPrint(tag + ": " + msg);
@@ -367,7 +367,7 @@ namespace emp { namespace notify {
     if (!success) {
 #ifdef NDEBUG
       Exit(1);
-#else  // #ifdef NDEBUG
+#else   // #ifdef NDEBUG
       abort();
 #endif  // #ifdef NDEBUG : #else
     }

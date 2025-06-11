@@ -148,7 +148,7 @@ namespace emp {
         alert(msg);
       },
       ss.str().c_str());
-#else  // #ifdef __EMSCRIPTEN__
+#else   // #ifdef __EMSCRIPTEN__
     std::cerr << ss.str() << std::endl;
 #endif  // #ifdef __EMSCRIPTEN__ : #else
   }
