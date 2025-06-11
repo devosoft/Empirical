@@ -17,7 +17,6 @@
 #include <stddef.h>
 
 #include "BitArray.hpp"
-
 #include "Bits.hpp"  // New version of BitSet is in Bits.hpp
 
 namespace emp::old {
@@ -27,4 +26,4 @@ namespace emp::old {
 
 }
 
-#endif // #ifndef EMP_BITS_BITSET_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_BITS_BIT_SET_HPP_GUARD

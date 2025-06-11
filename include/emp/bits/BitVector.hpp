@@ -47,9 +47,8 @@
 #include "../math/Random.hpp"
 
 #include "_bitset_helpers.hpp"
-#include "bitset_utils.hpp"
-
 #include "Bits.hpp"  // New version of BitVector is in Bits.hpp
+#include "bitset_utils.hpp"
 
 /*
 namespace emp::old {
@@ -761,7 +760,7 @@ namespace emp::old {
     emp_assert(bits.DebugIsArray() && in.DebugIsArray());
     emp_assert(bits.DebugGetArrayBytes() == in.DebugGetArrayBytes(),
                 bits.DebugGetArrayBytes(), in.DebugGetArrayBytes());
-    #endif
+#endif  // #ifdef EMP_TRACK_MEM
 
     const size_t NUM_FIELDS = NumFields();
     for (size_t i = 0; i < NUM_FIELDS; i++) bits[i] = in[i];
@@ -790,7 +789,7 @@ namespace emp::old {
     OR_SELF(move_bits);                                 // Merge bitstrings together.
   }
 
-  #endif // DOXYGEN_SHOULD_SKIP_THIS
+#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
   template <typename FUN_T>
   BitVector & BitVector::ApplyRange(const FUN_T & fun, size_t start, size_t stop) {
@@ -1083,7 +1082,7 @@ namespace emp::old {
     if (num_bits) {
       #ifdef EMP_TRACK_MEM
       emp_assert(!in.bits.IsNull() && in.bits.DebugIsArray(), in.bits.IsNull(), in.bits.DebugIsArray());
-      #endif
+#endif  // #ifdef EMP_TRACK_MEM
       bits = NewArrayPtr<field_t>(NumFields());
       RawCopy(in.bits);
     }
@@ -1280,7 +1279,7 @@ namespace emp::old {
 #ifdef EMP_TRACK_MEM
       emp_assert(bits.DebugIsArray()); // Must be marked as an array.
       emp_assert(bits.OK());           // Pointer must be okay.
-#endif
+#endif  // #ifdef EMP_TRACK_MEM
 
       // If there are end bits, make sure that everything past the last one is clear.
       if (NumEndBits()) {
@@ -2322,7 +2321,7 @@ namespace emp::old {
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 namespace std {
-#endif // DOXYGEN_SHOULD_SKIP_THIS
+#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
   /// Hash function to allow BitVector to be used with maps and sets.
   /// This is added to the std namespace so that BitVectors can be used
   /// in data structures that require hashing (such as unordered_map)
@@ -2334,9 +2333,9 @@ namespace std {
   };
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 }
-#endif
+#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
 */
-#endif // #ifndef EMP_BITS_BITVECTOR_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_BITS_BIT_VECTOR_HPP_GUARD
 
 // Local settings for Empecable file checker.
 // empecable_words: msse
