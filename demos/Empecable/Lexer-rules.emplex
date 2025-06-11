@@ -43,14 +43,22 @@ EMP_META_WORDS ^"// empecable_words: "[^\n\r\t]*[^ \n\r\t]
 # == Identify preprocessor commands ==
 
 # Consume whole line, ending in a non-space and cannot have illegal whitespace characters.
-IFDEF ^[ ]*\#[ ]*"ifdef "[^\n\r\t]*\S
-IFNDEF ^[ ]*\#[ ]*"ifndef "[^\n\r\t]*\S
+PP_IF ^[ ]*\#[ ]*"if "[^\n\r\t]*\S
+PP_IFDEF ^[ ]*\#[ ]*"ifdef "[^\n\r\t]*\S
+PP_IFNDEF ^[ ]*\#[ ]*"ifndef "[^\n\r\t]*\S
 
 # define should collect the rest of the line and possibly wrap with \ at line end.
-DEFINE ^[ ]*\#[ ]*"define "([^\n\r\t\\]|(\\(\n|.)))+\S
+# (We don't want macro details to be spell checked)
+PP_DEFINE ^[ ]*\#[ ]*"define "([^\n\r\t\\]|(\\(\n|.)))+\S
+
+# Grab whole line with other key pre-processing commands, including comments.
+PP_ELIF ^[ ]*\#[ ]*"elif "[^\n\r\t]*\S
+PP_ELIFDEF ^[ ]*\#[ ]*"elifdef "[^\n\r\t]*\S
+PP_ELIFNDEF ^[ ]*\#[ ]*"elifndef "[^\n\r\t]*\S
+PP_ELSE ^[ ]*\#[ ]*"else"([^\n\r\t]*\S)?
+PP_ENDIF ^[ ]*\#[ ]*"endif"([^\n\r\t]*\S)?
 
 PRAGMA_ONCE ^[ ]*\#[ ]*"pragma"[ ]+"once"
-ENDIF ^[ ]*\#[ ]*"endif"
 
 INCLUDE_SYS ^[ ]*\#[ ]*"include"[ ]*\<\S*\>
 INCLUDE_LOCAL ^[ ]*\#[ ]*"include"[ ]*\"\S*\"

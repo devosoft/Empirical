@@ -149,6 +149,12 @@ public:
     return File().IsValid();
   }
 
+  // Re-tokenize the active file based on its current state.
+  bool RefreshActiveFile() {
+    File().UpdateTokenize(lexer);
+    return File().IsValid();
+  }
+
   void SaveCurrentFile() {
     if (HasActiveFile()) File().Save();
     else emp::PrintLn("No active file to save.");

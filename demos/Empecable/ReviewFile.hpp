@@ -318,8 +318,8 @@ public:
             words.insert(word);
           }
         }
-      }
-      }
+      } // case ID_EMP_META_WORDS
+      } // switch
     }
 
     return true;
@@ -346,7 +346,7 @@ public:
 
     // Output the main body of the file.
     std::ofstream file(filename);
-    for (auto & token : tokens) {
+    for (const auto & token : tokens) {
       file << token.lexeme;
     }
 
@@ -368,6 +368,19 @@ public:
     valid = false;
   }
 
+  // Run through the strings in the file one more time to get a revised tokenization after other
+  // changes have been made.
+  void UpdateTokenize(emplex::Lexer & lexer) {
+    // Merge current lexemes.
+    std::stringstream ss;
+    for (const auto & token : tokens) {
+      ss << token.lexeme;
+    }
+    tokens = lexer.Tokenize(ss);
+    token_pos = 0;       // Reset the next token to be analyzed.
+  }
+
+
   // ========== Issue Tracking ==========
 
   [[nodiscard]] size_t GetNumIssues() const { return issues.size(); }
@@ -381,7 +394,7 @@ public:
     // Report the issue.
     if (mode >= Mode::Verbose) {
       size_t line_num = GetLineID(token_pos);
-      emp::PrintLn(ToBoldYellow("Found in ", filename, ":", line_num, ": "), issue);
+      emp::PrintLn("Found in ", filename, ":", line_num, ": ", issue.AsANSIYellow());
 
       // Print the affected code.
       PrintTokenRange(1);

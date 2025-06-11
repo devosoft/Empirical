@@ -102,10 +102,18 @@ private:
   size_t cur_year;                                      // Numerical year
   emp::String new_heading;                              // Heading for current file
 
+  // Answer tracking (for "Yes" or "No" to ALL type questions).
+  std::unordered_map<emp::String, bool> yes_no_answers;
+
   // === HELPER FUNCTIONS ===
 
   ReviewFile & File() { return file_handler.File(); }
   const ReviewFile & File() const { return file_handler.File(); }
+
+  template <typename... Ts>
+  void ReportIssue(Ts &&... args) {
+    File().ReportIssue(std::forward<Ts>(args)...);
+  }
 
   void SetupSettings() {
     settings.AddSetting("Copyright", copyright,
@@ -180,26 +188,66 @@ private:
       [this](){ emp::PrintLn("----------"); File().PrintTokenRange(10); return false; });
   }
 
-  bool AskYesNo(emp::String question) {
+  bool AskYesNo(emp::String question, emp::String label, bool is_dangerous = false) {
+    if (!IsInteractive()) return false; // Cannot ask, so assume false.
+
+    emp::String extra = "";
+    if (is_dangerous) {
+      extra = "\n" + ToBoldYellow("Warning:")
+              + " This action may be dangerous; consider editing by hand.";
+    }
+
+    // If we already have an answer locked in, use it.
+    if (yes_no_answers.contains(label)) return yes_no_answers[label];
+
     emp::ANSIOptionMenu menu;
-    menu.SetQuestion(question + " (" + ToOptionSet("yn") + ")");
+    menu.SetQuestion(question + " (" + ToOptionSet("yn") + ")" + extra);
     bool result = false;
 
     AddDefaultMenuOptions(menu);
     menu.AddSilent('y', "Accept suggestion", [&result](){ result=true; return true; });
     menu.AddSilent('n', "Reject suggestion", [&result](){ result=false; return true; });
+    if (!is_dangerous && label != "") {
+      menu.AddSilent('Y', "Accept suggestion for ALL", [this, &label, &result](){
+        emp::PrintLn("Responding YES to all instances of this question.");
+        yes_no_answers[label] = true;
+        result=true;
+        return true;
+      });
+      menu.AddSilent('N', "Reject suggestion for ALL", [this, &label, &result](){
+        emp::PrintLn("Responding NO to all instances of this question.");
+        yes_no_answers[label] = false;
+        result=false;
+        return true;
+      });
+    }
     menu.Run();
 
     return result;
   }
 
-  void AskRemoveToken() {
-    if (IsInteractive() && AskYesNo("Remove? ")) {
-      File().ClearLexeme();
-    }
+  void LineBreak() {
     if (IsVerbose()) { emp::PrintRepeatLn('-',79); }
   }
 
+  void AskRemoveToken(emp::String label, bool is_dangerous=false) {
+    if (AskYesNo("Remove? ", label, is_dangerous)) { File().ClearLexeme(); }
+    LineBreak();
+  }
+
+  void AskInsertToken(emp::String lexeme,  emp::String label, bool is_dangerous=false) {
+    if (AskYesNo("Insert ''? ", label, is_dangerous)) { File().InsertLexeme(lexeme); }
+    LineBreak();
+  }
+
+  void TestExpected(const emp::String & expected_lexeme, emp::String test_name) {
+    if (File().GetLexeme() != expected_lexeme) {
+      ReportIssue("Found unexpected ", test_name, " statement/comment."
+                  "\n...Found: ", ToBoldRed(File().GetLexeme()),
+                  "\nExpected: ", ToBoldGreen(expected_lexeme));
+      if (AskYesNo("Swap it?", "swap " + test_name)) { File().SetLexeme(expected_lexeme); }
+    }
+  }
 
   void AddHeaderModMenuOption(emp::ANSIOptionMenu & menu, emp::String name, char key,
                               emp::String desc) {
@@ -244,7 +292,7 @@ private:
 
   [[noreturn]] void Quit(bool save_before_quitting) {
     if (save_before_quitting ||
-        (file_handler.HasProjectChange() && AskYesNo("Save before quitting?"))) {
+        (file_handler.HasProjectChange() && AskYesNo("Save before quitting?", "quitsave"))) {
       file_handler.SaveAll();
     }
 
@@ -389,8 +437,8 @@ private:
     // See if we already have a replacement set up for this word.
     if (file_handler.HasReplacement(word)) { DoReplace(); return false; }
 
-    // Report unknown word.
-    File().ReportIssue(emp::MakeString("Unknown word '", word.AsANSICyan(), "'"));
+    // We do not have a record of this word.
+    ReportIssue("Unknown word '", word.AsANSICyan(), "'");
 
     // If interactive, allow user to decide how to handle the unknown word.
     if (IsInteractive()) { ManageWord_Interactive(word); }
@@ -466,7 +514,7 @@ public:
     // Make sure the initial comment block is good.
     size_t end_pos = File().FindTokenPos(Lexer::ID_COMMENT_END, start_pos);
     if (end_pos == ReviewFile::npos) {
-      File().ReportIssue("No close comment");
+      ReportIssue("No close comment");
       return start_pos;
     }
     const size_t brief_pos = File().FindTokenPos(Lexer::ID_DOX_BRIEF, start_pos);
@@ -478,7 +526,7 @@ public:
           File().GetToken(end_pos+2) == Lexer::ID_COMMENT_START) {
         end_pos = File().FindTokenPos(Lexer::ID_COMMENT_END, end_pos+2);
         if (end_pos == ReviewFile::npos) {
-          File().ReportIssue("No close comment");
+          ReportIssue("No close comment");
           return start_pos;
         }
       }
@@ -527,11 +575,12 @@ public:
     // Offer to delete blank lines at the beginning of a file.
     while (File().GetToken() == emplex::Lexer::ID_END_LINE) File().NextToken();
     if (!File().AtFront()) {
-      File().ReportIssue("File begins with ", File().GetTokenPos(), " blank lines.");
-      if (IsInteractive() && AskYesNo("Remove? ")) {
+      ReportIssue("File begins with ", File().GetTokenPos(), " blank lines.");
+      if (AskYesNo("Remove? ", "remove_leading_endlines")) {
         File().RemoveToken(0, File().GetTokenPos());
         File().ResetTokens();
       }
+      LineBreak();
     }
   }
 
@@ -542,7 +591,7 @@ public:
       var_map["old_heading"] = File().GetRangeToPos(copyright_end_pos+1);
       File().SetTokenPos(copyright_end_pos+1);
     } else {
-      File().ReportIssue("No file heading (with copyright) found!");
+      ReportIssue("No file heading (with copyright) found!");
     }
 
     // Generate what the copyright SHOULD look like.
@@ -605,8 +654,14 @@ public:
 
   emp::String GenerateGuardName() {
     emp::String guard_name = fs::relative(File().GetPath(), file_handler.BasePath()).string();
-    guard_name.SetPascalToCaps()                             // Change to ALL_CAPS
-              .ReplaceSet(!emp::AlphanumericCharSet(), '_')  // Change all punctuation to '_'
+    guard_name.SetPascalToCaps();                            // Change to ALL_CAPS
+
+    // If this filename begins with '_', assume it is an implementation file.
+    if (File().GetPath().filename().string()[0] == '_') {
+      guard_name += "_impl"; // This will be the only lowercase portion of the guard name.
+    }
+
+    guard_name.ReplaceSet(!emp::AlphanumericCharSet(), '_')  // Change all punctuation to '_'
               .Append("_GUARD")                              // Make name end in GUARD
               .Compress('_');                                // Compress multiple '_' to just one
     return guard_name;
@@ -617,7 +672,7 @@ public:
     bool ok = file_handler.AddIncludeGuard(guard_name);
 
     if (!ok) {
-      File().ReportIssue("Include guard '", ToBoldGreen(guard_name), "' already used!");
+      ReportIssue("Include guard '", ToBoldGreen(guard_name), "' already used!");
     }
   }
 
@@ -631,10 +686,8 @@ public:
     // Check for #pragma once
     File().SkipNewLines();
     if (File().GetToken() != Lexer::ID_PRAGMA_ONCE) {
-      File().ReportIssue("Did not find '#pragma once' after heading.");
-      if (IsInteractive() && AskYesNo("Insert it?")) {
-        File().InsertLexeme("#pragma once\n\n");
-      }
+      ReportIssue("Did not find '#pragma once' after heading.");
+      AskInsertToken("#pragma once\n\n", "insert #pragma once");
     } else {
       File().NextToken();
     }
@@ -642,13 +695,14 @@ public:
     // Check for include guards.
     File().SkipNewLines();
     emp::String guard_name = GenerateGuardName();
-    if (File().GetToken() != Lexer::ID_IFNDEF) {
-      File().ReportIssue("Did not find include guard");
-      if (IsInteractive() && AskYesNo("Insert guard '" + ToBoldGreen(guard_name) + "'?")) {
+    if (File().GetToken() != Lexer::ID_PP_IFNDEF) {
+      ReportIssue("Did not find include guard");
+      if (AskYesNo("Insert guard '" + ToBoldGreen(guard_name) + "'?", "insert_guards")) {
         File().InsertLexeme("#ifndef " + guard_name + "\n#define " + guard_name + "\n\n");
         File().InsertBack("\n#endif // #ifndef" + guard_name + "\n");
         RecordGuardName(guard_name);
       }
+      LineBreak();
     }
     else {  // There ARE existing include guards.
       // Determine the current guard.
@@ -657,24 +711,21 @@ public:
 
       // If guard is different from expected, offer to change it.
       if (cur_guard != guard_name) {
-        File().ReportIssue("Mis-named include guard."
-                           "\n...Found: ", ToBoldRed(cur_guard),
-                           "\nExpected: ", ToBoldGreen(guard_name));
-        if (IsInteractive() && AskYesNo("Swap it?")) {
+        ReportIssue("Mis-named include guard."
+                    "\n...Found: ", ToBoldRed(cur_guard),
+                    "\nExpected: ", ToBoldGreen(guard_name));
+        if (AskYesNo("Swap it?", "swap_guards")) {
           File().SetLexeme("#ifndef " + guard_name);
+
+          // Since we are changing the include guard, also change the #define on the next line.
           File().NextToken();
           File().SkipNewLines();
-          if (File().GetToken() != Lexer::ID_DEFINE) {
-            File().ReportIssue("Missing #define in include guard.");
-            if (AskYesNo("Add?")) {
-              File().InsertLexeme("#define " + guard_name + "\n\n");
-            }
+          if (File().GetToken() != Lexer::ID_PP_DEFINE) {
+            ReportIssue("Missing #define in include guard.");
+            AskInsertToken("#define " + guard_name + "\n\n", "insert_guard_define", true);
           } else {
             File().SetLexeme("#define " + guard_name);
           }
-  
-          // @CAO Should update end...
-          // File().InsertBack("\n#endif // #ifndef" + guard_name + "\n");
   
           RecordGuardName(guard_name); // Changed to suggested name.
         }
@@ -698,29 +749,64 @@ public:
   // Make sure all tokens throughout the body of a file are valid.
   void ValidateFileTokens() {
     using namespace emplex;
+    file_handler.RefreshActiveFile();  // Incorporate all previous changes.
+
+    // Track if's and ends in the pre-processor to provide useful comments.
+    emp::vector<emplex::Token> pp_stack;
 
     for (File().ResetTokens(); File().GetToken() != 0; File().NextToken()) {
       switch (File().GetToken()) {
       case Lexer::ID_WORD:
-        if (!TestWordToken() && IsVerbose()) emp::PrintRepeatLn('-',79);
+        if (!TestWordToken()) LineBreak();
         break;
       case Lexer::ID_ERR_END_LINE_WS:
-        File().ReportIssue("Extra whitespace at end of line:");
-        AskRemoveToken();
+        ReportIssue("Extra whitespace at end of line:");
+        AskRemoveToken("end-of-line spaces");
         break;
       case Lexer::ID_ERR_WS:
-        File().ReportIssue("Illegal whitespace:");
-        AskRemoveToken();
+        ReportIssue("Illegal whitespace:");
+        AskRemoveToken("illegal whitespace");
         break;
-      case emplex::Lexer::ID_EMP_META_START_OLD:
-        File().ReportIssue("Old-style EMP meta-data:");
-        AskRemoveToken();
+      case Lexer::ID_EMP_META_START_OLD:
+        ReportIssue("Old-style EMP meta-data:");
+        AskRemoveToken("old meta data");
         break;
+      case Lexer::ID_PP_IF:
+      case Lexer::ID_PP_IFDEF:
+      case Lexer::ID_PP_IFNDEF:
+        pp_stack.push_back(File().GetToken());
+        break;
+
+      case Lexer::ID_PP_ELSE:
+      case Lexer::ID_PP_ELIF:
+      case Lexer::ID_PP_ELIFDEF:
+      case Lexer::ID_PP_ELIFNDEF:
+      case Lexer::ID_PP_ENDIF:
+      {
+        PPLine line(File().GetLexeme());
+
+        // Make sure we are continuing an if-chain
+        if (pp_stack.size() == 0) {
+          ReportIssue(line.command, " found without opening #if* or #el*");
+          AskRemoveToken(line.command + " with no #if*", true);
+          break;
+        }
+
+        // Construct what this line SHOULD look like and test it.
+        line.ChainComment(pp_stack.back().lexeme);
+        TestExpected(line.AsLexeme(), line.command);
+
+        // Replace the top of the stack with a new message.
+        pp_stack.pop_back();
+        if (line.command != "#endif") pp_stack.push_back(File().GetToken());
+        break;
+      }
+
       case Lexer::ID_PRAGMA_ONCE:
         if (File().GetPragmaOnce() > 0) {
-          File().ReportIssue("Duplicate `#pragma once` found (original on line ",
-                              File().GetPragmaOnce(), "):");
-          AskRemoveToken();
+          ReportIssue("Duplicate `#pragma once` found (original on line ",
+                      File().GetPragmaOnce(), "):");
+          AskRemoveToken("duplicate #pragma once");
         }
         else {
           File().SetPragmaOnce();

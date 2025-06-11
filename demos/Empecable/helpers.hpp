@@ -128,6 +128,35 @@ emp::String AdjustCommentStars(emp::String comment, const emp::String prefix = "
   return result;
 }
 
+// ========== Text Processing Helpers ==========
+
+struct PPLine {
+  emp::String command;
+  emp::String args;
+  emp::String comment;
+
+  PPLine(emp::String line) {
+    line.TrimFront();                // Remove any leading whitespace
+    command = line.PopWord();        // Command goes to next whitespace
+    args = line.PopTo("//").Trim();  // Args come before comment.
+    comment = line.Trim();           // Everything left is comment.
+  }
+  PPLine(const std::string & line) : PPLine(emp::String(line)) { }
+
+  // When we have a chain of PP command (e.g., #if #elif, #else, #endif),
+  // comments should reflect where the came from.
+  void ChainComment(PPLine prev) {
+    comment = prev.command;
+    if (prev.args != "") comment.Append(" ", prev.args);
+    if (prev.comment != "") comment.Prepend(prev.comment, " : ");
+  }
+
+  // Convert this line back to the lexeme that SHOULD be in the file.
+  emp::String AsLexeme() {
+    if (args == "") return command + "  // " + comment;
+    return command + " " + args + "  // " + comment;
+  }
+};
 
 #endif // #ifndefDEMOS_EMPECABLE_HELPERS_HPP_GUARD
 
