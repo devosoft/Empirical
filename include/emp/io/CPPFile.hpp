@@ -17,6 +17,7 @@
 #include <fstream>
 #include <iostream>
 #include <set>
+#include <unordered_map>
 
 #include "../base/vector.hpp"
 #include "../tools/String.hpp"
@@ -34,6 +35,9 @@ namespace emp {
     emp::vector<String> code;   // One line of code per string.
 
     String indent;              // Extra indentation before code lines.
+
+    // Track values for variables to use as code is added.
+    std::unordered_map<emp::String, emp::String> var_map;
 
   public:
     CPPFile(String filename="") : filename(filename) { }
@@ -61,15 +65,29 @@ namespace emp {
     const emp::vector<String> & GetCode() const { return code; }
     const std::set<String> & GetIncludes() const { return includes; }
 
+    // Add a single line of code, merging together everything passed in.
     template <typename... Ts>
     CPPFile & AddCode(Ts &&... args) {
-      code.emplace_back( emp::MakeString(indent, std::forward<Ts>(args)...) );
+      emp::String line = emp::MakeString(indent, std::forward<Ts>(args)...);
+      if (var_map.size() > 0) line.SetReplaceVars(var_map, "$", StringSyntax::Quotes());
+      code.emplace_back(line);
       return *this;
     }
 
+    // Add on several lines of code; each argument should be a single line.
+    template <typename... Ts>
+    CPPFile & AddCodeBlock(const emp::String & line1, Ts &&... extras) {
+      AddCode(line1);
+      if constexpr (sizeof...(extras) > 0) AddCodeBlock(extras...);
+      return *this;
+    }
+
+    // Extend the previous line of code.
     template <typename... Ts>
     CPPFile & AppendCode(Ts &&... args) {
-      code.back() += emp::MakeString(std::forward<Ts>(args)...);
+      emp::String line = emp::MakeString(std::forward<Ts>(args)...);
+      if (var_map.size() > 0) line.SetReplaceVars(var_map, "$", StringSyntax::Quotes());
+      code.back() += line;
       return *this;
     }
 
@@ -80,6 +98,12 @@ namespace emp {
       if (cur_size < target_size) {
         code.back() += emp::String(target_size - cur_size, c);
       }
+      return *this;
+    }
+
+    template <typename... Ts>
+    CPPFile & AddVarSetting(const emp::String & var, Ts &&... value) {
+      var_map[var] = emp::MakeString(std::forward<Ts>(value)...);
       return *this;
     }
 
