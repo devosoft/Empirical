@@ -7,8 +7,10 @@
  * @brief Class to manage both config files and analyze files in Empecable.
  */
 
-#ifndef EMPECABLE_FILE_HANDLER_HPP_INCLUDE
-#define EMPECABLE_FILE_HANDLER_HPP_INCLUDE
+#pragma once
+
+#ifndef DEMOS_EMPECABLE_FILE_HANDLER_HPP_GUARD
+#define DEMOS_EMPECABLE_FILE_HANDLER_HPP_GUARD
 
 #include <filesystem>
 
@@ -41,6 +43,8 @@ private:
   word_set_t skip_words;      // Words to skip over for now.
   word_map_t replacement_map; // Track replacement words to always use.
   word_map_t suggest_map;     // Track replacement words to suggest.
+
+  word_set_t guard_names;     // Set of all include guards used so far.
 
   Mode mode;                    // Output level to use.
   bool project_changed = false; // Have there been any project-level changes requiring save?
@@ -127,6 +131,13 @@ public:
   [[nodiscard]] const emp::String & GetReplacement(const emp::String old_word) {
     emp_assert(replacement_map.contains(old_word));
     return replacement_map[old_word];
+  }
+
+  // Track another include guard.  Return false if it's already used.
+  [[nodiscard]] bool AddIncludeGuard(const emp::String & in_name) {
+    if (guard_names.contains(in_name)) return false;
+    guard_names.insert(in_name);
+    return true;
   }
 
   [[nodiscard]] bool HasProjectChange() const { return project_changed; }
