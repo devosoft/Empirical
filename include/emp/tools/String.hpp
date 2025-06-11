@@ -118,11 +118,17 @@ namespace emp {
     // Convert objects into a string of some kind.
     template <typename T>
     static auto Convert_(T && value) {
-      if constexpr (emp::hasToString<T>) {  // .ToString() member fun takes priority.
+      using U = std::decay_t<T>;
+
+      if constexpr (emp::hasToString<U>) {  // .ToString() member fun takes priority.
         return value.ToString();
-      } else if constexpr (std::convertible_to<T, std::string>) {  // If convertible, do so!
+      } else if constexpr (std::is_same_v<U, char>) { // Avoid treating char as small int
+        return emp::String(1, value);
+      } else if constexpr (std::is_same_v<U, bool>) {
+        return value ? "1" : "0";
+      } else if constexpr (std::convertible_to<U, std::string>) {  // If convertible, do so!
         return std::forward<T>(value);
-      } else if constexpr (std::ranges::range<T>) {  // Break down containers with Join()
+      } else if constexpr (std::ranges::range<U>) {  // Break down containers with Join()
         return '{' + Join(value, ",") + '}';
       } else {  // If all else fails, send through a stringstream.
         std::stringstream ss;
@@ -295,7 +301,8 @@ namespace emp {
     [[nodiscard]] char Get(size_t pos) const { return (pos < size()) ? operator[](pos) : '\0'; }
 
     [[nodiscard]] String substr(size_t pos = 0, size_t count = npos) const {
-      AssertPos_(pos);
+      emp_assert(pos <= size(), pos, size());
+      emp_assert(count == npos || pos+count <= size(), pos, count, size());
       return std::string::substr(pos, count);
     }
 
@@ -493,6 +500,20 @@ namespace emp {
       return AlphanumericCharSet().CountMatches(*this);
     }
 
+    [[nodiscard]] size_t CountFrontWhitespace() const { return WhitespaceCharSet().CountFrontMatches(*this); }
+
+    [[nodiscard]] size_t CountFrontUpper() const { return UpperCharSet().CountFrontMatches(*this); }
+
+    [[nodiscard]] size_t CountFrontLower() const { return LowerCharSet().CountFrontMatches(*this); }
+
+    [[nodiscard]] size_t CountFrontLetters() const { return LetterCharSet().CountFrontMatches(*this); }
+
+    [[nodiscard]] size_t CountFrontDigits() const { return DigitCharSet().CountFrontMatches(*this); }
+
+    [[nodiscard]] size_t CountFrontAlphanumeric() const {
+      return AlphanumericCharSet().CountFrontMatches(*this);
+    }
+
     // ------ Removals and Extractions ------
     // Inherited functions from std::string:
     //  void pop_back();
@@ -524,6 +545,18 @@ namespace emp {
     String & RemoveDigits() { return RemoveChars(DigitCharSet()); }
 
     String & RemovePunctuation() { return RemoveChars(PunctuationCharSet()); }
+
+    String AsRemoveWhitespace() const { return MakeRemoveChars(*this, WhitespaceCharSet()); }
+
+    String AsRemoveUpper() const { return MakeRemoveChars(*this, UpperCharSet()); }
+
+    String AsRemoveLower() const { return MakeRemoveChars(*this, LowerCharSet()); }
+
+    String AsRemoveLetters() const { return MakeRemoveChars(*this, LetterCharSet()); }
+
+    String AsRemoveDigits() const { return MakeRemoveChars(*this, DigitCharSet()); }
+
+    String AsRemovePunctuation() const { return MakeRemoveChars(*this, PunctuationCharSet()); }
 
     String & Resize(size_t new_size) {
       resize(new_size);
@@ -620,7 +653,10 @@ namespace emp {
       return *this;
     }
 
-    String & Prepend(const String & in) { return insert(0, in); }
+    template <typename... ARG_Ts>
+    String & Prepend(ARG_Ts &&... args) {
+      return insert(0, Make(std::forward<ARG_Ts>(args)...));
+    }
 
     String & PadFront(char padding, size_t target_size) {
       if (size() < target_size) { *this = std::string(target_size - size(), padding) + *this; }
@@ -1321,9 +1357,13 @@ namespace emp {
       }
     }
 
-    [[nodiscard]] static String Make(std::string in_str) { return in_str; }
+    [[nodiscard]] static String Make(const std::string & in_str) { return String(in_str); }
 
-    [[nodiscard]] static String Make(std::string && in_str) { return std::move(in_str); }
+    [[nodiscard]] static String Make(std::string && in_str) { return String(std::move(in_str)); }
+
+    [[nodiscard]] static const String & Make(const emp::String & in_str) { return in_str; }
+
+    [[nodiscard]] static String Make(emp::String && in_str) { return std::move(in_str); }
 
     // <= ANSI manipulations =>
     [[nodiscard]] String AsANSIBold() const { return emp::ANSI::MakeBold(*this); }
@@ -2509,7 +2549,7 @@ namespace emp {
     return ss.str();
   }
 
-#endif
+#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
   /// Convert a literal character representation to an actual string.
   /// (i.e., 'A', ';', or '\n')
@@ -2871,4 +2911,4 @@ struct std::hash<emp::String> {
 #endif // #ifndef INCLUDE_EMP_TOOLS_STRING_HPP_GUARD
 
 // Local settings for Empecable file checker.
-// empecable_words: quot apos nrt
+// empecable_words: nrt apos quot
