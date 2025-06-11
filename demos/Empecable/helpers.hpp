@@ -3,11 +3,14 @@
  * Copyright (C) 2025 Michigan State University
  * MIT Software license; see doc/LICENSE.md
  *
- * @file
+ * @file demos/Empecable/helpers.hpp
  * @brief Extra helper functions for Empecable
  */
 
 #pragma once
+
+#ifndef DEMOS_EMPECABLE_HELPERS_HPP_GUARD
+#define DEMOS_EMPECABLE_HELPERS_HPP_GUARD
 
 #include <filesystem>
 
@@ -72,6 +75,11 @@ emp::String ToBoldYellow(Ts &&... args) {
 }
 
 template <typename... Ts>
+emp::String ToBoldGreen(Ts &&... args) {
+  return emp::MakeString(args...).AsANSIGreen().AsANSIBold();
+}
+
+template <typename... Ts>
 void PrintError(Ts &&... args) {
   emp::PrintLn(ToBoldRed("ERROR: ", args...));
 }
@@ -119,4 +127,7 @@ emp::String AdjustCommentStars(emp::String comment, const emp::String prefix = "
 
   return result;
 }
+
+
+#endif // #ifndefDEMOS_EMPECABLE_HELPERS_HPP_GUARD
 
