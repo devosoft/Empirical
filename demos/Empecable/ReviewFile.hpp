@@ -1,13 +1,16 @@
-/*
+/**
  * This file is part of Empirical, https://github.com/devosoft/Empirical
  * Copyright (C) 2025 Michigan State University
  * MIT Software license; see doc/LICENSE.md
  *
- * @file
+ * @file demos/Empecable/ReviewFile.hpp
  * @brief Manage a single file being reviewed.
  */
 
 #pragma once
+
+#ifndef DEMOS_EMPECABLE_REVIEW_FILE_HPP_GUARD
+#define DEMOS_EMPECABLE_REVIEW_FILE_HPP_GUARD
 
 #include <filesystem>
 #include <fstream>
@@ -386,3 +389,6 @@ public:
   }
 
 };
+
+#endif // #ifndefDEMOS_EMPECABLE_REVIEW_FILE_HPP_GUARD
+
