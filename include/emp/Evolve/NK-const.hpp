@@ -20,8 +20,8 @@
 
 #include "../base/assert.hpp"
 #include "../bits/BitSet.hpp"
-#include "../math/Random.hpp"
 #include "../math/math.hpp"
+#include "../math/Random.hpp"
 
 namespace emp::evo {
 
@@ -47,30 +47,36 @@ namespace emp::evo {
   class NKLandscapeConst {
   private:
     static constexpr size_t state_count() { return emp::IntPow<size_t>(2, K + 1); }
+
     static constexpr size_t total_count() { return N * state_count(); }
+
     std::array<std::array<double, state_count()>, N> landscape;
 
   public:
     NKLandscapeConst() = delete;
 
     /// Build a new NKLandscapeConst using the random number generator [random]
-    NKLandscapeConst(emp::Random &random) : landscape() {
-      for (std::array<double, state_count()> &ltable : landscape) {
-        for (double &pos : ltable) {
-          pos = random.GetDouble();
-        }
+    NKLandscapeConst(emp::Random & random) : landscape() {
+      for (std::array<double, state_count()> & ltable : landscape) {
+        for (double & pos : ltable) { pos = random.GetDouble(); }
       }
     }
+
     NKLandscapeConst(const NKLandscapeConst &) = delete;
+
     ~NKLandscapeConst() { ; }
-    NKLandscapeConst &operator=(const NKLandscapeConst &) = delete;
+
+    NKLandscapeConst & operator=(const NKLandscapeConst &) = delete;
 
     /// Returns N
     constexpr size_t GetN() const { return N; }
+
     /// Returns K
     constexpr size_t GetK() const { return K; }
+
     /// Get the number of possible states for a given site
     constexpr size_t GetStateCount() const { return state_count(); }
+
     /// Get the total number of states possible in the landscape
     /// (i.e. the number of different fitness contributions in the table)
     constexpr size_t GetTotalCount() const { return total_count(); }
@@ -86,20 +92,20 @@ namespace emp::evo {
     /// Get the fitness of a whole  bitstring
     double GetFitness(std::array<size_t, N> states) const {
       double total = landscape[0][states[0]];
-      for (size_t i = 1; i < N; i++) total += GetFitness(i, states[i]);
+      for (size_t i = 1; i < N; i++) { total += GetFitness(i, states[i]); }
       return total;
     }
 
     /// Get the fitness of a whole  bitstring
-    double GetFitness(const BitSet<N> &genome) const {
+    double GetFitness(const BitSet<N> & genome) const {
       // Create a double-length genome to easily handle wrap-around.
       BitSet<N * 2> genome2(genome.template ExportArray<N * 2>());
       genome2 |= (genome2 << N);
 
-      double total = 0.0;
+      double total          = 0.0;
       constexpr size_t mask = emp::MaskLow<size_t>(K + 1);
       for (size_t i = 0; i < N; i++) {
-        const size_t cur_val = (genome2 >> (int)i).GetUInt(0) & mask;
+        const size_t cur_val = (genome2 >> (int) i).GetUInt(0) & mask;
         const double cur_fit = GetFitness(i, cur_val);
         total += cur_fit;
       }
@@ -107,9 +113,9 @@ namespace emp::evo {
     }
   };
 
-}  // namespace evo::emp
+}  // namespace emp::evo
 
-#endif  // #ifndef EMP_EVOLVE_NK_CONST_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_EVOLVE_NK_CONST_HPP_GUARD
 
 // Local settings for Empecable file checker.
 // empecable_words: ltable

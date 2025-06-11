@@ -112,7 +112,7 @@ namespace emp {
 
     static char & NoChar() {
       static char no_char;
-      return no_char = '\0'; // Always reset NoChar() in case it was changed.
+      return no_char = '\0';  // Always reset NoChar() in case it was changed.
     }
 
     // Convert objects into a string of some kind.
@@ -122,7 +122,7 @@ namespace emp {
 
       if constexpr (emp::hasToString<U>) {  // .ToString() member fun takes priority.
         return value.ToString();
-      } else if constexpr (std::is_same_v<U, char>) { // Avoid treating char as small int
+      } else if constexpr (std::is_same_v<U, char>) {  // Avoid treating char as small int
         return emp::String(1, value);
       } else if constexpr (std::is_same_v<U, bool>) {
         return value ? "1" : "0";
@@ -302,7 +302,7 @@ namespace emp {
 
     [[nodiscard]] String substr(size_t pos = 0, size_t count = npos) const {
       emp_assert(pos <= size(), pos, size());
-      emp_assert(count == npos || pos+count <= size(), pos, count, size());
+      emp_assert(count == npos || pos + count <= size(), pos, count, size());
       return std::string::substr(pos, count);
     }
 
@@ -500,15 +500,21 @@ namespace emp {
       return AlphanumericCharSet().CountMatches(*this);
     }
 
-    [[nodiscard]] size_t CountFrontWhitespace() const { return WhitespaceCharSet().CountFrontMatches(*this); }
+    [[nodiscard]] size_t CountFrontWhitespace() const {
+      return WhitespaceCharSet().CountFrontMatches(*this);
+    }
 
     [[nodiscard]] size_t CountFrontUpper() const { return UpperCharSet().CountFrontMatches(*this); }
 
     [[nodiscard]] size_t CountFrontLower() const { return LowerCharSet().CountFrontMatches(*this); }
 
-    [[nodiscard]] size_t CountFrontLetters() const { return LetterCharSet().CountFrontMatches(*this); }
+    [[nodiscard]] size_t CountFrontLetters() const {
+      return LetterCharSet().CountFrontMatches(*this);
+    }
 
-    [[nodiscard]] size_t CountFrontDigits() const { return DigitCharSet().CountFrontMatches(*this); }
+    [[nodiscard]] size_t CountFrontDigits() const {
+      return DigitCharSet().CountFrontMatches(*this);
+    }
 
     [[nodiscard]] size_t CountFrontAlphanumeric() const {
       return AlphanumericCharSet().CountFrontMatches(*this);
@@ -1082,17 +1088,23 @@ namespace emp {
 
     // <= Creating Literals =>
     template <typename T>
-    String & AppendLiteral(const T & in) { return (*this += MakeLiteral(in)); }
+    String & AppendLiteral(const T & in) {
+      return (*this += MakeLiteral(in));
+    }
 
     template <typename T>
-    String & SetLiteral(const T & in) { return (*this = MakeLiteral(in)); }
+    String & SetLiteral(const T & in) {
+      return (*this = MakeLiteral(in));
+    }
 
     String & SetLiteral() { return (*this = MakeLiteral(*this)); }
 
     [[nodiscard]] String AsLiteral() const { return MakeLiteral(*this); }
 
     template <typename T>
-    [[nodiscard]] T ConvertFromLiteral() const { return MakeFromLiteral<T>(*this); }
+    [[nodiscard]] T ConvertFromLiteral() const {
+      return MakeFromLiteral<T>(*this);
+    }
 
     [[nodiscard]] String ConvertStringFromLiteral() const { return MakeStringFromLiteral(*this); }
 
@@ -1267,7 +1279,7 @@ namespace emp {
       return *this = MakeCompressed(in, chars, compress_to, trim_start, trim_end);
     }
 
-  /// Compress all consecutive instances from a set of chars to a single specified char.
+    /// Compress all consecutive instances from a set of chars to a single specified char.
     String & Compress(const CharSet & chars = WhitespaceCharSet(),
                       char compress_to      = ' ',
                       bool trim_start       = true,
@@ -1276,9 +1288,7 @@ namespace emp {
     }
 
     /// Compress multiple consecutive instances of whitespace to just one instance.
-    String & Compress(char ch,
-                      bool trim_start       = true,
-                      bool trim_end         = true) {
+    String & Compress(char ch, bool trim_start = true, bool trim_end = true) {
       return *this = MakeCompressed(*this, ch, ch, trim_start, trim_end);
     }
 
@@ -2259,8 +2269,8 @@ namespace emp {
   /// Find any instances of ${X} and replace with dictionary lookup of X in this variable
   template <typename MAP_T>
   String & String::SetReplaceVars(const MAP_T & var_map,
-                               const String & symbol,
-                               const Syntax & syntax) {
+                                  const String & symbol,
+                                  const Syntax & syntax) {
     for (size_t pos = Find(symbol, 0, syntax);
          pos < size() - 3;  // Need room for a replacement tag.
          pos = Find(symbol, pos + symbol.size(), syntax)) {
@@ -2566,7 +2576,7 @@ namespace emp {
 
   /// Convert a literal string representation to an actual string.
   [[nodiscard]] String MakeStringFromLiteral(const String & value,
-                                              [[maybe_unused]] CharSet quotes) {
+                                             [[maybe_unused]] CharSet quotes) {
     emp_assert(value.IsLiteralString(quotes), value, value.DiagnoseLiteralString(quotes));
     // Given the assert, we can assume string DOES contain a literal string representation.
 
@@ -2638,17 +2648,17 @@ namespace emp {
     for (size_t i = 0; i < value.size(); ++i) {
       char & ch = value[i];
       if (is_lower_letter(ch)) {
-        ch = std::toupper(ch);
+        ch         = std::toupper(ch);
         last_lower = true;
-      }
-      else if (is_upper_letter(ch)) {
+      } else if (is_upper_letter(ch)) {
         if (last_lower) {
           value.insert(i, "_");
           ++i;
         }
         last_lower = false;
-      }
-      else { last_lower = false; } // Something else...
+      } else {
+        last_lower = false;
+      }  // Something else...
     }
     return value;
   }
@@ -2831,10 +2841,12 @@ namespace emp {
                         bool trim_start,
                         bool trim_end) {
     bool skip_next = trim_start;  // Remove characters from beginning of line?
-    size_t pos = 0;
+    size_t pos     = 0;
     for (const auto c : in) {
       if (compress_chars.Has(c)) {  // This char should be compressed.
-        if (skip_next) continue;  // Already skipping...
+        if (skip_next) {
+          continue;  // Already skipping...
+        }
         in.Get(pos++) = compress_to;  // Convert any block of chars to a single replace char.
         skip_next     = true;
       } else {  // Not a char to compress.
@@ -2908,7 +2920,7 @@ struct std::hash<emp::String> {
   size_t operator()(const emp::String & str) const noexcept { return str.Hash(); }
 };
 
-#endif // #ifndef INCLUDE_EMP_TOOLS_STRING_HPP_GUARD
+#endif  // #ifndef INCLUDE_EMP_TOOLS_STRING_HPP_GUARD
 
 // Local settings for Empecable file checker.
 // empecable_words: nrt apos quot

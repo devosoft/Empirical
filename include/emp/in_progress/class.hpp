@@ -72,7 +72,7 @@
 // values which it uses to setup initialization.
 #define EMP_CLASS_CONSTRUCTOR(NAME, ...) @CAO
 
-#define EMP_CLASS( NAME, ...)                                        \
+#define EMP_CLASS(NAME, ...)                                        \
   class NAME {                                                       \
   private:                                                           \
     EMP_CLASS_MEMBERS(EMP_FILTER_ARGS((i,i,x), __VA_ARGS__))         \
@@ -81,4 +81,4 @@
   };
 
 
-#endif // #ifndef EMP_IN_PROGRESS_CLASS_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_IN_PROGRESS_CLASS_HPP_GUARD

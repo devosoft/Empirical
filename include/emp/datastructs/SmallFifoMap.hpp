@@ -24,113 +24,102 @@
 
 namespace emp {
 
-template<class Key, class Value, size_t N>
-class SmallFifoMap {
+  template <class Key, class Value, size_t N>
+  class SmallFifoMap {
+    using value_type = std::pair<Key, Value>;
 
-  using value_type = std::pair<Key, Value>;
+  private:
+    using storage_t = emp::array<value_type, N>;
 
-private:
+    storage_t storage;
 
-  using storage_t = emp::array<value_type, N>;
+    unsigned char size_{};
 
-  storage_t storage;
+    // index of stalest element in cache, according to insertion order
+    unsigned char oldest{};
 
-  unsigned char size_{};
+    static_assert(N < 256);
 
-  // index of stalest element in cache, according to insertion order
-  unsigned char oldest{};
+  public:
+    using iterator = typename storage_t::iterator;
 
-  static_assert( N < 256 );
+    using const_iterator = typename storage_t::const_iterator;
 
-public:
+    iterator begin() { return storage.begin(); }
 
-  using iterator = typename storage_t::iterator;
+    const_iterator begin() const { return std::cbegin(storage); }
 
-  using const_iterator = typename storage_t::const_iterator;
+    const_iterator cbegin() const { return std::cbegin(storage); }
 
-  iterator begin() { return storage.begin(); }
+    iterator end() { return begin() + size(); }
 
-  const_iterator begin() const { return std::cbegin( storage ); }
+    const_iterator end() const { return cbegin() + size(); }
 
-  const_iterator cbegin() const { return std::cbegin( storage ); }
+    const_iterator cend() const { return cbegin() + size(); }
 
-  iterator end() { return begin() + size(); }
+    /// How many key-value pairs are in the cache?
+    size_t size() const { return size_; }
 
-  const_iterator end() const { return cbegin() + size(); }
+    /// Does the cache contain any key-value pairs?
+    bool empty() const { return size() == 0; }
 
-  const_iterator cend() const { return cbegin() + size(); }
+    /// How many key-value pairs can the cache contain?
+    static constexpr size_t capacity() { return N; }
 
-  /// How many key-value pairs are in the cache?
-  size_t size() const { return size_; }
+    /// Clear the cache.
+    void clear() { size_ = 0; }
 
-  /// Does the cache contain any key-value pairs?
-  bool empty() const { return size() == 0; }
+    /// Find key-value pair iterator in cache.
+    iterator find(const Key & key) {
+      return std::find_if(begin(), end(), [&key](const auto & kv) {
+        const auto & [k, v] = kv;
+        return k == key;
+      });
+    }
 
-  /// How many key-value pairs can the cache contain?
-  static constexpr size_t capacity() { return N; }
+    /// Find key-value pair iterator in cache.
+    const_iterator find(const Key & key) const {
+      return const_cast<SmallFifoMap *>(this)->find(key);
+    }
 
-  /// Clear the cache.
-  void clear() { size_ = 0; }
+    /// Get corresponding value from cache. Return nullptr if key not in cache.
+    Value * get(const Key & key) {
+      const auto it = find(key);
+      if (it == end()) { return nullptr; }
+      return std::addressof(it->second);
+    }
 
-  /// Find key-value pair iterator in cache.
-  iterator find(const Key& key) { return std::find_if(
-    begin(),
-    end(),
-    [&key](const auto& kv){ const auto& [k, v] = kv; return k == key; }
-  ); }
+    /// Get corresponding value from cache. Return nullptr if key not in cache.
+    const Value * get(const Key & key) const { return const_cast<SmallFifoMap *>(this)->get(key); }
 
-  /// Find key-value pair iterator in cache.
-  const_iterator find(const Key& key) const {
-    return const_cast<SmallFifoMap*>(this)->find(key);
-  }
+    /// Get corresponding value from cache.
+    Value & operator[](const Key & key) {
+      const auto it = find(key);
+      emp_assert(it != end());
+      return it->second;
+    }
 
-  /// Get corresponding value from cache. Return nullptr if key not in cache.
-  Value* get(const Key& key) {
-    const auto it = find( key );
-    if ( it == end() ) return nullptr;
-    return std::addressof( it->second );
-  }
+    /// Get corresponding value from cache.
+    const Value & operator[](const Key & key) const {
+      return const_cast<SmallFifoMap *>(this)->operator[](key);
+    }
 
-  /// Get corresponding value from cache. Return nullptr if key not in cache.
-  Value const* get(const Key& key) const {
-    return const_cast<SmallFifoMap*>(this)->get( key );
-  }
+    /// Put a key-value pair in the cache.
+    template <
+      class K,
+      class V,
+      class = std::enable_if_t<std::is_convertible<K, Key>{} && std::is_convertible<V, Value>{}> >
+    void set(K && key, V && val) {
+      emp_assert(find(key) == end());
 
-  /// Get corresponding value from cache.
-  Value& operator[](const Key& key) {
-    const auto it = find( key );
-    emp_assert( it != end() );
-    return it->second;
-  }
+      storage[oldest].first  = std::forward<K>(key);
+      storage[oldest].second = std::forward<V>(val);
 
-  /// Get corresponding value from cache.
-  const Value& operator[](const Key& key) const {
-    return const_cast<SmallFifoMap*>(this)->operator[]( key );
-  }
+      ++oldest %= N;
+      size_ += (size_ < N);
+    }
+  };
 
-  /// Put a key-value pair in the cache.
-  template<
-    class K,
-    class V,
-    class=std::enable_if_t<
-      std::is_convertible< K, Key >{}&&
-      std::is_convertible< V, Value >{}
-    >
-  >
-  void set( K&& key, V&& val ) {
+}  // namespace emp
 
-    emp_assert( find(key) == end() );
-
-    storage[oldest].first = std::forward<K>(key);
-    storage[oldest].second = std::forward<V>(val);
-
-    ++oldest %= N;
-    size_ += (size_ < N );
-
-  }
-
-};
-
-} // namespace emp
-
-#endif // #ifndef EMP_DATASTRUCTS_SMALLFIFOMAP_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_DATASTRUCTS_SMALL_FIFO_MAP_HPP_GUARD

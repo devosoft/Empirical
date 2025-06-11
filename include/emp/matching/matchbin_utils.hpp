@@ -19,4 +19,4 @@
 #include "../matching/matchbin_regulators.hpp"
 #include "../matching/matchbin_selectors.hpp"
 
-#endif // #ifndef EMP_MATCHING_MATCHBIN_UTILS_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_MATCHING_MATCHBIN_UTILS_HPP_GUARD

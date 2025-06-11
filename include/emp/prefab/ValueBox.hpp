@@ -16,7 +16,6 @@
 
 #include "../datastructs/set_utils.hpp"
 #include "../tools/string_utils.hpp"
-
 #include "../web/Div.hpp"
 #include "../web/Element.hpp"
 #include "../web/Input.hpp"
@@ -37,22 +36,18 @@ namespace emp::prefab {
    */
   class ValueBox : public web::Div {
 
-    protected:
-
+  protected:
     CommentBox description{emp::to_string(GetID(), "_descr")};
     Div view{emp::to_string(GetID(), "_view")};
 
-    public:
+  public:
     /**
      * @param label name for this value
      * @param desc a more detailed description of what the value means
      * @param id user defined ID for ValueBox Div (default is emscripten generated)
      */
-    ValueBox(
-      const std::string & label,
-      const std::string & desc,
-      const std::string & id=""
-    ) : Div(id) {
+    ValueBox(const std::string & label, const std::string & desc, const std::string & id = "")
+      : Div(id) {
       web::Element drop_button("button", emp::to_string(GetID(), "_label"));
       drop_button.AddAttr("class", "btn btn-link");
 
@@ -80,9 +75,7 @@ namespace emp::prefab {
      *
      * @return the view div
      */
-    Div & GetView() {
-      return view;
-    }
+    Div & GetView() { return view; }
   };
 
   /**
@@ -94,19 +87,18 @@ namespace emp::prefab {
    */
   class ValueDisplay : public ValueBox {
 
-    public:
+  public:
     /**
      * @param label name for this value
      * @param desc a more detailed description of what the value means
      * @param value the piece of information or data being displayed
      * @param id user defined ID for ValueDisplay div (default is emscripten generated)
      */
-    ValueDisplay(
-      const std::string & label,
-      const std::string & desc,
-      const std::string & value,
-      const std::string & id=""
-    ) : ValueBox(label, desc, id) {
+    ValueDisplay(const std::string & label,
+                 const std::string & desc,
+                 const std::string & value,
+                 const std::string & id = "")
+      : ValueBox(label, desc, id) {
       view << value;
     }
   };
@@ -122,7 +114,7 @@ namespace emp::prefab {
    */
   class LiveValueDisplay : public ValueBox {
 
-    public:
+  public:
     /**
      * @param label name for this value
      * @param desc a more detailed description of what the value means
@@ -131,17 +123,16 @@ namespace emp::prefab {
      * some other component manage its animation?
      * @param id user defined ID for LiveValueDisplay div (default is emscripten generated)
      */
-    template<typename T>
-    LiveValueDisplay(
-      const std::string & label,
-      const std::string & desc,
-      T && value,
-      const bool & independent=true,
-      const std::string & id=""
-    ) : ValueBox(label, desc, id) {
+    template <typename T>
+    LiveValueDisplay(const std::string & label,
+                     const std::string & desc,
+                     T && value,
+                     const bool & independent = true,
+                     const std::string & id   = "")
+      : ValueBox(label, desc, id) {
       view << web::Live(std::forward<T>(value));
       if (independent) {
-        this->AddAnimation(GetID(), [](){;}, view);
+        this->AddAnimation(GetID(), []() { ; }, view);
         this->Animate(GetID()).Start();
       }
     }
@@ -153,9 +144,9 @@ namespace emp::prefab {
    * controlling the value.
    */
   class ValueControl : public ValueBox {
-    protected:
+  protected:
     web::Input mainCtrl;
-    public:
+  public:
     /**
      * @param label name for this value
      * @param desc a more detailed description of what the value means
@@ -163,13 +154,12 @@ namespace emp::prefab {
      * @param input Input component that user can interact with
      * @param id user defined ID for ValueControl div (default is emscripten generated)
      */
-    ValueControl(
-      const std::string & label,
-      const std::string & desc,
-      const std::string & initial_value,
-      web::Input input,
-      const std::string & id=""
-    ) : ValueBox(label, desc, id), mainCtrl(input) {
+    ValueControl(const std::string & label,
+                 const std::string & desc,
+                 const std::string & initial_value,
+                 web::Input input,
+                 const std::string & id = "")
+      : ValueBox(label, desc, id), mainCtrl(input) {
       view << mainCtrl;
       mainCtrl.Value(initial_value);
     }
@@ -180,7 +170,7 @@ namespace emp::prefab {
    * description, and a text input to manipulate the value.
    */
   class TextValueControl : public ValueControl {
-    public:
+  public:
     /**
      * @param label name for this value
      * @param desc a more detailed description of what the value means
@@ -193,12 +183,12 @@ namespace emp::prefab {
       const std::string & desc,
       const std::string & value,
       const std::function<void(const std::string &)> & onChange
-        #ifndef DOXYGEN_SHOULD_SKIP_THIS
-        = [](const std::string &) { ; }
-        #endif // DOXYGEN_SHOULD_SKIP_THIS
-        ,
-      const std::string & id=""
-    ) : ValueControl(label, desc, value, web::Input(onChange, "text", ""), id) {
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+      = [](const std::string &) { ; }
+#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
+      ,
+      const std::string & id = "")
+      : ValueControl(label, desc, value, web::Input(onChange, "text", ""), id) {
       mainCtrl.AddAttr("class", "form-control");
     }
   };
@@ -208,7 +198,7 @@ namespace emp::prefab {
    * description, and a switch to toggle the value.
    */
   class BoolValueControl : public ValueBox {
-    public:
+  public:
     /**
      * @param label name for this value
      * @param desc a more detailed description of what the value means
@@ -221,12 +211,12 @@ namespace emp::prefab {
       const std::string & desc,
       const bool is_checked,
       const std::function<void(const std::string &)> & onChange
-      #ifndef DOXYGEN_SHOULD_SKIP_THIS
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
       = [](const std::string & val) { ; }
-      #endif // DOXYGEN_SHOULD_SKIP_THIS
+#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
       ,
-      const std::string & id=""
-    ) : ValueBox(label, desc, id) {
+      const std::string & id = "")
+      : ValueBox(label, desc, id) {
       prefab::ToggleSwitch toggle(onChange, "", is_checked);
       view << toggle;
     }
@@ -238,41 +228,35 @@ namespace emp::prefab {
    * value.
    */
   class NumericValueControl : public ValueControl {
+    using range_setter_t = std::function<void(const std::string &,  // value
+                                              const std::string &,  // type
+                                              emp::web::Input &)>;
 
-    using range_setter_t = std::function<void(
-      const std::string &, // value
-      const std::string &, // type
-      emp::web::Input &
-    )>;
+// Determine the default range by finding the next highest order of magnitude (base 10)
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+    inline static range_setter_t applyDefaultRange =
+      [](const std::string & value, const std::string & type, emp::web::Input & in) {
+        if (type == "float" || type == "double") {
+          const double val = emp::from_string<double>(value);
+          const int max    = (abs(val) <= 1) ? 1 : static_cast<int>(pow(10, ceil(log10(abs(val)))));
+          const int min    = (val >= 0) ? 0 : -max;
+          const double step = max / 100.0;
+          in.Max(max);
+          in.Min(min);
+          in.Step(step);
+        } else {
+          const int val  = emp::from_string<int>(value);
+          const int max  = (abs(val) <= 10) ? 10 : static_cast<int>(pow(10, ceil(log10(abs(val)))));
+          const int min  = (val >= 0) ? 0 : -max;
+          const int step = (int) fmax(max / 100.0, 1);
+          in.Max(max);
+          in.Min(min);
+          in.Step(step);
+        }
+      };
+#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-    // Determine the default range by finding the next highest order of magnitude (base 10)
-    #ifndef DOXYGEN_SHOULD_SKIP_THIS
-    inline static range_setter_t applyDefaultRange = [](
-      const std::string & value,
-      const std::string & type,
-      emp::web::Input & in
-    ) {
-      if(type == "float" || type == "double") {
-        const double val = emp::from_string<double>(value);
-        const int max = (abs(val) <= 1) ? 1 : static_cast<int>(pow(10, ceil(log10(abs(val)))));
-        const int min = (val >= 0) ? 0 : -max;
-        const double step = max/100.0;
-        in.Max(max);
-        in.Min(min);
-        in.Step(step);
-      } else {
-        const int val = emp::from_string<int>(value);
-        const int max = (abs(val) <= 10) ? 10 : static_cast<int>(pow(10, ceil(log10(abs(val)))));
-        const int min = (val >= 0) ? 0 : -max;
-        const int step = (int)fmax(max/100.0, 1);
-        in.Max(max);
-        in.Min(min);
-        in.Step(step);
-      }
-    };
-    #endif // DOXYGEN_SHOULD_SKIP_THIS
-
-    public:
+  public:
     /**
      * @param label name for this value
      * @param desc a more detailed description of what the value means
@@ -287,20 +271,27 @@ namespace emp::prefab {
       const std::string & value,
       const std::string & type,
       const std::function<void(const std::string & val)> & onChange
-      #ifndef DOXYGEN_SHOULD_SKIP_THIS
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
       = [](const std::string & val) { ; }
-      #endif // DOXYGEN_SHOULD_SKIP_THIS
+#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
       ,
-      const std::string & id=""
-    ) : ValueControl(label, desc, value, web::Input([](const std::string & val){ ; }, "range", ""), id) {
+      const std::string & id = "")
+      : ValueControl(label,
+                     desc,
+                     value,
+                     web::Input([](const std::string & val) { ; }, "range", ""),
+                     id) {
       mainCtrl.AddAttr("class", "form-range");
       web::Input temp(mainCtrl);
-      web::Input number_box([slider=temp, onChange](const std::string & val) mutable {
-        // Lambdas must be marked mutable since .Value is not a const function
-        // Note: referenced components/functions must be captured by value at
-        // this lowest level or dangling references (and broken components) result!
-        slider.Value(val);
-      }, "number", "");
+      web::Input number_box(
+        [slider = temp, onChange](const std::string & val) mutable {
+          // Lambdas must be marked mutable since .Value is not a const function
+          // Note: referenced components/functions must be captured by value at
+          // this lowest level or dangling references (and broken components) result!
+          slider.Value(val);
+        },
+        "number",
+        "");
       mainCtrl.Callback([number_box, onChange](const std::string & val) mutable {
         onChange(val);
         number_box.Value(val);
@@ -316,13 +307,11 @@ namespace emp::prefab {
      * @param det a function that based on the value and type provided sets
      * a slider input's min, max and step values appropriately.
      */
-    static void setDefaultRangeMaker(const range_setter_t & det) {
-      applyDefaultRange = det;
-    }
+    static void setDefaultRangeMaker(const range_setter_t & det) { applyDefaultRange = det; }
   };
-}
+}  // namespace emp::prefab
 
-#endif // #ifndef EMP_PREFAB_VALUEBOX_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_PREFAB_VALUE_BOX_HPP_GUARD
 
 // Local settings for Empecable file checker.
-// empecable_words: descr btn det fmax
+// empecable_words: fmax det btn descr

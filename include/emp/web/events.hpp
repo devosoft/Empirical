@@ -25,42 +25,43 @@
 
 #include "JSWrap.hpp"
 
-namespace emp {
-namespace web {
+namespace emp { namespace web {
 
   /// Runs the specified function when the document is finished loading and being set up.
-  template <typename FUN_TYPE> void OnDocumentReady(FUN_TYPE && fun) {
+  template <typename FUN_TYPE>
+  void OnDocumentReady(FUN_TYPE && fun) {
     // const size_t fun_id = JSWrapOnce(fun);
     const size_t fun_id = JSWrap(std::forward<FUN_TYPE>(fun), "", true);
     (void) fun_id;
 
-    MAIN_THREAD_EM_ASM({
-      if (document.readyState !== 'loading') emp.Callback($0);
-      else document.addEventListener('DOMContentLoaded', function() {
+    MAIN_THREAD_EM_ASM(
+      {
+        if (document.readyState != = 'loading') {
           emp.Callback($0);
-      });
-    }, fun_id);
+        } else {
+          document.addEventListener('DOMContentLoaded', function() { emp.Callback($0); });
+        }
+      },
+      fun_id);
   }
 
   /// Runs the specified function when the document is finished loading.
-  template <typename FUN_TYPE> void OnDocumentLoad(FUN_TYPE && fun) {
+  template <typename FUN_TYPE>
+  void OnDocumentLoad(FUN_TYPE && fun) {
     // const size_t fun_id = JSWrapOnce(fun);
     const size_t fun_id = JSWrap(std::forward<FUN_TYPE>(fun), "", true);
     (void) fun_id;
 
-    MAIN_THREAD_EM_ASM({
-        window.addEventListener("load", function() {
-          emp.Callback($0);
-        });
-      },
-      fun_id
-    );
+    MAIN_THREAD_EM_ASM(
+      { window.addEventListener("load", function() { emp.Callback($0); }); },
+      fun_id);
   }
 
   /// Data common to all web events.
   struct Event {
-    bool bubbles;           ///< Is this a bubbling event?
-    bool cancelable;        ///< Can the default action be prevented?
+    bool bubbles;     ///< Is this a bubbling event?
+    bool cancelable;  ///< Can the default action be prevented?
+
     // bool defaultPrevented;  // Has the default action already been prevented?
     // int currentTarget;   // Element whose event listeners triggered this event
     // int eventPhase;      // 0=none, 1=capturing, 2=at target, 3=bubbling
@@ -76,7 +77,7 @@ namespace web {
 
     template <int ARG_ID>
     void LoadFromArg() {
-      bubbles = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].bubbles; }, ARG_ID);
+      bubbles    = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].bubbles; }, ARG_ID);
       cancelable = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].cancelable; }, ARG_ID);
     }
   };
@@ -84,18 +85,19 @@ namespace web {
   /// Mouse-specific information about web events.
   struct MouseEvent : public Event {
     // All values reflect the state of devices when the event was triggered.
-    bool altKey;     ///< Was "ALT" key was pressed?
-    bool ctrlKey;    ///< Was "CTRL" key pressed?
-    bool metaKey;    ///< Was "META" key pressed?
-    bool shiftKey;   ///< Was "SHIFT" key pressed?
+    bool altKey;    ///< Was "ALT" key was pressed?
+    bool ctrlKey;   ///< Was "CTRL" key pressed?
+    bool metaKey;   ///< Was "META" key pressed?
+    bool shiftKey;  ///< Was "SHIFT" key pressed?
 
-    int button;      ///< Which mouse button was pressed?  -1=none  (0/1/2)
-    int detail;      ///< How many clicks happened in short succession?
+    int button;  ///< Which mouse button was pressed?  -1=none  (0/1/2)
+    int detail;  ///< How many clicks happened in short succession?
 
-    int clientX;     ///< X-mouse position, relative to current window
-    int clientY;     ///< Y-mouse position, relative to current window
-    int screenX;     ///< X-mouse position, relative to the screen
-    int screenY;     ///< Y-mouse position, relative to the screen
+    int clientX;  ///< X-mouse position, relative to current window
+    int clientY;  ///< Y-mouse position, relative to current window
+    int screenX;  ///< X-mouse position, relative to the screen
+    int screenY;  ///< Y-mouse position, relative to the screen
+
     // int buttons;     ///< Which mouse buttons were pressed? Sum: (1/4/2) (Special: 8,16)
     // int relatedTarget    ///< Element related to the element that triggered the mouse event
     // int which     ///< Which mouse button was pressed?  0=none  (1/2/3)
@@ -104,64 +106,61 @@ namespace web {
     void LoadFromArg() {
       Event::LoadFromArg<ARG_ID>();
 
-      altKey = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].altKey; }, ARG_ID);
-      ctrlKey = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].ctrlKey; }, ARG_ID);
-      metaKey = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].metaKey; }, ARG_ID);
+      altKey   = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].altKey; }, ARG_ID);
+      ctrlKey  = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].ctrlKey; }, ARG_ID);
+      metaKey  = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].metaKey; }, ARG_ID);
       shiftKey = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].shiftKey; }, ARG_ID);
-      button = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].button; }, ARG_ID);
-      detail = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].detail; }, ARG_ID);
-      clientX = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].clientX; }, ARG_ID);
-      clientY = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].clientY; }, ARG_ID);
-      screenX = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].screenX; }, ARG_ID);
-      screenY = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].screenY; }, ARG_ID);
+      button   = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].button; }, ARG_ID);
+      detail   = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].detail; }, ARG_ID);
+      clientX  = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].clientX; }, ARG_ID);
+      clientY  = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].clientY; }, ARG_ID);
+      screenX  = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].screenX; }, ARG_ID);
+      screenY  = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].screenY; }, ARG_ID);
     }
   };
-
 
   /// Keyboard-specific information about web events.
   struct KeyboardEvent : public Event {
     // All values reflect the state of devices when the event was triggered.
-    bool altKey;     ///< Was "ALT" key was pressed?
-    bool ctrlKey;    ///< Was "CTRL" key pressed?
-    bool metaKey;    ///< Was "META" key pressed?
-    bool shiftKey;   ///< Was "SHIFT" key pressed?
+    bool altKey;    ///< Was "ALT" key was pressed?
+    bool ctrlKey;   ///< Was "CTRL" key pressed?
+    bool metaKey;   ///< Was "META" key pressed?
+    bool shiftKey;  ///< Was "SHIFT" key pressed?
 
-    int charCode;    ///< Unicode character pressed
-    int keyCode;     ///< Which key was pressed on the keyboard (e.g., 'a' and 'A' are the same)
+    int charCode;  ///< Unicode character pressed
+    int keyCode;   ///< Which key was pressed on the keyboard (e.g., 'a' and 'A' are the same)
 
     template <int ARG_ID>
     void LoadFromArg() {
       Event::LoadFromArg<ARG_ID>();
 
-      altKey = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].altKey; }, ARG_ID);
-      ctrlKey = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].ctrlKey; }, ARG_ID);
-      metaKey = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].metaKey; }, ARG_ID);
+      altKey   = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].altKey; }, ARG_ID);
+      ctrlKey  = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].ctrlKey; }, ARG_ID);
+      metaKey  = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].metaKey; }, ARG_ID);
       shiftKey = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].shiftKey; }, ARG_ID);
       charCode = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].charCode; }, ARG_ID);
-      keyCode = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].keyCode; }, ARG_ID);
+      keyCode  = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].keyCode; }, ARG_ID);
     }
   };
-
 
   /// Mouse-wheel-specific information about web events.
   struct WheelEvent : public Event {
     // All values reflect the state of devices when the event was triggered.
-    int deltaX;      ///< Horizontal scroll amount.
-    int deltaY;      ///< Vertical scroll amount.
-    int deltaZ;      ///< Scroll amount of a mouse wheel for the z-axis
-    int deltaMode;   ///< The unit of measurements for delta values (pixels, lines or pages)
+    int deltaX;     ///< Horizontal scroll amount.
+    int deltaY;     ///< Vertical scroll amount.
+    int deltaZ;     ///< Scroll amount of a mouse wheel for the z-axis
+    int deltaMode;  ///< The unit of measurements for delta values (pixels, lines or pages)
 
     template <int ARG_ID>
     void LoadFromArg() {
       Event::LoadFromArg<ARG_ID>();
 
-      deltaX = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].deltaX; }, ARG_ID);
-      deltaY = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].deltaY; }, ARG_ID);
-      deltaZ = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].deltaZ; }, ARG_ID);
+      deltaX    = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].deltaX; }, ARG_ID);
+      deltaY    = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].deltaY; }, ARG_ID);
+      deltaZ    = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].deltaZ; }, ARG_ID);
       deltaMode = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].deltaMode; }, ARG_ID);
     }
   };
-}
-}
+}}  // namespace emp::web
 
-#endif // #ifndef EMP_WEB_EVENTS_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_WEB_EVENTS_HPP_GUARD

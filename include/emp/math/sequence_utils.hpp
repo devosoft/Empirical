@@ -31,7 +31,7 @@ namespace emp {
   /// Entries can be single values (Eg: "72") or ranges using start[:step]:stop format
   /// (Eg: "0:100" or "3:5:33").
 
-  template <typename T=size_t>
+  template <typename T = size_t>
   emp::vector<T> ToSequence(std::string sequence_str) {
     // Clean up input sequence and slice by commas.
     emp::remove_whitespace(sequence_str);
@@ -43,21 +43,21 @@ namespace emp {
     for (const std::string & slice : seq_slices) {
       emp::slice(slice, range_slices, ':');
       T start = emp::from_string<T>(range_slices[0]);
-      T step = static_cast<T>(1);
-      T stop = start + static_cast<T>(1);
+      T step  = static_cast<T>(1);
+      T stop  = start + static_cast<T>(1);
 
-      if (range_slices.size() == 2) stop = emp::from_string<T>(range_slices[1]);
-      else if (range_slices.size() == 3) {
+      if (range_slices.size() == 2) {
+        stop = emp::from_string<T>(range_slices[1]);
+      } else if (range_slices.size() == 3) {
         step = emp::from_string<T>(range_slices[1]);
         stop = emp::from_string<T>(range_slices[2]);
-      }
-      else if (range_slices.size() > 3) {
+      } else if (range_slices.size() > 3) {
         emp::notify::Exception("math::sequence_utils::ToSequence::invalid_range",
                                "emp::ToSequence() provided with range with too many ':'",
                                slice);
       }
 
-      for (T i = start; i < stop; i += step) out.push_back(i);
+      for (T i = start; i < stop; i += step) { out.push_back(i); }
     }
 
     return out;
@@ -70,21 +70,21 @@ namespace emp {
   /// @param in2 The second sequence to compare.
   /// @param offset (optional) Position in the first sequence to start the second sequence.
   template <typename TYPE>
-  size_t calc_hamming_distance(const TYPE & in1, const TYPE & in2, int offset=0) {
-    if (offset < 0) return calc_hamming_distance(in2, in1, -offset);
+  size_t calc_hamming_distance(const TYPE & in1, const TYPE & in2, int offset = 0) {
+    if (offset < 0) { return calc_hamming_distance(in2, in1, -offset); }
 
     const auto size1 = in1.size();
     const auto size2 = in2.size();
 
     // Calculate by how much the strings overlap.
-    size_t overlap = std::min( size1 - offset,  size2 );
+    size_t overlap = std::min(size1 - offset, size2);
 
     // Initialize the distance to that part of the strings which do not overlap.
     size_t num_diffs = size1 + size2 - 2 * overlap;
 
     // Step through the overlapped section and add on additional differences.
     for (size_t i = 0; i < overlap; i++) {
-      if (in1[i + offset] != in2[i]) num_diffs++;
+      if (in1[i + offset] != in2[i]) { num_diffs++; }
     }
 
     return num_diffs;
@@ -98,30 +98,35 @@ namespace emp {
     const auto size2 = in2.size();
 
     // If either size is zero, other size indicates number of insertions needed to produce it.
-    if (size1 == 0) return size2;
-    if (size2 == 0) return size1;
+    if (size1 == 0) { return size2; }
+    if (size2 == 0) { return size1; }
 
     emp::vector<size_t> cur_row(size1);   // The row we are calculating
     emp::vector<size_t> prev_row(size1);  // The previous row we calculated
 
     // Initialize the previous row to record the difference from nothing.
-    for (size_t i = 0; i < size1; i++) prev_row[i] = i + 1;
+    for (size_t i = 0; i < size1; i++) { prev_row[i] = i + 1; }
 
     // Loop through all other rows
     for (size_t row = 0; row < size2; row++) {
       // Initialize the first entry in the current row.
-      if (in1[0] == in2[row]) cur_row[0] = row;
-      else cur_row[0] = std::min(row, prev_row[0]) + 1;
+      if (in1[0] == in2[row]) {
+        cur_row[0] = row;
+      } else {
+        cur_row[0] = std::min(row, prev_row[0]) + 1;
+      }
 
       // Move through the cur_row and fill it in.
       for (size_t col = 1; col < size1; col++) {
         // If the values are equal, keep the value in the upper left.
-        if (in1[col] == in2[row]) cur_row[col] = prev_row[col-1];
+        if (in1[col] == in2[row]) {
+          cur_row[col] = prev_row[col - 1];
+        }
 
         // Otherwise, set the current position the the minimal of the three
         // numbers to the upper right in the chart plus one.
         else {
-          cur_row[col] = emp::Min(prev_row[col], prev_row[col-1], cur_row[col-1]) + 1;
+          cur_row[col] = emp::Min(prev_row[col], prev_row[col - 1], cur_row[col - 1]) + 1;
         }
       }
 
@@ -141,37 +146,45 @@ namespace emp {
     const auto size2 = in2.size();
 
     // If either size is zero, other size indicates number of insertions needed to produce it.
-    if (size1 == 0) return size2;
-    if (size2 == 0) return size1;
+    if (size1 == 0) { return size2; }
+    if (size2 == 0) { return size1; }
 
     emp::vector<size_t> cur_row(size1);   // The row we are calculating
     emp::vector<size_t> prev_row(size1);  // The previous row we calculated
-    emp::vector<emp::vector<char> > edit_info(size2, emp::vector<char>(size1));
+    emp::vector<emp::vector < char> > edit_info(size2, emp::vector<char>(size1));
 
     // Initialize the previous row to record the difference from nothing.
     for (size_t i = 0; i < size1; i++) {
-      prev_row[i] = i + 1;
+      prev_row[i]     = i + 1;
       edit_info[0][i] = 'i';
     }
 
     // Loop through all other rows
     for (size_t row = 0; row < size2; row++) {
       // Initialize the first entry in the current row.
-      if (in1[0] == in2[row]) { cur_row[0] = row; edit_info[row][0] = 's'; }
-      else { cur_row[0] = prev_row[0] + 1; edit_info[row][0] = 'd'; }
+      if (in1[0] == in2[row]) {
+        cur_row[0]        = row;
+        edit_info[row][0] = 's';
+      } else {
+        cur_row[0]        = prev_row[0] + 1;
+        edit_info[row][0] = 'd';
+      }
 
       // Move through the cur_row and fill it in.
       for (size_t col = 1; col < size1; col++) {
         // If the values are equal, keep the value in the upper left.
-        if (in1[col] == in2[row]) { cur_row[col] = prev_row[col-1]; edit_info[row][col] = 's'; }
+        if (in1[col] == in2[row]) {
+          cur_row[col]        = prev_row[col - 1];
+          edit_info[row][col] = 's';
+        }
 
         // Otherwise, set the current position to the minimum of the three
         // numbers to the left, upper, or upper left in the chart plus one.
         else {
-          cur_row[col] = emp::Min(prev_row[col], prev_row[col-1], cur_row[col-1]) + 1;
-          if (cur_row[col] == prev_row[col]+1)   { edit_info[row][col] = 'd'; }
-          if (cur_row[col] == prev_row[col-1]+1) { edit_info[row][col] = 's'; }
-          if (cur_row[col] == cur_row[col-1]+1)  { edit_info[row][col] = 'i'; }
+          cur_row[col] = emp::Min(prev_row[col], prev_row[col - 1], cur_row[col - 1]) + 1;
+          if (cur_row[col] == prev_row[col] + 1) { edit_info[row][col] = 'd'; }
+          if (cur_row[col] == prev_row[col - 1] + 1) { edit_info[row][col] = 's'; }
+          if (cur_row[col] == cur_row[col - 1] + 1) { edit_info[row][col] = 'i'; }
         }
       }
 
@@ -181,24 +194,41 @@ namespace emp {
 
     // Fill in gaps in the sequences to make them align!
 
-    int c = (int) size1 - 1;
-    int r = (int) size2 - 1;
+    int c         = (int) size1 - 1;
+    int r         = (int) size2 - 1;
     size_t length = 0;
 
     while (c >= 0 || r >= 0) {
-      if (c < 0) { ++length; --r; continue; }
-      else if (r < 0) { ++length; --c; continue; }
+      if (c < 0) {
+        ++length;
+        --r;
+        continue;
+      } else if (r < 0) {
+        ++length;
+        --c;
+        continue;
+      }
 
-      char cur_move = edit_info[(size_t)r][(size_t)c];
-      switch(cur_move) {
-      case 's': --c; --r; ++length; break;
-      case 'd': --r; ++length; break;
-      case 'i': --c; ++length; break;
+      char cur_move = edit_info[(size_t) r][(size_t) c];
+      switch (cur_move) {
+        case 's':
+          --c;
+          --r;
+          ++length;
+          break;
+        case 'd':
+          --r;
+          ++length;
+          break;
+        case 'i':
+          --c;
+          ++length;
+          break;
       };
     }
 
-    c = (int) size1-1;
-    r = (int) size2-1;
+    c = (int) size1 - 1;
+    r = (int) size2 - 1;
 
     TYPE out1(length, gap);
     TYPE out2(length, gap);
@@ -206,15 +236,36 @@ namespace emp {
     size_t pos = length - 1;
 
     while (c >= 0 && r >= 0) {
-      switch(edit_info[(size_t)r][(size_t)c]) {
-      case 's': out1[pos] = in1[(size_t)c]; out2[pos] = in2[(size_t)r]; --c; --r; break;
-      case 'd': out1[pos] = gap;    out2[pos] = in2[(size_t)r];      --r; break;
-      case 'i': out1[pos] = in1[(size_t)c]; out2[pos] = gap;    --c;      break;
+      switch (edit_info[(size_t) r][(size_t) c]) {
+        case 's':
+          out1[pos] = in1[(size_t) c];
+          out2[pos] = in2[(size_t) r];
+          --c;
+          --r;
+          break;
+        case 'd':
+          out1[pos] = gap;
+          out2[pos] = in2[(size_t) r];
+          --r;
+          break;
+        case 'i':
+          out1[pos] = in1[(size_t) c];
+          out2[pos] = gap;
+          --c;
+          break;
       };
       --pos;
     }
-    while (c >= 0) { out1[pos] = in1[(size_t)c]; --c; --pos; }
-    while (r >= 0) { out2[pos] = in2[(size_t)r]; --r; --pos; }
+    while (c >= 0) {
+      out1[pos] = in1[(size_t) c];
+      --c;
+      --pos;
+    }
+    while (r >= 0) {
+      out2[pos] = in2[(size_t) r];
+      --r;
+      --pos;
+    }
 
     in1 = out1;
     in2 = out2;
@@ -232,35 +283,40 @@ namespace emp {
     const int size2 = std::ssize(in2);
 
     // If either size is zero, other size indicates number of insertions needed to produce it.
-    if (size1 == 0) return size2;
-    if (size2 == 0) return size1;
+    if (size1 == 0) { return size2; }
+    if (size2 == 0) { return size1; }
 
     emp::vector<double> cur_row(size1);   // The row we are calculating
     emp::vector<double> prev_row(size1);  // The previous row we calculated
 
     // Initialize the previous row to record the difference from nothing.
-    for (int i = 0; i < size1; i++) prev_row[i] = i + 1;
+    for (int i = 0; i < size1; i++) { prev_row[i] = i + 1; }
 
     // Loop through all other rows
     for (int row = 0; row < size2; row++) {
       // Initialize the first entry in the current row.
-      if (in1[0] == in2[row]) cur_row[0] = row;
-      else cur_row[0] = std::min<double>(row, prev_row[0]) + 1;
+      if (in1[0] == in2[row]) {
+        cur_row[0] = row;
+      } else {
+        cur_row[0] = std::min<double>(row, prev_row[0]) + 1;
+      }
 
       // Move through the cur_row and fill it in.
       for (int col = 1; col < size1; col++) {
         // If the values are equal, keep the value in the upper left.
-        if (in1[col] == in2[row]) cur_row[col] = prev_row[col-1];
+        if (in1[col] == in2[row]) {
+          cur_row[col] = prev_row[col - 1];
+        }
 
         // If this is a transposition, take the single change counted in upper-left.
-        else if (col >= 2 && row >=2 && in1[col] == in2[row-1] && in1[col-1] == in2[row]) {
-          cur_row[col] = prev_row[col-1];
+        else if (col >= 2 && row >= 2 && in1[col] == in2[row - 1] && in1[col - 1] == in2[row]) {
+          cur_row[col] = prev_row[col - 1];
         }
 
         // Otherwise, set the current position the the minimal of the three
         // numbers to the upper right in the chart plus one.
         else {
-          cur_row[col] = emp::Min(prev_row[col], prev_row[col-1], cur_row[col-1]) + 1;
+          cur_row[col] = emp::Min(prev_row[col], prev_row[col - 1], cur_row[col - 1]) + 1;
         }
       }
 
@@ -272,11 +328,11 @@ namespace emp {
     double result = prev_row[size1 - 1];
 
     // Make differing first letters an extra penalty.
-    if (in1[0] != in2[0]) result += 0.5;
+    if (in1[0] != in2[0]) { result += 0.5; }
 
     return result;
   }
 
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_MATH_SEQUENCE_UTILS_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_MATH_SEQUENCE_UTILS_HPP_GUARD

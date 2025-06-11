@@ -22,6 +22,6 @@ namespace emp {
     return empty_config;
   }
 
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_CONFIG_CONFIG_UTILS_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_CONFIG_CONFIG_UTILS_HPP_GUARD

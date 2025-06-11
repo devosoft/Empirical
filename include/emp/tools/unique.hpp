@@ -19,7 +19,6 @@
 #include <type_traits>
 
 #include "../base/assert.hpp"
-
 #include "../math/constants.hpp"
 
 namespace emp {
@@ -33,16 +32,16 @@ namespace emp {
 
   /// A function that will always return a unique string (using UniqVal) with provided
   /// prefix and name.)
-  static inline std::string UniqueName(const std::string & prefix="",
-                                       const std::string & suffix="") {
+  static inline std::string UniqueName(const std::string & prefix = "",
+                                       const std::string & suffix = "") {
     std::stringstream ss;
     ss << prefix << UniqueVal() << suffix;
     return ss.str();
   }
 
-} // namespace emp
+}  // namespace emp
 
-#endif // #ifndef EMP_TOOLS_UNIQUE_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_TOOLS_UNIQUE_HPP_GUARD
 
 // Local settings for Empecable file checker.
 // empecable_words: uniq

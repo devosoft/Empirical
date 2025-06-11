@@ -1,257 +1,267 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2018
-*/
 /**
- *  @file
- *  @brief Tools to maintain data in D3.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/web/d3/dataset.hpp
+ * @brief Tools to maintain data in D3.
  */
 
-#ifndef EMP_WEB_D3_DATASET_HPP_INCLUDE
-#define EMP_WEB_D3_DATASET_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_WEB_D3_DATASET_HPP_GUARD
+#define INCLUDE_EMP_WEB_D3_DATASET_HPP_GUARD
 
 #include <cstdint>
 #include <functional>
 #include <stddef.h>
 
-#include "d3_init.hpp"
-
+#include "../../tools/string_utils.hpp"
 #include "../js_utils.hpp"
 #include "../JSWrap.hpp"
-#include "../../tools/string_utils.hpp"
+
+#include "d3_init.hpp"
 
 namespace D3 {
 
   class Dataset : public D3_Base {
   public:
-    Dataset(){;};
-    Dataset(int i) : D3_Base(i) {;};
+    Dataset() { ; }
 
-    void CaptureIncoming(){
-        MAIN_THREAD_EM_ASM({js.objects[$0] = emp.__incoming_data;}, this->id);
-    };
+    Dataset(int i) : D3_Base(i) { ; }
 
-    template <typename T>
-    emp::sfinae_decoy<double, decltype(&T::operator())>
-    Min(T comp) {
-        uint32_t fun_id = emp::JSWrap(comp, "", false);
-
-        double min = MAIN_THREAD_EM_ASM_DOUBLE({
-          return d3.min(js.objects[$0], function(d) {return emp.Callback($1, d);});
-        }, this->id, fun_id);
-
-        emp::JSDelete(fun_id);
-
-        return min;
+    void CaptureIncoming() {
+      MAIN_THREAD_EM_ASM({ js.objects[$0] = emp.__incoming_data; }, this->id);
     }
 
     template <typename T>
-    emp::sfinae_decoy<double, decltype(&T::operator())>
-    Max(T comp) {
-        uint32_t fun_id = emp::JSWrap(comp, "", false);
+    emp::sfinae_decoy<double, decltype(&T::operator())> Min(T comp) {
+      uint32_t fun_id = emp::JSWrap(comp, "", false);
 
-        double max = MAIN_THREAD_EM_ASM_DOUBLE({
-          return d3.max(js.objects[$0], function(d) {return emp.Callback($1, d);});
-        }, this->id, fun_id);
+      double min = MAIN_THREAD_EM_ASM_DOUBLE(
+        { return d3.min(js.objects[$0], function(d) { return emp.Callback($1, d); }); },
+        this->id,
+        fun_id);
 
-        emp::JSDelete(fun_id);
+      emp::JSDelete(fun_id);
 
-        return max;
+      return min;
     }
 
+    template <typename T>
+    emp::sfinae_decoy<double, decltype(&T::operator())> Max(T comp) {
+      uint32_t fun_id = emp::JSWrap(comp, "", false);
 
+      double max = MAIN_THREAD_EM_ASM_DOUBLE(
+        { return d3.max(js.objects[$0], function(d) { return emp.Callback($1, d); }); },
+        this->id,
+        fun_id);
+
+      emp::JSDelete(fun_id);
+
+      return max;
+    }
   };
-
 
   class JSONDataset : public Dataset {
   public:
-    //This should probably be static, but emscripten complains when it is
+    // This should probably be static, but emscripten complains when it is
     JSFunction FindInHierarchy;
 
-    JSONDataset(int i) : Dataset(i) {;}
-    JSONDataset() {
-      MAIN_THREAD_EM_ASM({js.objects[$0] = [];}, this->id);
+    JSONDataset(int i) : Dataset(i) { ; }
 
-      //Useful function for dealing with nested JSON data structures
-      //Assumes nested objects are stored in an array called children
+    JSONDataset() {
+      MAIN_THREAD_EM_ASM({ js.objects[$0] = []; }, this->id);
+
+      // Useful function for dealing with nested JSON data structures
+      // Assumes nested objects are stored in an array called children
       MAIN_THREAD_EM_ASM({
         //Inspired by Niels' answer to
         //http://stackoverflow.com/questions/12899609/how-to-add-an-object-to-a-nested-javascript-object-using-a-parent-id/37888800#37888800
         js.objects[$0] = function(root, id) {
           if (root.name == id){
             return root;
-          }
-          if (root.children) {
-            for (var k in root.children) {
-              if (root.children[k].name == id) {
-                return root.children[k];
-              }
-              else if (root.children[k].children) {
-                result = js.objects[$0](root.children[k], id);
-                if (result) {
-                  return result;
-                }
-              }
-            }
-          }
-        };
-      }, FindInHierarchy.GetID());
-    };
-
-    void LoadDataFromFile(std::string filename) {
-      MAIN_THREAD_EM_ASM ({
-        d3.json(UTF8ToString($1), function(data){js.objects[$0]=data;});
-      }, id, filename.c_str());
     }
 
-    template <typename DATA_TYPE>
-    void LoadDataFromFile(std::string filename, std::function<void(DATA_TYPE)> fun) {
-      emp::JSWrap(fun, "__json_load_fun__"+emp::to_string(id));
-
-      MAIN_THREAD_EM_ASM ({
-        d3.json(UTF8ToString($1), function(data){
-            js.objects[$0]=data;
-            emp["__json_load_fun__"+$0](data);
-        });
-      }, id, filename.c_str());
-    }
-
-    void LoadDataFromFile(std::string filename, std::function<void(void)> fun) {
-      emp::JSWrap(fun, "__json_load_fun__"+emp::to_string(id));
-      std::cout << filename.c_str() << std::endl;
-      MAIN_THREAD_EM_ASM ({
-        var filename = UTF8ToString($1);
-        d3.json(filename, function(data){
-            js.objects[$0]=data;
-            console.log(filename, data);
-            emp["__json_load_fun__"+$0]();
-        });
-      }, id, filename.c_str());
-    }
-
-
-    void Append(std::string json) {
-      MAIN_THREAD_EM_ASM({
-        js.objects[$0].push(JSON.parse(UTF8ToString($1)));
-      }, this->id, json.c_str());
-    }
-
-    void AppendNested(std::string json) {
-
-      int fail = MAIN_THREAD_EM_ASM_INT({
-
-        var obj = JSON.parse(UTF8ToString($2));
-
-        var result = null;
-        for (var i in js.objects[$0]) {
-          result = js.objects[$1](js.objects[$0][i], obj.parent);
-          if (result) {
-            break;
-          }
+    if (root.children) {
+      for (var k in root.children) {
+        if (root.children[k].name == id) {
+          return root.children[k];
+        } else if (root.children[k].children) {
+          result = js.objects[$0](root.children[k], id);
+          if (result) { return result; }
         }
-        if (!result) {
-          return 1;
-        }
-        result.children.push(obj);
-        return 0;
-    }, this->id, FindInHierarchy.GetID(), json.c_str());
-
-      if (fail) {
-        emp::NotifyWarning("Append to JSON failed - parent not found");
       }
     }
+  }
+}  // namespace D3
 
-    //Appends into large trees can be sped up by maintaining a list of
-    //possible parent nodes
-    int AppendNestedFromList(std::string json, JSObject & options) {
-      int pos = MAIN_THREAD_EM_ASM_INT({
-        var parent_node = null;
-        var pos = -1;
-        var child_node = JSON.parse(UTF8ToString($1));
-        for (var item in js.objects[$0]) {
-          if (js.objects[$0][item].name == child_node.parent) {
-            parent_node = js.objects[$0][item];
-            pos = item;
-            break;
-          }
+, FindInHierarchy.GetID());
+}
+
+void LoadDataFromFile(std::string filename) {
+  MAIN_THREAD_EM_ASM(
+    { d3.json(UTF8ToString($1), function(data) { js.objects[$0] = data; }); },
+    id,
+    filename.c_str());
+}
+
+template <typename DATA_TYPE>
+void LoadDataFromFile(std::string filename, std::function<void(DATA_TYPE)> fun) {
+  emp::JSWrap(fun, "__json_load_fun__" + emp::to_string(id));
+
+  MAIN_THREAD_EM_ASM(
+    {
+      d3.json(
+        UTF8ToString($1),
+        function(data) {
+          js.objects[$0] = data;
+          emp["__json_load_fun__" + $0](data);
+        });
+    },
+    id,
+    filename.c_str());
+}
+
+void LoadDataFromFile(std::string filename, std::function<void(void)> fun) {
+  emp::JSWrap(fun, "__json_load_fun__" + emp::to_string(id));
+  std::cout << filename.c_str() << std::endl;
+  MAIN_THREAD_EM_ASM(
+    {
+      var filename = UTF8ToString($1);
+      d3.json(
+        filename,
+        function(data) {
+          js.objects[$0] = data;
+          console.log(filename, data);
+          emp["__json_load_fun__" + $0]();
+        });
+    },
+    id,
+    filename.c_str());
+}
+
+void Append(std::string json) {
+  MAIN_THREAD_EM_ASM({ js.objects[$0].push(JSON.parse(UTF8ToString($1))); }, this->id, json.c_str());
+}
+
+void AppendNested(std::string json) {
+  int fail = MAIN_THREAD_EM_ASM_INT(
+    {
+      var obj = JSON.parse(UTF8ToString($2));
+
+      var result = null;
+      for (var i in js.objects[$0]) {
+        result = js.objects[$1](js.objects[$0][i], obj.parent);
+        if (result) { break; }
+      }
+      if (!result) { return 1; }
+      result.children.push(obj);
+      return 0;
+    },
+    this->id,
+    FindInHierarchy.GetID(),
+    json.c_str());
+
+  if (fail) { emp::NotifyWarning("Append to JSON failed - parent not found"); }
+}
+
+// Appends into large trees can be sped up by maintaining a list of
+// possible parent nodes
+int AppendNestedFromList(std::string json, JSObject & options) {
+  int pos = MAIN_THREAD_EM_ASM_INT(
+    {
+      var parent_node = null;
+      var pos         = -1;
+      var child_node  = JSON.parse(UTF8ToString($1));
+      for (var item in js.objects[$0]) {
+        if (js.objects[$0][item].name == child_node.parent) {
+          parent_node = js.objects[$0][item];
+          pos         = item;
+          break;
         }
+      }
 
-        if (!parent_node.hasOwnProperty("children")){
-          parent_node.children = [];
-        }
-        parent_node.children.push(child_node);
-        return pos;
-      }, options.GetID(), json.c_str());
-
+      if (!parent_node.hasOwnProperty("children")) { parent_node.children = []; }
+      parent_node.children.push(child_node);
       return pos;
-    }
+    },
+    options.GetID(),
+    json.c_str());
 
-  };
+  return pos;
+}
+}
+;
 
-  class CSVDataset : public Dataset {
-  public:
-    CSVDataset(){;}
-    CSVDataset(int i) : Dataset(i) {;}
+class CSVDataset : public Dataset {
+public:
+  CSVDataset() { ; }
 
+  CSVDataset(int i) : Dataset(i) { ; }
 
-    void LoadDataFromFile(std::string location, std::string callback, bool header=true) {
-      MAIN_THREAD_EM_ASM({
-        var acc = function(d){
-            return ([+d[0], +d[1]]);
-        };
+  void LoadDataFromFile(std::string location, std::string callback, bool header = true) {
+    MAIN_THREAD_EM_ASM(
+      {
+        var acc = function(d) { return ([+d[0], +d[1]]); }
 
-        var arg1 = UTF8ToString($0);
+        var arg1      = UTF8ToString($0);
         var in_string = UTF8ToString($1);
-        if (typeof window[in_string] === "function"){
+        if (typeof window[in_string] == = "function") {
           in_string = window[in_string];
-        } else if (typeof window["d3"][in_string] === "function") {
+        } else if (typeof window["d3"][in_string] == = "function") {
           in_string = window["d3"][in_string];
-        } else if (typeof window["emp"][in_string] === "function") {
+        } else if (typeof window["emp"][in_string] == = "function") {
           in_string = window["emp"][in_string];
         }
 
         if ($3) {
-          d3.csv(arg1, acc, function(d){
-            js.objects[$2] = d;
-            in_string($2);
-          });
+          d3.csv(
+            arg1,
+            acc,
+            function(d) {
+              js.objects[$2] = d;
+              in_string($2);
+            });
         } else {
-          d3.text(arg1, function(d){
-            js.objects[$2] = d3.csvParseRows(d, acc);
-            in_string($2);
-          });
+          d3.text(
+            arg1,
+            function(d) {
+              js.objects[$2] = d3.csvParseRows(d, acc);
+              in_string($2);
+            });
         }
-      }, location.c_str(), callback.c_str(), this->id, header);
-    }
+      },
+      location.c_str(),
+      callback.c_str(),
+      this->id,
+      header);
+  }
 
-    void Parse(std::string contents, std::string accessor){
-      D3_CALLBACK_FUNCTION_2_ARGS(d3.csvParse, contents.c_str(),  \
-          accessor.c_str())
-      }
+  void Parse(std::string contents, std::string accessor) {
+    D3_CALLBACK_FUNCTION_2_ARGS(d3.csvParse, contents.c_str(), accessor.c_str())
+  }
 
-    void ParseRows(std::string contents, std::string accessor){
-      D3_CALLBACK_FUNCTION_2_ARGS(d3.csvParseRows, contents.c_str(),  \
-          accessor.c_str())
-      }
+  void ParseRows(std::string contents, std::string accessor) {
+    D3_CALLBACK_FUNCTION_2_ARGS(d3.csvParseRows, contents.c_str(), accessor.c_str())
+  }
 
-    /// Put the last row of the array into arr
-    template <std::size_t N, typename T>
-    void GetLastRow(emp::array<T, N> & arr) {
-      MAIN_THREAD_EM_ASM({
-        emp_i.__outgoing_array = js.objects[$0][js.objects[$0].length - 1];
-      }, GetID());
-      emp::pass_array_to_cpp(arr);
-    }
+  /// Put the last row of the array into arr
+  template <std::size_t N, typename T>
+  void GetLastRow(emp::array<T, N> & arr) {
+    MAIN_THREAD_EM_ASM(
+      { emp_i.__outgoing_array = js.objects[$0][js.objects[$0].length - 1]; },
+      GetID());
+    emp::pass_array_to_cpp(arr);
+  }
 
-    //TODO Format and FormatRows
-
-  };
-
+  // TODO Format and FormatRows
 };
+}
+;
 
 
-#endif // #ifndef EMP_WEB_D3_DATASET_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_WEB_D3_DATASET_HPP_GUARD
 
 // Local settings for Empecable file checker.
-// empecable_words: javascript acc Niels
+// empecable_words: Niels acc javascript

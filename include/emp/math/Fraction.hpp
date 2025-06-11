@@ -25,25 +25,32 @@ namespace emp {
 
   public:
     void Reduce() {
-      if (denom == 0) return;                 // Undefined value!
-      if (num == 0) { denom = 1; return; }    // Zero value!
+      if (denom == 0) {
+        return;  // Undefined value!
+      }
+      if (num == 0) {
+        denom = 1;
+        return;
+      }  // Zero value!
 
       // Shuffle all negative values to num.
       if (denom < 0) {
         denom = -denom;
-        num = -num;
+        num   = -num;
       }
       const int64_t gcd = std::gcd(num, denom);  // overflows if uint64_t
       num /= gcd;
       denom /= gcd;
     }
 
-    Fraction(int64_t in_num=0, int64_t in_denom=1) : num(in_num), denom(in_denom) { }
+    Fraction(int64_t in_num = 0, int64_t in_denom = 1) : num(in_num), denom(in_denom) {}
+
     Fraction(const Fraction &) = default;
 
     int64_t GetNumerator() const { return num; }
+
     int64_t GetDenominator() const { return denom; }
   };
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_MATH_FRACTION_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_MATH_FRACTION_HPP_GUARD

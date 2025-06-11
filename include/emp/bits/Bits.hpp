@@ -1962,7 +1962,7 @@ namespace emp {
       for (size_t i = NUM_FIELDS; i > 0; --i) {  // Start loop at the largest field.
         const size_t pos = i - 1;
         if (_data.bits[pos] == in_fields[pos]) { continue; }  // If same, keep looking!
-        return (_data.bits[pos] < in_fields[pos]);  // Otherwise, do comparison
+        return (_data.bits[pos] < in_fields[pos]);            // Otherwise, do comparison
       }
     }
     return false;  // Bit vectors are identical.

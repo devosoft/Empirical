@@ -24,21 +24,29 @@ namespace emp {
 
   /// Print the contents of a span.
   template <typename T>
-  void Print(const std::span<T> & v, std::ostream & os=std::cout, const std::string & spacer=" ") {
+  void Print(const std::span<T> & v,
+             std::ostream & os          = std::cout,
+             const std::string & spacer = " ") {
     for (size_t id = 0; id < v.size(); id++) {
-      if (id) os << spacer; // Put a space before second element and beyond.
+      if (id) {
+        os << spacer;  // Put a space before second element and beyond.
+      }
       os << emp::to_string(v[id]);
     }
   }
 
   /// Convert an emp::array to an equivalent span
   template <typename T, size_t SIZE>
-  auto to_span(emp::array<T,SIZE> a) { return std::span<T,SIZE>(a); }
+  auto to_span(emp::array<T, SIZE> a) {
+    return std::span<T, SIZE>(a);
+  }
 
   /// Convert an emp::vector to an equivalent span
   template <typename T, typename... Ts>
-  auto to_span(emp::vector<T,Ts...> v) { return std::span<T>(v); }
-}
+  auto to_span(emp::vector<T, Ts...> v) {
+    return std::span<T>(v);
+  }
+}  // namespace emp
 
 namespace std {
   // A generic streaming function for spans.
@@ -50,10 +58,10 @@ namespace std {
 
   template <typename T>
   std::istream & operator>>(std::istream & is, std::span<T> s) {
-    for (T & x : s) is >> x;
+    for (T & x : s) { is >> x; }
     return is;
   }
 
-}
+}  // namespace std
 
-#endif // #ifndef EMP_DATASTRUCTS_SPAN_UTILS_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_DATASTRUCTS_SPAN_UTILS_HPP_GUARD

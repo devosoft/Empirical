@@ -22,38 +22,41 @@ namespace emp {
   /// A map of indices with fixed weights. If a random index is selected, the probability of an index being
   /// returned is directly proportional to its weight.
 
-  template <size_t MAX_BINS=1000>
+  template <size_t MAX_BINS = 1000>
   class StaticIndexMap {
   private:
-    double bin_weight = 0.0;        // Weight of each bin.
+    double bin_weight       = 0.0;  // Weight of each bin.
     double total_bin_weight = 0.0;  // bin_weight * num bins in use.
     emp::array<size_t, MAX_BINS> bins{};
-    UnorderedIndexMap index_map;    // Remaining weight, not in bins.
-    emp::vector<double> weights;    // List of all original weights.
+    UnorderedIndexMap index_map;  // Remaining weight, not in bins.
+    emp::vector<double> weights;  // List of all original weights.
 
   public:
     /// Default constructor; set up with no weights.
-    StaticIndexMap() { }
+    StaticIndexMap() {}
 
     /// Construct an StaticIndexMap where num_items is the maximum number of items that
     /// can be placed into the data structure.  All item weights default to zero.
     StaticIndexMap(const UnorderedIndexMap & in_map) : index_map(in_map) {
       weights.reserve(in_map.GetSize());
-      for (size_t i=0; i < in_map.GetSize(); ++i) weights.push_back(in_map.GetWeight(i));
+      for (size_t i = 0; i < in_map.GetSize(); ++i) { weights.push_back(in_map.GetWeight(i)); }
       Optimize();
     }
+
     /// Construct an StaticIndexMap with a specified initial set of weights.
     StaticIndexMap(const emp::vector<double> & in_weights)
-      : index_map(in_weights), weights(in_weights) { Optimize(); }
+      : index_map(in_weights), weights(in_weights) {
+      Optimize();
+    }
 
-    StaticIndexMap(const StaticIndexMap &) = default;
-    StaticIndexMap(StaticIndexMap &&) = default;
-    ~StaticIndexMap() = default;
+    StaticIndexMap(const StaticIndexMap &)             = default;
+    StaticIndexMap(StaticIndexMap &&)                  = default;
+    ~StaticIndexMap()                                  = default;
     StaticIndexMap & operator=(const StaticIndexMap &) = default;
-    StaticIndexMap & operator=(StaticIndexMap &&) = default;
+    StaticIndexMap & operator=(StaticIndexMap &&)      = default;
 
     void Reset() {
-      bin_weight = 0.0;
+      bin_weight       = 0.0;
       total_bin_weight = 0.0;
     }
 
@@ -62,14 +65,14 @@ namespace emp {
       Reset();
       index_map = in_map;
       weights.reserve(in_map.GetSize());
-      for (size_t i=0; i < in_map.GetSize(); ++i) weights.push_back(in_map.GetWeight(i));
+      for (size_t i = 0; i < in_map.GetSize(); ++i) { weights.push_back(in_map.GetWeight(i)); }
       Optimize();
     }
 
     void Set(const emp::vector<double> & in_weights) {
       Reset();
       index_map = in_weights;
-      weights = in_weights;
+      weights   = in_weights;
       Optimize();
     }
 
@@ -99,29 +102,27 @@ namespace emp {
     /// Calculate how many bins would be used for a given bin weight.
     size_t CalcBinCount(double bin_weight) const {
       size_t bins_found = 0;
-      for (double weight : weights) {
-        bins_found += static_cast<size_t>(weight/bin_weight);
-      }
+      for (double weight : weights) { bins_found += static_cast<size_t>(weight / bin_weight); }
       return bins_found;
     }
 
     /// Determine how big bins should be for optimal coverage.
     double OptimizeBinWeight() const {
-      double best_coverage = 0.0;
+      double best_coverage   = 0.0;
       double best_bin_weight = 0.0;
-      for (size_t div = MAX_BINS; ; ++div) {
+      for (size_t div = MAX_BINS;; ++div) {
         const double bin_weight = GetWeight() / div;
-        const size_t cur_bins = CalcBinCount(bin_weight);
+        const size_t cur_bins   = CalcBinCount(bin_weight);
         // std::cout << "div=" << div
         //           << " bin_weight=" << bin_weight
         //           << " cur_bins=" << cur_bins
         //           << " best_cov=" << (best_coverage / GetWeight())
         //           << " best_bin_w=" << best_bin_weight
         //           << std::endl;
-        if (cur_bins > MAX_BINS) break;
+        if (cur_bins > MAX_BINS) { break; }
         const double coverage = cur_bins * bin_weight;
         if (coverage > best_coverage) {
-          best_coverage = coverage;
+          best_coverage   = coverage;
           best_bin_weight = bin_weight;
         }
       }
@@ -140,13 +141,13 @@ namespace emp {
       size_t num_bins = 0;
       for (size_t id = 0; id < index_map.GetSize(); ++id) {
         const double id_weight = index_map.GetWeight(id);
-        size_t id_bins = static_cast<size_t>(id_weight / bin_weight);
-        size_t excess_weight = id_weight - id_bins * bin_weight;
+        size_t id_bins         = static_cast<size_t>(id_weight / bin_weight);
+        size_t excess_weight   = id_weight - id_bins * bin_weight;
         // std::cout << "id " << id << ":"
         //           << " weight=" << id_weight
         //           << " bins=" << id_bins
         //           << std::endl;
-        while (id_bins--) bins[num_bins++] = id;
+        while (id_bins--) { bins[num_bins++] = id; }
         index_map[id] = excess_weight;
       }
       total_bin_weight = num_bins * bin_weight;
@@ -157,11 +158,10 @@ namespace emp {
       //           << " remaining weight=" << index_map.GetWeight()
       //           << std::endl;
     }
-
   };
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_DATASTRUCTS_STATICINDEXMAP_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_DATASTRUCTS_STATIC_INDEX_MAP_HPP_GUARD
 
 // Local settings for Empecable file checker.
 // empecable_words: cov

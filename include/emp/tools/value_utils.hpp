@@ -20,7 +20,9 @@
 namespace emp {
 
   template <typename T>
-  inline double ToDouble(const T & in) { return (double) in; }
+  inline double ToDouble(const T & in) {
+    return (double) in;
+  }
 
   template <>
   inline double ToDouble<std::string>(const std::string & in) {
@@ -33,7 +35,9 @@ namespace emp {
   }
 
   template <typename T>
-  inline T FromDouble(double in) { return (T) in; }
+  inline T FromDouble(double in) {
+    return (T) in;
+  }
 
   template <>
   inline std::string FromDouble<std::string>(double in) {
@@ -45,6 +49,6 @@ namespace emp {
     return emp::MakeString(in);
   }
 
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_TOOLS_VALUE_UTILS_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_TOOLS_VALUE_UTILS_HPP_GUARD

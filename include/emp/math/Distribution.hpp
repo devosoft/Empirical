@@ -44,19 +44,22 @@ namespace emp {
 
   public:
     [[nodiscard]] size_t GetSize() const { return weights.GetSize(); }
+
     [[nodiscard]] double GetTotalProb() const { return weights.GetWeight(); }
+
     [[nodiscard]] double operator[](size_t id) const { return weights.GetWeight(id); }
 
     /// Pick an item from a distribution using a value between 0.0 and 1.0.
     [[nodiscard]] size_t PickPosition(double in_value) {
       emp_assert(in_value >= 0.0 && in_value <= 1.0, in_value);
-      return weights.Index( in_value * GetTotalProb() );
+      return weights.Index(in_value * GetTotalProb());
     }
 
     /// Pick a random item using this distribution.
     [[nodiscard]] size_t PickRandom(Random & random) const {
-      emp_assert(weights.GetSize() > 0, "Distribution can only pick a random entry if it has at least one entry!");
-      return weights.Index( random.GetDouble(GetTotalProb()) );
+      emp_assert(weights.GetSize() > 0,
+                 "Distribution can only pick a random entry if it has at least one entry!");
+      return weights.Index(random.GetDouble(GetTotalProb()));
     }
   };
 
@@ -69,13 +72,14 @@ namespace emp {
     Uniform(size_t _min, size_t _max) { Setup(_min, _max); }
 
     [[nodiscard]] size_t GetMin() const { return min_val; }
+
     [[nodiscard]] size_t GetMax() const { return max_val; }
 
     void Setup(size_t _min, size_t _max) {
       emp_assert(_min < _max);
 
       // If we're not changing these values, it's already setup!
-      if (min_val == _min && max_val == _max) return;
+      if (min_val == _min && max_val == _max) { return; }
 
       min_val = _min;
       max_val = _max;
@@ -84,9 +88,7 @@ namespace emp {
       double val_prob = 1.0 / (double) num_vals;
 
       emp::vector<double> probs(max_val);
-      for (size_t k = min_val; k < max_val; k++) {
-        probs[k] = val_prob;
-      }
+      for (size_t k = min_val; k < max_val; k++) { probs[k] = val_prob; }
       weights.Set(probs);
     }
   };
@@ -94,12 +96,13 @@ namespace emp {
   /// How many attempts before a probability p succeeds?
   class GeometricDistribution : public Distribution {
   private:
-    double p = 0.0;
+    double p         = 0.0;
     double precision = 0.0;
 
   public:
-    GeometricDistribution() { }
-    GeometricDistribution(double _p, double _precision=0.0000000001, size_t max_size=1000000) {
+    GeometricDistribution() {}
+
+    GeometricDistribution(double _p, double _precision = 0.0000000001, size_t max_size = 1000000) {
       emp_assert(_precision > 0.0);
       Setup(_p, _precision, max_size);
     }
@@ -110,23 +113,22 @@ namespace emp {
       emp_assert(_p > 0.0 && _p <= 1.0, _p);
 
       // If we're not changing p or precision, it's already setup!
-      if (p == _p && precision == _precision) return true;
+      if (p == _p && precision == _precision) { return true; }
 
-      p = _p;
+      p         = _p;
       precision = _precision;
 
       emp::vector<double> outcome_probs(1, 0.0);
-      for (double cur_prob = 1.0; cur_prob > _precision; ) {
+      for (double cur_prob = 1.0; cur_prob > _precision;) {
         const double next_prob = cur_prob * p;  // Probability of succeeding next time!
         outcome_probs.push_back(next_prob);
         cur_prob -= next_prob;
-        if (outcome_probs.size() == max_size) return false;
+        if (outcome_probs.size() == max_size) { return false; }
       }
 
       weights.Set(outcome_probs);
       return true;
     }
-
   };
 
   /// How many successes with p probability and N attempts?
@@ -136,24 +138,26 @@ namespace emp {
     size_t N = 0;
 
   public:
-    Binomial() = default;
+    Binomial()                 = default;
     Binomial(const Binomial &) = default;
-    Binomial(Binomial &&) = default;
+    Binomial(Binomial &&)      = default;
+
     Binomial(double _p, size_t _N) { Setup(_p, _N); }
 
     [[nodiscard]] double GetP() const { return p; }
+
     [[nodiscard]] double GetN() const { return N; }
 
     void Setup(double _p, size_t _N) {
       emp_assert(_p >= 0.0 && _p <= 1.0);
 
       // If we're not changing these values, it's already setup!
-      if (p == _p && N == _N) return;
+      if (p == _p && N == _N) { return; }
 
       p = _p;
       N = _N;
 
-      emp::vector<double> probs(N+1);
+      emp::vector<double> probs(N + 1);
       // p^k * (1-p)^(N-k) * N!/k!(N-k)!
 
       // Loop through all of the results and calculate their probabilities.
@@ -162,14 +166,13 @@ namespace emp {
         double prob = 1.0;
         for (size_t i = 0; i < N; i++) {
           prob *= (i < k) ? p : (1.0 - p);
-          prob *= (double) (N-i);
-          prob /= (double) ((i < k) ? (k-i) : (N-i));
+          prob *= (double) (N - i);
+          prob /= (double) ((i < k) ? (k - i) : (N - i));
         }
         probs[k] = prob;
       }
       weights.Set(probs);
     }
-
   };
 
   /// How many attempts to reach N successes, assuming p probability per attempt?
@@ -179,46 +182,47 @@ namespace emp {
     size_t N = 0;
 
   public:
-    NegativeBinomial() { }
-    NegativeBinomial(double _p, size_t _N=1) { Setup(_p, _N); }
+    NegativeBinomial() {}
+
+    NegativeBinomial(double _p, size_t _N = 1) { Setup(_p, _N); }
 
     [[nodiscard]] double GetP() const { return p; }
+
     [[nodiscard]] double GetN() const { return N; }
 
-    void Setup(double _p, size_t _N=1) {
+    void Setup(double _p, size_t _N = 1) {
       emp_assert(_p > 0.0 && _p <= 1.0, _p);
       emp_assert(_N > 0, _N);
 
       // If we're not changing these values, it's already setup!
-      if (p == _p && N == _N) return;
+      if (p == _p && N == _N) { return; }
 
       p = _p;
       N = _N;
       // Track the probability of each number of successes at each point in time.
       emp::vector<double> cur_probs(N, 0.0);
-      cur_probs[0] = 1.0;        // Initially we start with zero successes.
-      double found_probs = 0.0;  // Tally the total probability found so far.
-      const double q = 1.0 - p;        // Probability of failure.
+      cur_probs[0]       = 1.0;      // Initially we start with zero successes.
+      double found_probs = 0.0;      // Tally the total probability found so far.
+      const double q     = 1.0 - p;  // Probability of failure.
 
       emp::vector<double> outcome_probs(1, 0.0);
 
-      while (found_probs < 0.999999 || cur_probs[N-1] > 0.0000000001) {
-        double next_prob = cur_probs[N-1] * p;  // Probability of being one short + new success!
+      while (found_probs < 0.999999 || cur_probs[N - 1] > 0.0000000001) {
+        double next_prob = cur_probs[N - 1] * p;  // Probability of being one short + new success!
         outcome_probs.push_back(next_prob);
         found_probs += next_prob;
 
         // Update all of the other probabilities.
-        for (size_t i = N-1; i > 0; i--) {
-          cur_probs[i] = cur_probs[i] * q + cur_probs[i-1] * p;
+        for (size_t i = N - 1; i > 0; i--) {
+          cur_probs[i] = cur_probs[i] * q + cur_probs[i - 1] * p;
         }
         cur_probs[0] = cur_probs[0] * q;
       }
 
       weights.Set(outcome_probs);
     }
-
   };
 
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_MATH_DISTRIBUTION_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_MATH_DISTRIBUTION_HPP_GUARD

@@ -109,8 +109,8 @@
 
 
 
-#define EMP_BUILD_CONCEPT( WRAPPER_NAME, BASE_NAME, ... )      \
-  /* Do error-checking on the inputs! */                       \
+#define EMP_BUILD_CONCEPT(WRAPPER_NAME, BASE_NAME, ...)
+/* Do error-checking on the inputs! */                       \
   EMP_WRAP_EACH(EMP_BUILD_CONCEPT__ERROR_CHECK, __VA_ARGS__)   \
   /* Build the interface class. */                             \
   class BASE_NAME {                                            \
@@ -129,17 +129,17 @@
 // We want to do error checking to minimize confusing errors that come out of the compiler.
 
 // Any legal entry should be made empty.  Complain if anything is left!
-#define EMP_BUILD_CONCEPT__ERROR_CHECK( CMD ) EMP_BUILD_CONCEPT__ERROR_CHECK_impl(EMP_BUILD_CONCEPT__EC_ ## CMD, CMD)
-#define EMP_BUILD_CONCEPT__ERROR_CHECK_impl( RESULT, CMD ) EMP_BUILD_CONCEPT__CHECK_EMPTY( RESULT, CMD )
+#define EMP_BUILD_CONCEPT__ERROR_CHECK(CMD) EMP_BUILD_CONCEPT__ERROR_CHECK_impl(EMP_BUILD_CONCEPT__EC_ ## CMD, CMD)
+#define EMP_BUILD_CONCEPT__ERROR_CHECK_impl(RESULT, CMD) EMP_BUILD_CONCEPT__CHECK_EMPTY( RESULT, CMD )
 
-#define EMP_BUILD_CONCEPT__EC_REQUIRED_FUN(...)           /* REQUIRED_FUN okay */
-#define EMP_BUILD_CONCEPT__EC_OPTIONAL_FUN(...)           /* OPTIONAL_FUN okay */
-#define EMP_BUILD_CONCEPT__EC_REQUIRED_OVERLOAD_FUN(...)  /* REQUIRED_OVERLOAD_FUN okay */
-#define EMP_BUILD_CONCEPT__EC_REQUIRED_TYPE(...)          /* REQUIRED_TYPE okay */
-#define EMP_BUILD_CONCEPT__EC_OPTIONAL_TYPE(...)          /* OPTIONAL_TYPE okay */
-#define EMP_BUILD_CONCEPT__EC_PRIVATE(...)                /* PRIVATE okay */
-#define EMP_BUILD_CONCEPT__EC_PROTECTED(...)              /* PROTECTED okay */
-#define EMP_BUILD_CONCEPT__EC_PUBLIC(...)                 /* PUBLIC okay */
+#define EMP_BUILD_CONCEPT__EC_REQUIRED_FUN(...)          /* REQUIRED_FUN okay */
+#define EMP_BUILD_CONCEPT__EC_OPTIONAL_FUN(...)          /* OPTIONAL_FUN okay */
+#define EMP_BUILD_CONCEPT__EC_REQUIRED_OVERLOAD_FUN(...) /* REQUIRED_OVERLOAD_FUN okay */
+#define EMP_BUILD_CONCEPT__EC_REQUIRED_TYPE(...)         /* REQUIRED_TYPE okay */
+#define EMP_BUILD_CONCEPT__EC_OPTIONAL_TYPE(...)         /* OPTIONAL_TYPE okay */
+#define EMP_BUILD_CONCEPT__EC_PRIVATE(...)               /* PRIVATE okay */
+#define EMP_BUILD_CONCEPT__EC_PROTECTED(...)             /* PROTECTED okay */
+#define EMP_BUILD_CONCEPT__EC_PUBLIC(...)                /* PUBLIC okay */
 
 #define EMP_BUILD_CONCEPT__CHECK_EMPTY(A, CMD)               \
   EMP_GET_ARG_2( EMP_BUILD_CONCEPT__SPACER ## A,             \
@@ -156,7 +156,7 @@
 // ***************************************************************************
 // Build the base class for concepts.
 
-#define EMP_BUILD_CONCEPT__BASE( CMD ) EMP_BUILD_CONCEPT__BASE_ ## CMD
+#define EMP_BUILD_CONCEPT__BASE(CMD) EMP_BUILD_CONCEPT__BASE_ ## CMD
 
 // Required and optional functions should have a virtual version declared in the base class.
 #define EMP_BUILD_CONCEPT__BASE_REQUIRED_FUN(NAME, X, RETURN_T, ...) virtual RETURN_T NAME( __VA_ARGS__ ) = 0;
@@ -191,7 +191,7 @@
 // ***************************************************************************
 // Setup the wrapper.
 
-#define EMP_BUILD_CONCEPT__PROCESS( CMD ) EMP_BUILD_CONCEPT__PROCESS_ ## CMD
+#define EMP_BUILD_CONCEPT__PROCESS(CMD) EMP_BUILD_CONCEPT__PROCESS_ ## CMD
 
 #define EMP_BUILD_CONCEPT__PROCESS_REQUIRED_FUN(FUN_NAME, ERROR, ...)                             \
   EMP_BUILD_CONCEPT__REQUIRED_FUN_impl(FUN_NAME, ERROR,                                           \
@@ -345,4 +345,4 @@
 
 
 
-#endif // #ifndef EMP_META_CONCEPTWRAPPER_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_META_CONCEPT_WRAPPER_HPP_GUARD

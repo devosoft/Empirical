@@ -19,7 +19,6 @@
 #include <type_traits>
 
 #include "../base/assert.hpp"
-
 #include "../math/constants.hpp"
 
 /// A simple macro to time how long it takes for a function to complete.
@@ -34,7 +33,7 @@
   }
 
 /// A simple macro to time how long it takes for a function to complete.
-  #define EMP_VOID_FUNCTION_TIMER(TEST_FUN) {                                \
+#define EMP_VOID_FUNCTION_TIMER(TEST_FUN) {                                \
     std::clock_t emp_start_time = std::clock();                              \
     TEST_FUN;                                                                \
     std::clock_t emp_tot_time = std::clock() - emp_start_time;               \
@@ -53,6 +52,6 @@ namespace emp {
     return 1000.0 * ((double) tot_time) / (double) CLOCKS_PER_SEC;
   }
 
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_TOOLS_TIMING_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_TOOLS_TIMING_HPP_GUARD

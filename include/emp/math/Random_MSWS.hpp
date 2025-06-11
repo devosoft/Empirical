@@ -21,21 +21,21 @@ namespace emp {
   ///  generator. https://arxiv.org/abs/1704.00358
   ///  Based on: https://en.wikipedia.org/wiki/Middle-square_method
   struct Random_MSWS {
-    uint64_t value = 0;           ///< Current squaring value
-    uint64_t weyl_state = 0;      ///< Weyl sequence state
-    uint64_t value2 = 0;          ///< Extra squaring value for 64 bit
-    uint64_t weyl_state2 = 0;     ///< Extra Weyl sequence state for 64 bit
+    uint64_t value       = 0;  ///< Current squaring value
+    uint64_t weyl_state  = 0;  ///< Weyl sequence state
+    uint64_t value2      = 0;  ///< Extra squaring value for 64 bit
+    uint64_t weyl_state2 = 0;  ///< Extra Weyl sequence state for 64 bit
 
-    static constexpr uint64_t STEP_SIZE   = 0xb5ad4eceda1ce2a9; // Weyl sequence step size
-    static constexpr uint64_t STEP_SIZE2  = 0x278c5a4d8419fe6b; // Extra step size for 64 bit
+    static constexpr uint64_t STEP_SIZE  = 0xb5ad'4ece'da1c'e2a9;  // Weyl sequence step size
+    static constexpr uint64_t STEP_SIZE2 = 0x278c'5a4d'8419'fe6b;  // Extra step size for 64 bit
 
     [[nodiscard]] std::string GetType() const noexcept { return "Random_MSWS"; }
 
     /// Return a 32-bit Random number
     uint32_t Get() noexcept {
-      value *= value;                       // Square the current value.
-      value += (weyl_state += STEP_SIZE);   // Take a step in the Weyl sequence
-      value = (value>>32) | (value<<32);    // Return the middle of the value
+      value *= value;                         // Square the current value.
+      value += (weyl_state += STEP_SIZE);     // Take a step in the Weyl sequence
+      value = (value >> 32) | (value << 32);  // Return the middle of the value
       return static_cast<uint32_t>(value);
     }
 
@@ -54,7 +54,8 @@ namespace emp {
     /// Return a 64-bit Random number
     uint64_t Get64() noexcept {
       // Square both values
-      value *= value;  value2 *= value2;
+      value *= value;
+      value2 *= value2;
 
       // Advance the weyl states and the values
       value += (weyl_state += STEP_SIZE);
@@ -62,8 +63,8 @@ namespace emp {
 
       // Backup the first value before swap (only swapped second value in result)
       const uint64_t nonswap_value = value;
-      value = (value >> 32) | (value << 32);
-      value2 = (value2 >> 32) | (value2 << 32);
+      value                        = (value >> 32) | (value << 32);
+      value2                       = (value2 >> 32) | (value2 << 32);
 
       return nonswap_value ^ value2;
     }
@@ -88,14 +89,13 @@ namespace emp {
       weyl_state *= 2;  // Force starting state to be even.
       weyl_state2 *= 2;
 
-      Get(); // Prime the new sequence by skipping the first number.
+      Get();  // Prime the new sequence by skipping the first number.
     }
-
   };
 
-} // END emp namespace
+}  // namespace emp
 
-#endif // #ifndef EMP_MATH_RANDOM_MSWS_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_MATH_RANDOM_MSWS_HPP_GUARD
 
 // Local settings for Empecable file checker.
-// empecable_words: weyl msws nonswap
+// empecable_words: nonswap msws weyl

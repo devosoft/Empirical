@@ -544,21 +544,20 @@ namespace emp {
     file.AddVarSetting("token_name", token_name);
     file.AddVarSetting("DFA_name", DFA_name);
 
-    file.AddCodeBlock(
-      "class ${object_name} {",
-      "private:",
-      "  static constexpr int NUM_TOKENS=${token_set_size};",
-      "",
-      "  // -- Load State --",
-      "  size_t cur_line = 1;   // Track LINE we are reading in the input.",
-      "  size_t cur_col = 0;    // Track COLUMN we are reading in the input.",
-      "  int start_pos = 0;     // Track INDEX for the start of current lexeme.",
-      "  std::string lexeme{};  // Lexeme found for the current token",
-      "",
-      "  // -- Process State --",
-      "  std::vector<${token_name}> tokens{}; // Set of tokens loaded so far.",
-      "  size_t token_id = 0;                 // Next token to process.",
-      "  const ${token_name} eof_token{0");
+    file.AddCodeBlock("class ${object_name} {",
+                      "private:",
+                      "  static constexpr int NUM_TOKENS=${token_set_size};",
+                      "",
+                      "  // -- Load State --",
+                      "  size_t cur_line = 1;   // Track LINE we are reading in the input.",
+                      "  size_t cur_col = 0;    // Track COLUMN we are reading in the input.",
+                      "  int start_pos = 0;     // Track INDEX for the start of current lexeme.",
+                      "  std::string lexeme{};  // Lexeme found for the current token",
+                      "",
+                      "  // -- Process State --",
+                      "  std::vector<${token_name}> tokens{}; // Set of tokens loaded so far.",
+                      "  size_t token_id = 0;                 // Next token to process.",
+                      "  const ${token_name} eof_token{0");
     if (save_lexeme) { file.AppendCode(", \"_EOF_\""); }
     if (save_line_id) { file.AppendCode(", 0"); }
     if (save_col_id) { file.AppendCode(", 0"); }
@@ -570,52 +569,49 @@ namespace emp {
         .AppendPadding(50)
         .AppendCode("// Regex: ", token.regex.ToString());
     }
-    file.AddCodeBlock(
-      "",
-      "  // Return the name of a token given its ID.",
-      "  static std::string TokenName(int id) {",
-      "    switch (id) {",
-      "    case -1: return \"_ERROR_\";",
-      "    case 0: return \"_EOF_\";");
+    file.AddCodeBlock("",
+                      "  // Return the name of a token given its ID.",
+                      "  static std::string TokenName(int id) {",
+                      "    switch (id) {",
+                      "    case -1: return \"_ERROR_\";",
+                      "    case 0: return \"_EOF_\";");
     for (size_t i = token_set.size(); i > 0; --i) {
       const auto & token = token_set[i - 1];
       file.AddCode("    case ID_", token.name, ": return ", token.name.AsLiteral(), ";");
     }
-    file.AddCodeBlock(
-      "    default:",
-      "      // If ID is a visible character print it, otherwise provide ID.",
-      "      if (id > 0 && id < 128 && std::isprint(id)) {",
-      "        return std::string(\"'\") + static_cast<char>(id) + \"'\";",
-      "      }",
-      "      if (id == '\\n') return \"'\\\\n'\";",
-      "      if (id == '\\r') return \"'\\\\r'\";",
-      "      if (id == '\\t') return \"'\\\\t'\";",
-      "      if (id == '\\\\') return \"'\\\\n'\";",
-      "      return std::string(\"Token ID: \") + std::to_string(id);",
-      "    }; // End switch.",
-      "  }",
-      "",
-      "  // Identify if a token should be skipped during tokenizing.",
-      "  static constexpr bool IgnoreToken(int id) {",
-      "    switch (id) {",
-      "    case 0:");
+    file.AddCodeBlock("    default:",
+                      "      // If ID is a visible character print it, otherwise provide ID.",
+                      "      if (id > 0 && id < 128 && std::isprint(id)) {",
+                      "        return std::string(\"'\") + static_cast<char>(id) + \"'\";",
+                      "      }",
+                      "      if (id == '\\n') return \"'\\\\n'\";",
+                      "      if (id == '\\r') return \"'\\\\r'\";",
+                      "      if (id == '\\t') return \"'\\\\t'\";",
+                      "      if (id == '\\\\') return \"'\\\\n'\";",
+                      "      return std::string(\"Token ID: \") + std::to_string(id);",
+                      "    }; // End switch.",
+                      "  }",
+                      "",
+                      "  // Identify if a token should be skipped during tokenizing.",
+                      "  static constexpr bool IgnoreToken(int id) {",
+                      "    switch (id) {",
+                      "    case 0:");
     for (size_t i = token_set.size(); i > 0; --i) {
       const auto & token = token_set[i - 1];
       if (token.save_lexeme == false) { file.AddCode("    case ", token.id, ":"); }
     }
-    file.AddCodeBlock(
-      "      return true;",
-      "    default: return false;",
-      "    };",
-      "  }",
-      "",
-      "  // Return the number of token types the lexer recognizes.",
-      "  static constexpr int GetNumTokens() { return NUM_TOKENS; }",
-      "",
-      "  // Generate and return the next token from the input stream.",
-      "  ${token_name} NextToken(std::string_view in) {",
-      "    // If we cannot read in, return an \"EOF\" token.",
-      "    if (start_pos >= std::ssize(in)) return { 0");
+    file.AddCodeBlock("      return true;",
+                      "    default: return false;",
+                      "    };",
+                      "  }",
+                      "",
+                      "  // Return the number of token types the lexer recognizes.",
+                      "  static constexpr int GetNumTokens() { return NUM_TOKENS; }",
+                      "",
+                      "  // Generate and return the next token from the input stream.",
+                      "  ${token_name} NextToken(std::string_view in) {",
+                      "    // If we cannot read in, return an \"EOF\" token.",
+                      "    if (start_pos >= std::ssize(in)) return { 0");
     if (save_lexeme) { file.AppendCode(", \"\""); }
     if (save_line_id) { file.AppendCode(", cur_line"); }
     if (save_col_id) { file.AppendCode(", cur_col"); }

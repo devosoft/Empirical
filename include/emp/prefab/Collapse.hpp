@@ -13,12 +13,11 @@
 #define INCLUDE_EMP_PREFAB_COLLAPSE_HPP_GUARD
 
 #include "../tools/string_utils.hpp"
-#include "../web/Div.hpp"
 #include "../web/_FacetedWidget.hpp"
+#include "../web/Div.hpp"
 #include "../web/Widget.hpp"
 
-namespace emp {
-namespace prefab {
+namespace emp { namespace prefab {
   namespace internal {
 
     /**
@@ -27,44 +26,39 @@ namespace prefab {
      * Only ever called by CollapseCoupling class.
      */
     class CollapseController {
-      private:
-        web::Div inner_controller; // reference to controller passed to constructor
+    private:
+      web::Div inner_controller;  // reference to controller passed to constructor
 
-      public:
-        /**
-         * @param controller web element that cause target area(s) to expand/collapse when clicked
-         * @param controls_class CSS class for controls
-         * @param expanded whether or not the target(s) are initially in an expanded/open state
-         * @param id HTML id of div for this controller
-         */
-        template <typename T>
-        CollapseController(
-          T controller,
-          const std::string controls_class,
-          bool expanded, std::string id=""
-        ) : inner_controller(id) {
+    public:
+      /**
+       * @param controller web element that cause target area(s) to expand/collapse when clicked
+       * @param controls_class CSS class for controls
+       * @param expanded whether or not the target(s) are initially in an expanded/open state
+       * @param id HTML id of div for this controller
+       */
+      template <typename T>
+      CollapseController(T controller,
+                         const std::string controls_class,
+                         bool expanded,
+                         std::string id = "")
+        : inner_controller(id) {
+        inner_controller = controller;
+        inner_controller.SetAttr("role", "button", "data-toggle", "collapse");
+        inner_controller.AddAttr("data-target",
+                                 "." + controls_class,
+                                 "aria-controls",
+                                 "." + controls_class,
+                                 "class",
+                                 "collapse_toggle");
 
-          inner_controller = controller;
-          inner_controller.SetAttr(
-            "role", "button",
-            "data-toggle", "collapse"
-          );
-          inner_controller.AddAttr(
-            "data-target", "." + controls_class,
-            "aria-controls", "." + controls_class,
-            "class", "collapse_toggle"
-          );
+        inner_controller.SetAttr("aria-expanded", expanded ? "true" : "false");
 
-          inner_controller.SetAttr("aria-expanded", expanded ? "true" : "false");
+        if (!expanded) { inner_controller.AddAttr("class", "collapsed"); }
+      }
 
-          if (!expanded) {
-            inner_controller.AddAttr("class", "collapsed");
-          }
-        }
-
-        web::Div & GetLinkDiv() { return inner_controller; }
+      web::Div & GetLinkDiv() { return inner_controller; }
     };
-  }
+  }  // namespace internal
 
   /**
    * CollapseCoupling class maintains a group of targets and controllers.
@@ -72,165 +66,167 @@ namespace prefab {
    * will change state (expand/collapse).
    */
   class CollapseCoupling {
-    private:
-      // all web elements that expand/collapse with this coupling
-      emp::vector<web::Widget> targets;
-      // all web elements that control expanding/collapsing with this coupling
-      emp::vector<web::Widget> controllers;
-      // class associated with this
-      std::string target_class;
-      // counter used to generate unique class names, shared by all instances of this class
-      inline static int counter = 0;
-      int widget_counter = 0;
+  private:
+    // all web elements that expand/collapse with this coupling
+    emp::vector<web::Widget> targets;
+    // all web elements that control expanding/collapsing with this coupling
+    emp::vector<web::Widget> controllers;
+    // class associated with this
+    std::string target_class;
+    // counter used to generate unique class names, shared by all instances of this class
+    inline static int counter = 0;
+    int widget_counter        = 0;
 
-    public:
-      /**
-       * Constructor which takes web elements as the controller and target.
-       * It will put each in a vector and call the constructor which takes
-       * vectors as controller and target parameters.
-       */
-      CollapseCoupling(
-        web::Widget controller,
-        web::Widget target,
-        const bool expanded=false,
-        const std::string in_class=""
-      ) : CollapseCoupling(emp::vector<web::Widget>{controller},
-            emp::vector<web::Widget>{target}, expanded, in_class) { ; }
+  public:
+    /**
+     * Constructor which takes web elements as the controller and target.
+     * It will put each in a vector and call the constructor which takes
+     * vectors as controller and target parameters.
+     */
+    CollapseCoupling(web::Widget controller,
+                     web::Widget target,
+                     const bool expanded        = false,
+                     const std::string in_class = "")
+      : CollapseCoupling(emp::vector<web::Widget>{controller},
+                         emp::vector<web::Widget>{target},
+                         expanded,
+                         in_class) {
+      ;
+    }
 
-      /**
-       * Constructor which takes vectors of web elements as the controller and target
-       * It will create the collapse coupling by adding necessary HTML attributes
-       * to all controllers and targets
-       */
-      CollapseCoupling(
-        emp::vector<web::Widget> controllers,
-        emp::vector<web::Widget> targets,
-        const bool expanded=false,
-        const std::string in_class=""
-      ) {
-          /*
-           * if a class is defined by the user, use it
-           * Otherwise generate a unique class
-           */
-          if (in_class == "") {
-            target_class = "emp__collapse_class_" + std::to_string(counter);
-            counter++;
-          } else {
-            target_class = in_class;
-          }
-
-          // add controllers to this coupling
-          for (auto & widget : controllers) {
-            AddController(widget, expanded);
-          }
-          // add targets to this coupling
-          for (auto & widget : targets) {
-            AddTarget(widget, expanded);
-          }
-      }
-
+    /**
+     * Constructor which takes vectors of web elements as the controller and target
+     * It will create the collapse coupling by adding necessary HTML attributes
+     * to all controllers and targets
+     */
+    CollapseCoupling(emp::vector<web::Widget> controllers,
+                     emp::vector<web::Widget> targets,
+                     const bool expanded        = false,
+                     const std::string in_class = "") {
       /*
-       * TODO: Ideally, this constructor will be templated and can handle any input that is
-       * not a Widget or vector of Widgets.
-       * When we tried this before, all input would go through to this constructor.
-       * This caused issues when it tried to stream widgets into a div but the widget
-       * already had another parent.
-       *
-       * Note: Maybe if we web::internal::FacetedWidget instead of web::Widget in the
-       * first constructor, templating this constructor will work?
+       * if a class is defined by the user, use it
+       * Otherwise generate a unique class
        */
-      /**
-       * Constructor which takes strings as the controller and target
-       * It will put each in a Div element and call the constructor which takes
-       * web elements as controller and target parameters.
-       */
-      CollapseCoupling(
-        const std::string controller,
-        const std::string target,
-        const bool expanded=false,
-        const std::string in_class=""
-      ): CollapseCoupling(web::Div("emp__collapse_controller_div_" + std::to_string(counter)), web::Div("emp__collapse_target_div_" + std::to_string(counter)), expanded, in_class) { counter++; }
-
-      /**
-       * Adds a controller to the vector of controllers for this CollapseCouple
-       *
-       * @param controller new controller to add to coupling is of type Widget
-       * @param expanded initial state of the target(s), is it expanded or not?
-       */
-      void AddController(web::Widget controller, const bool expanded) {
-        internal::CollapseController controller_widget(controller, target_class, expanded);
-        controllers.push_back(controller_widget.GetLinkDiv());
+      if (in_class == "") {
+        target_class = "emp__collapse_class_" + std::to_string(counter);
+        counter++;
+      } else {
+        target_class = in_class;
       }
 
-      /** Adds a controller to the vector of controllers for this CollapseCouple.
-       *
-       * @param controller new controller to add to coupling is of type string
-       * @param expanded initial state of the target(s), is it expanded or not?
-       */
+      // add controllers to this coupling
+      for (auto & widget : controllers) { AddController(widget, expanded); }
+      // add targets to this coupling
+      for (auto & widget : targets) { AddTarget(widget, expanded); }
+    }
 
-      /*
-       * TODO: Ideally, this method would be templated, but running into same issues
-       * as when trying to do this with the constructor
-       */
-      void AddController(const std::string controller, const bool expanded) {
-        AddController(web::Div("emp__collapse_controller_div_" + std::to_string(counter) + "_" + std::to_string(widget_counter)), expanded);
-        widget_counter++;
+    /*
+     * TODO: Ideally, this constructor will be templated and can handle any input that is
+     * not a Widget or vector of Widgets.
+     * When we tried this before, all input would go through to this constructor.
+     * This caused issues when it tried to stream widgets into a div but the widget
+     * already had another parent.
+     *
+     * Note: Maybe if we web::internal::FacetedWidget instead of web::Widget in the
+     * first constructor, templating this constructor will work?
+     */
+    /**
+     * Constructor which takes strings as the controller and target
+     * It will put each in a Div element and call the constructor which takes
+     * web elements as controller and target parameters.
+     */
+    CollapseCoupling(const std::string controller,
+                     const std::string target,
+                     const bool expanded        = false,
+                     const std::string in_class = "")
+      : CollapseCoupling(web::Div("emp__collapse_controller_div_" + std::to_string(counter)),
+                         web::Div("emp__collapse_target_div_" + std::to_string(counter)),
+                         expanded,
+                         in_class) {
+      counter++;
+    }
+
+    /**
+     * Adds a controller to the vector of controllers for this CollapseCouple
+     *
+     * @param controller new controller to add to coupling is of type Widget
+     * @param expanded initial state of the target(s), is it expanded or not?
+     */
+    void AddController(web::Widget controller, const bool expanded) {
+      internal::CollapseController controller_widget(controller, target_class, expanded);
+      controllers.push_back(controller_widget.GetLinkDiv());
+    }
+
+    /** Adds a controller to the vector of controllers for this CollapseCouple.
+     *
+     * @param controller new controller to add to coupling is of type string
+     * @param expanded initial state of the target(s), is it expanded or not?
+     */
+
+    /*
+     * TODO: Ideally, this method would be templated, but running into same issues
+     * as when trying to do this with the constructor
+     */
+    void AddController(const std::string controller, const bool expanded) {
+      AddController(web::Div("emp__collapse_controller_div_" + std::to_string(counter) + "_" +
+                             std::to_string(widget_counter)),
+                    expanded);
+      widget_counter++;
+    }
+
+    /**
+     * Adds a target to the vector of targets for this CollapseCouple
+     *
+     *  @param widget new target to add to coupling is a web element
+     *  @param expanded initial state of the target(s), is it expanded or not?
+     */
+    void AddTarget(web::internal::FacetedWidget widget, const bool expanded) {
+      if (expanded) {
+        widget.AddAttr("class", "collapse show");
+      } else {
+        widget.AddAttr("class", "collapse");
       }
+      widget.AddAttr("class", target_class);
+      targets.push_back(widget);
+    }
 
-      /**
-       * Adds a target to the vector of targets for this CollapseCouple
-       *
-       *  @param widget new target to add to coupling is a web element
-       *  @param expanded initial state of the target(s), is it expanded or not?
-       */
-      void AddTarget(web::internal::FacetedWidget widget, const bool expanded) {
-        if (expanded) {
-          widget.AddAttr("class", "collapse show");
-        } else {
-          widget.AddAttr("class", "collapse");
-        }
-        widget.AddAttr("class", target_class);
-        targets.push_back(widget);
-      }
+    /**
+     * Adds a target to the vector of targets for this CollapseCouple
+     *
+     * @param target new target to add to coupling is a string
+     * @param expanded initial state of the target(s), is it expanded or not?
+     */
 
-      /**
-       * Adds a target to the vector of targets for this CollapseCouple
-       *
-       * @param target new target to add to coupling is a string
-       * @param expanded initial state of the target(s), is it expanded or not?
-       */
+    /*
+     * If the target is not a web widget, place it in a div and call the other AddTarget function
+     * TODO: Ideally, this method would be templated, but running into same issues
+     * as when trying to do this with the constructor
+     */
+    void AddTarget(const std::string target, const bool expanded) {
+      AddTarget(web::Div{} << target, expanded);
+    }
 
-      /*
-       * If the target is not a web widget, place it in a div and call the other AddTarget function
-       * TODO: Ideally, this method would be templated, but running into same issues
-       * as when trying to do this with the constructor
-       */
-      void AddTarget(const std::string target, const bool expanded) {
-        AddTarget(web::Div{} << target, expanded);
-      }
+    /// Returns the target_class associated with this CollapseCouple
+    std::string GetTargetClass() { return target_class; }
 
-      /// Returns the target_class associated with this CollapseCouple
-      std::string GetTargetClass() { return target_class; }
+    /*
+     * Functions used to retrieve controllers and targets
+     * TODO: In the future, add capability to call controllers and targets by name
+     * (Like dictionary accesses, key/value pairs)
+     */
 
-      /*
-       * Functions used to retrieve controllers and targets
-       * TODO: In the future, add capability to call controllers and targets by name
-       * (Like dictionary accesses, key/value pairs)
-       */
+    /// Returns the vector of all controllers associated with this CollapseCouple
+    emp::vector<web::Widget> & GetControllerDivs() { return controllers; }
 
-      /// Returns the vector of all controllers associated with this CollapseCouple
-      emp::vector<web::Widget> & GetControllerDivs() { return controllers; }
+    /// Returns the controller at the given index
+    web::Widget & GetControllerDiv(const size_t index = 0) { return controllers[index]; }
 
-      /// Returns the controller at the given index
-      web::Widget & GetControllerDiv(const size_t index=0) { return controllers[index]; }
+    /// Returns the vector of all targets associated with this CollapseCouple
+    emp::vector<web::Widget> & GetTargetDivs() { return targets; }
 
-      /// Returns the vector of all targets associated with this CollapseCouple
-      emp::vector<web::Widget> & GetTargetDivs() { return targets; }
-
-      /// Returns the target at the given index
-      web::Widget & GetTargetDiv(const size_t index=0) { return targets[index]; }
+    /// Returns the target at the given index
+    web::Widget & GetTargetDiv(const size_t index = 0) { return targets[index]; }
   };
-}
-}
+}}  // namespace emp::prefab
 
-#endif // #ifndef EMP_PREFAB_COLLAPSE_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_PREFAB_COLLAPSE_HPP_GUARD

@@ -51,32 +51,33 @@ namespace emp {
 
   class NKLandscape {
   private:
-    size_t N = 0;             ///< The number of bits in each genome.
-    size_t K = 0;             ///< The number of OTHER bits with which each bit is epistatic.
-    size_t state_count = 0;   ///< The total number of states associated with each bit table.
-    size_t total_count = 0;   ///< The total number of states in the entire landscape space.
-    emp::vector< emp::vector<double> > landscape;  ///< The actual values in the landscape.
+    size_t N           = 0;  ///< The number of bits in each genome.
+    size_t K           = 0;  ///< The number of OTHER bits with which each bit is epistatic.
+    size_t state_count = 0;  ///< The total number of states associated with each bit table.
+    size_t total_count = 0;  ///< The total number of states in the entire landscape space.
+    emp::vector<emp::vector < double> > landscape;  ///< The actual values in the landscape.
 
   public:
-    NKLandscape() = default;
+    NKLandscape()                    = default;
     NKLandscape(const NKLandscape &) = default;
-    NKLandscape(NKLandscape &&) = default;
+    NKLandscape(NKLandscape &&)      = default;
 
     /// N is the length of bitstrings in your population, K is the number of neighboring sites
     /// the affect the fitness contribution of each site (i.e. epistasis or ruggedness), random
     /// is the random number generator to use to generate this landscape.
     NKLandscape(size_t _N, size_t _K, emp::Random & random)
-     : N(_N), K(_K)
-     , state_count(emp::IntPow<size_t>(2,K+1))
-     , total_count(N * state_count)
-     , landscape(N)
-    {
+      : N(_N)
+      , K(_K)
+      , state_count(emp::IntPow<size_t>(2, K + 1))
+      , total_count(N * state_count)
+      , landscape(N) {
       Reset(random);
     }
+
     ~NKLandscape() = default;
 
     NKLandscape & operator=(const NKLandscape &) = delete;
-    NKLandscape & operator=(NKLandscape &&) = default;
+    NKLandscape & operator=(NKLandscape &&)      = default;
 
     /// Randomize the landscape without changing the landscape size.
     void Reset(emp::Random & random) {
@@ -84,19 +85,18 @@ namespace emp {
       emp_assert(K < N, K, N);
 
       // Build new landscape.
-      for ( auto & ltable : landscape) {
+      for (auto & ltable : landscape) {
         ltable.resize(state_count);
-        for (double & pos : ltable) {
-          pos = random.GetDouble();
-        }
+        for (double & pos : ltable) { pos = random.GetDouble(); }
       }
     }
 
     /// Configure for new values of N and K.
     void Config(size_t _N, size_t _K, emp::Random & random) {
       // Save new values.
-      N = _N;  K = _K;
-      state_count = emp::IntPow<size_t>(2,K+1);
+      N           = _N;
+      K           = _K;
+      state_count = emp::IntPow<size_t>(2, K + 1);
       total_count = N * state_count;
       landscape.resize(N);
       Reset(random);
@@ -104,10 +104,13 @@ namespace emp {
 
     /// Returns N
     size_t GetN() const { return N; }
+
     /// Returns K
     size_t GetK() const { return K; }
+
     /// Get the number of possible states for a given site
     size_t GetStateCount() const { return state_count; }
+
     /// Get the total number of states possible in the landscape
     /// (i.e. the number of different fitness contributions in the table)
     size_t GetTotalCount() const { return total_count; }
@@ -120,10 +123,10 @@ namespace emp {
     }
 
     /// Get the fitness of a whole  bitstring
-    double GetFitness( std::vector<size_t> states ) const {
+    double GetFitness(std::vector<size_t> states) const {
       emp_assert(states.size() == N);
       double total = landscape[0][states[0]];
-      for (size_t i = 1; i < N; i++) total += GetFitness(i,states[i]);
+      for (size_t i = 1; i < N; i++) { total += GetFitness(i, states[i]); }
       return total;
     }
 
@@ -132,11 +135,11 @@ namespace emp {
       emp_assert(genome.GetSize() == N, genome.GetSize(), N);
 
       // Use a double-length genome to easily handle wrap-around.
-      genome.Resize(N*2);
+      genome.Resize(N * 2);
       genome |= (genome << N);
 
       double total = 0.0;
-      size_t mask = emp::MaskLow<size_t>(K+1);
+      size_t mask  = emp::MaskLow<size_t>(K + 1);
       for (size_t i = 0; i < N; i++) {
         const size_t cur_val = (genome >> i).GetUInt(0) & mask;
         const double cur_fit = GetFitness(i, cur_val);
@@ -151,22 +154,22 @@ namespace emp {
       emp_assert(genome.GetSize() == N, genome.GetSize(), N);
 
       // Use a double-length genome to easily handle wrap-around.
-      genome.Resize(N*2);
+      genome.Resize(N * 2);
       genome |= (genome << N);
 
-      size_t mask = emp::MaskLow<size_t>(K+1);
+      size_t mask          = emp::MaskLow<size_t>(K + 1);
       const size_t cur_val = (genome >> n).GetUInt(0) & mask;
       return GetFitness(n, cur_val);
     }
 
-   /// Get the fitness of a whole bitstring (pass by value so can be modified.)
+    /// Get the fitness of a whole bitstring (pass by value so can be modified.)
     emp::vector<double> GetFitnesses(emp::BitVector genome) const {
       // Use a double-length genome to easily handle wrap-around.
-      genome.Resize(N*2);
+      genome.Resize(N * 2);
       genome |= (genome << N);
       emp::vector<double> fits;
 
-      size_t mask = emp::MaskLow<size_t>(K+1);
+      size_t mask = emp::MaskLow<size_t>(K + 1);
       for (size_t i = 0; i < N; i++) {
         const size_t cur_val = (genome >> i).GetUInt(0) & mask;
         const double cur_fit = GetFitness(i, cur_val);
@@ -177,12 +180,11 @@ namespace emp {
 
     void SetState(size_t n, size_t state, double in_fit) { landscape[n][state] = in_fit; }
 
-    void RandomizeStates(Random & random, size_t num_states=1) {
+    void RandomizeStates(Random & random, size_t num_states = 1) {
       for (size_t i = 0; i < num_states; i++) {
         SetState(random.GetUInt(N), random.GetUInt(state_count), random.GetDouble());
       }
     }
-
   };
 
   /// The NKLandscapeMemo class is similar to NKLandscape, but it does not pre-calculate all
@@ -193,51 +195,52 @@ namespace emp {
   private:
     size_t N;
     size_t K;
-    mutable emp::vector< emp::memo_function<double(const BitVector &)> > landscape;
+    mutable emp::vector<emp::memo_function < double(const BitVector &)> > landscape;
     emp::vector<BitVector> masks;
 
   public:
-    NKLandscapeMemo() = delete;
+    NKLandscapeMemo()                        = delete;
     NKLandscapeMemo(const NKLandscapeMemo &) = delete;
-    NKLandscapeMemo(NKLandscapeMemo &&) = default;
+    NKLandscapeMemo(NKLandscapeMemo &&)      = default;
+
     NKLandscapeMemo(size_t _N, size_t _K, emp::Random & random)
-      : N(_N), K(_K), landscape(N), masks(N)
-    {
+      : N(_N), K(_K), landscape(N), masks(N) {
       // Each position in the landscape...
       for (size_t n = 0; n < N; n++) {
         // ...should have its own memo_function
-        landscape[n] = [&random](const BitVector &){ return random.GetDouble(); };
+        landscape[n] = [&random](const BitVector &) { return random.GetDouble(); };
         // ...and its own mask.
         masks[n].Resize(N);
-        for (size_t k = 0; k < K; k++) masks[n][(n+k)%N] = 1;
+        for (size_t k = 0; k < K; k++) { masks[n][(n + k) % N] = 1; }
       }
     }
-    ~NKLandscapeMemo() = default;
+
+    ~NKLandscapeMemo()                                   = default;
     NKLandscapeMemo & operator=(const NKLandscapeMemo &) = delete;
-    NKLandscapeMemo & operator=(NKLandscapeMemo &&) = default;
+    NKLandscapeMemo & operator=(NKLandscapeMemo &&)      = default;
 
     size_t GetN() const { return N; }
+
     size_t GetK() const { return K; }
 
     double GetFitness(size_t n, const BitVector & state) const {
       emp_assert(state == (state & masks[n]));
       return landscape[n](state);
     }
+
     double GetFitness(const BitVector & genome) const {
       emp_assert(genome.GetSize() == N);
 
       // Otherwise calculate it.
       double total = 0.0;
-      for (size_t n = 0; n < N; n++) {
-        total += landscape[n](genome & masks[n]);
-      }
+      for (size_t n = 0; n < N; n++) { total += landscape[n](genome & masks[n]); }
       return total;
     }
   };
 
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_EVOLVE_NK_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_EVOLVE_NK_HPP_GUARD
 
 // Local settings for Empecable file checker.
 // empecable_words: ltable

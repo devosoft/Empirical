@@ -30,15 +30,15 @@ namespace emp {
   template <typename T>
   class ra_set {
   private:
-    emp::map<T,size_t> id_map;  ///< A map of where to find values in vector.
-    emp::vector<T> vals;        ///< A vector of all values contained.
+    emp::map<T, size_t> id_map;  ///< A map of where to find values in vector.
+    emp::vector<T> vals;         ///< A vector of all values contained.
 
   public:
-    ra_set() = default;
-    ra_set(const ra_set &) = default;
-    ra_set(ra_set &&) = default;
+    ra_set()                              = default;
+    ra_set(const ra_set &)                = default;
+    ra_set(ra_set &&)                     = default;
     ra_set<T> & operator=(const ra_set &) = default;
-    ra_set<T> & operator=(ra_set &&) = default;
+    ra_set<T> & operator=(ra_set &&)      = default;
 
     using value_type = T;
 
@@ -52,11 +52,16 @@ namespace emp {
     const T & operator[](size_t pos) const { return vals[pos]; }
 
     /// Remove all values from this container.
-    void clear() { id_map.clear(); vals.resize(0); }
+    void clear() {
+      id_map.clear();
+      vals.resize(0);
+    }
 
     /// Insert a new value into container.
     void insert(const T & v) {
-      if (count(v)) return; // Already in set.
+      if (count(v)) {
+        return;  // Already in set.
+      }
       const size_t pos = vals.size();
       vals.push_back(v);
       id_map[v] = pos;
@@ -64,7 +69,9 @@ namespace emp {
 
     /// Erase a specific value from the container.
     bool erase(const T & v) {
-      if (!count(v)) return false;   // Not in set.
+      if (!count(v)) {
+        return false;  // Not in set.
+      }
 
       // Find out where v is in id_map and clear it.
       const size_t pos = id_map[v];
@@ -73,7 +80,7 @@ namespace emp {
       // Move the former last value to the now-empty spot.
       const size_t last_pos = vals.size() - 1;
       if (pos != last_pos) {
-        vals[pos] = vals[last_pos];
+        vals[pos]         = vals[last_pos];
         id_map[vals[pos]] = pos;
       }
       vals.resize(last_pos);
@@ -84,6 +91,6 @@ namespace emp {
     size_t count(const T & v) const { return id_map.count(v); }
   };
 
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_DATASTRUCTS_RA_SET_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_DATASTRUCTS_RA_SET_HPP_GUARD

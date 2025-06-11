@@ -47,34 +47,30 @@ namespace emp {
   namespace cl {
 
     // Convert input arguments to a vector of strings for easier processing.
-    emp::vector<std::string> args_to_strings(int argc, char* argv[]) {
+    emp::vector<std::string> args_to_strings(int argc, char * argv[]) {
       emp::vector<std::string> args;
-      for (size_t i = 0; i < (size_t) argc; i++) {
-        args.push_back(argv[i]);
-      }
+      for (size_t i = 0; i < (size_t) argc; i++) { args.push_back(argv[i]); }
       return args;
     }
 
     // Convert input arguments to a vector of emp::String for easier processing.
-    emp::vector<emp::String> ArgsToStrings(int argc, char* argv[]) {
+    emp::vector<emp::String> ArgsToStrings(int argc, char * argv[]) {
       emp::vector<emp::String> args;
-      for (size_t i = 0; i < (size_t) argc; i++) {
-        args.push_back(argv[i]);
-      }
+      for (size_t i = 0; i < (size_t) argc; i++) { args.push_back(argv[i]); }
       return args;
     }
 
     // Use an argument in a given position OR a default value of that arg doesn't exist.
     template <typename T>
-    T read_arg_pos(const emp::vector<std::string> & args, size_t pos, T default_val=T()) {
-      if (args.size() <= pos) return default_val;
+    T read_arg_pos(const emp::vector<std::string> & args, size_t pos, T default_val = T()) {
+      if (args.size() <= pos) { return default_val; }
       return emp::from_string<T>(args[pos]);
     }
 
     // Search through args to find a specific value.
     int find_arg(const emp::vector<std::string> & args, const std::string & pattern) {
       for (size_t i = 0; i < args.size(); i++) {
-        if (args[i] == pattern) return (int) i;
+        if (args[i] == pattern) { return (int) i; }
       }
       return -1;
     }
@@ -82,7 +78,7 @@ namespace emp {
     // Search through args to find a specific value.
     int FindArg(const emp::vector<emp::String> & args, const emp::String & pattern) {
       for (size_t i = 0; i < args.size(); i++) {
-        if (args[i] == pattern) return (int) i;
+        if (args[i] == pattern) { return (int) i; }
       }
       return -1;
     }
@@ -100,66 +96,85 @@ namespace emp {
     // Return true/false if a specific argument is present and REMOVE IT.
     bool use_arg(emp::vector<std::string> & args, const std::string & pattern) {
       const int pos = find_arg(args, pattern);
-      if (pos >= 0) args.erase(args.begin()+pos);
+      if (pos >= 0) { args.erase(args.begin() + pos); }
       return (pos != -1);
     }
 
     // Return true/false if a specific argument is present and REMOVE IT.
     bool UseArg(emp::vector<emp::String> & args, const emp::String & pattern) {
       const int pos = FindArg(args, pattern);
-      if (pos >= 0) args.erase(args.begin()+pos);
+      if (pos >= 0) { args.erase(args.begin() + pos); }
       return (pos != -1);
     }
 
     // Load the value from an argument with the provided pattern into the provided variable.
     template <typename T>
     int get_arg_value(emp::vector<std::string> & args, const std::string & pattern, T & var) {
-      const int pos = find_arg(args, pattern);        // Find the pattern in the set of arguments!
-      if (pos == -1) return 0;                        // Arg not found; abort, return 0 (not found)
-      if (pos >= (int) args.size() - 1) return -1;    // No value!  Abort, return -1 (error)
-      var = emp::from_string<T>(args[(size_t)pos+1]); // Store the found value.
-      return 1;                                       // Indicate success!
+      const int pos = find_arg(args, pattern);  // Find the pattern in the set of arguments!
+      if (pos == -1) {
+        return 0;  // Arg not found; abort, return 0 (not found)
+      }
+      if (pos >= (int) args.size() - 1) {
+        return -1;  // No value!  Abort, return -1 (error)
+      }
+      var = emp::from_string<T>(args[(size_t) pos + 1]);  // Store the found value.
+      return 1;                                           // Indicate success!
     }
 
     // ...assume arg is a PAIR of strings.
-    int get_arg_value(emp::vector<std::string> & args, const std::string & pattern,
-                      std::string & var1, std::string & var2) {
+    int get_arg_value(emp::vector<std::string> & args,
+                      const std::string & pattern,
+                      std::string & var1,
+                      std::string & var2) {
       const int pos = find_arg(args, pattern);
-      if (pos == -1) return 0;                      // Arg not found.
-      if (pos >= (int) args.size() - 2) return -1;  // No room for both values!
-      var1 = args[(size_t)pos+1];
-      var2 = args[(size_t)pos+2];
+      if (pos == -1) {
+        return 0;  // Arg not found.
+      }
+      if (pos >= (int) args.size() - 2) {
+        return -1;  // No room for both values!
+      }
+      var1 = args[(size_t) pos + 1];
+      var2 = args[(size_t) pos + 2];
       return 1;
     }
 
     // Load the value from an argument with the provided pattern into the provided variable.
     template <typename T>
     int GetArgValue(emp::vector<emp::String> & args, const emp::String & pattern, T & var) {
-      const int pos = FindArg(args, pattern);         // Find the pattern in the set of arguments!
-      if (pos == -1) return 0;                        // Arg not found; abort, return 0 (not found)
-      if (pos >= (int) args.size() - 1) return -1;    // No value!  Abort, return -1 (error)
-      var = args[(size_t)pos+1].As<T>();              // Store the found value.
-      return 1;                                       // Indicate success!
+      const int pos = FindArg(args, pattern);  // Find the pattern in the set of arguments!
+      if (pos == -1) {
+        return 0;  // Arg not found; abort, return 0 (not found)
+      }
+      if (pos >= (int) args.size() - 1) {
+        return -1;  // No value!  Abort, return -1 (error)
+      }
+      var = args[(size_t) pos + 1].As<T>();  // Store the found value.
+      return 1;                              // Indicate success!
     }
 
     // ...assume arg is a PAIR of strings.
-    int GetArgValue(emp::vector<emp::String> & args, const emp::String & pattern,
-                      emp::String & var1, emp::String & var2) {
+    int GetArgValue(emp::vector<emp::String> & args,
+                    const emp::String & pattern,
+                    emp::String & var1,
+                    emp::String & var2) {
       const int pos = FindArg(args, pattern);
-      if (pos == -1) return 0;                      // Arg not found.
-      if (pos >= (int) args.size() - 2) return -1;  // No room for both values!
-      var1 = args[(size_t)pos+1];
-      var2 = args[(size_t)pos+2];
+      if (pos == -1) {
+        return 0;  // Arg not found.
+      }
+      if (pos >= (int) args.size() - 2) {
+        return -1;  // No room for both values!
+      }
+      var1 = args[(size_t) pos + 1];
+      var2 = args[(size_t) pos + 2];
       return 1;
     }
-
 
     // Same as get arg_value, but ALSO remove the args.
     template <typename... Ts>
     int use_arg_value(emp::vector<std::string> & args, const std::string & pattern, Ts &... vars) {
       const int result = get_arg_value(args, pattern, vars...);
-      const int pos = find_arg(args, pattern);
-      if (result == 1) args.erase(args.begin()+pos, args.begin()+pos+sizeof...(Ts)+1);
+      const int pos    = find_arg(args, pattern);
+      if (result == 1) { args.erase(args.begin() + pos, args.begin() + pos + sizeof...(Ts) + 1); }
       return result;
     }
 
@@ -167,15 +182,15 @@ namespace emp {
     template <typename... Ts>
     int UseArgValue(emp::vector<emp::String> & args, const emp::String & pattern, Ts &... vars) {
       const int result = GetArgValue(args, pattern, vars...);
-      const int pos = FindArg(args, pattern);
-      if (result == 1) args.erase(args.begin()+pos, args.begin()+pos+sizeof...(Ts)+1);
+      const int pos    = FindArg(args, pattern);
+      if (result == 1) { args.erase(args.begin() + pos, args.begin() + pos + sizeof...(Ts) + 1); }
       return result;
     }
 
 
-  }
+  }  // namespace cl
 
   using namespace cl;
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_CONFIG_COMMAND_LINE_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_CONFIG_COMMAND_LINE_HPP_GUARD

@@ -28,28 +28,60 @@ namespace emp {
     bool value;
 
   public:
-      // Bool(const Bool & b) : value(b.value) { }
-      Bool(bool b=false) : value(b) { }
-      Bool & operator=(bool b) { value = b; return *this; }
+    // Bool(const Bool & b) : value(b.value) { }
+    Bool(bool b = false) : value(b) {}
 
-      /// Conversion of this proxy to Boolean (as an rvalue)
-      operator bool() const { return value; }
+    Bool & operator=(bool b) {
+      value = b;
+      return *this;
+    }
 
-      // Conversion to a bool reference.
-      bool & Value() { return value; }
-      bool Value() const { return value; }
+    /// Conversion of this proxy to Boolean (as an rvalue)
+    operator bool() const { return value; }
 
-      /// Compound assignment operators using Bool as lvalue.
-      Bool & operator &=(bool b) { value &= b; return *this; }
-      Bool & operator |=(bool b) { value |= b; return *this; }
-      Bool & operator ^=(bool b) { value ^= b; return *this; }
-      Bool & operator +=(bool b) { value += b; return *this; }
-      Bool & operator -=(bool b) { value -= b; return *this; }
-      Bool & operator *=(bool b) { value = value && b; return *this; }
-      Bool & operator /=(bool b) { emp_assert(b == true); return *this; }
-    };
+    // Conversion to a bool reference.
+    bool & Value() { return value; }
 
-}
+    bool Value() const { return value; }
+
+    /// Compound assignment operators using Bool as lvalue.
+    Bool & operator&=(bool b) {
+      value &= b;
+      return *this;
+    }
+
+    Bool & operator|=(bool b) {
+      value |= b;
+      return *this;
+    }
+
+    Bool & operator^=(bool b) {
+      value ^= b;
+      return *this;
+    }
+
+    Bool & operator+=(bool b) {
+      value += b;
+      return *this;
+    }
+
+    Bool & operator-=(bool b) {
+      value -= b;
+      return *this;
+    }
+
+    Bool & operator*=(bool b) {
+      value = value && b;
+      return *this;
+    }
+
+    Bool & operator/=(bool b) {
+      emp_assert(b == true);
+      return *this;
+    }
+  };
+
+}  // namespace emp
 
 namespace std {
 
@@ -65,6 +97,6 @@ namespace std {
     return out;
   }
 
-}
+}  // namespace std
 
-#endif // #ifndef EMP_DATASTRUCTS_BOOL_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_DATASTRUCTS_BOOL_HPP_GUARD

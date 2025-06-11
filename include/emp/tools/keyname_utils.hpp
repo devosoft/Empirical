@@ -22,9 +22,9 @@
 #include <unordered_map>
 #ifndef __EMSCRIPTEN__
 #include <filesystem>
-#else
+#else  // #ifndef __EMSCRIPTEN__
 #include <experimental/filesystem>
-#endif
+#endif  // #ifndef __EMSCRIPTEN__ : #else
 #include <array>
 
 #include "../base/assert.hpp"
@@ -36,14 +36,14 @@ namespace emp::keyname {
   using unpack_t = std::unordered_map<std::string, std::string>;
 
   inline std::string pack(const unpack_t & dict) {
-
     std::map<std::string, std::string> regular, underscore, ext;
 
-    for (const auto &[k, v] : dict) {
-      if (k == "ext") ext[k] = v;
-      else if (k.size() && k[0] == '_') {
+    for (const auto & [k, v] : dict) {
+      if (k == "ext") {
+        ext[k] = v;
+      } else if (k.size() && k[0] == '_') {
         // ignore "_", this is a reserved keyword
-        if (k.size() > 1) underscore[k] = v;
+        if (k.size() > 1) { underscore[k] = v; }
       } else {
         regular[k] = v;
       }
@@ -52,67 +52,57 @@ namespace emp::keyname {
     emp::vector<std::string> res;
 
     for (const auto & map : {regular, underscore, ext}) {
-      std::transform(
-        std::cbegin(map),
-        std::cend(map),
-        std::back_inserter(res),
-        [](const std::pair<std::string, std::string> & pair){
-          std::array<std::string, 2> arr{pair.first, pair.second};
-          emp_assert([&arr](){ // check for illegal characters
-            for (const char c : {'=', '+'}) {
-              for (const auto &s : arr) {
-                if(s.find(c) != std::string::npos) return false;
-              }
-            }
-            return true;
-          }());
-          return emp::join(arr, "=");
-        }
-      );
+      std::transform(std::cbegin(map),
+                     std::cend(map),
+                     std::back_inserter(res),
+                     [](const std::pair<std::string, std::string> & pair) {
+                       std::array<std::string, 2> arr{pair.first, pair.second};
+                       emp_assert([&arr]() {  // check for illegal characters
+                         for (const char c : {'=', '+'}) {
+                           for (const auto & s : arr) {
+                             if (s.find(c) != std::string::npos) { return false; }
+                           }
+                         }
+                         return true;
+                       }());
+                       return emp::join(arr, "=");
+                     });
     }
 
     return emp::join(res, "+");
-
   }
 
   inline unpack_t unpack(const std::string & filename) {
     unpack_t res;
     const auto kv_strs = emp::slice(
 #ifndef __EMSCRIPTEN__
-      std::filesystem::path(filename).filename().string(), // get basename
-#else
-      std::experimental::filesystem::path(filename).filename().string(), // get basename
-#endif
-      '+'
-    );
+      std::filesystem::path(filename).filename().string(),  // get basename
+#else                                                       // #ifndef __EMSCRIPTEN__
+      std::experimental::filesystem::path(filename).filename().string(),  // get basename
+#endif                                                      // #ifndef __EMSCRIPTEN__ : #else
+      '+');
 
-    std::transform(
-      std::cbegin(kv_strs),
-      std::cend(kv_strs),
-      std::inserter(res, std::end(res)),
-      [](const std::string & kv_str){
-        const auto kv_vec = emp::slice(kv_str, '=', 2);
-        emp_assert(kv_vec.size() > 0);
-        emp_assert(kv_vec.size() <= 2);
-        return (
-          kv_vec.size() == 1
-          ? decltype(res)::value_type(kv_vec[0], "")
-          : decltype(res)::value_type(kv_vec[0], kv_vec[1])
-        );
-      }
-    );
+    std::transform(std::cbegin(kv_strs),
+                   std::cend(kv_strs),
+                   std::inserter(res, std::end(res)),
+                   [](const std::string & kv_str) {
+                     const auto kv_vec = emp::slice(kv_str, '=', 2);
+                     emp_assert(kv_vec.size() > 0);
+                     emp_assert(kv_vec.size() <= 2);
+                     return (kv_vec.size() == 1 ? decltype(res)::value_type(kv_vec[0], "")
+                                                : decltype(res)::value_type(kv_vec[0], kv_vec[1]));
+                   });
 
     res["_"] = filename;
 
     return res;
-
   }
 
 
 
-}
+}  // namespace emp::keyname
 
-#endif // #ifndef EMP_TOOLS_KEYNAME_UTILS_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_TOOLS_KEYNAME_UTILS_HPP_GUARD
 
 // Local settings for Empecable file checker.
-// empecable_words: mmore ext strs
+// empecable_words: strs ext mmore

@@ -51,10 +51,9 @@
 #include "init.hpp"
 #include "WidgetExtras.hpp"
 
-namespace emp {
-namespace web {
+namespace emp { namespace web {
 
-    #ifndef DOXYGEN_SHOULD_SKIP_THIS
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
   // Setup some types we will need later
   namespace internal {
     // Pre-declare WidgetInfo so classes can inter-operate.
@@ -63,37 +62,39 @@ namespace web {
     class TableInfo;
 
     /// Quick method for generating unique Widget ID numbers when not otherwise specified.
-    static size_t NextWidgetNum(bool inc_num=true) {
+    static size_t NextWidgetNum(bool inc_num = true) {
       static size_t next_id = 0;
-      if (!inc_num) return next_id;
+      if (!inc_num) { return next_id; }
       return next_id++;
     }
 
     /// Quick method for generating unique string IDs for Widgets.
-    static std::string NextWidgetID() {
-      return emp::to_string("emp__", NextWidgetNum());
-    }
+    static std::string NextWidgetID() { return emp::to_string("emp__", NextWidgetNum()); }
 
     /// Base class for command-objects that can be fed into widgets.
     class WidgetCommand {
     public:
       virtual ~WidgetCommand() { ; }
+
       virtual bool Trigger(WidgetInfo &) const = 0;
     };
-  }
-  #endif // DOXYGEN_SHOULD_SKIP_THIS
+  }  // namespace internal
+#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
   /// Widget is effectively a smart pointer to a WidgetInfo object, plus some basic accessors.
   class Widget {
-    friend internal::WidgetInfo; friend internal::DivInfo; friend internal::TableInfo;
+    friend internal::WidgetInfo;
+    friend internal::DivInfo;
+    friend internal::TableInfo;
   protected:
-    #ifndef DOXYGEN_SHOULD_SKIP_THIS
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
     using WidgetInfo = internal::WidgetInfo;
-    #endif /*DOXYGEN_SHOULD_SKIP_THIS*/
-    WidgetInfo * info;                        ///< Information associated with this widget.
+#endif /*DOXYGEN_SHOULD_SKIP_THIS*/  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
+    WidgetInfo * info;               ///< Information associated with this widget.
 
     /// If an Append doesn't work with current class, forward it to the parent and try there.
-    template <typename FWD_TYPE> Widget & ForwardAppend(FWD_TYPE && arg);
+    template <typename FWD_TYPE>
+    Widget & ForwardAppend(FWD_TYPE && arg);
 
     /// Set the information associated with this widget.
     Widget & SetInfo(WidgetInfo * in_info);
@@ -118,8 +119,10 @@ namespace web {
   public:
     /// When Widgets are first created, they should be provided with an ID.
     Widget(const std::string & id);
-    Widget(WidgetInfo * in_info=nullptr);
+    Widget(WidgetInfo * in_info = nullptr);
+
     Widget(const Widget & in) : Widget(in.info) { ; }
+
     Widget & operator=(const Widget & in) { return SetInfo(in.info); }
 
     virtual ~Widget();
@@ -135,19 +138,29 @@ namespace web {
     bool IsFrozen() const;    ///< Test if the activity state of this widget is currently FROZEN
     bool IsActive() const;    ///< Test if the activity state of this widget is currently ACTIVE
 
-    bool AppendOK() const;    ///< Is it okay to add more internal Widgets into this one?
-    void PreventAppend();     ///< Disallow further appending to this Widget.
+    bool AppendOK() const;  ///< Is it okay to add more internal Widgets into this one?
+    void PreventAppend();   ///< Disallow further appending to this Widget.
 
-    bool IsButton()   const { return GetInfoTypeName() == "ButtonInfo"; }
-    bool IsCanvas()   const { return GetInfoTypeName() == "CanvasInfo"; }
+    bool IsButton() const { return GetInfoTypeName() == "ButtonInfo"; }
+
+    bool IsCanvas() const { return GetInfoTypeName() == "CanvasInfo"; }
+
     bool IsCheckBox() const { return GetInfoTypeName() == "CheckBoxInfo"; }
-    bool IsDiv()      const { return GetInfoTypeName() == "DivInfo"; }
-    bool IsImage()    const { return GetInfoTypeName() == "ImageInfo"; }
-    bool IsInput()    const { return GetInfoTypeName() == "InputInfo"; }
+
+    bool IsDiv() const { return GetInfoTypeName() == "DivInfo"; }
+
+    bool IsImage() const { return GetInfoTypeName() == "ImageInfo"; }
+
+    bool IsInput() const { return GetInfoTypeName() == "InputInfo"; }
+
     bool IsSelector() const { return GetInfoTypeName() == "SelectorInfo"; }
-    bool IsTable()    const { return GetInfoTypeName() == "TableInfo"; }
-    bool IsText()     const { return GetInfoTypeName() == "TextInfo"; }
+
+    bool IsTable() const { return GetInfoTypeName() == "TableInfo"; }
+
+    bool IsText() const { return GetInfoTypeName() == "TextInfo"; }
+
     bool IsTextArea() const { return GetInfoTypeName() == "TextAreaInfo"; }
+
     bool IsTextFeed() const { return GetInfoTypeName() == "TextFeedInfo"; }
 
     bool IsD3Visualization() const { return GetInfoTypeName() == "D3VisualizationInfo"; }
@@ -176,16 +189,18 @@ namespace web {
     /// Convert Widget to bool (I.e., is this Widget active?)
     operator bool() const { return info != nullptr; }
 
-    const std::string & GetTitle() const { return GetAttr("title"); }  /// Get current tooltip on this widget.
+    const std::string & GetTitle() const {
+      return GetAttr("title");
+    }  /// Get current tooltip on this widget.
 
-    double GetXPos();          ///< Get the X-position of this Widget within its parent.
-    double GetYPos();          ///< Get the Y-position of this Widget within its parent.
-    double GetWidth();         ///< Get the width of this Widget on screen.
-    double GetHeight();        ///< Get the height of this Widget on screen.
-    double GetInnerWidth();    ///< Get the width of this Widget not including padding.
-    double GetInnerHeight();   ///< Get the height of this Widget not including padding.
-    double GetOuterWidth();    ///< Get the width of this Widget including all padding.
-    double GetOuterHeight();   ///< Get the height of this Widget including all padding.
+    double GetXPos();         ///< Get the X-position of this Widget within its parent.
+    double GetYPos();         ///< Get the Y-position of this Widget within its parent.
+    double GetWidth();        ///< Get the width of this Widget on screen.
+    double GetHeight();       ///< Get the height of this Widget on screen.
+    double GetInnerWidth();   ///< Get the width of this Widget not including padding.
+    double GetInnerHeight();  ///< Get the height of this Widget not including padding.
+    double GetOuterWidth();   ///< Get the width of this Widget including all padding.
+    double GetOuterHeight();  ///< Get the height of this Widget including all padding.
 
     /// Make this widget live, so changes occur immediately (once document is ready)
     void Activate();
@@ -195,7 +210,7 @@ namespace web {
 
     /// Record changes internally and REMOVE from screen until Activate is called.
     /// (Argument is for recursive, internal use only.)
-    virtual void Deactivate(bool top_level=true);
+    virtual void Deactivate(bool top_level = true);
 
     /// Toggle between Active and Deactivated.
     bool ToggleActive();
@@ -211,13 +226,15 @@ namespace web {
 
     /// Setup << operator to redirect to Append; option preparation can be overridden.
     virtual void PrepareAppend() { ; }
-    template <typename IN_TYPE> Widget operator<<(IN_TYPE && in_val);
+
+    template <typename IN_TYPE>
+    Widget operator<<(IN_TYPE && in_val);
 
     /// Debug...
     std::string GetInfoType() const;
   };
 
-  #ifndef DOXYGEN_SHOULD_SKIP_THIS
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
 
     // WidgetInfo is a base class containing information needed by all GUI widget classes
@@ -226,56 +243,67 @@ namespace web {
     class WidgetInfo {
     public:
       // Smart-pointer info
-      int ptr_count;                  ///< How many widgets are pointing to this info?
+      int ptr_count;  ///< How many widgets are pointing to this info?
 
       // Basic info about a widget
-      std::string id;                 ///< ID used for associated DOM element.
-      WidgetExtras extras;            ///< HTML attributes, CSS style, and listeners for web events.
+      std::string id;       ///< ID used for associated DOM element.
+      WidgetExtras extras;  ///< HTML attributes, CSS style, and listeners for web events.
 
       // Track hierarchy
-      WidgetInfo * parent;            ///< Which WidgetInfo is this one contained within?
-      emp::vector<Widget> dependants; ///< Widgets to be refreshed if this one is triggered
-      Widget::ActivityState state;    ///< Is this element active in DOM?
+      WidgetInfo * parent;             ///< Which WidgetInfo is this one contained within?
+      emp::vector<Widget> dependants;  ///< Widgets to be refreshed if this one is triggered
+      Widget::ActivityState state;     ///< Is this element active in DOM?
 
-      emp::Signal<void()> on_update_js_signal; /// Signal for JavaScript functions to be called with TriggerJS()
+      emp::Signal<void()>
+        on_update_js_signal;  /// Signal for JavaScript functions to be called with TriggerJS()
 
       /// WidgetInfo cannot be built unless within derived class, so constructor is protected
-      WidgetInfo(const std::string & in_id="")
-        : ptr_count(1), id(in_id), parent(nullptr), state(Widget::INACTIVE)
-      {
+      WidgetInfo(const std::string & in_id = "")
+        : ptr_count(1), id(in_id), parent(nullptr), state(Widget::INACTIVE) {
         EMP_TRACK_CONSTRUCT(WebWidgetInfo);
-        if (id == "") id = NextWidgetID();
+        if (id == "") { id = NextWidgetID(); }
       }
 
       /// No copies of INFO allowed
-      WidgetInfo(const WidgetInfo &) = delete;
+      WidgetInfo(const WidgetInfo &)             = delete;
       WidgetInfo & operator=(const WidgetInfo &) = delete;
 
-      virtual ~WidgetInfo() {
-        EMP_TRACK_DESTRUCT(WebWidgetInfo);
-      }
+      virtual ~WidgetInfo() { EMP_TRACK_DESTRUCT(WebWidgetInfo); }
 
       /// Debugging helpers...
       virtual std::string GetTypeName() const { return "WidgetInfo"; }
 
       // If not overloaded, pass along widget registration to parent.
-      virtual void Register_recurse(Widget & w) { if (parent) parent->Register_recurse(w); }
-      virtual void Register(Widget & w) { if (parent) parent->Register(w); }
-      virtual void Unregister_recurse(Widget & w) { if (parent) parent->Unregister_recurse(w); }
-      virtual void Unregister(Widget & w) { if (parent) parent->Unregister(w); }
+      virtual void Register_recurse(Widget & w) {
+        if (parent) { parent->Register_recurse(w); }
+      }
+
+      virtual void Register(Widget & w) {
+        if (parent) { parent->Register(w); }
+      }
+
+      virtual void Unregister_recurse(Widget & w) {
+        if (parent) { parent->Unregister_recurse(w); }
+      }
+
+      virtual void Unregister(Widget & w) {
+        if (parent) { parent->Unregister(w); }
+      }
 
       // Some nodes can have children and need to be able to recursively register them.
-      virtual void RegisterChildren(DivInfo * /*registrar*/) { ; }   // No children by default.
-      virtual void UnregisterChildren(DivInfo * /*registrar*/) { ; } // No children by default.
+      virtual void RegisterChildren(DivInfo * /*registrar*/) { ; }  // No children by default.
+
+      virtual void UnregisterChildren(DivInfo * /*registrar*/) { ; }  // No children by default.
 
       virtual void AddChild(Widget /*in*/) { emp_error("Invalid Widget for AddChild!", id); }
-      virtual void RemoveChild(Widget & /*child*/) { emp_error("Invalid Widget for RemoveChild!", id); }
+
+      virtual void RemoveChild(Widget & /*child*/) {
+        emp_error("Invalid Widget for RemoveChild!", id);
+      }
 
       // Record dependants.  Dependants are only acted upon when this widget's action is
       // triggered (e.g. a button is pressed)
-      void AddDependant(Widget in) {
-        dependants.emplace_back(in);
-      }
+      void AddDependant(Widget in) { dependants.emplace_back(in); }
 
       template <typename... T>
       void AddDependants(Widget first, T... widgets) {
@@ -285,31 +313,36 @@ namespace web {
 
       void AddDependants() { ; }
 
-      void UpdateDependants() { for (auto & d : dependants) d->ReplaceHTML(); }
-
-
-      // Activate is delayed until the document is ready, when DoActivate will be called.
-      virtual void DoActivate(bool top_level=true) {
-
-        if ( state != Widget::ACTIVE ) {
-          state = Widget::ACTIVE;
-          if ( top_level ) ReplaceHTML();
-        }
-
+      void UpdateDependants() {
+        for (auto & d : dependants) { d->ReplaceHTML(); }
       }
 
-      virtual bool AppendOK() const { return false; } // Most widgets can't be appended to.
-      virtual void PreventAppend() { emp_assert(false, GetTypeName()); } // Only for appendable widgets.
+      // Activate is delayed until the document is ready, when DoActivate will be called.
+      virtual void DoActivate(bool top_level = true) {
+        if (state != Widget::ACTIVE) {
+          state = Widget::ACTIVE;
+          if (top_level) { ReplaceHTML(); }
+        }
+      }
+
+      virtual bool AppendOK() const { return false; }  // Most widgets can't be appended to.
+
+      virtual void PreventAppend() {
+        emp_assert(false, GetTypeName());
+      }  // Only for appendable widgets.
 
       // By default, elements should forward unknown appends to their parents.
       virtual Widget Append(const std::string & text) { return ForwardAppend(text); }
+
       virtual Widget Append(const std::function<std::string()> & fn) { return ForwardAppend(fn); }
+
       virtual Widget Append(Widget info) { return ForwardAppend(info); }
+
       virtual Widget Append(const Font & font) { return ForwardAppend(font); }
 
       // Handle special commands
       virtual Widget Append(const emp::web::internal::WidgetCommand & cmd) {
-        if (cmd.Trigger(*this)) return Widget(this);
+        if (cmd.Trigger(*this)) { return Widget(this); }
         return ForwardAppend(cmd);  // Otherwise pass the Close to parent!
       }
 
@@ -318,32 +351,30 @@ namespace web {
       template <typename T>
       Widget Append(const T & val) {
         // First, test if we are working with a Widget command.
-        if constexpr ( std::is_base_of<Widget,T>() ) {
+        if constexpr (std::is_base_of<Widget, T>()) {
           const Widget widget = val;
           return Append(widget);
         }
 
         // First, test if we are working with a Widget command.
-        if constexpr ( std::is_base_of<WidgetCommand,T>() ) {
+        if constexpr (std::is_base_of<WidgetCommand, T>()) {
           const WidgetCommand & cmd = val;
           return Append(cmd);
         }
 
         // Next, test if this if an invocable function
         // @CAO: We should make sure it returns a string when called with no arguments.
-        else if constexpr ( std::is_invocable<T>() ) {
-          std::function<std::string()> fun_val( val );
+        else if constexpr (std::is_invocable<T>()) {
+          std::function<std::string()> fun_val(val);
           return Append(fun_val);
         }
 
         // If we are given a vector, we should try and add each element individually.
         // Allows one to stream ___.Children() to get similar behavior to display: contents
         // which is unsupported on some browsers
-        else if constexpr ( is_emp_vector<T>::value ) {
+        else if constexpr (is_emp_vector<T>::value) {
           Widget last(this);
-          for (auto & item : val) {
-            last = Append(item);
-          }
+          for (auto & item : val) { last = Append(item); }
           return last;
         }
 
@@ -364,37 +395,41 @@ namespace web {
       virtual void GetHTML(std::stringstream & ss) = 0;
 
       // Derived widgets may also provide JavaScript code to be run on redraw.
-      virtual void TriggerJS() {
-        on_update_js_signal.Trigger();
-      }
+      virtual void TriggerJS() { on_update_js_signal.Trigger(); }
 
       // Add JS function to be executed when TriggerJS() is called
-      SignalKey RegisterUpdateJS(const std::function<void()> &fun){
+      SignalKey RegisterUpdateJS(const std::function<void()> & fun) {
         return on_update_js_signal.AddAction(fun);
       }
 
       // Assume that the associated ID exists and replace it with the current HTML code.
       virtual void ReplaceHTML() {
         // If this node is frozen, don't change it!
-        if (state == Widget::FROZEN) return;
+        if (state == Widget::FROZEN) { return; }
 
         // If this node is active, put its contents in ss; otherwise make ss an empty span.
         std::stringstream ss;
-        if (state == Widget::ACTIVE) GetHTML(ss);
-        else ss << "<span id='" << id << "'></span>";
+        if (state == Widget::ACTIVE) {
+          GetHTML(ss);
+        } else {
+          ss << "<span id='" << id << "'></span>";
+        }
 
         // Now do the replacement.
-        MAIN_THREAD_EM_ASM({
+        MAIN_THREAD_EM_ASM(
+          {
             var widget_id = UTF8ToString($0);
-            var out_html = UTF8ToString($1);
-            var element = document.getElementById(widget_id);
-            if (element) element.outerHTML = out_html;
-          }, id.c_str(), ss.str().c_str());
+            var out_html  = UTF8ToString($1);
+            var element   = document.getElementById(widget_id);
+            if (element) { element.outerHTML = out_html; }
+          },
+          id.c_str(),
+          ss.str().c_str());
 
         // If active update style, trigger JS, and recurse to children!
         if (state == Widget::ACTIVE) {
-          extras.Apply(id); // Update the attributes, style, and listeners.
-          TriggerJS();      // Run associated Javascript code, if any (e.g., to fill out a canvas)
+          extras.Apply(id);  // Update the attributes, style, and listeners.
+          TriggerJS();       // Run associated Javascript code, if any (e.g., to fill out a canvas)
         }
       }
 
@@ -402,13 +437,13 @@ namespace web {
       virtual std::string GetType() { return "web::WidgetInfo"; }
     };
 
-  }  // end namespace
-  #endif // DOXYGEN_SHOULD_SKIP_THIS
+  }  // namespace internal
+#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
   // Implementation of Widget methods...
 
   Widget::Widget(const std::string & id) {
-    (void) id; // Not used outside of debug mode.
+    (void) id;  // Not used outside of debug mode.
     emp_assert(has_whitespace(id) == false);
     // We are creating a new widget; in derived class, make sure:
     // ... to assign info pointer to new object of proper *Info type
@@ -418,7 +453,7 @@ namespace web {
 
   Widget::Widget(WidgetInfo * in_info) {
     info = in_info;
-    if (info) info->ptr_count++;
+    if (info) { info->ptr_count++; }
     EMP_TRACK_CONSTRUCT(WebWidget);
   }
 
@@ -426,44 +461,71 @@ namespace web {
     // We are deleting a widget.
     if (info) {
       info->ptr_count--;
-      if (info->ptr_count == 0) delete info;
+      if (info->ptr_count == 0) { delete info; }
     }
     EMP_TRACK_DESTRUCT(WebWidget);
   }
 
-  std::string Widget::GetInfoTypeName() const { if (IsNull()) return "NULL"; return info->GetTypeName(); }
+  std::string Widget::GetInfoTypeName() const {
+    if (IsNull()) { return "NULL"; }
+    return info->GetTypeName();
+  }
 
   Widget & Widget::SetInfo(WidgetInfo * in_info) {
     // If the widget is already set correctly, stop here.
-    if (info == in_info) return *this;
+    if (info == in_info) { return *this; }
 
     // Clean up the old info that was previously pointed to.
     if (info) {
       info->ptr_count--;
-      if (info->ptr_count == 0) delete info;
+      if (info->ptr_count == 0) { delete info; }
     }
 
     // Setup new info.
     info = in_info;
-    if (info) info->ptr_count++;
+    if (info) { info->ptr_count++; }
 
     return *this;
   }
 
-  bool Widget::IsInactive() const { if (!info) return false; return info->state == INACTIVE; }
-  bool Widget::IsWaiting() const { if (!info) return false; return info->state == WAITING; }
-  bool Widget::IsFrozen() const { if (!info) return false; return info->state == FROZEN; }
-  bool Widget::IsActive() const { if (!info) return false; return info->state == ACTIVE; }
+  bool Widget::IsInactive() const {
+    if (!info) { return false; }
+    return info->state == INACTIVE;
+  }
 
-  bool Widget::AppendOK() const { if (!info) return false; return info->AppendOK(); }
-  void Widget::PreventAppend() { emp_assert(info); info->PreventAppend(); }
+  bool Widget::IsWaiting() const {
+    if (!info) { return false; }
+    return info->state == WAITING;
+  }
+
+  bool Widget::IsFrozen() const {
+    if (!info) { return false; }
+    return info->state == FROZEN;
+  }
+
+  bool Widget::IsActive() const {
+    if (!info) { return false; }
+    return info->state == ACTIVE;
+  }
+
+  bool Widget::AppendOK() const {
+    if (!info) { return false; }
+    return info->AppendOK();
+  }
+
+  void Widget::PreventAppend() {
+    emp_assert(info);
+    info->PreventAppend();
+  }
 
   const std::string Widget::no_name = "(none)";
+
   const std::string & Widget::GetID() const { return info ? info->id : no_name; }
 
   const std::string & Widget::GetCSS(const std::string & setting) const {
     return info ? info->extras.GetStyle(setting) : emp::empty_string();
   }
+
   bool Widget::HasCSS(const std::string & setting) {
     return info ? info->extras.HasStyle(setting) : false;
   }
@@ -471,124 +533,161 @@ namespace web {
   const std::string & Widget::GetAttr(const std::string & setting) const {
     return info ? info->extras.GetAttr(setting) : emp::empty_string();
   }
+
   bool Widget::HasAttr(const std::string & setting) {
     return info ? info->extras.HasAttr(setting) : false;
   }
 
   double Widget::GetXPos() {
-    if (!info) return -1.0;
+    if (!info) { return -1.0; }
     emp_assert(GetID() != "");  // Must have a name!
-    return MAIN_THREAD_EM_ASM_DOUBLE({
-      var id = UTF8ToString($0);
-      var element = document.getElementById(id);
-      if (!element) return -1.0; // Check if element exists
-      return element.offsetLeft;
-    }, GetID().c_str());
+    return MAIN_THREAD_EM_ASM_DOUBLE(
+      {
+        var id      = UTF8ToString($0);
+        var element = document.getElementById(id);
+        if (!element) {
+          return -1.0;  // Check if element exists
+        }
+        return element.offsetLeft;
+      },
+      GetID().c_str());
   }
 
   double Widget::GetYPos() {
-    if (!info) return -1.0;
+    if (!info) { return -1.0; }
     emp_assert(GetID() != "");  // Must have a name!
-    return MAIN_THREAD_EM_ASM_DOUBLE({
-      var id = UTF8ToString($0);
-      var element = document.getElementById(id);
-      if (!element) return -1.0; // Check if element exists
-      return element.offsetTop;
-    }, GetID().c_str());
+    return MAIN_THREAD_EM_ASM_DOUBLE(
+      {
+        var id      = UTF8ToString($0);
+        var element = document.getElementById(id);
+        if (!element) {
+          return -1.0;  // Check if element exists
+        }
+        return element.offsetTop;
+      },
+      GetID().c_str());
   }
 
-  double Widget::GetWidth(){
-    if (!info) return -1.0;
+  double Widget::GetWidth() {
+    if (!info) { return -1.0; }
     emp_assert(GetID() != "");  // Must have a name!
-    return MAIN_THREAD_EM_ASM_DOUBLE({
-      var id = UTF8ToString($0);
-      var element = document.getElementById(id);
-      if (!element) return -1.0; // Check if element exists
-      return element.clientWidth;
-    }, GetID().c_str());
+    return MAIN_THREAD_EM_ASM_DOUBLE(
+      {
+        var id      = UTF8ToString($0);
+        var element = document.getElementById(id);
+        if (!element) {
+          return -1.0;  // Check if element exists
+        }
+        return element.clientWidth;
+      },
+      GetID().c_str());
   }
-  double Widget::GetHeight(){
-    if (!info) return -1.0;
+
+  double Widget::GetHeight() {
+    if (!info) { return -1.0; }
     emp_assert(GetID() != "");  // Must have a name!
-    return MAIN_THREAD_EM_ASM_DOUBLE({
-      var id = UTF8ToString($0);
-      var element = document.getElementById(id);
-      if (!element) return -1.0; // Check if element exists
-      return element.clientHeight;
-    }, GetID().c_str());
+    return MAIN_THREAD_EM_ASM_DOUBLE(
+      {
+        var id      = UTF8ToString($0);
+        var element = document.getElementById(id);
+        if (!element) {
+          return -1.0;  // Check if element exists
+        }
+        return element.clientHeight;
+      },
+      GetID().c_str());
   }
-  double Widget::GetInnerWidth(){
-    if (!info) return -1.0;
+
+  double Widget::GetInnerWidth() {
+    if (!info) { return -1.0; }
     emp_assert(GetID() != "");  // Must have a name!
-    return MAIN_THREAD_EM_ASM_DOUBLE({
-      var id = UTF8ToString($0);
-      var element = document.getElementById(id);
-      if (!element) return 0.0; // Check if element exists
-      var style = window.getComputedStyle(element);
-      return (
-        element.clientWidth
-        - parseFloat(style.paddingLeft)
-        - parseFloat(style.paddingRight)
-      );
-    }, GetID().c_str());
+    return MAIN_THREAD_EM_ASM_DOUBLE(
+      {
+        var id      = UTF8ToString($0);
+        var element = document.getElementById(id);
+        if (!element) {
+          return 0.0;  // Check if element exists
+        }
+        var style = window.getComputedStyle(element);
+        return (element.clientWidth - parseFloat(style.paddingLeft) -
+                parseFloat(style.paddingRight));
+      },
+      GetID().c_str());
   }
-  double Widget::GetInnerHeight(){
-    if (!info) return -1.0;
+
+  double Widget::GetInnerHeight() {
+    if (!info) { return -1.0; }
     emp_assert(GetID() != "");  // Must have a name!
-    return MAIN_THREAD_EM_ASM_DOUBLE({
-      var id = UTF8ToString($0);
-      var element = document.getElementById(id);
-      if (!element) return 0.0; // Check if element exists
-      var style = window.getComputedStyle(element);
-      return (
-        element.clientHeight
-        - parseFloat(style.paddingTop)
-        - parseFloat(style.paddingBottom)
-      );
-    }, GetID().c_str());
+    return MAIN_THREAD_EM_ASM_DOUBLE(
+      {
+        var id      = UTF8ToString($0);
+        var element = document.getElementById(id);
+        if (!element) {
+          return 0.0;  // Check if element exists
+        }
+        var style = window.getComputedStyle(element);
+        return (element.clientHeight - parseFloat(style.paddingTop) -
+                parseFloat(style.paddingBottom));
+      },
+      GetID().c_str());
   }
-  double Widget::GetOuterWidth(){
-    if (!info) return -1.0;
+
+  double Widget::GetOuterWidth() {
+    if (!info) { return -1.0; }
     emp_assert(GetID() != "");  // Must have a name!
-    return MAIN_THREAD_EM_ASM_DOUBLE({
-      var id = UTF8ToString($0);
-      var element = document.getElementById(id);
-      if (!element) return 0.0; // Check if element exists
-      return element.offsetWidth;
-    }, GetID().c_str());
+    return MAIN_THREAD_EM_ASM_DOUBLE(
+      {
+        var id      = UTF8ToString($0);
+        var element = document.getElementById(id);
+        if (!element) {
+          return 0.0;  // Check if element exists
+        }
+        return element.offsetWidth;
+      },
+      GetID().c_str());
   }
-  double Widget::GetOuterHeight(){
-    if (!info) return -1.0;
+
+  double Widget::GetOuterHeight() {
+    if (!info) { return -1.0; }
     emp_assert(GetID() != "");  // Must have a name!
-    return MAIN_THREAD_EM_ASM_DOUBLE({
-      var id = UTF8ToString($0);
-      var element = document.getElementById(id);
-      if (!element) return 0.0; // Check if element exists
-      return element.offsetHeight;
-    }, GetID().c_str());
+    return MAIN_THREAD_EM_ASM_DOUBLE(
+      {
+        var id      = UTF8ToString($0);
+        var element = document.getElementById(id);
+        if (!element) {
+          return 0.0;  // Check if element exists
+        }
+        return element.offsetHeight;
+      },
+      GetID().c_str());
   }
 
   void Widget::Activate() {
     auto * cur_info = info;
-    info->state = WAITING;
-    OnDocumentReady( std::function<void(void)>([cur_info](){ cur_info->DoActivate(); }) );
-    OnDocumentLoad( std::function<void(void)>([cur_info](){ cur_info->DoActivate(); }) );
+    info->state     = WAITING;
+    OnDocumentReady(std::function<void(void)>([cur_info]() { cur_info->DoActivate(); }));
+    OnDocumentLoad(std::function<void(void)>([cur_info]() { cur_info->DoActivate(); }));
   }
 
-  void Widget::Freeze() {
-    info->state = FROZEN;
-  }
+  void Widget::Freeze() { info->state = FROZEN; }
 
   void Widget::Deactivate(bool top_level) {
-    if (!info || info->state == INACTIVE) return;  // Skip if we are not active.
+    if (!info || info->state == INACTIVE) {
+      return;  // Skip if we are not active.
+    }
     info->state = INACTIVE;
-    if (top_level) info->ReplaceHTML();            // If at top level, clear the contents
+    if (top_level) {
+      info->ReplaceHTML();  // If at top level, clear the contents
+    }
   }
 
   bool Widget::ToggleActive() {
     emp_assert(info);
-    if (info->state != INACTIVE) Deactivate();
-    else Activate();
+    if (info->state != INACTIVE) {
+      Deactivate();
+    } else {
+      Activate();
+    }
     return info->state;
   }
 
@@ -609,11 +708,11 @@ namespace web {
   }
 
   std::string Widget::GetInfoType() const {
-    if (!info) return "UNINITIALIZED";
+    if (!info) { return "UNINITIALIZED"; }
     return info->GetType();
   }
 
-  #ifndef DOXYGEN_SHOULD_SKIP_THIS
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
 
     /// WidgetFacet is a template that provides accessors into Widget with a derived return type.
@@ -621,57 +720,66 @@ namespace web {
     class WidgetFacet : public Widget {
     protected:
       /// WidgetFacet cannot be built unless within derived class, so constructors are protected
-      WidgetFacet(const std::string & in_id="") : Widget(in_id) { }
-      WidgetFacet(const WidgetFacet & in) : Widget(in) { }
+      WidgetFacet(const std::string & in_id = "") : Widget(in_id) {}
+
+      WidgetFacet(const WidgetFacet & in) : Widget(in) {}
+
       WidgetFacet(const Widget & in) : Widget(in) {
         // Converting from a generic widget; make sure type is correct or non-existent!
-        emp_assert(!in || dynamic_cast<typename RETURN_TYPE::INFO_TYPE *>( Info(in) ) != NULL,
+        emp_assert(!in || dynamic_cast<typename RETURN_TYPE::INFO_TYPE *>(Info(in)) != NULL,
                    in.GetID());
       }
-      WidgetFacet(WidgetInfo * in_info) : Widget(in_info) { }
-      WidgetFacet & operator=(const WidgetFacet & in) { Widget::operator=(in); return *this; }
+
+      WidgetFacet(WidgetInfo * in_info) : Widget(in_info) {}
+
+      WidgetFacet & operator=(const WidgetFacet & in) {
+        Widget::operator=(in);
+        return *this;
+      }
+
       virtual ~WidgetFacet() { ; }
 
       /// CSS-related options may be overridden in derived classes that have multiple styles.
       /// By default DoCSS will track the new information and apply it (if active) to the widget.
       virtual void DoCSS(const std::string & setting, const std::string & value) {
         info->extras.style.Set(setting, value);
-        if (IsActive()) Style::Apply(info->id, setting, value);
+        if (IsActive()) { Style::Apply(info->id, setting, value); }
       }
 
       virtual void DoCSS(const std::string & class_) {
         info->extras.style.AddClass(class_);
-        if (IsActive()) Style::ApplyClass(info->id, class_);
+        if (IsActive()) { Style::ApplyClass(info->id, class_); }
       }
 
       /// Attr-related options may be overridden in derived classes that have multiple attributes.
       /// By default DoAttr will track the new information and apply it (if active) to the widget.
       virtual void DoAttr(const std::string & setting, const std::string & value) {
         info->extras.attr.Set(setting, value);
-        if (IsActive()) Attributes::Apply(info->id, setting, value);
+        if (IsActive()) { Attributes::Apply(info->id, setting, value); }
       }
 
       /// New attribute value will be appended to any existing values for this widget, not overridden.
-      virtual void DoAddAttr(const std::string attr, const std::string & value){
+      virtual void DoAddAttr(const std::string attr, const std::string & value) {
         info->extras.attr.DoAddAttr(attr, value);
-        if (IsActive()) Attributes::Apply(info->id, attr, info->extras.attr.GetAttrValue(attr));
+        if (IsActive()) { Attributes::Apply(info->id, attr, info->extras.attr.GetAttrValue(attr)); }
       }
 
       /// Listener options may be overridden in derived classes that have multiple listen targets.
       /// By default DoListen will track new listens and set them up immediately, if active.
       virtual void DoListen(const std::string & event_name, size_t fun_id) {
         info->extras.listen.Set(event_name, fun_id);
-        if (IsActive()) Listeners::Apply(info->id, event_name, fun_id);
+        if (IsActive()) { Listeners::Apply(info->id, event_name, fun_id); }
       }
 
     public:
       using return_t = RETURN_TYPE;
 
-      std::string GetHTML(){
+      std::string GetHTML() {
         std::stringstream ss;
         info->GetHTML(ss);
         return ss.str();
       }
+
       /// Set a specific CSS value for this widget.
       template <typename SETTING_TYPE>
       return_t & SetCSS(const std::string & setting, SETTING_TYPE && value) {
@@ -690,16 +798,18 @@ namespace web {
 
       /// Multiple CSS settings can be provided simultaneously.
       template <typename T1, typename T2, typename... OTHER_SETTINGS>
-      return_t & SetCSS(const std::string & setting1, T1 && val1,
-                        const std::string & setting2, T2 && val2,
+      return_t & SetCSS(const std::string & setting1,
+                        T1 && val1,
+                        const std::string & setting2,
+                        T2 && val2,
                         OTHER_SETTINGS... others) {
-        SetCSS(setting1, val1);                      // Set the first CSS value.
-        return SetCSS(setting2, val2, others...);    // Recurse to the others.
+        SetCSS(setting1, val1);                    // Set the first CSS value.
+        return SetCSS(setting2, val2, others...);  // Recurse to the others.
       }
 
       /// Add more than one value to an attribute.
       template <typename T>
-      return_t & AddAttr(const std::string attr, T && value){
+      return_t & AddAttr(const std::string attr, T && value) {
         emp_assert(info != nullptr);
         DoAddAttr(attr, emp::to_string(value));
         return (return_t &) *this;
@@ -707,33 +817,32 @@ namespace web {
 
       /// Multiple Attributes can be added to simultaneously.
       template <typename T1, typename T2, typename... OTHER_SETTINGS>
-      return_t & AddAttr(const std::string & setting1, T1 && val1,
-                            const std::string & setting2, T2 && val2,
-                            OTHER_SETTINGS... others) {
-        AddAttr(setting1, val1);                      // Set the first CSS value.
-        return AddAttr(setting2, val2, others...);    // Recurse to the others.
+      return_t & AddAttr(const std::string & setting1,
+                         T1 && val1,
+                         const std::string & setting2,
+                         T2 && val2,
+                         OTHER_SETTINGS... others) {
+        AddAttr(setting1, val1);                    // Set the first CSS value.
+        return AddAttr(setting2, val2, others...);  // Recurse to the others.
       }
 
       /// Multiple Attributes can be provided simultaneously.
       template <typename T1, typename T2, typename... OTHER_SETTINGS>
-      return_t & SetAttr(const std::string & setting1, T1 && val1,
-                            const std::string & setting2, T2 && val2,
-                            OTHER_SETTINGS... others) {
-        SetAttr(setting1, val1);                      // Set the first CSS value.
-        return SetAttr(setting2, val2, others...);    // Recurse to the others.
+      return_t & SetAttr(const std::string & setting1,
+                         T1 && val1,
+                         const std::string & setting2,
+                         T2 && val2,
+                         OTHER_SETTINGS... others) {
+        SetAttr(setting1, val1);                    // Set the first CSS value.
+        return SetAttr(setting2, val2, others...);  // Recurse to the others.
       }
 
       /// Allow multiple CSS settings to be provided as a single object.
       /// (still go through DoCSS given need for virtual re-routing.)
       return_t & SetCSS(const Style & in_style) {
-
         emp_assert(info != nullptr);
-        for (const auto & s : in_style.GetMap()) {
-          DoCSS(s.first, s.second);
-        }
-        for (const auto & s : in_style.GetClasses()) {
-          DoCSS(s);
-        }
+        for (const auto & s : in_style.GetMap()) { DoCSS(s.first, s.second); }
+        for (const auto & s : in_style.GetClasses()) { DoCSS(s); }
         return (return_t &) *this;
       }
 
@@ -741,9 +850,7 @@ namespace web {
       /// (still go through DoAttr given need for virtual re-routing.)
       return_t & SetAttr(const Attributes & in_attr) {
         emp_assert(info != nullptr);
-        for (const auto & a : in_attr.GetMap()) {
-          DoAttr(a.first, a.second);
-        }
+        for (const auto & a : in_attr.GetMap()) { DoAttr(a.first, a.second); }
         return (return_t &) *this;
       }
 
@@ -779,12 +886,12 @@ namespace web {
       /// Provide an event and a function that will be called when that event is triggered.
       /// In this case, the function takes two doubles which will be filled in with mouse coordinates.
       return_t & On(const std::string & event_name,
-                    const std::function<void(double,double)> & fun) {
+                    const std::function<void(double, double)> & fun) {
         emp_assert(info != nullptr);
-        auto fun_cb = [this, fun](MouseEvent evt){
+        auto fun_cb = [this, fun](MouseEvent evt) {
           double x = evt.clientX - GetXPos();
           double y = evt.clientY - GetYPos();
-          fun(x,y);
+          fun(x, y);
         };
         size_t fun_id = JSWrap(fun_cb);
         DoListen(event_name, fun_id);
@@ -792,62 +899,109 @@ namespace web {
       }
 
       /// Provide a function to be called when the window is resized.
-      template <typename T> return_t & OnResize(T && arg) { return On("resize", arg); }
+      template <typename T>
+      return_t & OnResize(T && arg) {
+        return On("resize", arg);
+      }
 
       /// Provide a function to be called when the mouse button is clicked in this Widget.
-      template <typename T> return_t & OnClick(T && arg) { return On("click", arg); }
+      template <typename T>
+      return_t & OnClick(T && arg) {
+        return On("click", arg);
+      }
 
       /// Provide a function to be called when the mouse button is double clicked in this Widget.
-      template <typename T> return_t & OnDoubleClick(T && arg) { return On("dblclick", arg); }
+      template <typename T>
+      return_t & OnDoubleClick(T && arg) {
+        return On("dblclick", arg);
+      }
 
       /// Provide a function to be called when the mouse button is pushed down in this Widget.
-      template <typename T> return_t & OnMouseDown(T && arg) { return On("mousedown", arg); }
+      template <typename T>
+      return_t & OnMouseDown(T && arg) {
+        return On("mousedown", arg);
+      }
 
       /// Provide a function to be called when the mouse button is released in this Widget.
-      template <typename T> return_t & OnMouseUp(T && arg) { return On("mouseup", arg); }
+      template <typename T>
+      return_t & OnMouseUp(T && arg) {
+        return On("mouseup", arg);
+      }
 
       /// Provide a function to be called whenever the mouse moves in this Widget.
-      template <typename T> return_t & OnMouseMove(T && arg) { return On("mousemove", arg); }
+      template <typename T>
+      return_t & OnMouseMove(T && arg) {
+        return On("mousemove", arg);
+      }
 
       /// Provide a function to be called whenever the mouse leaves the Widget.
-      template <typename T> return_t & OnMouseOut(T && arg) { return On("mouseout", arg); }
+      template <typename T>
+      return_t & OnMouseOut(T && arg) {
+        return On("mouseout", arg);
+      }
 
       /// Provide a function to be called whenever the mouse moves over the Widget.
-      template <typename T> return_t & OnMouseOver(T && arg) { return On("mouseover", arg); }
+      template <typename T>
+      return_t & OnMouseOver(T && arg) {
+        return On("mouseover", arg);
+      }
 
       /// Provide a function to be called whenever the mouse wheel moves in this Widget.
-      template <typename T> return_t & OnMouseWheel(T && arg) { return On("mousewheel", arg); }
+      template <typename T>
+      return_t & OnMouseWheel(T && arg) {
+        return On("mousewheel", arg);
+      }
 
       /// Provide a function to be called whenever a key is pressed down in this Widget.
-      template <typename T> return_t & OnKeydown(T && arg) { return On("keydown", arg); }
+      template <typename T>
+      return_t & OnKeydown(T && arg) {
+        return On("keydown", arg);
+      }
 
       /// Provide a function to be called whenever a key is pressed down and released in this Widget.
-      template <typename T> return_t & OnKeypress(T && arg) { return On("keypress", arg); }
+      template <typename T>
+      return_t & OnKeypress(T && arg) {
+        return On("keypress", arg);
+      }
 
       /// Provide a function to be called whenever a key is pressed released in this Widget.
-      template <typename T> return_t & OnKeyup(T && arg) { return On("keyup", arg); }
+      template <typename T>
+      return_t & OnKeyup(T && arg) {
+        return On("keyup", arg);
+      }
 
       /// Provide a function to be called whenever text is copied in this Widget.
-      template <typename T> return_t & OnCopy(T && arg) { return On("copy", arg); }
+      template <typename T>
+      return_t & OnCopy(T && arg) {
+        return On("copy", arg);
+      }
 
       /// Provide a function to be called whenever text is cut in this Widget.
-      template <typename T> return_t & OnCut(T && arg) { return On("cut", arg); }
+      template <typename T>
+      return_t & OnCut(T && arg) {
+        return On("cut", arg);
+      }
 
       /// Provide a function to be called whenever text is pasted in this Widget.
-      template <typename T> return_t & OnPaste(T && arg) { return On("paste", arg); }
+      template <typename T>
+      return_t & OnPaste(T && arg) {
+        return On("paste", arg);
+      }
 
       /// Trigger a click on this widget.
 
       return_t & DoClick() {
 #ifdef __EMSCRIPTEN__
-        MAIN_THREAD_EM_ASM({
-          var id = UTF8ToString($0);
-          var element = document.getElementById(id);
-          if (element) element.click();
-        }, info->id.c_str());
-#else
+        MAIN_THREAD_EM_ASM(
+          {
+            var id      = UTF8ToString($0);
+            var element = document.getElementById(id);
+            if (element) { element.click(); }
+          },
+          info->id.c_str());
+#else   // #ifdef __EMSCRIPTEN__
         emp::notify::Message("Triggering click on '", info->id, "'.");
-#endif
+#endif  // #ifdef __EMSCRIPTEN__ : #else
         return (return_t &) *this;
       }
 
@@ -857,72 +1011,84 @@ namespace web {
       /// Update the width of this Widget.
       /// @param w new width of the widget
       /// @param unit defaults to pixels ("px"), but can also be a measured distance (e.g, "inches") or a percentage("%")
-      return_t & SetWidth(double w, const std::string & unit="px") {
-        return SetCSS("width", emp::to_string(w, unit) );
+      return_t & SetWidth(double w, const std::string & unit = "px") {
+        return SetCSS("width", emp::to_string(w, unit));
       }
 
       /// Update the height of this Widget.
       /// @param h new height for the widget
       /// @param unit defaults to pixels ("px"), but can also be a measured distance (e.g, "inches") or a percentage("%")
-      return_t & SetHeight(double h, const std::string & unit="px") {
-        return SetCSS("height", emp::to_string(h, unit) );
+      return_t & SetHeight(double h, const std::string & unit = "px") {
+        return SetCSS("height", emp::to_string(h, unit));
       }
 
       /// Update the size (width and height) of this widget.
       /// @param w widget width
       /// @param h widget height
       /// @param unit defaults to pixels ("px"), but can also be a measured distance (e.g, "inches") or a percentage("%")
-      return_t & SetSize(double w, double h, const std::string & unit="px") {
-        SetWidth(w, unit); return SetHeight(h, unit);
+      return_t & SetSize(double w, double h, const std::string & unit = "px") {
+        SetWidth(w, unit);
+        return SetHeight(h, unit);
       }
 
       /// Move this widget to the center of its container.
       return_t & Center() { return SetCSS("margin", "auto"); }
 
       /// Set the x-y position of this widget within its container.
-      return_t & SetPosition(int x, int y, const std::string & unit="px",
-                             const std::string & pos_type="absolute",
-                             const std::string & x_anchor="left",
-                             const std::string & y_anchor="top") {
-        return SetCSS("position", pos_type,
-                      x_anchor, emp::to_string(x, unit),
-                      y_anchor, emp::to_string(y, unit));
+      return_t & SetPosition(int x,
+                             int y,
+                             const std::string & unit     = "px",
+                             const std::string & pos_type = "absolute",
+                             const std::string & x_anchor = "left",
+                             const std::string & y_anchor = "top") {
+        return SetCSS("position",
+                      pos_type,
+                      x_anchor,
+                      emp::to_string(x, unit),
+                      y_anchor,
+                      emp::to_string(y, unit));
       }
 
       /// Set the x-y position of this Widget within its container, using the TOP-RIGHT as an anchor.
-      return_t & SetPositionRT(int x, int y, const std::string & unit="px")
-        { return SetPosition(x, y, unit, "absolute", "right", "top"); }
+      return_t & SetPositionRT(int x, int y, const std::string & unit = "px") {
+        return SetPosition(x, y, unit, "absolute", "right", "top");
+      }
 
       /// Set the x-y position of this Widget within its container, using the BOTTOM-RIGHT as an anchor.
-      return_t & SetPositionRB(int x, int y, const std::string & unit="px")
-        { return SetPosition(x, y, unit, "absolute", "right", "bottom"); }
+      return_t & SetPositionRB(int x, int y, const std::string & unit = "px") {
+        return SetPosition(x, y, unit, "absolute", "right", "bottom");
+      }
 
       /// Set the x-y position of this Widget within its container, using the BOTTOM-LEFT as an anchor.
-      return_t & SetPositionLB(int x, int y, const std::string & unit="px")
-        { return SetPosition(x, y, unit, "absolute", "left", "bottom"); }
+      return_t & SetPositionLB(int x, int y, const std::string & unit = "px") {
+        return SetPosition(x, y, unit, "absolute", "left", "bottom");
+      }
 
       /// Set the x-y position of this Widget, fixed within the browser window.
-      return_t & SetPositionFixed(int x, int y, const std::string & unit="px")
-        { return SetPosition(x, y, unit, "fixed", "left", "top"); }
+      return_t & SetPositionFixed(int x, int y, const std::string & unit = "px") {
+        return SetPosition(x, y, unit, "fixed", "left", "top");
+      }
 
       /// Set the x-y position of the top-right corner this Widget, fixed within the browser window.
-      return_t & SetPositionFixedRT(int x, int y, const std::string & unit="px")
-        { return SetPosition(x, y, unit, "fixed", "right", "top"); }
+      return_t & SetPositionFixedRT(int x, int y, const std::string & unit = "px") {
+        return SetPosition(x, y, unit, "fixed", "right", "top");
+      }
 
       /// Set the x-y position of the bottom-right corner this Widget, fixed within the browser window.
-      return_t & SetPositionFixedRB(int x, int y, const std::string & unit="px")
-        { return SetPosition(x, y, unit, "fixed", "right", "bottom"); }
+      return_t & SetPositionFixedRB(int x, int y, const std::string & unit = "px") {
+        return SetPosition(x, y, unit, "fixed", "right", "bottom");
+      }
 
       /// Set the x-y position of the bottom-left corner this Widget, fixed within the browser window.
-      return_t & SetPositionFixedLB(int x, int y, const std::string & unit="px")
-        { return SetPosition(x, y, unit, "fixed", "left", "bottom"); }
-
+      return_t & SetPositionFixedLB(int x, int y, const std::string & unit = "px") {
+        return SetPosition(x, y, unit, "fixed", "left", "bottom");
+      }
 
       /// Set this Widget to float appropriately within its container.
-      return_t & SetFloat(const std::string & f="left") { return SetCSS("float", f); }
+      return_t & SetFloat(const std::string & f = "left") { return SetCSS("float", f); }
 
       /// Setup how this Widget should handle overflow.
-      return_t & SetOverflow(const std::string & o="auto") { return SetCSS("overflow", o); }
+      return_t & SetOverflow(const std::string & o = "auto") { return SetCSS("overflow", o); }
 
       /// Setup how this Widget to always have scrollbars.
       return_t & SetScroll() { return SetCSS("overflow", "scroll"); }
@@ -978,12 +1144,12 @@ namespace web {
       }
 
       /// The the number of pixels (or alternate unit) for the padding around cells (used with Tables)
-      return_t & SetPadding(double p, const std::string & unit="px") {
+      return_t & SetPadding(double p, const std::string & unit = "px") {
         return SetCSS("padding", emp::to_string(p, unit));
       }
 
       /// Make a widget appear or disappear.
-      return_t & Hide(bool hide=true, String display_type="block") {
+      return_t & Hide(bool hide = true, String display_type = "block") {
         return SetCSS("display", hide ? "none" : display_type);
       }
 
@@ -991,16 +1157,12 @@ namespace web {
       /// @param wrapper the wrapper that will be placed around this Widget
       /// @return this Widget
       return_t & WrapWith(Widget wrapper) {
-
         // if this Widget is already nested within a parent
         // we'll need to wedge the wrapper between this Widget and the parent
         // e.g., parent->child will become parent->wrapper->child
         if (Info(*this)->parent) {
-
           // parent should be a DivInfo
-          emp_assert(dynamic_cast<internal::DivInfo*>(
-            Info(*this)->parent
-          ));
+          emp_assert(dynamic_cast<internal::DivInfo *>(Info(*this)->parent));
 
           const auto parent_info = Info((return_t &) *this)->parent;
 
@@ -1016,20 +1178,18 @@ namespace web {
       }
 
       // Add JS function to on_update_js_sig
-      SignalKey RegisterUpdateJS(const std::function<void()> & fun){
+      SignalKey RegisterUpdateJS(const std::function<void()> & fun) {
         return info->RegisterUpdateJS(fun);
       }
-
     };
 
-  }
-  #endif // DOXYGEN_SHOULD_SKIP_THIS
+  }  // namespace internal
+#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-}
-}
+}}  // namespace emp::web
 
 
-#endif // #ifndef EMP_WEB_WIDGET_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_WEB_WIDGET_HPP_GUARD
 
 // Local settings for Empecable file checker.
 // empecable_words: evt

@@ -24,30 +24,44 @@ namespace emp {
   class reference_vector {
   private:
     using this_t = reference_vector<T>;
-    using vec_t = emp::vector< emp::Ptr<T> >;
+    using vec_t  = emp::vector<emp::Ptr < T> > ;
     vec_t vals;
 
     class Iterator {
-     ///  @todo Add a const iterator, and probably a reverse iterator.
+      ///  @todo Add a const iterator, and probably a reverse iterator.
     private:
       typename vec_t::iterator it;
 
     public:
-      Iterator(this_t & v, size_t pos=0) : it(v.vals.begin() + pos) { ; }
+      Iterator(this_t & v, size_t pos = 0) : it(v.vals.begin() + pos) { ; }
+
       Iterator(const typename vec_t::iterator & in_it) : it(in_it) { ; }
-      Iterator(const Iterator &) = default;
+
+      Iterator(const Iterator &)             = default;
       Iterator & operator=(const Iterator &) = default;
 
-      Iterator & operator++() { ++it; return *this; }
-      Iterator & operator--() { --it; return *this; }
+      Iterator & operator++() {
+        ++it;
+        return *this;
+      }
+
+      Iterator & operator--() {
+        --it;
+        return *this;
+      }
 
       /// Iterator comparisons
-      bool operator==(const Iterator& in) const { return it == in.it; }
-      bool operator!=(const Iterator& in) const { return it != in.it; }
-      bool operator< (const Iterator& in) const { return it <  in.it; }
-      bool operator<=(const Iterator& in) const { return it <= in.it; }
-      bool operator> (const Iterator& in) const { return it >  in.it; }
-      bool operator>=(const Iterator& in) const { return it >= in.it; }
+      bool operator==(const Iterator & in) const { return it == in.it; }
+
+      bool operator!=(const Iterator & in) const { return it != in.it; }
+
+      bool operator<(const Iterator & in) const { return it < in.it; }
+
+      bool operator<=(const Iterator & in) const { return it <= in.it; }
+
+      bool operator>(const Iterator & in) const { return it > in.it; }
+
+      bool operator>=(const Iterator & in) const { return it >= in.it; }
 
       /// Return a reference to the element pointed to by this iterator; may advance iterator.
       T & operator*() { return *(*it); }
@@ -74,25 +88,31 @@ namespace emp {
     using iterator_t = Iterator;
   public:
     size_t size() const { return vals.size(); }
+
     void resize(size_t new_size) {
       emp_assert(new_size <= vals.size(),
                  "A reference_vector can only be resized smaller; grow using push_back()",
-                 new_size, size());
+                 new_size,
+                 size());
       vals.resize(new_size);
     }
 
     T & operator[](size_t id) { return *(vals[id]); }
+
     const T & operator[](size_t id) const { return *(vals[id]); }
 
     void push_back(T & val) { vals.push_back(&val); }
 
     // Iterators
     Iterator begin() { return Iterator(vals.begin()); }
+
     const Iterator begin() const { return Iterator(vals.begin()); }
+
     Iterator end() { return Iterator(vals.end()); }
+
     const Iterator end() const { return Iterator(vals.end()); }
   };
 
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_DATASTRUCTS_REFERENCE_VECTOR_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_DATASTRUCTS_REFERENCE_VECTOR_HPP_GUARD

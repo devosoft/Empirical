@@ -1,15 +1,16 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2018
-*/
 /**
- *  @file
- *  @brief Handles creation or retrieval of type objects.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/in_progress/Empower/TypeManager.hpp
+ * @brief Handles creation or retrieval of type objects.
  */
 
-#ifndef EMP_IN_PROGRESS_EMPOWER_TYPEMANAGER_HPP_INCLUDE
-#define EMP_IN_PROGRESS_EMPOWER_TYPEMANAGER_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_IN_PROGRESS_EMPOWER_TYPE_MANAGER_HPP_GUARD
+#define INCLUDE_EMP_IN_PROGRESS_EMPOWER_TYPE_MANAGER_HPP_GUARD
 
 #include <functional>
 #include <stddef.h>
@@ -25,27 +26,28 @@ namespace emp {
 
   class TypeManager {
   private:
-    std::unordered_map< size_t, emp::Ptr<Type> > type_map;       ///< Map type values to Type objects.
+    std::unordered_map<size_t, emp::Ptr<Type> > type_map;  ///< Map type values to Type objects.
 
   public:
     TypeManager() : type_map() { ; }
+
     ~TypeManager() {
       // Delete all types being managed
-      for (auto & x : type_map) x.second.Delete();
+      for (auto & x : type_map) { x.second.Delete(); }
     }
 
     template <typename T>
     const Type & GetType() {
       using base_t = typename std::decay<T>::type;
 
-      size_t type_hash = GetTypeValue<base_t>();
+      size_t type_hash      = GetTypeValue<base_t>();
       std::string type_name = typeid(base_t).name();
 
       // If this type already exists stop here!
       auto type_it = type_map.find(type_hash);
-      if (type_it != type_map.end()) return *(type_it->second);
+      if (type_it != type_map.end()) { return *(type_it->second); }
 
-      Ptr<Type> type_ptr = emp::NewPtr< TypeInfo<T> >();
+      Ptr<Type> type_ptr  = emp::NewPtr<TypeInfo<T> >();
       type_map[type_hash] = type_ptr;
 
       return *type_ptr;
@@ -58,6 +60,6 @@ namespace emp {
   };
 
 
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_IN_PROGRESS_EMPOWER_TYPEMANAGER_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_IN_PROGRESS_EMPOWER_TYPE_MANAGER_HPP_GUARD

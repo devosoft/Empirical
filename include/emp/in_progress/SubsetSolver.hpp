@@ -22,7 +22,7 @@
 
 namespace emp {
 
-  template <bool FIND_MAX=false>
+  template <bool FIND_MAX = false>
   class SubsetSolver {
   private:
     double best_score;
@@ -56,11 +56,15 @@ namespace emp {
 
   public:
     SubsetSolver(size_t problem_size) : best_state(problem_size) {
-      next_id_fun = [](const SolveState & state){ return static_cast<size_t>(state.GetNextUnk()); };
+      next_id_fun = [](const SolveState & state) {
+        return static_cast<size_t>(state.GetNextUnk());
+      };
     }
 
     void SetEvalFun(eval_fun_t in_fun) { eval_fun = in_fun; }
+
     void SetNextIDFun(next_id_fun_t in_fun) { next_id_fun = in_fun; }
+
     void SetIncludeOptFun(include_opt_fun_t in_fun) { include_opt_fun = in_fun; }
 
     void Solve(SolveState state) {
@@ -73,7 +77,7 @@ namespace emp {
       state.Exclude(id);
       Solve(state);
       state.Include(id);
-      if (include_opt_fun) include_opt_fun(state, id);
+      if (include_opt_fun) { include_opt_fun(state, id); }
       Solve(state);
     }
 
@@ -84,6 +88,6 @@ namespace emp {
     }
   };
 
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_TOOLS_SUBSET_SOLVER_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_IN_PROGRESS_SUBSET_SOLVER_HPP_GUARD

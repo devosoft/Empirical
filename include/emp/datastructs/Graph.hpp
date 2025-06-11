@@ -25,20 +25,25 @@ namespace emp {
   /// A graph class that maintains a set of vertices (nodes) and edges (connecting pairs of nodes)
   class Graph {
   public:
-    #ifndef DOXYGEN_SHOULD_SKIP_THIS
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
     /// Information about nodes within a graph.
     class Node {
     private:
-      BitVector edge_set; /// What other node IDs is this one connected to?
+      BitVector edge_set;  /// What other node IDs is this one connected to?
       std::string label;
     public:
       Node(size_t num_nodes) : edge_set(num_nodes), label("") { ; }
+
       Node(const Node & in_node) = default;
-      Node(Node && in_node) = default;
+      Node(Node && in_node)      = default;
+
       ~Node() { ; }
 
       /// Set this node to have the same connections as another node.
-      Node & operator=(const Node & in_node) { edge_set = in_node.edge_set; return *this; }
+      Node & operator=(const Node & in_node) {
+        edge_set = in_node.edge_set;
+        return *this;
+      }
 
       /// Is this node connect to a specific other node?
       bool HasEdge(size_t to) const { return edge_set[to]; }
@@ -70,30 +75,26 @@ namespace emp {
       /// Identify how many other nodes from a provided set (a BitVector) this one is connected to.
       size_t GetMaskedDegree(const BitVector & mask) const { return (mask & edge_set).CountOnes(); }
 
-      void SetLabel(std::string lab) {
-        label = lab;
-      }
+      void SetLabel(std::string lab) { label = lab; }
 
-      std::string GetLabel() {
-        return label;
-      }
-
+      std::string GetLabel() { return label; }
     };
-    #endif // DOXYGEN_SHOULD_SKIP_THIS
+#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
   protected:
     emp::vector<Node> nodes;  ///< Set of vertices in this graph.
 
   public:
     /// Construct a new graph with the specified number of nodes.
-    Graph(size_t num_nodes=0) : nodes(num_nodes, num_nodes) { ; }
+    Graph(size_t num_nodes = 0) : nodes(num_nodes, num_nodes) { ; }
 
-    Graph(const Graph &) = default;              ///< Copy constructor
-    Graph(Graph &&) = default;                   ///< Move constructor
+    Graph(const Graph &) = default;  ///< Copy constructor
+    Graph(Graph &&)      = default;  ///< Move constructor
+
     ~Graph() { ; }
 
     Graph & operator=(const Graph &) = default;  ///< Copy operator
-    Graph & operator=(Graph &&) = default;       ///< Move operator
+    Graph & operator=(Graph &&)      = default;  ///< Move operator
 
     /// Get number of vertices in this graph.
     size_t GetSize() const { return nodes.size(); }
@@ -101,14 +102,15 @@ namespace emp {
     /// Get the total number of edges in this graph.
     size_t GetEdgeCount() const {
       size_t edge_count = 0;
-      for (size_t i = 0; i < nodes.size(); i++) edge_count += nodes[i].GetDegree();
+      for (size_t i = 0; i < nodes.size(); i++) { edge_count += nodes[i].GetDegree(); }
       return edge_count;
     }
 
     /// @returns the \c i th node in the graph
-    Node GetNode(int i) {return nodes[i];}
+    Node GetNode(int i) { return nodes[i]; }
+
     /// @returns a vector of all nodes in the graph
-    emp::vector<Node> GetNodes(){return nodes;}
+    emp::vector<Node> GetNodes() { return nodes; }
 
     /// Change the number of vertices in this graph.
     void Resize(size_t new_size) {
@@ -141,9 +143,7 @@ namespace emp {
       for (auto & node : nodes) {
         // Node is allowed to to have edge to itself so it's
         // okay that we don't exclude it
-        if (node.HasEdge(id)) {
-          count++;
-        }
+        if (node.HasEdge(id)) { count++; }
       }
       return count;
     }
@@ -155,14 +155,10 @@ namespace emp {
     }
 
     /// Set label of node @param id to @param lab
-    void SetLabel(size_t id, std::string lab) {
-      nodes[id].SetLabel(lab);
-    }
+    void SetLabel(size_t id, std::string lab) { nodes[id].SetLabel(lab); }
 
     /// Get label of node @param id
-    std::string GetLabel(size_t id) {
-      return nodes[id].GetLabel();
-    }
+    std::string GetLabel(size_t id) { return nodes[id].GetLabel(); }
 
     /// Determine if a specific edge is included in this graph.
     bool HasEdge(size_t from, size_t to) const {
@@ -218,11 +214,9 @@ namespace emp {
     /// Merge a second graph into this one.
     void Merge(const Graph & in_graph) {
       const size_t start_size = nodes.size();
-      const size_t new_size = start_size + in_graph.GetSize();
+      const size_t new_size   = start_size + in_graph.GetSize();
       nodes.resize(new_size, new_size);
-      for (auto & node : nodes) {
-        node.Resize(new_size);
-      }
+      for (auto & node : nodes) { node.Resize(new_size); }
 
       for (size_t i = 0; i < in_graph.GetSize(); i++) {
         BitVector edge_set = in_graph.nodes[i].GetEdgeSet();
@@ -233,52 +227,52 @@ namespace emp {
     }
 
     /// Print a symmetric graph to the provided output stream (defaulting to standard out)
-    void PrintSym(std::ostream & os=std::cout) {
-      os << GetSize() << " " << (GetEdgeCount()/2) << std::endl;
+    void PrintSym(std::ostream & os = std::cout) {
+      os << GetSize() << " " << (GetEdgeCount() / 2) << std::endl;
       for (size_t from = 0; from < nodes.size(); from++) {
-        for (size_t to=from+1; to < nodes.size(); to++) {
-          if (HasEdge(from, to) == false) continue;
-          emp_assert(HasEdge(to, from));              // This must be a symmetric graph!
+        for (size_t to = from + 1; to < nodes.size(); to++) {
+          if (HasEdge(from, to) == false) { continue; }
+          emp_assert(HasEdge(to, from));  // This must be a symmetric graph!
           os << from << " " << to << std::endl;
         }
       }
     }
 
     /// Print a directed graph to the provided output stream (defaulting to standard out)
-    void PrintDirected(std::ostream & os=std::cout) {
+    void PrintDirected(std::ostream & os = std::cout) {
       os << GetSize() << " " << GetEdgeCount() << std::endl;
       for (size_t from = 0; from < nodes.size(); from++) {
         for (size_t to = 0; to < nodes.size(); to++) {
-          if (HasEdge(from, to) == false) continue;
+          if (HasEdge(from, to) == false) { continue; }
           os << from << " " << to << std::endl;
         }
       }
     }
-
   };
 
   /// A graph class that maintains a set of vertices (nodes), edges (connecting pairs of nodes),
   /// and edge weights
   class WeightedGraph : public Graph {
   protected:
-    emp::vector< emp::vector< double > > weights; /// The weight of each edge in the graph
+    emp::vector<emp::vector < double> > weights;  /// The weight of each edge in the graph
 
   public:
-    WeightedGraph(size_t num_nodes=0) : Graph(num_nodes), weights(num_nodes) {
-      for (auto & row : weights) row.resize(num_nodes, 0.0);
+    WeightedGraph(size_t num_nodes = 0) : Graph(num_nodes), weights(num_nodes) {
+      for (auto & row : weights) { row.resize(num_nodes, 0.0); }
     }
 
-    WeightedGraph(const WeightedGraph &) = default;              ///< Copy constructor
-    WeightedGraph(WeightedGraph &&) = default;                   ///< Move constructor
+    WeightedGraph(const WeightedGraph &) = default;  ///< Copy constructor
+    WeightedGraph(WeightedGraph &&)      = default;  ///< Move constructor
+
     ~WeightedGraph() { ; }
 
     WeightedGraph & operator=(const WeightedGraph &) = default;  ///< Copy operator
-    WeightedGraph & operator=(WeightedGraph &&) = default;       ///< Move operator
+    WeightedGraph & operator=(WeightedGraph &&)      = default;  ///< Move operator
 
     void Resize(size_t new_size) {
       Graph::Resize(new_size);
       weights.resize(new_size);
-      for (auto & row : weights) row.resize(new_size,0.0);
+      for (auto & row : weights) { row.resize(new_size, 0.0); }
     }
 
     /// Determine weight of a specific edge in this graph.
@@ -305,43 +299,42 @@ namespace emp {
       const size_t start_size = nodes.size();
       Graph::Merge(in_graph);
       weights.resize(nodes.size());
-      for (auto & row : weights) row.resize(nodes.size(), 0.0);
+      for (auto & row : weights) { row.resize(nodes.size(), 0.0); }
 
       // Move the weights over.
       for (size_t i = 0; i < in_graph.GetSize(); i++) {
         for (size_t j = 0; j < in_graph.GetSize(); j++) {
-          weights[i+start_size][j+start_size] = in_graph.weights[i][j];
+          weights[i + start_size][j + start_size] = in_graph.weights[i][j];
         }
       }
     }
 
     /// Print a symmetric graph to the provided output stream (defaulting to standard out)
-    void PrintSym(std::ostream & os=std::cout) {
-      os << GetSize() << " " << (GetEdgeCount()/2) << std::endl;
+    void PrintSym(std::ostream & os = std::cout) {
+      os << GetSize() << " " << (GetEdgeCount() / 2) << std::endl;
       for (size_t from = 0; from < nodes.size(); from++) {
-        for (size_t to=from+1; to < nodes.size(); to++) {
-          if (HasEdge(from, to) == false) continue;
-          emp_assert(HasEdge(to, from));              // This must be a symmetric graph!
+        for (size_t to = from + 1; to < nodes.size(); to++) {
+          if (HasEdge(from, to) == false) { continue; }
+          emp_assert(HasEdge(to, from));  // This must be a symmetric graph!
           os << from << " " << to << " " << weights[from][to] << std::endl;
         }
       }
     }
 
     /// Print a directed graph to the provided output stream (defaulting to standard out)
-    void PrintDirected(std::ostream & os=std::cout) {
+    void PrintDirected(std::ostream & os = std::cout) {
       os << GetSize() << " " << GetEdgeCount() << std::endl;
       for (size_t from = 0; from < nodes.size(); from++) {
         for (size_t to = 0; to < nodes.size(); to++) {
-          if (HasEdge(from, to) == false) continue;
+          if (HasEdge(from, to) == false) { continue; }
           os << from << " " << to << " " << weights[from][to] << std::endl;
         }
       }
     }
 
     /// @returns the weights for all edges in the graph
-    emp::vector<emp::vector<double> > GetWeights(){return weights;}
-
+    emp::vector<emp::vector < double> > GetWeights() { return weights; }
   };
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_DATASTRUCTS_GRAPH_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_DATASTRUCTS_GRAPH_HPP_GUARD

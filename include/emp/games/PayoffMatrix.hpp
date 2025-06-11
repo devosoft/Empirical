@@ -29,45 +29,44 @@ namespace emp {
 
     constexpr size_t to_index(size_t A, size_t B) const { return A * num_moves + B; }
   public:
-    PayoffMatrix(size_t _moves=2) : num_moves(_moves) {
+    PayoffMatrix(size_t _moves = 2) : num_moves(_moves) {
       const size_t combos = num_moves * num_moves;
       payoff.resize(combos);
     }
 
     using move_t = size_t;
 
-    void Reset() { ; } // No history...
+    void Reset() { ; }  // No history...
 
-    void SetVal(size_t self, size_t other, double value) { payoff[to_index(self,other)] = value; }
-    double & operator()(size_t A, size_t B) { return payoff[to_index(A,B)]; }
-    double operator()(size_t A, size_t B) const { return payoff[to_index(A,B)]; }
+    void SetVal(size_t self, size_t other, double value) { payoff[to_index(self, other)] = value; }
+
+    double & operator()(size_t A, size_t B) { return payoff[to_index(A, B)]; }
+
+    double operator()(size_t A, size_t B) const { return payoff[to_index(A, B)]; }
 
     // Setup a Prisoner's Dilemma Payoff Matrix
     void SetupPD(double u) {
-      payoff[to_index(0,0)] = u;         // Both defect
-      payoff[to_index(0,1)] = 1.0 + u;   // Player defects, other cooperates
-      payoff[to_index(1,0)] = 0.0;       // Player cooperates, other defects
-      payoff[to_index(1,1)] = 1.0;       // Both cooperate
+      payoff[to_index(0, 0)] = u;        // Both defect
+      payoff[to_index(0, 1)] = 1.0 + u;  // Player defects, other cooperates
+      payoff[to_index(1, 0)] = 0.0;      // Player cooperates, other defects
+      payoff[to_index(1, 1)] = 1.0;      // Both cooperate
     }
 
     void SetupSnowdrift(double cost) {
-      payoff[to_index(0,0)] = 0;            // Both defect -- trapped in snowdrift
-      payoff[to_index(0,1)] = 1.0;          // Player defects, other digs out alone.
-      payoff[to_index(1,0)] = 1.0 - cost;   // Player digs out by themself.
-      payoff[to_index(1,1)] = 1.0 - cost/2; // Both dig out together and share cost.
+      payoff[to_index(0, 0)] = 0;               // Both defect -- trapped in snowdrift
+      payoff[to_index(0, 1)] = 1.0;             // Player defects, other digs out alone.
+      payoff[to_index(1, 0)] = 1.0 - cost;      // Player digs out by themself.
+      payoff[to_index(1, 1)] = 1.0 - cost / 2;  // Both dig out together and share cost.
     }
 
     std::unordered_map<int, double> AsInput(size_t /*player_id*/) const {
       std::unordered_map<int, double> out_map;
       out_map[-1] = num_moves;
-      for (size_t i = 0; i < payoff.size(); i++) {
-        out_map[i] = payoff[i];
-      }
+      for (size_t i = 0; i < payoff.size(); i++) { out_map[i] = payoff[i]; }
       return out_map;
     }
-
   };
 
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_GAMES_PAYOFFMATRIX_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_GAMES_PAYOFF_MATRIX_HPP_GUARD

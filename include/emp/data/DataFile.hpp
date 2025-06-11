@@ -36,9 +36,9 @@ namespace emp {
 
   class DataFile {
   protected:
-    using fun_t = void(std::ostream &);
+    using fun_t      = void(std::ostream &);
     using time_fun_t = std::function<bool(size_t)>;
-    using pre_fun_t = std::function<void()>;
+    using pre_fun_t  = std::function<void()>;
 
     std::string filename;            ///< Name of the file that we are printing to (if one exists)
     std::ostream * os;               ///< Stream to print to.
@@ -48,44 +48,72 @@ namespace emp {
     emp::vector<std::string> descs;  ///< Full description for each column.
     time_fun_t timing_fun;           ///< Function to determine updates to print on (default: all)
 
-    std::string line_begin;          ///< What should we print at the start of each line?
-    std::string line_spacer;         ///< What should we print between entries?
-    std::string line_end;            ///< What should we print at the end of each line?
+    std::string line_begin;   ///< What should we print at the start of each line?
+    std::string line_spacer;  ///< What should we print between entries?
+    std::string line_end;     ///< What should we print at the end of each line?
 
   public:
     DataFile(const std::string & in_filename,
-             const std::string & b="", const std::string & s=",", const std::string & e="\n")
-      : filename(in_filename), os(
-      #ifdef __EMSCRIPTEN__
-      new emp::NullStream()
-      #else
-      new std::ofstream(in_filename)
-      #endif
-      ), funs(), pre_funs(), keys(), descs()
-      , timing_fun([](size_t){return true;})
-      , line_begin(b), line_spacer(s), line_end(e) { ; }
+             const std::string & b = "",
+             const std::string & s = ",",
+             const std::string & e = "\n")
+      : filename(in_filename)
+      , os(
+#ifdef __EMSCRIPTEN__
+          new emp::NullStream()
+#else   // #ifdef __EMSCRIPTEN__
+          new std::ofstream(in_filename)
+#endif  // #ifdef __EMSCRIPTEN__ : #else
+            )
+      , funs()
+      , pre_funs()
+      , keys()
+      , descs()
+      , timing_fun([](size_t) { return true; })
+      , line_begin(b)
+      , line_spacer(s)
+      , line_end(e) {
+      ;
+    }
+
     DataFile(std::ostream & in_os,
-             const std::string & b="", const std::string & s=",", const std::string & e="\n")
-      : filename(), os(&in_os), funs(), pre_funs(), keys(), descs(), timing_fun(
-        #ifndef DOXYGEN_SHOULD_SKIP_THIS
-        [](size_t){return true;}
-        #endif
-        ), line_begin(b), line_spacer(s), line_end(e) { ; }
+             const std::string & b = "",
+             const std::string & s = ",",
+             const std::string & e = "\n")
+      : filename()
+      , os(&in_os)
+      , funs()
+      , pre_funs()
+      , keys()
+      , descs()
+      , timing_fun(
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+          [](size_t) { return true; }
+#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
+          )
+      , line_begin(b)
+      , line_spacer(s)
+      , line_end(e) {
+      ;
+    }
 
     DataFile(const DataFile &) = default;
-    DataFile(DataFile &&) = default;
+    DataFile(DataFile &&)      = default;
+
     virtual ~DataFile() { os->flush(); }
 
     DataFile & operator=(const DataFile &) = default;
-    DataFile & operator=(DataFile &&) = default;
+    DataFile & operator=(DataFile &&)      = default;
 
     /// Get the filename used for this file.
     const std::string & GetFilename() const { return filename; }
 
     /// Returns the string that is printed at the beginning of each line.
     const std::string & GetLineBegin() const { return line_begin; }
+
     /// Returns the string that is printed between elements on each line (i.e. the delimiter).
     const std::string & GetSpacer() const { return line_spacer; }
+
     /// Returns the string that is printed at the end of each line.
     const std::string & GetLineEnd() const { return line_end; }
 
@@ -97,8 +125,8 @@ namespace emp {
     /// function can be replaced at any time, even after being triggered.
     /// @param print_time The update the file should print at
     void SetTimingOnce(size_t print_time) {
-       timing_fun = [print_time](size_t update) { return update == print_time; };
-     }
+      timing_fun = [print_time](size_t update) { return update == print_time; };
+    }
 
     /// Setup this file to print every 'step' updates.
     void SetTimingRepeat(size_t step) {
@@ -110,31 +138,34 @@ namespace emp {
     void SetTimingRange(size_t first, size_t step, size_t last) {
       emp_assert(step > 0);
       emp_assert(first < last);
-      timing_fun = [first,step,last](size_t update) {
-        if (update < first || update > last) return false;
+      timing_fun = [first, step, last](size_t update) {
+        if (update < first || update > last) { return false; }
         return ((update - first) % step) == 0;
       };
     }
 
     /// Print a string at the beginning of each line. @param _in the string to print
     void SetLineBegin(const std::string & _in) { line_begin = _in; }
+
     /// Print a string between elements @param _in the string (i.e. the delimiter).
     void SetSpacer(const std::string & _in) { line_spacer = _in; }
+
     /// Print a string at the end of each line. @param _in the string to print
     void SetLineEnd(const std::string & _in) { line_end = _in; }
+
     /// Set line begin, delimiter, and line end characters.
     /// @param b line-begin character. @param s column delimiter @param e line end character
     void SetupLine(const std::string & b, const std::string & s, const std::string & e) {
-      line_begin = b;
+      line_begin  = b;
       line_spacer = s;
-      line_end = e;
+      line_end    = e;
     }
 
     /// Print a header containing the name of each column
     virtual void PrintHeaderKeys() {
       *os << line_begin;
       for (size_t i = 0; i < keys.size(); i++) {
-        if (i > 0) *os << line_spacer;
+        if (i > 0) { *os << line_spacer; }
         *os << keys[i];
       }
       *os << line_end;
@@ -154,7 +185,7 @@ namespace emp {
       pre_funs.Run();
       *os << line_begin;
       for (size_t i = 0; i < funs.size(); i++) {
-        if (i > 0) *os << line_spacer;
+        if (i > 0) { *os << line_spacer; }
         funs[i](*os);
       }
       *os << line_end;
@@ -164,14 +195,14 @@ namespace emp {
     /// If Update is called with an update number, the full version of update is called only if the
     /// update value passes the timing function (that is, the timing function returns true).
     /// @param update the current time step
-    virtual void Update(size_t update) { if (timing_fun(update)) Update(); }
+    virtual void Update(size_t update) {
+      if (timing_fun(update)) { Update(); }
+    }
 
     /// Add a function to run before each time data is calculated. You can add as many
     /// functions as you want.
     /// @param fun the function to add
-    void AddPreFun(pre_fun_t fun) {
-      pre_funs.Add(fun);
-    }
+    void AddPreFun(pre_fun_t fun) { pre_funs.Add(fun); }
 
     // If a function takes an ostream, pass in the correct one.
     /// Generic function for adding a column to the DataFile. In practice, you probably
@@ -179,7 +210,9 @@ namespace emp {
     /// @param fun function to call to get the value to print
     /// @param key Keyword associated with this column (gets used as a column name for this data)
     /// @param desc Full description of this data (used by \c PrintHeaderComment)
-    size_t Add(const std::function<void(std::ostream &)> & fun, const std::string & key, const std::string & desc) {
+    size_t Add(const std::function<void(std::ostream &)> & fun,
+               const std::string & key,
+               const std::string & desc) {
       size_t id = funs.GetSize();
       funs.Add(fun);
       keys.emplace_back(key);
@@ -192,8 +225,10 @@ namespace emp {
     /// @param key Keyword associated with this column (gets used as a column name for this data)
     /// @param desc Full description of this data (used by \c PrintHeaderComment)
     template <typename T>
-    size_t AddFun(const std::function<T()> & fun, const std::string & key="", const std::string & desc="") {
-      std::function<fun_t> in_fun = [fun](std::ostream & os){ os << fun(); };
+    size_t AddFun(const std::function<T()> & fun,
+                  const std::string & key  = "",
+                  const std::string & desc = "") {
+      std::function<fun_t> in_fun = [fun](std::ostream & os) { os << fun(); };
       return Add(in_fun, key, desc);
     }
 
@@ -202,8 +237,8 @@ namespace emp {
     /// @param key Keyword associated with this column (gets used as a column name for this data)
     /// @param desc Full description of this data (used by \c PrintHeaderComment)
     template <typename T>
-    size_t AddVar(const T & var, const std::string & key="", const std::string & desc="") {
-      std::function<fun_t> in_fun = [&var](std::ostream & os){ os << var; };
+    size_t AddVar(const T & var, const std::string & key = "", const std::string & desc = "") {
+      std::function<fun_t> in_fun = [&var](std::ostream & os) { os << var; };
       return Add(in_fun, key, desc);
     }
 
@@ -216,15 +251,18 @@ namespace emp {
     /// current value from the node
     /// @param pull Should the node pull data before this statistic is calculated?
     template <typename VAL_TYPE, emp::data... MODS>
-    size_t AddCurrent(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
-      std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os){
-        if (pull) node.PullData();
+    size_t AddCurrent(DataNode<VAL_TYPE, MODS...> & node,
+                      const std::string & key  = "",
+                      const std::string & desc = "",
+                      const bool & reset       = false,
+                      const bool & pull        = false) {
+      std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os) {
+        if (pull) { node.PullData(); }
         os << node.GetCurrent();
-        if (reset) node.Reset();
+        if (reset) { node.Reset(); }
       };
       return Add(in_fun, key, desc);
     }
-
 
     /// Add a function that always pulls the mean value from the DataNode \c node.
     /// Requires that \c node have the \c data::Range or \c data::FullRange modifier.
@@ -235,11 +273,15 @@ namespace emp {
     /// current value from the node
     /// @param pull Should the node pull data before this statistic is calculated?    template <typename VAL_TYPE, emp::data... MODS>
     template <typename VAL_TYPE, emp::data... MODS>
-    size_t AddMean(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
-      std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os){
-        if (pull) node.PullData();
+    size_t AddMean(DataNode<VAL_TYPE, MODS...> & node,
+                   const std::string & key  = "",
+                   const std::string & desc = "",
+                   const bool & reset       = false,
+                   const bool & pull        = false) {
+      std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os) {
+        if (pull) { node.PullData(); }
         os << node.GetMean();
-        if (reset) node.Reset();
+        if (reset) { node.Reset(); }
       };
       return Add(in_fun, key, desc);
     }
@@ -253,11 +295,15 @@ namespace emp {
     /// current value from the node
     /// @param pull Should the node pull data before this statistic is calculated?
     template <typename VAL_TYPE, emp::data... MODS>
-    size_t AddMedian(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
-      std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os){
-        if (pull) node.PullData();
+    size_t AddMedian(DataNode<VAL_TYPE, MODS...> & node,
+                     const std::string & key  = "",
+                     const std::string & desc = "",
+                     const bool & reset       = false,
+                     const bool & pull        = false) {
+      std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os) {
+        if (pull) { node.PullData(); }
         os << node.GetMedian();
-        if (reset) node.Reset();
+        if (reset) { node.Reset(); }
       };
       return Add(in_fun, key, desc);
     }
@@ -272,11 +318,16 @@ namespace emp {
     /// current value from the node
     /// @param pull Should the node pull data before this statistic is calculated?
     template <typename VAL_TYPE, emp::data... MODS>
-    size_t AddPercentile(DataNode<VAL_TYPE, MODS...> & node, const double pct=100.0, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
-      std::function<fun_t> in_fun = [&node, reset, pull, pct](std::ostream & os){
-        if (pull) node.PullData();
+    size_t AddPercentile(DataNode<VAL_TYPE, MODS...> & node,
+                         const double pct         = 100.0,
+                         const std::string & key  = "",
+                         const std::string & desc = "",
+                         const bool & reset       = false,
+                         const bool & pull        = false) {
+      std::function<fun_t> in_fun = [&node, reset, pull, pct](std::ostream & os) {
+        if (pull) { node.PullData(); }
         os << node.GetPercentile(pct);
-        if (reset) node.Reset();
+        if (reset) { node.Reset(); }
       };
       return Add(in_fun, key, desc);
     }
@@ -290,11 +341,15 @@ namespace emp {
     /// current value from the node
     /// @param pull Should the node pull data before this statistic is calculated?
     template <typename VAL_TYPE, emp::data... MODS>
-    size_t AddTotal(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
-      std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os){
-        if (pull) node.PullData();
+    size_t AddTotal(DataNode<VAL_TYPE, MODS...> & node,
+                    const std::string & key  = "",
+                    const std::string & desc = "",
+                    const bool & reset       = false,
+                    const bool & pull        = false) {
+      std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os) {
+        if (pull) { node.PullData(); }
         os << node.GetTotal();
-        if (reset) node.Reset();
+        if (reset) { node.Reset(); }
       };
       return Add(in_fun, key, desc);
     }
@@ -308,11 +363,15 @@ namespace emp {
     /// current value from the node
     /// @param pull Should the node pull data before this statistic is calculated?
     template <typename VAL_TYPE, emp::data... MODS>
-    size_t AddMin(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
-      std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os){
-        if (pull) node.PullData();
+    size_t AddMin(DataNode<VAL_TYPE, MODS...> & node,
+                  const std::string & key  = "",
+                  const std::string & desc = "",
+                  const bool & reset       = false,
+                  const bool & pull        = false) {
+      std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os) {
+        if (pull) { node.PullData(); }
         os << node.GetMin();
-        if (reset) node.Reset();
+        if (reset) { node.Reset(); }
       };
       return Add(in_fun, key, desc);
     }
@@ -326,11 +385,15 @@ namespace emp {
     /// current value from the node
     /// @param pull Should the node pull data before this statistic is calculated?
     template <typename VAL_TYPE, emp::data... MODS>
-    size_t AddMax(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
-      std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os){
-        if (pull) node.PullData();
+    size_t AddMax(DataNode<VAL_TYPE, MODS...> & node,
+                  const std::string & key  = "",
+                  const std::string & desc = "",
+                  const bool & reset       = false,
+                  const bool & pull        = false) {
+      std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os) {
+        if (pull) { node.PullData(); }
         os << node.GetMax();
-        if (reset) node.Reset();
+        if (reset) { node.Reset(); }
       };
       return Add(in_fun, key, desc);
     }
@@ -344,11 +407,15 @@ namespace emp {
     /// current value from the node
     /// @param pull Should the node pull data before this statistic is calculated?
     template <typename VAL_TYPE, emp::data... MODS>
-    size_t AddVariance(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
-      std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os){
-        if (pull) node.PullData();
+    size_t AddVariance(DataNode<VAL_TYPE, MODS...> & node,
+                       const std::string & key  = "",
+                       const std::string & desc = "",
+                       const bool & reset       = false,
+                       const bool & pull        = false) {
+      std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os) {
+        if (pull) { node.PullData(); }
         os << node.GetVariance();
-        if (reset) node.Reset();
+        if (reset) { node.Reset(); }
       };
       return Add(in_fun, key, desc);
     }
@@ -362,11 +429,15 @@ namespace emp {
     /// current value from the node
     /// @param pull Should the node pull data before this statistic is calculated?
     template <typename VAL_TYPE, emp::data... MODS>
-    size_t AddStandardDeviation(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
-      std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os){
-        if (pull) node.PullData();
+    size_t AddStandardDeviation(DataNode<VAL_TYPE, MODS...> & node,
+                                const std::string & key  = "",
+                                const std::string & desc = "",
+                                const bool & reset       = false,
+                                const bool & pull        = false) {
+      std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os) {
+        if (pull) { node.PullData(); }
         os << node.GetStandardDeviation();
-        if (reset) node.Reset();
+        if (reset) { node.Reset(); }
       };
       return Add(in_fun, key, desc);
     }
@@ -380,11 +451,15 @@ namespace emp {
     /// current value from the node
     /// @param pull Should the node pull data before this statistic is calculated?
     template <typename VAL_TYPE, emp::data... MODS>
-    size_t AddSkew(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
-      std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os){
-        if (pull) node.PullData();
+    size_t AddSkew(DataNode<VAL_TYPE, MODS...> & node,
+                   const std::string & key  = "",
+                   const std::string & desc = "",
+                   const bool & reset       = false,
+                   const bool & pull        = false) {
+      std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os) {
+        if (pull) { node.PullData(); }
         os << node.GetSkew();
-        if (reset) node.Reset();
+        if (reset) { node.Reset(); }
       };
       return Add(in_fun, key, desc);
     }
@@ -398,11 +473,15 @@ namespace emp {
     /// current value from the node
     /// @param pull Should the node pull data before this statistic is calculated?
     template <typename VAL_TYPE, emp::data... MODS>
-    size_t AddKurtosis(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
-      std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os){
-        if (pull) node.PullData();
+    size_t AddKurtosis(DataNode<VAL_TYPE, MODS...> & node,
+                       const std::string & key  = "",
+                       const std::string & desc = "",
+                       const bool & reset       = false,
+                       const bool & pull        = false) {
+      std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os) {
+        if (pull) { node.PullData(); }
         os << node.GetKurtosis();
-        if (reset) node.Reset();
+        if (reset) { node.Reset(); }
       };
       return Add(in_fun, key, desc);
     }
@@ -424,13 +503,16 @@ namespace emp {
     /// current value from the node
     /// @param pull Should the node pull data before this statistic is calculated?
     template <typename VAL_TYPE, emp::data... MODS>
-    void AddStats(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
+    void AddStats(DataNode<VAL_TYPE, MODS...> & node,
+                  const std::string & key  = "",
+                  const std::string & desc = "",
+                  const bool & reset       = false,
+                  const bool & pull        = false) {
       AddMean(node, "mean_" + key, "mean of " + desc, false, pull);
       AddMin(node, "min_" + key, "min of " + desc);
       AddMax(node, "max_" + key, "max of " + desc);
       AddVariance(node, "variance_" + key, "variance of " + desc, reset);
     }
-
 
     /// Add multiple functions that pull all stats measurements (mean, variance, min, max,
     /// skew, and kurtosis) from the DataNode \c node
@@ -449,7 +531,11 @@ namespace emp {
     /// current value from the node
     /// @param pull Should the node pull data before this statistic is calculated?
     template <typename VAL_TYPE, emp::data... MODS>
-    void AddAllStats(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
+    void AddAllStats(DataNode<VAL_TYPE, MODS...> & node,
+                     const std::string & key  = "",
+                     const std::string & desc = "",
+                     const bool & reset       = false,
+                     const bool & pull        = false) {
       AddStats(node, key, desc, false, pull);
       AddSkew(node, "skew_" + key, "skew of " + desc);
       AddKurtosis(node, "kurtosis_" + key, "kurtosis of " + desc, reset);
@@ -466,13 +552,17 @@ namespace emp {
     /// current value from the node
     /// @param pull Should the node pull data before this statistic is calculated?
     template <typename VAL_TYPE, emp::data... MODS>
-    size_t AddHistBin(DataNode<VAL_TYPE, MODS...> & node, size_t bin_id, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
-      std::function<fun_t> in_fun =
-        [&node,bin_id,reset, pull](std::ostream & os){
-          if (pull) node.PullData();
-          os << node.GetHistCount(bin_id);
-          if (reset) node.Reset();
-        };
+    size_t AddHistBin(DataNode<VAL_TYPE, MODS...> & node,
+                      size_t bin_id,
+                      const std::string & key  = "",
+                      const std::string & desc = "",
+                      const bool & reset       = false,
+                      const bool & pull        = false) {
+      std::function<fun_t> in_fun = [&node, bin_id, reset, pull](std::ostream & os) {
+        if (pull) { node.PullData(); }
+        os << node.GetHistCount(bin_id);
+        if (reset) { node.Reset(); }
+      };
       return Add(in_fun, key, desc);
     }
 
@@ -490,16 +580,23 @@ namespace emp {
     /// current value from the node
     /// @param pull Should the node pull data before this statistic is calculated?
     template <typename VAL_TYPE, emp::data... MODS>
-    void AddAllHistBins(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
-        bool actual_reset = false;
-        bool actual_pull = pull;
-        for (size_t i = 0; i < node.GetHistCounts().size(); i++) {
-          if (i == node.GetHistCounts().size() - 1) {
-            actual_reset = reset;
-          }
-          AddHistBin(node, i, key + "_bin_" + emp::to_string(i), desc + " bin " + emp::to_string(i), actual_reset, actual_pull);
-          actual_pull = false;
-        }
+    void AddAllHistBins(DataNode<VAL_TYPE, MODS...> & node,
+                        const std::string & key  = "",
+                        const std::string & desc = "",
+                        const bool & reset       = false,
+                        const bool & pull        = false) {
+      bool actual_reset = false;
+      bool actual_pull  = pull;
+      for (size_t i = 0; i < node.GetHistCounts().size(); i++) {
+        if (i == node.GetHistCounts().size() - 1) { actual_reset = reset; }
+        AddHistBin(node,
+                   i,
+                   key + "_bin_" + emp::to_string(i),
+                   desc + " bin " + emp::to_string(i),
+                   actual_reset,
+                   actual_pull);
+        actual_pull = false;
+      }
     }
 
     /// Add a function that always pulls the inferiority (mean divided by max) from the specified DataNode.
@@ -511,12 +608,16 @@ namespace emp {
     /// current value from the node
     /// @param pull Should the node pull data before this statistic is calculated?
     template <typename VAL_TYPE, emp::data... MODS>
-    size_t AddInferiority(DataNode<VAL_TYPE, MODS...> & node, const std::string & key="", const std::string & desc="", const bool & reset=false, const bool & pull=false) {
-      std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os){
-        if (pull) node.PullData();
+    size_t AddInferiority(DataNode<VAL_TYPE, MODS...> & node,
+                          const std::string & key  = "",
+                          const std::string & desc = "",
+                          const bool & reset       = false,
+                          const bool & pull        = false) {
+      std::function<fun_t> in_fun = [&node, reset, pull](std::ostream & os) {
+        if (pull) { node.PullData(); }
         VAL_TYPE inf = (node.GetMax() == 0) ? 0 : (node.GetMean() / node.GetMax());
         os << inf;
-        if (reset) node.Reset();
+        if (reset) { node.Reset(); }
       };
       return Add(in_fun, key, desc);
     }
@@ -526,17 +627,15 @@ namespace emp {
   template <typename container_t>
   class ContainerDataFile;
 
-  // This handles all possible forms of pointers to containers.
-  #ifndef DOXYGEN_SHOULD_SKIP_THIS
+// This handles all possible forms of pointers to containers.
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
 
     template <typename container_t>
     struct update_impl {
       void Update(ContainerDataFile<container_t> * df) {
         using data_t = typename container_t::value_type;
-        for (const data_t & d : df->GetCurrentRows()) {
-          df->OutputLine(d);
-        }
+        for (const data_t & d : df->GetCurrentRows()) { df->OutputLine(d); }
       }
     };
 
@@ -545,25 +644,21 @@ namespace emp {
       void Update(ContainerDataFile<Ptr<container_t>> * df) {
         using data_t = typename remove_ptr_type<container_t>::type::value_type;
 
-        for (const data_t & d : *(df->GetCurrentRows())) {
-          df->OutputLine(d);
-        }
+        for (const data_t & d : *(df->GetCurrentRows())) { df->OutputLine(d); }
       }
     };
 
     template <typename container_t>
-    struct update_impl<container_t*> {
-      void Update(ContainerDataFile<container_t*> * df) {
+    struct update_impl<container_t *> {
+      void Update(ContainerDataFile<container_t *> * df) {
         using data_t = typename remove_ptr_type<container_t>::type::value_type;
 
-        for (const data_t & d : *(df->GetCurrentRows())) {
-          df->OutputLine(d);
-        }
+        for (const data_t & d : *(df->GetCurrentRows())) { df->OutputLine(d); }
       }
     };
 
-  }
-  #endif // DOXYGEN_SHOULD_SKIP_THIS
+  }  // namespace internal
+#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
   /// Sometimes you may want a data file where a set
   /// of functions is run on every item in a container
@@ -574,12 +669,12 @@ namespace emp {
 
   template <typename CONTAINER>
   class ContainerDataFile : public DataFile {
-    protected:
+  protected:
     // The container type cannot be a reference
-    using container_t = typename std::remove_reference<CONTAINER>::type;
-    using raw_container_t = typename remove_ptr_type<container_t>::type;
-    using data_t = typename raw_container_t::value_type;
-    using container_fun_t = void(std::ostream &, data_t);
+    using container_t            = typename std::remove_reference<CONTAINER>::type;
+    using raw_container_t        = typename remove_ptr_type<container_t>::type;
+    using data_t                 = typename raw_container_t::value_type;
+    using container_fun_t        = void(std::ostream &, data_t);
     using fun_update_container_t = std::function<container_t(void)>;
 
     fun_update_container_t update_container_fun;
@@ -590,27 +685,27 @@ namespace emp {
     emp::vector<std::string> container_descs;
 
   public:
-    template <typename ...ARGS>
-    explicit ContainerDataFile(ARGS&& ...arguments)
-      : DataFile(std::forward<ARGS>(arguments)...), update_container_fun(), current_rows() {;}
+    template <typename... ARGS>
+    explicit ContainerDataFile(ARGS &&... arguments)
+      : DataFile(std::forward<ARGS>(arguments)...), update_container_fun(), current_rows() {
+      ;
+    }
 
-    ~ContainerDataFile() {;}
+    ~ContainerDataFile() { ; }
 
     /// Tell this file what function to run to update the contents of the
     /// container that data is being calculated on.
-    void SetUpdateContainerFun(const fun_update_container_t fun) {
-      update_container_fun = fun;
-    }
+    void SetUpdateContainerFun(const fun_update_container_t fun) { update_container_fun = fun; }
 
     /// Print a header containing the name of each column
     void PrintHeaderKeys() override {
       *os << line_begin;
       for (size_t i = 0; i < keys.size(); i++) {
-        if (i > 0) *os << line_spacer;
+        if (i > 0) { *os << line_spacer; }
         *os << keys[i];
       }
       for (size_t i = 0; i < container_keys.size(); i++) {
-        if (i > 0 || keys.size() > 0) *os << line_spacer;
+        if (i > 0 || keys.size() > 0) { *os << line_spacer; }
         *os << container_keys[i];
       }
       *os << line_end;
@@ -623,7 +718,8 @@ namespace emp {
         *os << cstart << i << ": " << descs[i] << " (" << keys[i] << ")\n";
       }
       for (size_t i = 0; i < container_keys.size(); i++) {
-        *os << cstart << i+keys.size() << ": " << container_descs[i] << " (" << container_keys[i] << ")\n";
+        *os << cstart << i + keys.size() << ": " << container_descs[i] << " (" << container_keys[i]
+            << ")\n";
       }
 
       os->flush();
@@ -633,15 +729,15 @@ namespace emp {
 
     void OutputLine(const data_t d) {
       *os << line_begin;
-        for (size_t i = 0; i < funs.size(); i++) {
-          if (i > 0) *os << line_spacer;
-          funs[i](*os);
-        }
+      for (size_t i = 0; i < funs.size(); i++) {
+        if (i > 0) { *os << line_spacer; }
+        funs[i](*os);
+      }
 
-        for (size_t i = 0; i < container_funs.size(); i++) {
-          if (i > 0 || keys.size() > 0) *os << line_spacer;
-          container_funs[i](*os, d);
-        }
+      for (size_t i = 0; i < container_funs.size(); i++) {
+        if (i > 0 || keys.size() > 0) { *os << line_spacer; }
+        container_funs[i](*os, d);
+      }
       *os << line_end;
     }
 
@@ -655,13 +751,15 @@ namespace emp {
 
     /// Update the file with an additional set of lines.
     void Update(size_t update) override {
-      if (timing_fun(update)) Update();
+      if (timing_fun(update)) { Update(); }
     }
 
     /// If a function takes an ostream, pass in the correct one.
     /// Generic function for adding a column to the DataFile. In practice, you probably
     /// want to call one of the more specific ones.
-    size_t Add(const std::function<void(std::ostream &, data_t)> & fun, const std::string & key, const std::string & desc) {
+    size_t Add(const std::function<void(std::ostream &, data_t)> & fun,
+               const std::string & key,
+               const std::string & desc) {
       size_t id = container_funs.GetSize();
       container_funs.Add(fun);
       container_keys.emplace_back(key);
@@ -672,15 +770,13 @@ namespace emp {
     /// Add a function that returns a value to be printed to the file.
     template <typename T>
     size_t AddContainerFun(const std::function<T(const data_t)> & fun,
-                           const std::string & key="",
-                           const std::string & desc="")
-    {
-      std::function<container_fun_t> in_fun =
-        [fun](std::ostream & os, const data_t data){ os << fun(data); };
+                           const std::string & key  = "",
+                           const std::string & desc = "") {
+      std::function<container_fun_t> in_fun = [fun](std::ostream & os, const data_t data) {
+        os << fun(data);
+      };
       return Add(in_fun, key, desc);
     }
-
-
   };
 
   /// Convenience function for building a container data file.
@@ -692,17 +788,17 @@ namespace emp {
   template <typename CONTAINER>
   ContainerDataFile<CONTAINER> MakeContainerDataFile(std::function<CONTAINER(void)> fun,
                                                      const std::string & filename,
-                                                     const std::string & b="",
-                                                     const std::string & s=",",
-                                                     const std::string & e="\n") {
+                                                     const std::string & b = "",
+                                                     const std::string & s = ",",
+                                                     const std::string & e = "\n") {
     ContainerDataFile<CONTAINER> dfile(filename, b, s, e);
     dfile.SetUpdateContainerFun(fun);
     return dfile;
   }
 
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_DATA_DATAFILE_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_DATA_DATA_FILE_HPP_GUARD
 
 // Local settings for Empecable file checker.
-// empecable_words: cstart pct dfile
+// empecable_words: dfile pct cstart

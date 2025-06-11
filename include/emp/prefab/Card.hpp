@@ -18,8 +18,7 @@
 #include "Collapse.hpp"
 #include "FontAwesomeIcon.hpp"
 
-namespace emp {
-namespace prefab {
+namespace emp { namespace prefab {
 
   namespace internal {
     /**
@@ -39,32 +38,26 @@ namespace prefab {
        * Construct a shared pointer to manage Card state.
        * @param in_id HTML ID of Card div
        */
-      CardInfo(const std::string & in_id="")
-      : DivInfo(in_id), toggle_handler([]() {;}) { ; }
+      CardInfo(const std::string & in_id = "") : DivInfo(in_id), toggle_handler([]() { ; }) { ; }
 
       /**
        * Get the on-toggle function for this component.
        * @return the function called whenever the card's state
        * is toggled open or closed
        */
-      on_toggle_fun_t & GetOnToggle() {
-        return toggle_handler;
-      }
+      on_toggle_fun_t & GetOnToggle() { return toggle_handler; }
 
       /**
        * Set the on-toggle function for this component.
        * @param on_toggle the function to be called whenever the
        * card's state is toggled open or closed.
        */
-      void SetOnToggle(on_toggle_fun_t on_toggle) {
-        toggle_handler = on_toggle;
-      }
+      void SetOnToggle(on_toggle_fun_t on_toggle) { toggle_handler = on_toggle; }
     };
-  }
+  }  // namespace internal
 
   /// Use Card class to create Bootstrap style cards.
   class Card : public web::Div {
-
     using on_toggle_fun_t = internal::CardInfo::on_toggle_fun_t;
 
   private:
@@ -72,17 +65,13 @@ namespace prefab {
      * Get shared info pointer, cast to Card-specific type.
      * @return cast pointer
      */
-    internal::CardInfo * Info() {
-      return dynamic_cast<internal::CardInfo *>(info);
-    }
+    internal::CardInfo * Info() { return dynamic_cast<internal::CardInfo *>(info); }
 
     /**
      * Get shared info pointer, cast to const Card-specific type.
      * @return cast pointer
      */
-    const internal::CardInfo * Info() const {
-      return dynamic_cast<internal::CardInfo *>(info);
-    }
+    const internal::CardInfo * Info() const { return dynamic_cast<internal::CardInfo *>(info); }
 
   protected:
     // ID of card Div to be used in ID of associated card sub components
@@ -91,6 +80,7 @@ namespace prefab {
     web::Div card_header{emp::to_string(card_base, "_card_header")};
     // all body content will be added here
     web::Div card_body{emp::to_string(card_base, "_card_body")};
+
     // Assigns classes to card elements for styling
     void AddBootstrap() {
       this->SetAttr("class", "card");
@@ -104,11 +94,12 @@ namespace prefab {
      * @param show_glyphs should toggle icons show in collapsible card header? (default true)
      * @param id user defined ID for card Div, (default emscripten generated)
      */
-    Card(
-      const std::string & state="STATIC",
-      const bool & show_glyphs=true,
-      const std::string & id=""
-    ) : Card(state, show_glyphs, new internal::CardInfo(id)) { ; }
+    Card(const std::string & state = "STATIC",
+         const bool & show_glyphs  = true,
+         const std::string & id    = "")
+      : Card(state, show_glyphs, new internal::CardInfo(id)) {
+      ;
+    }
 
   protected:
     /**
@@ -118,30 +109,25 @@ namespace prefab {
      * @param in_info a pointer to the underlying ReadoutPanelInfo object for this ReadoutPanel
      * or a pointer to a derived info object (simulating inheritance)
      */
-    Card(
-      const std::string & state,
-      const bool & show_glyphs,
-      internal::CardInfo * in_info
-    ) : Div(in_info) {
-
+    Card(const std::string & state, const bool & show_glyphs, internal::CardInfo * in_info)
+      : Div(in_info) {
       AddBootstrap();
-      if (state == "STATIC") { // static card with no toggle enabled
-        static_cast<Div>(*this) << card_header; // Cast to Div prevents redefined
-        static_cast<Div>(*this) << card_body;   // stream operator from being used
+      if (state == "STATIC") {                   // static card with no toggle enabled
+        static_cast<Div>(*this) << card_header;  // Cast to Div prevents redefined
+        static_cast<Div>(*this) << card_body;    // stream operator from being used
       } else {
         // card is collapsible, make the collapse link the head of the card
         prefab::CollapseCoupling accordion(card_header,
-          card_body,
-          state == "INIT_OPEN",
-          emp::to_string(card_base+ "_card_collapse")
-        );
+                                           card_body,
+                                           state == "INIT_OPEN",
+                                           emp::to_string(card_base + "_card_collapse"));
 
         Div header_div{accordion.GetControllerDiv()};
         static_cast<Div>(*this) << header_div;
         static_cast<Div>(*this) << accordion.GetTargetDiv();
 
         on_toggle_fun_t & tog = GetOnToggle();
-        header_div.OnClick([header_div, &toggle = tog](){
+        header_div.OnClick([header_div, &toggle = tog]() {
           toggle();
           // TODO: toggle really should accept Boolean so the user can trigger
           // different events on open/close to prevent double click issues
@@ -149,7 +135,7 @@ namespace prefab {
           // https://github.com/devosoft/Empirical/issues/440.
         });
 
-        if (show_glyphs) { // by default add glyphs to a collapsible card
+        if (show_glyphs) {  // by default add glyphs to a collapsible card
           prefab::FontAwesomeIcon up("fa-angle-double-up");
           prefab::FontAwesomeIcon down("fa-angle-double-down");
           card_header << up;
@@ -168,7 +154,7 @@ namespace prefab {
      * @param link_content indicates whether the content should have Bootstrap link properties (default false)
      */
     template <typename T>
-    void AddHeaderContent(T val, const bool link_content=false) {
+    void AddHeaderContent(T val, const bool link_content = false) {
       /*
        * Note: val can be a controller of a target area (made with CollapseCoupling class)
        * but when added to header of the card, it will also trigger the card
@@ -196,8 +182,7 @@ namespace prefab {
      * @deprecated Use stream operator instead
      */
     template <typename T>
-    [[deprecated("Use the stream operator (<<) to add to card body")]]
-    void AddBodyContent(T val) {
+    [[deprecated("Use the stream operator (<<) to add to card body")]] void AddBodyContent(T val) {
       card_body << val;
     }
 
@@ -217,24 +202,18 @@ namespace prefab {
      * @param on_toggle the function to be called whenever the card's state is
      * toggled open or closed
      */
-    void SetOnToggle(on_toggle_fun_t on_toggle) {
-      Info()->SetOnToggle(on_toggle);
-    }
+    void SetOnToggle(on_toggle_fun_t on_toggle) { Info()->SetOnToggle(on_toggle); }
 
     /**
      * Get the on-toggle function for this component.
      * @return the function to be called whenever the card's state is
      * toggled open or closed
      */
-    on_toggle_fun_t & GetOnToggle() {
-      return Info()->GetOnToggle();
-    }
-
+    on_toggle_fun_t & GetOnToggle() { return Info()->GetOnToggle(); }
   };
-}
-}
+}}  // namespace emp::prefab
 
-#endif // #ifndef EMP_PREFAB_CARD_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_PREFAB_CARD_HPP_GUARD
 
 // Local settings for Empecable file checker.
 // empecable_words: btn

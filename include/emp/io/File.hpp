@@ -38,14 +38,18 @@ namespace emp {
 
   public:
     File() : lines() { ; }
+
     File(std::istream & input) : lines() { Load(input); }
+
     File(const String & filename) : lines() { Load(filename); }
+
     File(const File &) = default;
-    File(File &&) = default;
+    File(File &&)      = default;
+
     ~File() { ; }
 
     File & operator=(const File &) = default;
-    File & operator=(File &&) = default;
+    File & operator=(File &&)      = default;
 
     /// Return const iterator to beginning of file
     auto begin() const { return std::begin(lines); }
@@ -66,7 +70,7 @@ namespace emp {
     size_t size() const { return lines.size(); }
 
     /// Return entire text of the file
-    emp::vector<String> GetAllLines() {return lines;}
+    emp::vector<String> GetAllLines() { return lines; }
 
     /// Index into a specific line in this file.
     String & operator[](size_t pos) { return lines[pos]; }
@@ -96,7 +100,10 @@ namespace emp {
     void ClearError() { file_error.resize(0); }
 
     /// Append a new line to the end of the file.
-    File & Append(const String & line) { lines.emplace_back(line); return *this; }
+    File & Append(const String & line) {
+      lines.emplace_back(line);
+      return *this;
+    }
 
     /// Append a vector of lines to the end of the file.
     template <typename T>
@@ -104,7 +111,7 @@ namespace emp {
       size_t start_size = lines.size();
       lines.resize(start_size + in_lines.size());
       for (size_t pos = 0; pos < in_lines.size(); pos++) {
-        lines[start_size+pos] = in_lines[pos];
+        lines[start_size + pos] = in_lines[pos];
       }
       return *this;
     }
@@ -114,11 +121,15 @@ namespace emp {
 
     /// Append to the end of a file.
     template <typename T>
-    File & operator+=(T && in) { Append( std::forward<T>(in) ); return *this; }
+    File & operator+=(T && in) {
+      Append(std::forward<T>(in));
+      return *this;
+    }
 
     /// Insert formatted data into file
     /// This is exactly the same as operator+=
-    template <typename T> auto operator<<(T &&in) {
+    template <typename T>
+    auto operator<<(T && in) {
       Append(std::forward<T>(in));
       return *this;
     }
@@ -146,7 +157,7 @@ namespace emp {
       }
 
       // If the input file is DOS formatted, make sure to remove the \r at the end of each line.
-      if (lines.back().size() && lines.back().back() == '\r') lines.back().pop_back();
+      if (lines.back().size() && lines.back().back() == '\r') { lines.back().pop_back(); }
 
       return true;
     }
@@ -172,9 +183,7 @@ namespace emp {
 
     /// Write this file to a provided output stream.
     File & Write(std::ostream & output) {
-      for (String & cur_line : lines) {
-        output << cur_line << '\n';
-      }
+      for (String & cur_line : lines) { output << cur_line << '\n'; }
       return *this;
     }
 
@@ -189,7 +198,7 @@ namespace emp {
     /// Test if a substring exists on ANY line of a file.
     bool Contains(const String & pattern) const {
       for (const String & line : lines) {
-        if (line.find(pattern) != String::npos) return true;
+        if (line.find(pattern) != String::npos) { return true; }
       }
       return false;
     }
@@ -197,9 +206,7 @@ namespace emp {
     /// Convert this file into an std::set of lines (loses line ordering).
     std::set<String> AsSet() const {
       std::set<String> line_set;
-      for (size_t i = 0; i < lines.size(); i++) {
-        line_set.insert(lines[i]);
-      }
+      for (size_t i = 0; i < lines.size(); i++) { line_set.insert(lines[i]); }
       return line_set;
     }
 
@@ -210,7 +217,7 @@ namespace emp {
         // If the function returns a string, assume that's what we're supposed to use.
         // Otherwise assume that the string gets modified.
         using return_t = typename FunInfo<FUN_T>::return_t;
-        if constexpr ( std::is_same<return_t, String>() ) {
+        if constexpr (std::is_same<return_t, String>()) {
           cur_line = fun(cur_line);
         } else {
           fun(cur_line);
@@ -223,7 +230,7 @@ namespace emp {
     File & KeepIf(const std::function<bool(const String &)> & fun) {
       emp::vector<String> new_lines;
       for (String & cur_line : lines) {
-        if (fun(cur_line)) new_lines.emplace_back(cur_line);
+        if (fun(cur_line)) { new_lines.emplace_back(cur_line); }
       }
       std::swap(lines, new_lines);
       return *this;
@@ -231,54 +238,44 @@ namespace emp {
 
     /// Keep only lines that contain a specific substring.
     File & KeepIfContains(const String & pattern) {
-      return KeepIf(
-        [&pattern](const String & line){ return line.find(pattern) != String::npos; }
-      );
+      return KeepIf([&pattern](const String & line) { return line.find(pattern) != String::npos; });
     }
 
     /// Remove all lines that contain a specific substring.
     File & RemoveIfContains(const String & pattern) {
-      return KeepIf(
-        [&pattern](const String & line){ return line.find(pattern) == String::npos; }
-      );
+      return KeepIf([&pattern](const String & line) { return line.find(pattern) == String::npos; });
     }
 
     /// Keep only lines that contain a specific substring.
     File & KeepIfBegins(const String & prefix) {
-      return KeepIf(
-        [&prefix](const String & line){ return line.find(prefix) == 0; }
-      );
+      return KeepIf([&prefix](const String & line) { return line.find(prefix) == 0; });
     }
 
     /// Remove all lines that contain a specific substring.
     File & RemoveIfBegins(const String & prefix) {
-      return KeepIf(
-        [&prefix](const String & line){ return line.Find(prefix) != 0; }
-      );
+      return KeepIf([&prefix](const String & line) { return line.Find(prefix) != 0; });
     }
 
     /// Remove all lines that are empty strings.
     File & RemoveEmpty() {
-      return KeepIf( [](const String & str){ return (bool) str.size(); } );
+      return KeepIf([](const String & str) { return (bool) str.size(); });
     }
 
     /// Any time multiple whitespaces are next to each other, collapse to a single WS char.
     /// Prefer '\n' if in whitespace collapsed, otherwise use ' '.
     File & CompressWhitespace() {
-      Apply([](String & in){ in.Compress(); });
+      Apply([](String & in) { in.Compress(); });
       RemoveEmpty();
       return *this;
     }
 
     /// Delete all whitespace; by default keep newlines.
-    File & RemoveWhitespace(bool keep_newlines=true) {
-      Apply([](String & in){ in.RemoveWhitespace(); });
+    File & RemoveWhitespace(bool keep_newlines = true) {
+      Apply([](String & in) { in.RemoveWhitespace(); });
       RemoveEmpty();
       if (!keep_newlines) {
         String all_lines;
-        for (const String & cur_line : lines){
-          all_lines += cur_line;
-        }
+        for (const String & cur_line : lines) { all_lines += cur_line; }
         lines.resize(1);
         std::swap(lines[0], all_lines);
       }
@@ -286,16 +283,16 @@ namespace emp {
     }
 
     /// A technique to remove all comments in a file.
-    File & RemoveComments(const String & marker, bool skip_quotes=true) {
-      Apply( [marker,skip_quotes](String & str) {
+    File & RemoveComments(const String & marker, bool skip_quotes = true) {
+      Apply([marker, skip_quotes](String & str) {
         size_t pos = str.Find(marker, 0, skip_quotes);
-        if (pos !=String::npos) str.resize( pos );
-      } );
+        if (pos != String::npos) { str.resize(pos); }
+      });
       return *this;
     }
 
     /// Allow remove comments to also be specified with a single character.
-    File & RemoveComments(char marker, bool skip_quotes=true) {
+    File & RemoveComments(char marker, bool skip_quotes = true) {
       return RemoveComments(emp::MakeString(marker), skip_quotes);
     }
 
@@ -304,62 +301,56 @@ namespace emp {
     template <typename T>
     emp::vector<T> Process(const std::function<T(String &)> & fun) {
       emp::vector<T> results(lines.size());
-      for (size_t i = 0; i < lines.size(); i++) {
-        results[i] = fun(lines[i]);
-      }
+      for (size_t i = 0; i < lines.size(); i++) { results[i] = fun(lines[i]); }
       return results;
     }
 
     /// Get a series of lines.
     emp::vector<String> Read(size_t start, size_t end) const {
-      if (end > lines.size()) end = lines.size();
-      auto start_it = lines.begin()+static_cast<int>(start);
-      auto end_it = lines.begin()+static_cast<int>(end);
+      if (end > lines.size()) { end = lines.size(); }
+      auto start_it = lines.begin() + static_cast<int>(start);
+      auto end_it   = lines.begin() + static_cast<int>(end);
       return emp::vector<String>(start_it, end_it);
     }
 
     /// Get a series of lines until a line meets a certain condition.
     emp::vector<String> ReadUntil(size_t start, auto test_fun) const {
       size_t end = start;
-      while (end < lines.size() && !test_fun(lines[end])) ++end;
+      while (end < lines.size() && !test_fun(lines[end])) { ++end; }
       return Read(start, end);
     }
 
     /// Get a series of lines while lines continue to meet a certain condition.
     emp::vector<String> ReadWhile(size_t start, auto test_fun) const {
       size_t end = start;
-      while (end < lines.size() && test_fun(lines)) ++end;
+      while (end < lines.size() && test_fun(lines)) { ++end; }
       return Read(start, end);
     }
 
     /// Remove the first column from the file, returning it as a vector of strings.
-    emp::vector<String> ExtractCol(char delim=',') {
-      return Process<String>( [delim](String & line){
-        return line.Pop(delim);
-      });
+    emp::vector<String> ExtractCol(char delim = ',') {
+      return Process<String>([delim](String & line) { return line.Pop(delim); });
     }
 
     /// Remove the first column from the file, returning it as a vector of a specified type.
     template <typename T>
-    emp::vector<T> ExtractColAs(char delim=',') {
-      return Process<T>( [delim](String & line){
-        return line.Pop(delim).As<T>();
-      });
+    emp::vector<T> ExtractColAs(char delim = ',') {
+      return Process<T>([delim](String & line) { return line.Pop(delim).As<T>(); });
     }
 
     /// Convert a row of a file to a vector of string views.
-    emp::vector<std::string_view> ViewRowSlices(size_t row_id, String delim=",") {
+    emp::vector<std::string_view> ViewRowSlices(size_t row_id, String delim = ",") {
       return lines[row_id].ViewSlices(delim);
     }
 
     /// Remove the first row from the file, returning it as a vector of strings.
-    emp::vector<String> ExtractRow(String delim=",") {
+    emp::vector<String> ExtractRow(String delim = ",") {
       // Identify the data as string_views
       emp::vector<std::string_view> sv_row = ViewRowSlices(0, delim);
 
       // Build the array to return and copy strings into it.
       emp::vector<String> out_row(sv_row.size());
-      for (size_t i=0; i < sv_row.size(); i++) out_row[i] = sv_row[i];
+      for (size_t i = 0; i < sv_row.size(); i++) { out_row[i] = sv_row[i]; }
 
       // Remove the row to be extracted and return the result.
       lines.erase(begin());
@@ -368,21 +359,21 @@ namespace emp {
 
     /// Remove the first row from the file, returning it as a vector of a specified type.
     template <typename T>
-    emp::vector<T> ExtractRowAs(String delim=",") {
+    emp::vector<T> ExtractRowAs(String delim = ",") {
       // Identify the data as string_views
       emp::vector<std::string_view> sv_row = ViewRowSlices(0, delim);
 
       // Build the array to return and copy strings into it.
       emp::vector<T> out_row(sv_row.size());
-      for (size_t i=0; i < sv_row.size(); i++) out_row[i] = from_string<T>(sv_row[i]);
+      for (size_t i = 0; i < sv_row.size(); i++) { out_row[i] = from_string<T>(sv_row[i]); }
 
       // Remove the row to be extracted and return the result.
       lines.erase(begin());
       return out_row;
     }
 
-    emp::vector< emp::vector<emp::String> > ToCSV(String delim=",") const {
-      emp::vector< emp::vector<emp::String> > out_csv(lines.size());
+    emp::vector<emp::vector < emp::String> > ToCSV(String delim = ",") const {
+      emp::vector<emp::vector < emp::String> > out_csv(lines.size());
       for (size_t row_id = 0; row_id < lines.size(); row_id++) {
         out_csv[row_id] = lines[row_id].Slice(delim);
       }
@@ -390,20 +381,19 @@ namespace emp {
     }
 
     template <typename T>
-    emp::vector< emp::vector<T> > ToData(String delim=",") const {
-      emp::vector< emp::vector<T> > out_data(lines.size());
+      emp::vector<emp::vector < T> > ToData(String delim = ",") const {
+      emp::vector<emp::vector < T> > out_data(lines.size());
 
       for (size_t row_id = 0; row_id < lines.size(); row_id++) {
         auto sv_row = lines[row_id].ViewSlices(delim);
         out_data[row_id].resize(sv_row.size());
-        for (size_t i=0; i < sv_row.size(); i++) {
+        for (size_t i = 0; i < sv_row.size(); i++) {
           out_data[row_id][i] = from_string<T>(sv_row[i]);
         }
       }
 
       return out_data;
     }
-
 
     // A File::Scan object allows a user to easily step through a File.
     class Scan {
@@ -412,32 +402,38 @@ namespace emp {
       size_t line = 0;
 
     public:
-      Scan(const File & in, size_t start=0) : file(in), line(start) { }
+      Scan(const File & in, size_t start = 0) : file(in), line(start) {}
+
       Scan(const Scan & in) = default;
 
       const File & GetFile() const { return file; }
+
       size_t GetLine() const { return line; }
 
       bool AtStart() const { return line == 0; }
+
       bool AtEnd() const { return line >= file.size(); }
+
       operator bool() const { return !AtEnd(); }
 
       void Set(size_t in_line) { line = in_line; }
+
       void Reset() { line = 0; }
+
       void SetEnd() { line = file.size(); }
 
       // Get the very next line.
       const String & Read() {
-        if (line > file.size()) return String::StaticEmpty();
+        if (line > file.size()) { return String::StaticEmpty(); }
         return file[line++];
       }
 
       // Get a block of lines.
       emp::vector<String> ReadTo(size_t end) {
         emp_assert(end >= line);
-        if (end > file.size()) end = file.size();
+        if (end > file.size()) { end = file.size(); }
         size_t start = line;
-        line = end;
+        line         = end;
         return file.Read(start, end);
       }
 
@@ -456,9 +452,9 @@ namespace emp {
       }
     };
 
-    Scan StartScan(size_t start=0) const { return Scan(*this, start); }
+    Scan StartScan(size_t start = 0) const { return Scan(*this, start); }
   };
 
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_IO_FILE_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_IO_FILE_HPP_GUARD

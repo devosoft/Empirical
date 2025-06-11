@@ -359,7 +359,7 @@ namespace emp {
 #ifdef EMP_TRACK_MEM
           emp_assert(bits.DebugIsArray());  // Must be marked as an array.
           emp_assert(bits.OK());            // Pointer must be okay.
-#endif  // #ifdef EMP_TRACK_MEM
+#endif                                      // #ifdef EMP_TRACK_MEM
         } else {
           emp_assert(base_t::num_bits == 0);
         }  // If bits is null, num_bits should be zero.

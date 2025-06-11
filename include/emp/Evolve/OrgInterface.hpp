@@ -15,9 +15,8 @@
 
 namespace emp {
 
-  class OrgInterface {
-  };
+  class OrgInterface {};
 
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_EVOLVE_ORGINTERFACE_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_EVOLVE_ORG_INTERFACE_HPP_GUARD

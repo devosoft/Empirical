@@ -15,4 +15,4 @@
 
 #include "Document.hpp"
 
-#endif // #ifndef EMP_WEB_WEB_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_WEB_WEB_HPP_GUARD

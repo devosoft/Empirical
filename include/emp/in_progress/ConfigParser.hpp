@@ -32,16 +32,17 @@ namespace emp {
 
   class ConfigParser {
   private:
-    ConfigLexer lexer;                      // Lexer to provide token stream.
-    emp::vector<ParseRule> rules;           // Vector of all rules linking states to productions.
-    std::map<std::string, int> state_ids;   // Map of state names to their IDs.
-    int next_state;                         // If we add another state, what ID should we use?
+    ConfigLexer lexer;                     // Lexer to provide token stream.
+    emp::vector<ParseRule> rules;          // Vector of all rules linking states to productions.
+    std::map<std::string, int> state_ids;  // Map of state names to their IDs.
+    int next_state;                        // If we add another state, what ID should we use?
 
     int ToStateID(const std::string & name) {
       auto state_ptr = state_ids.find(name);
-      if (state_ptr == state_ids.end()) return next_state++;
+      if (state_ptr == state_ids.end()) { return next_state++; }
       return state_ptr->second;
     }
+
     int ToStateID(int state_id) const { return state_id; }
 
     // Take a token name or as state name and convert to its ID.
@@ -52,14 +53,12 @@ namespace emp {
 
     emp::vector<int> ToRHS(const emp::vector<std::string> & str_rhs) {
       emp::vector<int> rhs(str_rhs.size());
-      for (int i = 0; i < (int) str_rhs.size(); i++) {
-        rhs[i] = StringToID(str_rhs[i]);
-      }
+      for (int i = 0; i < (int) str_rhs.size(); i++) { rhs[i] = StringToID(str_rhs[i]); }
       return rhs;
     }
-    emp::vector<int> ToRHS(const std::string & str_rhs) {
-      return ToRHS(emp::slice(str_rhs, ' '));
-    }
+
+    emp::vector<int> ToRHS(const std::string & str_rhs) { return ToRHS(emp::slice(str_rhs, ' ')); }
+
     emp::vector<int> ToRHS(const emp::vector<int> & rhs) { return rhs; }
 
     int AddRule_impl(int state_id, const emp::vector<int> & rhs) {
@@ -68,17 +67,17 @@ namespace emp {
     }
 
   public:
-    ConfigParser(std::istream & in_stream)
-      : lexer(in_stream), next_state(lexer.GetMaxToken()) { ; }
+    ConfigParser(std::istream & in_stream) : lexer(in_stream), next_state(lexer.GetMaxToken()) { ; }
+
     ~ConfigParser() { ; }
 
     // Returns state ID for rule.
     template <typename T1, typename T2>
     int AddRule(T1 && state, const emp::vector<int> & rhs) {
-      return AddRule_impl( ToStateID(std::forward<T1>(state)), ToRHS(std::forward<T2>(rhs)) );
+      return AddRule_impl(ToStateID(std::forward<T1>(state)), ToRHS(std::forward<T2>(rhs)));
     }
   };
 
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_IN_PROGRESS_CONFIGPARSER_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_IN_PROGRESS_CONFIG_PARSER_HPP_GUARD

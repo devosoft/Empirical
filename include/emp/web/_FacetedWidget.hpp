@@ -11,28 +11,23 @@
 
 #pragma once
 
-#ifndef INCLUDE_EMP_WEB_FACETED_WIDGET_HPP_GUARD
-#define INCLUDE_EMP_WEB_FACETED_WIDGET_HPP_GUARD
+#ifndef INCLUDE_EMP_WEB_FACETED_WIDGET_HPP_impl_GUARD
+#define INCLUDE_EMP_WEB_FACETED_WIDGET_HPP_impl_GUARD
 
 #include "../web/Widget.hpp"
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-namespace emp{
-namespace web{
-  namespace internal{
-    class FacetedWidget : public internal::WidgetFacet<FacetedWidget>
-    {
-      public:
-      using base_t = internal::WidgetFacet<FacetedWidget>;
-      using INFO_TYPE = internal::WidgetInfo;
-      FacetedWidget(const Widget & widget) : base_t(widget){
-      }
-    };
-  }
-}
-}
+namespace emp { namespace web { namespace internal {
+  class FacetedWidget : public internal::WidgetFacet<FacetedWidget> {
+  public:
+    using base_t    = internal::WidgetFacet<FacetedWidget>;
+    using INFO_TYPE = internal::WidgetInfo;
 
-#endif
+    FacetedWidget(const Widget & widget) : base_t(widget) {}
+  };
+}}}  // namespace emp::web::internal
 
-#endif // #ifndef EMP_WEB__FACETEDWIDGET_HPP_INCLUDE
+#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
+
+#endif  // #ifndef INCLUDE_EMP_WEB_FACETED_WIDGET_HPP_impl_GUARD

@@ -30,42 +30,82 @@ namespace emp {
       double num;
       emp::String str;
     };
+
     bool is_num = true;
 
-    void InitString() { new (&str) emp::String; is_num = false; }
+    void InitString() {
+      new (&str) emp::String;
+      is_num = false;
+    }
+
     template <typename T>
-    void InitString(T && in) { new (&str) emp::String(std::forward<T>(in)); is_num = false; }
-    void FreeString() { if (!is_num) str.~String(); }
+    void InitString(T && in) {
+      new (&str) emp::String(std::forward<T>(in));
+      is_num = false;
+    }
+
+    void FreeString() {
+      if (!is_num) { str.~String(); }
+    }
   public:
-    Datum() : num(0.0), is_num(true) { }
-    Datum(double in) : num(in), is_num(true) { }
+    Datum() : num(0.0), is_num(true) {}
+
+    Datum(double in) : num(in), is_num(true) {}
+
     Datum(const std::string & in) { InitString(in); }
+
     Datum(const emp::String & in) { InitString(in); }
+
     Datum(emp::String && in) { InitString(in); }
+
     Datum(const char * in) { InitString(in); }
+
     Datum(const Datum & in) {
-      if (in.is_num) num = in.num;
-      else InitString(in.str);
+      if (in.is_num) {
+        num = in.num;
+      } else {
+        InitString(in.str);
+      }
     }
+
     Datum(Datum && in) {
-      if (in.is_num) num = in.num;
-      else InitString(std::move(in.str));
+      if (in.is_num) {
+        num = in.num;
+      } else {
+        InitString(std::move(in.str));
+      }
     }
+
     ~Datum() { FreeString(); }
 
-    bool IsDouble() const { return is_num; }   ///< Is this natively stored as a double?
+    bool IsDouble() const { return is_num; }  ///< Is this natively stored as a double?
+
     bool IsString() const { return !is_num; }  ///< Is this natively stored as a string?
 
     /// If we know Datum is a Double, we can request its native form.
-    double & NativeDouble() { emp_assert(is_num); return num; }
-    double NativeDouble() const { emp_assert(is_num); return num; }
+    double & NativeDouble() {
+      emp_assert(is_num);
+      return num;
+    }
+
+    double NativeDouble() const {
+      emp_assert(is_num);
+      return num;
+    }
 
     /// If we know Datum is a String, we can request its native form.
-    emp::String & NativeString() { emp_assert(!is_num); return str; }
-    const emp::String & NativeString() const { emp_assert(!is_num); return str; }
+    emp::String & NativeString() {
+      emp_assert(!is_num);
+      return str;
+    }
+
+    const emp::String & NativeString() const {
+      emp_assert(!is_num);
+      return str;
+    }
 
     double AsDouble() const {
-      if (is_num) return num;
+      if (is_num) { return num; }
       // Make sure we have a value here; otherwise provide a warning and return 0.0.
       if (str.size() > 0 &&
           (std::isdigit(str[0]) || (str[0] == '-' && str.size() > 1 && std::isdigit(str[1])))) {
@@ -78,45 +118,59 @@ namespace emp {
     }
 
     emp::String AsString() const {
-      if (!is_num) return str;
+      if (!is_num) { return str; }
       std::stringstream ss;
       ss << num;
       return ss.str();
-      //return std::to_string(num);
+      // return std::to_string(num);
     }
 
     operator double() const { return AsDouble(); }
+
     operator std::string() const { return AsString(); }
+
     operator emp::String() const { return AsString(); }
 
     Datum & SetDouble(double in) {  // If this were previously a string, clean it up!
-      FreeString();  // If there was previously a string, make sure to free it.
+      FreeString();                 // If there was previously a string, make sure to free it.
       is_num = true;
-      num = in;
+      num    = in;
       return *this;
     }
 
     template <typename T>
     Datum & SetString(T && in) {
-      if (is_num) InitString(std::forward<T>(in));  // Convert to string.
-      else str = std::forward<T>(in);               // Already a string.
+      if (is_num) {
+        InitString(std::forward<T>(in));  // Convert to string.
+      } else {
+        str = std::forward<T>(in);  // Already a string.
+      }
       return *this;
     }
 
     Datum & Set(const Datum & in) {
-      if (in.is_num) return SetDouble(in.num);
-      else return SetString(in.str);
+      if (in.is_num) {
+        return SetDouble(in.num);
+      } else {
+        return SetString(in.str);
+      }
     }
 
     Datum & operator=(double in) { return SetDouble(in); }
+
     Datum & operator=(const std::string & in) { return SetString(in); }
+
     Datum & operator=(emp::String && in) { return SetString(in); }
+
     Datum & operator=(const char * in) { return SetString(in); }
+
     Datum & operator=(const Datum & in) { return Set(in); }
 
     // Unary operators
     Datum operator+() const { return AsDouble(); }
+
     Datum operator-() const { return -AsDouble(); }
+
     Datum operator!() const { return AsDouble() == 0.0; }
 
     // Comparison operators
@@ -134,61 +188,111 @@ namespace emp {
     }
 
     int Compare(double rhs) const { return CompareNumber(rhs); }
-    int Compare(const std::string & rhs) const { return CompareString(rhs); }
-    int Compare(const char * rhs) const { return CompareString(rhs); }
-    int Compare(const Datum & rhs) const { return (rhs.is_num) ? CompareNumber(rhs) : CompareString(rhs); }
 
-    template<typename T> bool operator==(const T & rhs) const { return Compare(rhs) == 0; }
-    template<typename T> bool operator!=(const T & rhs) const { return Compare(rhs) != 0; }
-    template<typename T> bool operator< (const T & rhs) const { return Compare(rhs) == -1; }
-    template<typename T> bool operator>=(const T & rhs) const { return Compare(rhs) != -1; }
-    template<typename T> bool operator> (const T & rhs) const { return Compare(rhs) == 1; }
-    template<typename T> bool operator<=(const T & rhs) const { return Compare(rhs) != 1; }
+    int Compare(const std::string & rhs) const { return CompareString(rhs); }
+
+    int Compare(const char * rhs) const { return CompareString(rhs); }
+
+    int Compare(const Datum & rhs) const {
+      return (rhs.is_num) ? CompareNumber(rhs) : CompareString(rhs);
+    }
+
+    template <typename T>
+    bool operator==(const T & rhs) const {
+      return Compare(rhs) == 0;
+    }
+
+    template <typename T>
+    bool operator!=(const T & rhs) const {
+      return Compare(rhs) != 0;
+    }
+
+    template <typename T>
+    bool operator<(const T & rhs) const {
+      return Compare(rhs) == -1;
+    }
+
+    template <typename T>
+    bool operator>=(const T & rhs) const {
+      return Compare(rhs) != -1;
+    }
+
+    template <typename T>
+    bool operator>(const T & rhs) const {
+      return Compare(rhs) == 1;
+    }
+
+    template <typename T>
+    bool operator<=(const T & rhs) const {
+      return Compare(rhs) != 1;
+    }
 
     // Binary Operators
 
     Datum operator+(double in) const {
-      if (IsDouble()) return NativeDouble() + in;
+      if (IsDouble()) { return NativeDouble() + in; }
       return NativeString() + std::to_string(in);
     }
+
     Datum operator*(double in) const {
-      if (IsDouble()) return NativeDouble() * in;
+      if (IsDouble()) { return NativeDouble() * in; }
       emp::String out_string;
       const size_t count = static_cast<size_t>(in);
       out_string.reserve(NativeString().size() * count);
-      for (size_t i = 0; i < count; ++i) out_string += NativeString();
+      for (size_t i = 0; i < count; ++i) { out_string += NativeString(); }
       return out_string;
     }
+
     Datum operator-(double in) const { return AsDouble() - in; }
+
     Datum operator/(double in) const { return AsDouble() / in; }
+
     Datum operator%(double in) const { return emp::Mod(AsDouble(), in); }
 
     Datum operator+(const Datum & in) const {
-      if (IsDouble()) return NativeDouble() + in.AsDouble();
+      if (IsDouble()) { return NativeDouble() + in.AsDouble(); }
       return NativeString() + in.AsString();
     }
+
     Datum operator*(const Datum & in) const {
-      if (IsDouble()) return NativeDouble() * in.AsDouble();
+      if (IsDouble()) { return NativeDouble() * in.AsDouble(); }
       emp::String out_string;
       size_t count = static_cast<size_t>(in.AsDouble());
       out_string.reserve(NativeString().size() * count);
-      for (size_t i = 0; i < count; i++) out_string += NativeString();
+      for (size_t i = 0; i < count; i++) { out_string += NativeString(); }
       return out_string;
     }
+
     Datum operator-(const Datum & in) const { return AsDouble() - in.AsDouble(); }
+
     Datum operator/(const Datum & in) const { return AsDouble() / in.AsDouble(); }
+
     Datum operator%(const Datum & in) const { return emp::Mod(AsDouble(), in.AsDouble()); }
 
     template <typename T>
-    Datum operator+=(T && in) { return *this = operator+(std::forward<T>(in)); }
+    Datum operator+=(T && in) {
+      return *this = operator+(std::forward<T>(in));
+    }
+
     template <typename T>
-    Datum operator-=(T && in) { return *this = operator-(std::forward<T>(in)); }
+    Datum operator-=(T && in) {
+      return *this = operator-(std::forward<T>(in));
+    }
+
     template <typename T>
-    Datum operator*=(T && in) { return *this = operator*(std::forward<T>(in)); }
+    Datum operator*=(T && in) {
+      return *this = operator*(std::forward<T>(in));
+    }
+
     template <typename T>
-    Datum operator/=(T && in) { return *this = operator/(std::forward<T>(in)); }
+    Datum operator/=(T && in) {
+      return *this = operator/(std::forward<T>(in));
+    }
+
     template <typename T>
-    Datum operator%=(T && in) { return *this = operator%(std::forward<T>(in)); }
+    Datum operator%=(T && in) {
+      return *this = operator%(std::forward<T>(in));
+    }
   };
 
   std::ostream & operator<<(std::ostream & out, const emp::Datum & d) {
@@ -196,10 +300,10 @@ namespace emp {
     return out;
   }
 
-}
+}  // namespace emp
 
 emp::Datum operator%(double value1, emp::Datum value2) {
   return emp::Mod(value1, value2.AsDouble());
 }
 
-#endif // #ifndef EMP_DATA_DATUM_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_DATA_DATUM_HPP_GUARD

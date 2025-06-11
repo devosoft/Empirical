@@ -22,7 +22,8 @@
 
 namespace emp {
 
-  template <int FRAC_BITS=10> class fixed {
+  template <int FRAC_BITS = 10>
+  class fixed {
   private:
     int value;
     static const int int_bits = 31 - FRAC_BITS;
@@ -31,28 +32,54 @@ namespace emp {
     fixed(int in_value, bool) : value(in_value) { ; }
   public:
     fixed() : value(0) { ; }
-    fixed(const fixed & in_value) : value (in_value.value) { ; }
+
+    fixed(const fixed & in_value) : value(in_value.value) { ; }
+
     fixed(int in_value) : value(in_value << FRAC_BITS) { ; }
+
     fixed(double in_value) : value(in_value * (1 << FRAC_BITS)) { ; }
+
     ~fixed() { ; }
 
     int bits() const { return value; }
+
     int AsInt() const { return value >> FRAC_BITS; }
+
     double AsDouble() const { return ((double) value) / ((double) (1 << FRAC_BITS)); }
 
-    fixed & operator=(const fixed & other) { value = other.value; return *this; }
-    fixed & operator=(int other) { value = other << FRAC_BITS; return *this; }
-    fixed & operator=(double other) { value = other * (1 << FRAC_BITS); return *this; }
+    fixed & operator=(const fixed & other) {
+      value = other.value;
+      return *this;
+    }
 
-    fixed & operator+=(const fixed & rhs) { value += rhs.value; return *this; }
-    fixed & operator-=(const fixed & rhs) { value -= rhs.value; return *this; }
+    fixed & operator=(int other) {
+      value = other << FRAC_BITS;
+      return *this;
+    }
+
+    fixed & operator=(double other) {
+      value = other * (1 << FRAC_BITS);
+      return *this;
+    }
+
+    fixed & operator+=(const fixed & rhs) {
+      value += rhs.value;
+      return *this;
+    }
+
+    fixed & operator-=(const fixed & rhs) {
+      value -= rhs.value;
+      return *this;
+    }
+
     fixed & operator*=(const fixed & rhs) {
       // Take advantage of (a+b)*(c+d) = ac+ad+bc+bd.  Since bd is too low precision: b*c + a*(c+d)
       const int frac_mask = (1 << FRAC_BITS) - 1;
-      value = (value & frac_mask) * (rhs.value >> FRAC_BITS) + (value >> FRAC_BITS) * rhs.value
-        + ((value & frac_mask) * (rhs.value & frac_mask) >> FRAC_BITS);
+      value = (value & frac_mask) * (rhs.value >> FRAC_BITS) + (value >> FRAC_BITS) * rhs.value +
+              ((value & frac_mask) * (rhs.value & frac_mask) >> FRAC_BITS);
       return *this;
     }
+
     fixed & operator/=(const fixed & rhs) {
       // @CAO can we take advantage of (a+b)/c = a/c + b/c
       value = (((long) value) << FRAC_BITS) / rhs.value;
@@ -60,60 +87,72 @@ namespace emp {
     }
 
     fixed & operator++() { value += (1 << FRAC_BITS); }
-    fixed operator++(int) { int old_val = value; operator++(); return fixed(old_val); }
+
+    fixed operator++(int) {
+      int old_val = value;
+      operator++();
+      return fixed(old_val);
+    }
+
     fixed & operator--() { value -= (1 << FRAC_BITS); }
-    fixed operator--(int) { int old_val = value; operator--(); return fixed(old_val); }
+
+    fixed operator--(int) {
+      int old_val = value;
+      operator--();
+      return fixed(old_val);
+    }
 
     friend fixed operator+(const fixed & lhs, const fixed & rhs) {
       return fixed(lhs.value + rhs.value, true);
     }
+
     friend fixed operator-(const fixed & lhs, const fixed & rhs) {
       return fixed(lhs.value - rhs.value, true);
     }
+
     friend fixed operator*(const fixed & lhs, const fixed & rhs) {
       // Take advantage of (a+b)*(c+d) = ac+ad+bc+bd.  Since bd is too low precision: b*c + a*(c+d)
       const int frac_mask = (1 << FRAC_BITS) - 1;
-      const int new_value = (lhs.value & frac_mask) * (rhs.value >> FRAC_BITS)
-        + (lhs.value >> FRAC_BITS) * rhs.value
-        + ((lhs.value & frac_mask) * (rhs.value & frac_mask) >> FRAC_BITS);
+      const int new_value = (lhs.value & frac_mask) * (rhs.value >> FRAC_BITS) +
+                            (lhs.value >> FRAC_BITS) * rhs.value +
+                            ((lhs.value & frac_mask) * (rhs.value & frac_mask) >> FRAC_BITS);
       return fixed(new_value, true);
     }
+
     friend fixed operator/(const fixed & lhs, const fixed & rhs) {
       // @CAO can we take advantage of (a+b)/c = a/c + b/c
       const int new_value = (((long) lhs.value) << FRAC_BITS) / rhs.value;
       return fixed(new_value, true);
     }
 
-    friend bool operator==(const fixed & lhs, const fixed & rhs)
-    { return lhs.value == rhs.value; }
-    friend bool operator!=(const fixed & lhs, const fixed & rhs)
-    { return lhs.value != rhs.value; }
-    friend bool operator< (const fixed & lhs, const fixed & rhs)
-    { return lhs.value <  rhs.value; }
-    friend bool operator<=(const fixed & lhs, const fixed & rhs)
-    { return lhs.value <= rhs.value; }
-    friend bool operator> (const fixed & lhs, const fixed & rhs)
-    { return lhs.value >  rhs.value; }
-    friend bool operator>=(const fixed & lhs, const fixed & rhs)
-    { return lhs.value >= rhs.value; }
+    friend bool operator==(const fixed & lhs, const fixed & rhs) { return lhs.value == rhs.value; }
 
+    friend bool operator!=(const fixed & lhs, const fixed & rhs) { return lhs.value != rhs.value; }
+
+    friend bool operator<(const fixed & lhs, const fixed & rhs) { return lhs.value < rhs.value; }
+
+    friend bool operator<=(const fixed & lhs, const fixed & rhs) { return lhs.value <= rhs.value; }
+
+    friend bool operator>(const fixed & lhs, const fixed & rhs) { return lhs.value > rhs.value; }
+
+    friend bool operator>=(const fixed & lhs, const fixed & rhs) { return lhs.value >= rhs.value; }
   };
 
 
-};
+};  // namespace emp
 
 // Overload istream and ostream to work with fixed.
-template <int FRAC_BITS> std::ostream & operator<<(std::ostream & os,
-                                                   const emp::fixed<FRAC_BITS> & input) {
+template <int FRAC_BITS>
+std::ostream & operator<<(std::ostream & os, const emp::fixed<FRAC_BITS> & input) {
   return os << input.AsDouble();
 }
 
-template <int FRAC_BITS> std::istream & operator>>(std::istream & is,
-                                                   emp::fixed<FRAC_BITS> & input) {
+template <int FRAC_BITS>
+std::istream & operator>>(std::istream & is, emp::fixed<FRAC_BITS> & input) {
   double tmp_val;
   is >> tmp_val;
   input = tmp_val;
   return is;
 }
 
-#endif // #ifndef EMP_IN_PROGRESS_FIXED_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_IN_PROGRESS_FIXED_HPP_GUARD

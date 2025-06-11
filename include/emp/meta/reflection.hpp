@@ -161,11 +161,10 @@ using NAME = typename emp::TypePack<Ts...>::template find_t<EMPDetect_ ## NAME>;
  EMP_IMPL_TYPE_DEFAULT(EMP_DETECT_ ## NEW_TYPE, ..., DEFAULT);                       \
  using NEW_TYPE = decltype(EMP_DETECT_ ## NEW_TYPE ## _impl<BASE_TYPE>(true))
 
-
 namespace emp {
 
-  // Helper tools for SubsetCall.
-  #ifndef DOXYGEN_SHOULD_SKIP_THIS
+// Helper tools for SubsetCall.
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
     template <typename RETURN, typename... FUN_ARGS>
     struct SubsetCall_impl {
@@ -174,8 +173,8 @@ namespace emp {
         return fun(args...);
       }
     };
-  }
-  #endif // DOXYGEN_SHOULD_SKIP_THIS
+  }  // namespace internal
+#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
   /// Identify the number of parameters in a function and pass in correct number of argument.
   template <typename RETURN, typename... FUN_ARGS, typename... CALL_ARGS>
@@ -183,20 +182,25 @@ namespace emp {
     return internal::SubsetCall_impl<RETURN, FUN_ARGS...>::Call(fun, args...);
   }
 
-  #ifndef DOXYGEN_SHOULD_SKIP_THIS
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
   // Helper tools for type_if.
   namespace internal {
-    template< typename T, bool match_ok > struct EMP_eval_type { };
-    template< typename T> struct EMP_eval_type<T,true> { using type = T; }; // If match, define type!
-  }
+    template <typename T, bool match_ok>
+    struct EMP_eval_type {};
+
+    template <typename T>
+    struct EMP_eval_type<T, true> {
+      using type = T;
+    };  // If match, define type!
+  }  // namespace internal
 
   /// A template for making a type exist if and only if it passes a template test.
   /// For example: type_if<T, std::is_integral>
   /// This becomes T if the type is integral; it's undefined otherwise.
   template <typename T, template <typename...> class FILTER>
-  using type_if = typename internal::EMP_eval_type< T, FILTER<T>::value >::type;
-  #endif // DOXYGEN_SHOULD_SKIP_THIS
+  using type_if = typename internal::EMP_eval_type<T, FILTER<T>::value>::type;
+#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_META_REFLECTION_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_META_REFLECTION_HPP_GUARD

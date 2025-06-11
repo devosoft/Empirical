@@ -57,18 +57,17 @@ namespace emp {
       // Simple splitmix64 seeding (adapted from Blackman & Vigna)
       uint64_t tmp;
       for (size_t i = 0; i < 4; ++i) {
-        tmp = (seed += 0x9e3779b97f4a7c15); // Shift seed for each starting point.
-        tmp = (tmp ^ (tmp >> 30)) * 0xbf58476d1ce4e5b9;
-        tmp = (tmp ^ (tmp >> 27)) * 0x94d049bb133111eb;
+        tmp      = (seed += 0x9e37'79b9'7f4a'7c15);  // Shift seed for each starting point.
+        tmp      = (tmp ^ (tmp >> 30)) * 0xbf58'476d'1ce4'e5b9;
+        tmp      = (tmp ^ (tmp >> 27)) * 0x94d0'49bb'1331'11eb;
         state[i] = tmp ^ (tmp >> 31);
       }
     }
-
   };
 
-} // END emp namespace
+}  // namespace emp
 
-#endif // #ifndef EMP_MATH_RANDOM_XOSHIRO256PP_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_MATH_RANDOM_XOSHIRO256PP_HPP_GUARD
 
 // Local settings for Empecable file checker.
-// empecable_words: xoshiro Blackman Vigna splitmix
+// empecable_words: splitmix Vigna Blackman xoshiro

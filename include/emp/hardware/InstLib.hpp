@@ -28,45 +28,64 @@ namespace emp {
 
   /// ScopeType is used for scopes that we need to do something special at the end.
   /// Eg: LOOP needs to go back to beginning of loop; FUNCTION needs to return to call.
-  enum class ScopeType { NONE=0, ROOT, BASIC, LOOP, FUNCTION };
+  enum class ScopeType { NONE = 0, ROOT, BASIC, LOOP, FUNCTION };
 
   /// @brief InstLib maintains a set of instructions for use in virtual hardware.
   /// @tparam HARDWARE_T Type of the virtual hardware class to track instructions.
   /// @tparam ARG_T What types of arguments are associated with instructions.
   /// @tparam ARG_COUNT Max number of arguments on an instruction.
-  template <typename HARDWARE_T, typename ARG_T=size_t, size_t ARG_COUNT=3>
+  template <typename HARDWARE_T, typename ARG_T = size_t, size_t ARG_COUNT = 3>
   class InstLib {
   public:
-    using hardware_t = HARDWARE_T;
-    using inst_t = typename hardware_t::inst_t;
-    using genome_t = emp::vector<inst_t>;
-    using arg_t = ARG_T;
-    using fun_t = std::function<void(hardware_t &, const inst_t &)>;
+    using hardware_t        = HARDWARE_T;
+    using inst_t            = typename hardware_t::inst_t;
+    using genome_t          = emp::vector<inst_t>;
+    using arg_t             = ARG_T;
+    using fun_t             = std::function<void(hardware_t &, const inst_t &)>;
     using inst_properties_t = std::unordered_set<emp::String>;
 
-    struct InstructionBase{
-      virtual ~InstructionBase() {;}
+    struct InstructionBase {
+      virtual ~InstructionBase() { ; }
+
       virtual size_t GetIndex() const = 0;
     };
 
     struct InstDef {
       size_t index;
       size_t id;
-      emp::String name;             ///< Name of this instruction.
-      fun_t fun_call;               ///< Function to call when executing.
-      size_t num_args;              ///< Number of args needed by function.
-      emp::String desc;             ///< Description of function.
-      ScopeType scope_type;         ///< How does this instruction affect scoping?
-      size_t scope_arg;             ///< Which arg indicates new scope (if any).
-      inst_properties_t properties; ///< Are there any generic properties associated with this inst def?
-      char symbol;                  ///< Unique symbol for this instruction.
+      emp::String name;      ///< Name of this instruction.
+      fun_t fun_call;        ///< Function to call when executing.
+      size_t num_args;       ///< Number of args needed by function.
+      emp::String desc;      ///< Description of function.
+      ScopeType scope_type;  ///< How does this instruction affect scoping?
+      size_t scope_arg;      ///< Which arg indicates new scope (if any).
+      inst_properties_t
+        properties;  ///< Are there any generic properties associated with this inst def?
+      char symbol;   ///< Unique symbol for this instruction.
 
-      InstDef(size_t _idx, size_t _id, const emp::String & _n, fun_t _fun, size_t _args,
-              const emp::String & _d, ScopeType _s_type, size_t _s_arg,
+      InstDef(size_t _idx,
+              size_t _id,
+              const emp::String & _n,
+              fun_t _fun,
+              size_t _args,
+              const emp::String & _d,
+              ScopeType _s_type,
+              size_t _s_arg,
               const inst_properties_t & _properties = inst_properties_t(),
-              char _sym='?')
-        : index(_idx), id(_id), name(_n), fun_call(_fun), num_args(_args), desc(_d)
-        , scope_type(_s_type), scope_arg(_s_arg), properties(_properties), symbol(_sym) { ; }
+              char _sym                             = '?')
+        : index(_idx)
+        , id(_id)
+        , name(_n)
+        , fun_call(_fun)
+        , num_args(_args)
+        , desc(_d)
+        , scope_type(_s_type)
+        , scope_arg(_s_arg)
+        , properties(_properties)
+        , symbol(_sym) {
+        ;
+      }
+
       InstDef(const InstDef &) = default;
     };
 
@@ -78,18 +97,23 @@ namespace emp {
     std::map<emp::String, arg_t> arg_map;    ///< How are different arguments named?
 
     /// Symbols to use when representing individual instructions (80).
-    emp::String symbol_defaults = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*~_=,.|/\\><";
-    char extra_symbol = '+';            ///< Symbol for more instructions than fit above.
-    emp::array<size_t, 128> symbol_map; ///< Map of symbols back to instruction IDs.
+    emp::String symbol_defaults =
+      "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*~_=,.|/\\><";
+    char extra_symbol = '+';             ///< Symbol for more instructions than fit above.
+    emp::array<size_t, 128> symbol_map;  ///< Map of symbols back to instruction IDs.
 
   public:
-    InstLib() : inst_lib(), inst_funs(), name_map(), id_map(), arg_map() { ; }  ///< Default Constructor
-    InstLib(const InstLib &) = delete;                               ///< Copy Constructor
-    InstLib(InstLib &&) = delete;                                    ///< Move Constructor
-    virtual ~InstLib() { ; }                                         ///< Destructor
+    InstLib() : inst_lib(), inst_funs(), name_map(), id_map(), arg_map() {
+      ;
+    }  ///< Default Constructor
 
-    InstLib & operator=(const InstLib &) = default;                  ///< Copy Operator
-    InstLib & operator=(InstLib &&) = default;                       ///< Move Operator
+    InstLib(const InstLib &) = delete;  ///< Copy Constructor
+    InstLib(InstLib &&)      = delete;  ///< Move Constructor
+
+    virtual ~InstLib() { ; }  ///< Destructor
+
+    InstLib & operator=(const InstLib &) = default;  ///< Copy Operator
+    InstLib & operator=(InstLib &&)      = default;  ///< Move Operator
 
     /// Return the name associated with the specified instruction ID.
     const emp::String & GetName(size_t idx) const { return inst_lib[idx].name; }
@@ -110,9 +134,7 @@ namespace emp {
     size_t GetScopeArg(size_t idx) const { return inst_lib[idx].scope_arg; }
 
     /// Return the set of properties for the provided instruction ID.
-    const inst_properties_t & GetProperties(size_t idx) const {
-      return inst_lib[idx].properties;
-    }
+    const inst_properties_t & GetProperties(size_t idx) const { return inst_lib[idx].properties; }
 
     char GetSymbol(size_t idx) const { return inst_lib[idx].symbol; }
 
@@ -126,13 +148,10 @@ namespace emp {
 
     /// Returns Boolean indicating whether the given
     /// string is a valid instruction.
-    bool IsInst(const emp::String name) const {
-      return Has(name_map, name);
-    }
+    bool IsInst(const emp::String name) const { return Has(name_map, name); }
 
-    size_t GetID(const size_t idx) const {
-     return inst_lib[idx].id;
-    }
+    size_t GetID(const size_t idx) const { return inst_lib[idx].id; }
+
     /// Return the ID of the instruction that has the specified name.
     size_t GetID(const emp::String & name) const {
       emp_assert(Has(name_map, name), name);
@@ -150,6 +169,7 @@ namespace emp {
       emp_assert(Has(name_map, name), name);
       return Find(name_map, name, (size_t) -1);
     }
+
     /// Return the ID of the instruction that has the specified id.
     size_t GetIndex(const size_t id) const {
       emp_assert(Has(id_map, id), id);
@@ -177,24 +197,32 @@ namespace emp {
     /// @param inst_properties Strings representing arbitrary properties associated with instruction
     void AddInst(const emp::String & name,
                  const fun_t & fun_call,
-                 size_t num_args=0,
-                 const emp::String & desc="",
-                 ScopeType scope_type=ScopeType::NONE,
-                 size_t scope_arg=(size_t) -1,
-                 const inst_properties_t & inst_properties=inst_properties_t(),
-                 int _id = -1)
-    {
+                 size_t num_args                           = 0,
+                 const emp::String & desc                  = "",
+                 ScopeType scope_type                      = ScopeType::NONE,
+                 size_t scope_arg                          = (size_t) -1,
+                 const inst_properties_t & inst_properties = inst_properties_t(),
+                 int _id                                   = -1) {
       const size_t idx = inst_lib.size();
-      const size_t id = (_id >= 0) ? _id : inst_lib.size();
+      const size_t id  = (_id >= 0) ? _id : inst_lib.size();
       emp_assert(!Has(id_map, id), "ID is already in use!", id);
       const char symbol = (id < symbol_defaults.size()) ? symbol_defaults[id] : '+';
-      inst_lib.emplace_back(idx, id, name, fun_call, num_args, desc, scope_type, scope_arg,
-          inst_properties, symbol);
+      inst_lib.emplace_back(idx,
+                            id,
+                            name,
+                            fun_call,
+                            num_args,
+                            desc,
+                            scope_type,
+                            scope_arg,
+                            inst_properties,
+                            symbol);
       inst_funs.emplace_back(fun_call);
-      name_map[name] = idx;
-      id_map[id] = idx;
+      name_map[name]              = idx;
+      id_map[id]                  = idx;
       symbol_map[(size_t) symbol] = id;
-      std::cout << "Registered instruction: " << name << " index: " << idx << "; id: " << id << "; symbol: " << symbol << std::endl;
+      std::cout << "Registered instruction: " << name << " index: " << idx << "; id: " << id
+                << "; symbol: " << symbol << std::endl;
     }
 
     /// Specify a keyword and arg value.
@@ -211,18 +239,16 @@ namespace emp {
     /// Process a specified instruction on hardware that can be converted to the correct type.
     template <typename IN_HW>
     void ProcessInst(emp::Ptr<IN_HW> hw, const inst_t & inst) const {
-      emp_assert( dynamic_cast<hardware_t*>(hw.Raw()) );
+      emp_assert(dynamic_cast<hardware_t *>(hw.Raw()));
       inst_funs[inst.GetIndex()](*(hw.template Cast<hardware_t>()), inst);
     }
 
     /// Write out a full genome to the provided ostream.
-    void WriteGenome(const genome_t & genome, std::ostream & os=std::cout) const {
+    void WriteGenome(const genome_t & genome, std::ostream & os = std::cout) const {
       for (const inst_t & inst : genome) {
         os << inst.id << " " << GetName(inst.id);
         const size_t num_args = GetNumArgs(inst.id);
-        for (size_t i = 0; i < num_args; i++) {
-          os << ' ' << inst.args[i];
-        }
+        for (size_t i = 0; i < num_args; i++) { os << ' ' << inst.args[i]; }
         os << '\n';
       }
     }
@@ -230,8 +256,8 @@ namespace emp {
     /// Read the instruction in the provided info and append it to the provided genome.
     void ReadInst(genome_t & genome, emp::String info) const {
       emp::String name = emp::string_pop_word(info);
-      size_t idx = GetIndex(name);
-      size_t id = GetID(idx);
+      size_t idx       = GetIndex(name);
+      size_t id        = GetID(idx);
       genome.emplace_back(idx, id);
       size_t num_args = GetNumArgs(idx);
       for (size_t i = 0; i < num_args; i++) {
@@ -245,15 +271,14 @@ namespace emp {
     }
 
     /// Print out summary of instruction library.
-    void PrintManifest(std::ostream & os=std::cout) const {
+    void PrintManifest(std::ostream & os = std::cout) const {
       os << "id" << "," << "name" << std::endl;
       for (size_t i = 0; i < inst_lib.size(); ++i) {
         os << i << "," << inst_lib[i].name << std::endl;
       }
     }
-
   };
 
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_HARDWARE_INSTLIB_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_HARDWARE_INST_LIB_HPP_GUARD

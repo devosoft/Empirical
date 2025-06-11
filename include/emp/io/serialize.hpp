@@ -62,48 +62,54 @@
 
 #include "serialize_macros.hpp"
 
-namespace emp {
-namespace serialize {
+namespace emp { namespace serialize {
 
   /// A DataPod managed information about another class for serialization.
   class DataPod {
   protected:
     emp::Ptr<std::ostream> os = nullptr;  // Pointer to streams to use for reading and writing.
     emp::Ptr<std::istream> is = nullptr;
-    bool own_os = false;                  // Are we supposed to delete these streams on destruction?
-    bool own_is = false;
+    bool own_os               = false;  // Are we supposed to delete these streams on destruction?
+    bool own_is               = false;
 
     void ClearData() {
-      if (own_os && os) os.Delete();
-      if (own_is && is) is.Delete();
+      if (own_os && os) { os.Delete(); }
+      if (own_is && is) { is.Delete(); }
       os = nullptr;
       is = nullptr;
     }
   public:
     DataPod(std::ostream & _os, std::istream & _is) : os(&_os), is(&_is) { ; }
+
     DataPod(std::iostream & _ios) : DataPod(_ios, _ios) { ; }
 
     // Allow move transfer of a DataPod.
     DataPod(DataPod && rhs) : os(rhs.os), is(rhs.is), own_os(rhs.own_os), own_is(rhs.own_is) {
-      rhs.own_os = false; rhs.own_is=false;
+      rhs.own_os = false;
+      rhs.own_is = false;
     }
+
     DataPod & operator=(DataPod && rhs) {
       ClearData();
-      os = rhs.os;  is = rhs.is;  own_os = rhs.own_os;  own_is = rhs.own_is;
-      rhs.own_os = false; rhs.own_is=false;
+      os         = rhs.os;
+      is         = rhs.is;
+      own_os     = rhs.own_os;
+      own_is     = rhs.own_is;
+      rhs.own_os = false;
+      rhs.own_is = false;
       return *this;
     }
 
     // Make sure these are never accidentally created or copied.
-    DataPod() = delete;
+    DataPod()                = delete;
     DataPod(const DataPod &) = delete;
 
     ~DataPod() { ClearData(); }
 
     std::ostream & OStream() { return *os; }
+
     std::istream & IStream() { return *is; }
   };
-
 
   /// StoreVar() takes a DataPod and a variable and stores that variable to the pod.
   /// The third argument (bool vs. int) will receive a bool, and thus bool versions
@@ -121,9 +127,7 @@ namespace serialize {
   template <typename T>
   void StoreVar(DataPod & pod, const emp::vector<T> & var, bool) {
     StoreVar(pod, var.size(), true);
-    for (int i = 0; i < (int) var.size(); ++i) {
-      StoreVar(pod, var[i], true);
-    }
+    for (int i = 0; i < (int) var.size(); ++i) { StoreVar(pod, var[i], true); }
 
     // @CAO for now use ':' separator, but more generally we need to ensure uniqueness.
     pod.OStream() << ':';
@@ -138,7 +142,6 @@ namespace serialize {
     // emp_assert(pod.OStream()); // @ELD - this is throwing a compiler error
   }
 
-
   // The SetupLoad() function determines what type of information a constructor needs from
   // a DataPod (based on the objects types) and returns that information.  By default, the
   // function will produce an instance of the needed type to trigger the copy constructor,
@@ -146,13 +149,13 @@ namespace serialize {
 
   // Use SFINAE technique to identify custom types.
   template <typename T>
-  auto SetupLoad(DataPod & pod, T*, bool) -> typename T::emp_load_return_type & {
+  auto SetupLoad(DataPod & pod, T *, bool) -> typename T::emp_load_return_type & {
     return pod;
   }
 
   // Otherwise use default streams.
   template <typename T>
-  auto SetupLoad(DataPod & pod, const T*, int) -> T {
+  auto SetupLoad(DataPod & pod, const T *, int) -> T {
     // std::decay<T> var;
     T var;
     pod.IStream() >> var;
@@ -176,39 +179,35 @@ namespace serialize {
     emp::vector<T> var;
 
     // Create vector of correct size and create elements with pod.
-    for (uint32_t i = 0; i < v_size; i++) {
-      var.emplace_back(SetupLoad(pod, &(var[0]), true));
-    }
+    for (uint32_t i = 0; i < v_size; i++) { var.emplace_back(SetupLoad(pod, &(var[0]), true)); }
     emp_assert(pod.IStream() && "Make sure the DataPod is still okay.");
     return var;
   }
 
-
-
-  // Setup for a variadic Store() function that systematically save all variables in a DataPod.
-  #ifndef DOXYGEN_SHOULD_SKIP_THIS
+// Setup for a variadic Store() function that systematically save all variables in a DataPod.
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
 
     // Base implementation to specialize on.
-    template <typename... IGNORE> struct serial_impl;
+    template <typename... IGNORE>
+    struct serial_impl;
 
     // Specialized to recurse, storing or loading individual vars.
     template <typename FIRST_TYPE, typename... OTHER_TYPES>
     struct serial_impl<FIRST_TYPE, OTHER_TYPES...> {
-      static void Store(DataPod & pod, FIRST_TYPE & arg1, OTHER_TYPES&... others) {
+      static void Store(DataPod & pod, FIRST_TYPE & arg1, OTHER_TYPES &... others) {
         StoreVar(pod, arg1, true);
-        if constexpr (sizeof...(others)) serial_impl<OTHER_TYPES...>::Store(pod, others...);
+        if constexpr (sizeof...(others)) { serial_impl<OTHER_TYPES...>::Store(pod, others...); }
       }
     };
-  }
-  #endif // DOXYGEN_SHOULD_SKIP_THIS
+  }  // namespace internal
+#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
   template <typename... ARG_TYPES>
-  void Store(DataPod & pod, ARG_TYPES&... args) {
+  void Store(DataPod & pod, ARG_TYPES &... args) {
     internal::serial_impl<ARG_TYPES...>::Store(pod, args...);
   }
 
-}
-}
+}}  // namespace emp::serialize
 
-#endif // #ifndef EMP_IO_SERIALIZE_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_IO_SERIALIZE_HPP_GUARD

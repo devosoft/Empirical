@@ -19,29 +19,26 @@
 
 #include "Animate.hpp"
 #include "Div.hpp"
+#include "init.hpp"
 #include "Text.hpp"
 #include "Widget.hpp"
 
-#include "init.hpp"
-
-namespace emp {
-namespace web {
+namespace emp { namespace web {
 
   /// A widget to track an element in an HTML file, and all of its contents.
   class Element : public Div {
   public:
     /// @param in_tag sets the html tag for used this object (i.e., div, footer, header, p, etc.)
     /// @param in_name sets the id of this html element
-    Element(const std::string & in_tag, const std::string & in_name="")
-    : Div(in_name) {
+    Element(const std::string & in_tag, const std::string & in_name = "") : Div(in_name) {
       // When a name is provided, create an associated Widget info.
       Info()->DoSetTag(in_tag);
     }
+
     /// Construct Element from a Widget.
     Element(const Widget & in) : Div(in) { ; }
   };
 
-}
-}
+}}  // namespace emp::web
 
-#endif // #ifndef EMP_WEB_ELEMENT_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_WEB_ELEMENT_HPP_GUARD

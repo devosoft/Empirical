@@ -26,8 +26,7 @@
 #include "../web/Element.hpp"
 #include "../web/Widget.hpp"
 
-namespace emp {
-namespace prefab {
+namespace emp { namespace prefab {
   /**
    * This method does not belong to a class, but it is used
    * to close a loading modal that is added with the
@@ -35,10 +34,7 @@ namespace prefab {
    * for more details on how to implement the Loading Modal
    * in your web app. https://devosoft.github.io/empirical-prefab-demo
    */
-  void CloseLoadingModal() {
-    emscripten_run_script("CloseLoadingModal();");
-  }
-}
-}
+  void CloseLoadingModal() { emscripten_run_script("CloseLoadingModal();"); }
+}}  // namespace emp::prefab
 
-#endif // #ifndef EMP_PREFAB_LOADINGMODAL_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_PREFAB_LOADING_MODAL_HPP_GUARD

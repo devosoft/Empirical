@@ -41,33 +41,29 @@
 namespace emp {
 
   /// Abstract base class for regulators
-  template<typename set_t_, typename adj_t_, typename view_t_>
+  template <typename set_t_, typename adj_t_, typename view_t_>
   struct RegulatorBase {
-
-    using set_t = set_t_;
-    using adj_t = adj_t_;
+    using set_t  = set_t_;
+    using adj_t  = adj_t_;
     using view_t = view_t_;
 
-    virtual ~RegulatorBase() {};
-    virtual bool Set(const set_t & set) = 0;
-    virtual bool Adj(const adj_t & adj) = 0;
-    virtual bool Decay(const int steps) = 0;
-    virtual const view_t & View() const = 0;
-    virtual double operator()(double raw_score) const = 0;
-    virtual std::string name() const = 0;
+    virtual ~RegulatorBase() {}
 
+    virtual bool Set(const set_t & set)               = 0;
+    virtual bool Adj(const adj_t & adj)               = 0;
+    virtual bool Decay(const int steps)               = 0;
+    virtual const view_t & View() const               = 0;
+    virtual double operator()(double raw_score) const = 0;
+    virtual std::string name() const                  = 0;
   };
 
   /// This regulator does nothing!
   /// Useful for control experiments.
   struct NopRegulator : RegulatorBase<double, double, double> {
-
     constexpr static double state = 0.0;
 
     /// Apply regulation to a raw match score.
-    double operator()(const double raw_score) const override {
-      return raw_score;
-    }
+    double operator()(const double raw_score) const override { return raw_score; }
 
     /// No-op set.
     /// Return whether MatchBin should be updated (never).
@@ -97,17 +93,17 @@ namespace emp {
 
     bool operator!=(const NopRegulator & /* other */) const { return false; }
 
-    #ifdef CEREAL_NVP
+#ifdef CEREAL_NVP
     template <class Archive>
-    void serialize( Archive & ar ){ std::ignore = ar; }
-    #endif
-
+    void serialize(Archive & ar) {
+      std::ignore = ar;
+    }
+#endif  // #ifdef CEREAL_NVP
   };
 
   /// Don't use this regulator.
   /// It's here so tests don't break.
   struct LegacyRegulator : RegulatorBase<double, double, double> {
-
     // >1.0 downregulated
     // 1.0 neutral
     // <1.0 upregulated
@@ -117,9 +113,7 @@ namespace emp {
     LegacyRegulator() : state(1.0) {}
 
     /// Apply regulation to a raw match score.
-    double operator()(const double raw_score) const override {
-      return state * raw_score + state;
-    }
+    double operator()(const double raw_score) const override { return state * raw_score + state; }
 
     /// A value between zero and one upregulates the item,
     /// a value of exactly one is neutral,
@@ -150,36 +144,24 @@ namespace emp {
     }
 
     /// Return a double representing the state of the regulator.
-    const double & View() const override {
-      return state;
-    }
+    const double & View() const override { return state; }
 
-    std::string name() const override {
-      return "Legacy Regulator";
-    }
+    std::string name() const override { return "Legacy Regulator"; }
 
-    bool operator!=(const LegacyRegulator & other) const {
-      return state != other.state;
-    }
+    bool operator!=(const LegacyRegulator & other) const { return state != other.state; }
 
-    #ifdef CEREAL_NVP
+#ifdef CEREAL_NVP
     template <class Archive>
-    void serialize( Archive & ar )
-    {
-      ar(
-        CEREAL_NVP(state)
-      );
+    void serialize(Archive & ar) {
+      ar(CEREAL_NVP(state));
     }
-    #endif
-
+#endif  // #ifdef CEREAL_NVP
   };
 
-  template <typename Slope=std::ratio<1,10>>
+  template <typename Slope = std::ratio<1, 10>>
   struct AdditiveCountdownRegulator : RegulatorBase<double, double, double> {
-
-    static constexpr double slope = (
-      static_cast<double>(Slope::num) / static_cast<double>(Slope::den)
-    );
+    static constexpr double slope =
+      (static_cast<double>(Slope::num) / static_cast<double>(Slope::den));
 
     // positive = downregulated
     // negative = upregulated
@@ -201,16 +183,11 @@ namespace emp {
     /// Apply regulation to a raw match score.
     /// Returns a value between 0.0 and 1.0
     double operator()(const double raw_score) const override {
-      const double res = std::clamp(
-        std::tanh(slope * state) + raw_score,
-        0.0,
-        1.0
-      );
+      const double res = std::clamp(std::tanh(slope * state) + raw_score, 0.0, 1.0);
       emp_assert(state <= 0 || res > raw_score);
       emp_assert(state >= 0 || res < raw_score);
       emp_assert(res >= 0.0 && res <= 1.0);
       return res;
-
     }
 
     /// A positive value downregulates the item,
@@ -248,41 +225,30 @@ namespace emp {
         timer -= std::min(timer, static_cast<size_t>(steps));
       }
 
-      return timer == 0 ? (
-        std::exchange(state, 0.0) != 0.0
-      ) : false;
+      return timer == 0 ? (std::exchange(state, 0.0) != 0.0) : false;
     }
 
     /// Return a double representing the state of the regulator.
     const double & View() const override { return state; }
 
-    std::string name() const override {
-      return "Additive Countdown Regulator";
-    }
+    std::string name() const override { return "Additive Countdown Regulator"; }
 
     bool operator!=(const AdditiveCountdownRegulator & other) const {
       return state != other.state || timer != other.timer;
     }
 
-    #ifdef CEREAL_NVP
+#ifdef CEREAL_NVP
     template <class Archive>
-    void serialize( Archive & ar )
-    {
-      ar(
-        CEREAL_NVP(state),
-        CEREAL_NVP(timer)
-      );
+    void serialize(Archive & ar) {
+      ar(CEREAL_NVP(state), CEREAL_NVP(timer));
     }
-    #endif
-
+#endif  // #ifdef CEREAL_NVP
   };
 
-  template <typename Slope=std::ratio<1,10>>
+  template <typename Slope = std::ratio<1, 10>>
   struct MultiplicativeCountdownRegulator : RegulatorBase<double, double, double> {
-
-    static constexpr double slope = (
-      static_cast<double>(Slope::num) / static_cast<double>(Slope::den)
-    );
+    static constexpr double slope =
+      (static_cast<double>(Slope::num) / static_cast<double>(Slope::den));
 
     // positive = downregulated
     // negative = upregulated
@@ -314,14 +280,8 @@ namespace emp {
     /// Apply regulation to a raw match score.
     /// Returns a value between 0 and 1.
     double operator()(const double raw_score) const override {
-      const double res = (
-        raw_score
-        + std::tanh(slope * state) * (
-          state < 0
-          ? raw_score
-          : 1.0 - raw_score
-        )
-      );
+      const double res =
+        (raw_score + std::tanh(slope * state) * (state < 0 ? raw_score : 1.0 - raw_score));
       emp_assert(state <= 0 || res >= raw_score);
       emp_assert(state >= 0 || res <= raw_score);
       emp_assert(res >= 0.0 && res <= 1.0);
@@ -363,38 +323,29 @@ namespace emp {
         timer -= std::min(timer, static_cast<size_t>(steps));
       }
 
-      return timer == 0 ? (
-        std::exchange(state, 0.0) != 0.0
-      ) : false;
+      return timer == 0 ? (std::exchange(state, 0.0) != 0.0) : false;
     }
 
     /// Return a double representing the state of the regulator.
     const double & View() const override { return state; }
 
-    std::string name() const override {
-      return "Multiplicative Countdown Regulator";
-    }
+    std::string name() const override { return "Multiplicative Countdown Regulator"; }
 
     bool operator!=(const MultiplicativeCountdownRegulator & other) const {
       return state != other.state || timer != other.timer;
     }
 
-    #ifdef CEREAL_NVP
+#ifdef CEREAL_NVP
     template <class Archive>
-    void serialize( Archive & ar )
-    {
-      ar(
-        CEREAL_NVP(state),
-        CEREAL_NVP(timer)
-      );
+    void serialize(Archive & ar) {
+      ar(CEREAL_NVP(state), CEREAL_NVP(timer));
     }
-    #endif
-
+#endif  // #ifdef CEREAL_NVP
   };
 
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_MATCHING_MATCHBIN_REGULATORS_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_MATCHING_MATCHBIN_REGULATORS_HPP_GUARD
 
 // Local settings for Empecable file checker.
-// empecable_words: amt adj
+// empecable_words: adj amt

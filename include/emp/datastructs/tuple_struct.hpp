@@ -88,7 +88,7 @@
   TYPE & NAME(const typename std::decay<TYPE>::type & _in) {       \
     std::get<POS>(TUPLE_NAME) = _in;                               \
     return std::get<POS>(TUPLE_NAME);                              \
-  }                                                                \
+  }
 
 
 // We have to figure out how many arguments we have.
@@ -177,7 +177,7 @@
 
 /// @cond SIMPLIFY
 
-//Helper macros for building introspective tuples
+// Helper macros for building introspective tuples
 #define GET_TYPEID(t) typeid(t)
 #define GET_POINTER(A) &A()
 
@@ -203,9 +203,11 @@ namespace emp {
   using n_fields_member_type = decltype(T::n_fields);
 
   template <typename T>
-  constexpr bool is_introspective_tuple() { return test_type_exist<n_fields_member_type, T>(); };
+  constexpr bool is_introspective_tuple() {
+    return test_type_exist<n_fields_member_type, T>();
+  }
 
-}
+}  // namespace emp
 
 /// This variant of the tuple building macro can be used in situations where
 /// access to stringified versions of variable names is necessary.
@@ -227,6 +229,6 @@ namespace emp {
 ///
 #define EMP_BUILD_INTROSPECTIVE_TUPLE(...) EMP_BUILD_INTROSPECTIVE_NAMED_TUPLE(emp__tuple_body, __VA_ARGS__)
 
-#endif /*DOXYGEN_SHOULD_SKIP_THIS*/
+#endif /*DOXYGEN_SHOULD_SKIP_THIS*/  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-#endif // #ifndef EMP_DATASTRUCTS_TUPLE_STRUCT_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_DATASTRUCTS_TUPLE_STRUCT_HPP_GUARD

@@ -24,24 +24,25 @@ namespace emp {
   template <typename T1, typename T2>
   class bimap {
   private:
-    std::unordered_map<T1,T2> map1;
-    std::unordered_map<T2,T1> map2;
+    std::unordered_map<T1, T2> map1;
+    std::unordered_map<T2, T1> map2;
 
   public:
     void Insert(const T1 & in1, const T2 & in2) {
-      map1.insert({in1,in2});
-      map2.insert({in2,in1});
+      map1.insert({in1, in2});
+      map2.insert({in2, in1});
     }
 
     void Set(const T1 & in1, const T2 & in2) { Insert(in1, in2); }
+
     void Set2(const T2 & in2, const T1 & in1) { Insert(in1, in2); }
 
     T2 & Get1(const T1 & in1)
   };
 
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_DATASTRUCTS_BIMAP_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_IN_PROGRESS_BIMAP_HPP_GUARD
 
 // Local settings for Empecable file checker.
 // empecable_words: bimap

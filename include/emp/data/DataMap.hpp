@@ -90,7 +90,7 @@
 #ifndef INCLUDE_EMP_DATA_DATA_MAP_HPP_GUARD
 #define INCLUDE_EMP_DATA_DATA_MAP_HPP_GUARD
 
-#include <cstring>        // For std::memcpy
+#include <cstring>  // For std::memcpy
 #include <span>
 #include <stddef.h>
 #include <string>
@@ -108,18 +108,22 @@ namespace emp {
 
   class DataMap {
   protected:
-    MemoryImage memory;              ///< Memory contents for this Map.
-    emp::Ptr<DataLayout> layout_ptr; ///< Layout we are using (shared across maps w/ same format)
+    MemoryImage memory;               ///< Memory contents for this Map.
+    emp::Ptr<DataLayout> layout_ptr;  ///< Layout we are using (shared across maps w/ same format)
 
     DataMap(emp::Ptr<DataLayout> in_layout_ptr, size_t in_size)
-      : memory(in_size), layout_ptr(in_layout_ptr) { ; }
+      : memory(in_size), layout_ptr(in_layout_ptr) {
+      ;
+    }
 
     // -- Helper functions --
 
     /// If the current layout is shared, make a copy of it.
     void MakeLayoutUnique() {
       // Make sure we have a layout, even if empty.
-      if (layout_ptr.IsNull()) layout_ptr = emp::NewPtr<DataLayout>();
+      if (layout_ptr.IsNull()) {
+        layout_ptr = emp::NewPtr<DataLayout>();
+      }
 
       // If our we already had layout and it is shared, make a copy.
       else if (layout_ptr->GetNumMaps() > 1) {
@@ -130,12 +134,14 @@ namespace emp {
 
   public:
     DataMap() : layout_ptr(nullptr) { ; }
+
     DataMap(const DataMap & in_map) : layout_ptr(in_map.layout_ptr) {
       if (layout_ptr) {
         layout_ptr->CopyImage(in_map.memory, memory);
         layout_ptr->IncMaps();
       }
     }
+
     DataMap(DataMap && in_map) : memory(std::move(in_map.memory)), layout_ptr(in_map.layout_ptr) {
       in_map.memory.RawResize(0);
       // @CAO: Should we set in_map.layout_ptr to null???
@@ -147,9 +153,9 @@ namespace emp {
     ~DataMap() {
       /// If we have a layout pointer, clean up!
       if (!layout_ptr.IsNull()) {
-        layout_ptr->ClearImage(memory);    // Clean up the current MemoryImage.
-        layout_ptr->DecMaps();             // Clean up the DataLayout
-        if (layout_ptr->GetNumMaps() == 0) layout_ptr.Delete();
+        layout_ptr->ClearImage(memory);  // Clean up the current MemoryImage.
+        layout_ptr->DecMaps();           // Clean up the DataLayout
+        if (layout_ptr->GetNumMaps() == 0) { layout_ptr.Delete(); }
       }
     }
 
@@ -166,19 +172,20 @@ namespace emp {
     }
 
     /// Test if this map has a setting ID.
-    bool HasID(size_t id) const {
-      return layout_ptr && layout_ptr->HasID(id);
-    }
+    bool HasID(size_t id) const { return layout_ptr && layout_ptr->HasID(id); }
 
     /// Test is this map has a variable by a given name.
     bool HasName(const std::string & name) const { return layout_ptr && layout_ptr->HasName(name); }
 
     /// Test if a variable is of a given type.
-    template <typename T> bool IsType(size_t id) const {
+    template <typename T>
+    bool IsType(size_t id) const {
       emp_assert(layout_ptr);
       return layout_ptr->IsType<T>(id);
     }
-    template <typename T> bool IsType(const std::string & name) const {
+
+    template <typename T>
+    bool IsType(const std::string & name) const {
       emp_assert(layout_ptr);
       return layout_ptr->IsType<T>(GetID(name));
     }
@@ -193,75 +200,99 @@ namespace emp {
     /// Retrieve a variable by its type and position.
     template <typename T>
     T & Get(size_t id) {
-      emp_assert(Has<T>(id), "Can only get IDs/types that match DataMap in type and count.",
-                 id, GetSize(), layout_ptr->DiagnoseHas<T>(id));
+      emp_assert(Has<T>(id),
+                 "Can only get IDs/types that match DataMap in type and count.",
+                 id,
+                 GetSize(),
+                 layout_ptr->DiagnoseHas<T>(id));
       return memory.Get<T>(id);
     }
 
     /// Retrieve a const variable by its type and position.
     template <typename T>
     const T & Get(size_t id) const {
-      emp_assert(Has<T>(id), "Can only get IDs/types that match DataMap in type and count.",
-                 id, GetSize(), layout_ptr->DiagnoseHas<T>(id));
+      emp_assert(Has<T>(id),
+                 "Can only get IDs/types that match DataMap in type and count.",
+                 id,
+                 GetSize(),
+                 layout_ptr->DiagnoseHas<T>(id));
       return memory.Get<T>(id);
     }
-
 
     /// Retrieve a variable by its type and name. (Slower!)
     template <typename T>
     T & Get(const std::string & name) {
-      emp_assert(Has<T>(name), "Can only get name/types that match DataMap in type and count.",
-                 name, GetSize(), layout_ptr->DiagnoseHas<T>(name));
+      emp_assert(Has<T>(name),
+                 "Can only get name/types that match DataMap in type and count.",
+                 name,
+                 GetSize(),
+                 layout_ptr->DiagnoseHas<T>(name));
       return memory.Get<T>(GetID(name));
     }
 
     /// Retrieve a const variable by its type and name. (Slower!)
     template <typename T>
     const T & Get(const std::string & name) const {
-      emp_assert(Has<T>(name), "Can only get name/types that match DataMap in type and count.",
-                 name, GetSize(), layout_ptr->DiagnoseHas<T>(name));
+      emp_assert(Has<T>(name),
+                 "Can only get name/types that match DataMap in type and count.",
+                 name,
+                 GetSize(),
+                 layout_ptr->DiagnoseHas<T>(name));
       return memory.Get<T>(GetID(name));
     }
 
     // Retrieve a set of variables by id (as an std::span)
     template <typename T>
     std::span<T> Get(size_t id, size_t count) {
-      emp_assert(Has<T>(id, count), "Can only get name/types that match DataMap.",
-                 id, count, GetSize(), layout_ptr->DiagnoseHas<T>(id,count));
+      emp_assert(Has<T>(id, count),
+                 "Can only get name/types that match DataMap.",
+                 id,
+                 count,
+                 GetSize(),
+                 layout_ptr->DiagnoseHas<T>(id, count));
       return memory.Get<T>(id, count);
     }
 
     // Retrieve a const set of variables by id (as an std::span)
     template <typename T>
     std::span<const T> Get(size_t id, size_t count) const {
-      emp_assert(Has<T>(id, count), "Can only get name/types that match DataMap.",
-                 id, GetSize(), layout_ptr->DiagnoseHas<T>(id,count));
+      emp_assert(Has<T>(id, count),
+                 "Can only get name/types that match DataMap.",
+                 id,
+                 GetSize(),
+                 layout_ptr->DiagnoseHas<T>(id, count));
       return memory.Get<T>(id, count);
     }
 
     // Retrieve a set of variables by name (as an std::span)
     template <typename T>
     std::span<T> Get(const std::string & name, size_t count) {
-      emp_assert(HasName(name), "Cannot get names not stored in DataMap.",
-                 name, layout_ptr->DiagnoseHas<T>(name, count));
+      emp_assert(HasName(name),
+                 "Cannot get names not stored in DataMap.",
+                 name,
+                 layout_ptr->DiagnoseHas<T>(name, count));
       return Get<T>(GetID(name), count);
     }
 
     // Retrieve a const set of variables by name (as an std::span)
     template <typename T>
     std::span<const T> Get(const std::string & name, size_t count) const {
-      emp_assert(HasName(name), "Cannot get names not stored in DataMap.",
-                 name, layout_ptr->DiagnoseHas<T>(name, count));
+      emp_assert(HasName(name),
+                 "Cannot get names not stored in DataMap.",
+                 name,
+                 layout_ptr->DiagnoseHas<T>(name, count));
       return Get<T>(GetID(name), count);
     }
 
     /// Set a variable by ID.
-    template <typename T> T & Set(size_t id, const T & value) {
+    template <typename T>
+    T & Set(size_t id, const T & value) {
       return (Get<T>(id) = value);
     }
 
     /// Set a variable by name.
-    template <typename T> T & Set(const std::string & name, const T & value) {
+    template <typename T>
+    T & Set(const std::string & name, const T & value) {
       return (Get<T>(name) = value);
     }
 
@@ -278,6 +309,7 @@ namespace emp {
     }
 
     bool IsNumeric(size_t id) const { return GetType(id).IsArithmetic(); }
+
     bool IsNumeric(const std::string & name) const { return IsNumeric(GetID(name)); }
 
     /// Get the memory at the target position, assume it is the provided type, and convert the
@@ -296,16 +328,17 @@ namespace emp {
 
     /// Get the memory at the target position, assume it is the provided type, and convert the
     /// value found there to string.
-    std::string GetAsString(size_t id, TypeID type_id, size_t count=1) const {
+    std::string GetAsString(size_t id, TypeID type_id, size_t count = 1) const {
       emp_assert(HasID(id), "Can only Get IDs that are available in DataMap.", id, GetSize());
       emp_assert(type_id == layout_ptr->GetType(id));
       emp_assert(count = layout_ptr->GetCount(id));
-      if (count == 1) return type_id.ToString(memory.GetPtr(id));
-      else {
+      if (count == 1) {
+        return type_id.ToString(memory.GetPtr(id));
+      } else {
         size_t obj_size = type_id.GetSize();
         std::stringstream ss;
         for (size_t i = 0; i < count; ++i) {
-          ss << '[' << type_id.ToString(memory.GetPtr(id+i*obj_size)) << ']';
+          ss << '[' << type_id.ToString(memory.GetPtr(id + i * obj_size)) << ']';
         }
         return ss.str();
       }
@@ -320,10 +353,10 @@ namespace emp {
     /// Add a new variable with a specified type, name and value.
     template <typename T>
     size_t AddVar(const std::string & name,
-               const T & default_value,
-               const std::string & desc="",
-               const std::string & notes="",
-               size_t count=1) {
+                  const T & default_value,
+                  const std::string & desc  = "",
+                  const std::string & notes = "",
+                  size_t count              = 1) {
       MakeLayoutUnique();  // If the current layout is shared, first make a copy of it.
       return layout_ptr->Add<T>(memory, name, default_value, desc, notes, count);
     }
@@ -336,9 +369,7 @@ namespace emp {
     }
 
     /// Test if this DataMap uses the specified layout.
-    bool HasLayout(const emp::DataLayout & in_layout) const {
-      return layout_ptr == &in_layout;
-    }
+    bool HasLayout(const emp::DataLayout & in_layout) const { return layout_ptr == &in_layout; }
 
     /// Test if this DataMap has ANY layout.
     bool HasLayout() const { return layout_ptr; }
@@ -364,7 +395,6 @@ namespace emp {
       layout_ptr->Lock();
     }
 
-
     /////////////////////////////////////////////////////////////////
     //  Tools for working with DataMaps....
 
@@ -381,23 +411,16 @@ namespace emp {
       TypeID type_id = layout.GetType(id);
 
       // Return an appropriate accessor for this value.
-      if (type_id.IsType<std::string>()) {                  // Explicit STRING
-        return [id](const emp::DataMap & dm){
-          return emp::Datum(dm.Get<std::string>(id));
-        };
-      }
-      else if (type_id.IsType<double>()) {                  // Explicit DOUBLE
-        return [id](const emp::DataMap & dm){
-          return emp::Datum(dm.Get<double>(id));
-        };
-      }
-      else if (type_id.IsArithmetic()) {                    // Other NUMERIC type
-        return [id,type_id](const emp::DataMap & dm){
+      if (type_id.IsType<std::string>()) {  // Explicit STRING
+        return [id](const emp::DataMap & dm) { return emp::Datum(dm.Get<std::string>(id)); };
+      } else if (type_id.IsType<double>()) {  // Explicit DOUBLE
+        return [id](const emp::DataMap & dm) { return emp::Datum(dm.Get<double>(id)); };
+      } else if (type_id.IsArithmetic()) {  // Other NUMERIC type
+        return [id, type_id](const emp::DataMap & dm) {
           return emp::Datum(type_id.ToDouble(dm.memory.GetPtr(id)));
         };
-      }
-      else {                                                // Resort to STRING
-        return [id,type_id](const emp::DataMap & dm){
+      } else {  // Resort to STRING
+        return [id, type_id](const emp::DataMap & dm) {
           return emp::Datum(type_id.ToString(dm.memory.GetPtr(id)));
         };
       }
@@ -411,7 +434,6 @@ namespace emp {
     }
   };
 
-
   // Copy Operator...
   DataMap & DataMap::operator=(const DataMap & in_map) {
     // If we have a layout pointer, use it to clear our memory image and update it if needed.
@@ -420,17 +442,23 @@ namespace emp {
 
       // If layout pointer doesn't match the new one, shift over.
       if (layout_ptr != in_map.layout_ptr) {
-        layout_ptr->DecMaps();                                   // Remove self from counter.
-        if (layout_ptr->GetNumMaps() == 0) layout_ptr.Delete();  // Delete layout if now unused.
-        layout_ptr = in_map.layout_ptr;                          // Shift to new layout.
-        if (layout_ptr) layout_ptr->IncMaps();                   // Add self to new counter.
+        layout_ptr->DecMaps();  // Remove self from counter.
+        if (layout_ptr->GetNumMaps() == 0) {
+          layout_ptr.Delete();  // Delete layout if now unused.
+        }
+        layout_ptr = in_map.layout_ptr;  // Shift to new layout.
+        if (layout_ptr) {
+          layout_ptr->IncMaps();  // Add self to new counter.
+        }
       }
     }
 
     // Otherwise we DON'T have a layout pointer, so setup the new one.
     else {
-      layout_ptr = in_map.layout_ptr;                            // Shift to new layout.
-      if (layout_ptr) layout_ptr->IncMaps();                     // Add self to new counter.
+      layout_ptr = in_map.layout_ptr;  // Shift to new layout.
+      if (layout_ptr) {
+        layout_ptr->IncMaps();  // Add self to new counter.
+      }
     }
 
     // Now that we know we have a good layout, copy over the image.
@@ -440,6 +468,6 @@ namespace emp {
   }
 
 
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_DATA_DATAMAP_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_DATA_DATA_MAP_HPP_GUARD

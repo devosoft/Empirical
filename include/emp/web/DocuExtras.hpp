@@ -15,56 +15,49 @@
 #define INCLUDE_EMP_WEB_DOCU_EXTRAS_HPP_GUARD
 
 #include "Animate.hpp"
+#include "init.hpp"
 #include "Text.hpp"
 #include "Widget.hpp"
 
-#include "init.hpp"
-
-namespace emp {
-namespace web {
+namespace emp { namespace web {
 
   /// A widget to track a div in an HTML file, and all of its contents.
   class DocuExtras : private Widget {
 
   protected:
-
     class DocuExtrasInfo : public internal::WidgetInfo {
-      #ifndef DOXYGEN_SHOULD_SKIP_THIS
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
       friend DocuExtras;
-      #endif // DOXYGEN_SHOULD_SKIP_THIS
-      protected:
-
-      DocuExtrasInfo(const std::string & in_id)
-        : internal::WidgetInfo(in_id)
-      { emp::Initialize(); }
+#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
+    protected:
+      DocuExtrasInfo(const std::string & in_id) : internal::WidgetInfo(in_id) { emp::Initialize(); }
 
       // No copies of INFO allowed
       DocuExtrasInfo(const DocuExtrasInfo &) = delete;
 
-        // No copies of INFO allowed
+      // No copies of INFO allowed
       DocuExtrasInfo & operator=(const DocuExtrasInfo &) = delete;
 
       virtual ~DocuExtrasInfo() { ; }
 
       virtual void GetHTML(std::stringstream & HTML) override {
-         // this should never get called because we don't want to nuke
-         // pre-existing HTML inside the target div
+        // this should never get called because we don't want to nuke
+        // pre-existing HTML inside the target div
         emp_assert(false);
       }
 
       std::string GetTypeName() const override { return "DocuExtrasInfo"; }
 
-      void Clear() {
-        extras.Clear();
-      }
+      void Clear() { extras.Clear(); }
 
     public:
       virtual std::string GetType() override { return "web::DocuExtrasInfo"; }
 
-    }; // end of InputInfo definition
+    };  // end of InputInfo definition
 
     // Get a properly cast version of info.
     DocuExtrasInfo * Info() { return (DocuExtrasInfo *) info; }
+
     const DocuExtrasInfo * Info() const { return (DocuExtrasInfo *) info; }
 
     /// Apply all HTML details associated with this widget.
@@ -77,12 +70,13 @@ namespace web {
     }
 
     DocuExtras(const DocuExtras & in) : Widget(in) { ; }
+
     // DocuExtras(const Widget & in) : WidgetFacet(in) { emp_assert(in.IsDiv()); }
 
     ~DocuExtras() { ; }
 
     template <typename SET_TYPE>
-    DocuExtras& SetCSS(const std::string & s, SET_TYPE v) {
+    DocuExtras & SetCSS(const std::string & s, SET_TYPE v) {
       Info()->extras.SetStyle<SET_TYPE>(s, v);
       Apply();
       return *this;
@@ -96,7 +90,7 @@ namespace web {
       return Info()->extras.GetStyle(setting);
     }
 
-    DocuExtras& RemoveCSS(const std::string & setting) {
+    DocuExtras & RemoveCSS(const std::string & setting) {
       Info()->extras.RemoveStyle(setting);
       Apply();
       return *this;
@@ -116,24 +110,26 @@ namespace web {
       return Info()->extras.GetAttr(setting);
     }
 
-    DocuExtras& RemoveAttr(const std::string & setting) {
+    DocuExtras & RemoveAttr(const std::string & setting) {
       Info()->extras.RemoveAttr(setting);
       Apply();
       return *this;
     }
 
     /// Clear all of style, attributes, and listeners.
-    DocuExtras& Clear() { Info()->extras.Clear(); Apply(); return *this; }
+    DocuExtras & Clear() {
+      Info()->extras.Clear();
+      Apply();
+      return *this;
+    }
 
     /// Have any details been set?
     operator bool() const { return static_cast<bool>(Info()->extras); }
-
   };
 
-}
-}
+}}  // namespace emp::web
 
-#endif // #ifndef EMP_WEB_DOCUEXTRAS_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_WEB_DOCU_EXTRAS_HPP_GUARD
 
 // Local settings for Empecable file checker.
 // empecable_words: docu

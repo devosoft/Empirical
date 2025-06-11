@@ -1,15 +1,16 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2018
-*/
 /**
- *  @file
- *  @brief A collection of information about a single, instantiated variable in Empower
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/in_progress/Empower/Var.hpp
+ * @brief A collection of information about a single, instantiated variable in Empower
  */
 
-#ifndef EMP_IN_PROGRESS_EMPOWER_VAR_HPP_INCLUDE
-#define EMP_IN_PROGRESS_EMPOWER_VAR_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_IN_PROGRESS_EMPOWER_VAR_HPP_GUARD
+#define INCLUDE_EMP_IN_PROGRESS_EMPOWER_VAR_HPP_GUARD
 
 #include <stddef.h>
 
@@ -24,13 +25,16 @@ namespace emp {
 
   class Var {
   private:
-    const Type & type;       ///< What type is this variable?
-    MemoryImage & memory;    ///< Which memory image is variable using (by default)
-    size_t mem_pos;          ///< Where is this variable in a memory image?
+    const Type & type;     ///< What type is this variable?
+    MemoryImage & memory;  ///< Which memory image is variable using (by default)
+    size_t mem_pos;        ///< Where is this variable in a memory image?
 
   public:
     Var(const Type & _type, MemoryImage & _mem, size_t _pos)
-      : type(_type), memory(_mem), mem_pos(_pos) { ; }
+      : type(_type), memory(_mem), mem_pos(_pos) {
+      ;
+    }
+
     Var(const Var &) = default;
 
     Var & operator=(const Var &) = default;
@@ -39,7 +43,7 @@ namespace emp {
     template <typename T>
     T & Restore() {
       // Make sure function is restoring the correct type.
-      emp_assert( type.GetID() == GetTypeValue<T>(), "Trying to restore Var to incorrect type." );
+      emp_assert(type.GetID() == GetTypeValue<T>(), "Trying to restore Var to incorrect type.");
 
       // Convert this memory to a reference that can be returned.
       return memory.GetRef<T>(mem_pos);
@@ -86,6 +90,6 @@ namespace emp {
   };
 
 
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_IN_PROGRESS_EMPOWER_VAR_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_IN_PROGRESS_EMPOWER_VAR_HPP_GUARD

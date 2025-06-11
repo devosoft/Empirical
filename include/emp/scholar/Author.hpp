@@ -39,84 +39,106 @@ namespace emp {
     static Lexer & GetFormatLexer() {
       static Lexer lexer;
       if (lexer.GetNumTokens() == 0) {
-        ID_type    = lexer.AddToken("type",    "[FMLfmlPSx]");
+        ID_type    = lexer.AddToken("type", "[FMLfmlPSx]");
         ID_spacing = lexer.AddToken("spacing", "[- ,.:]+");
       }
       return lexer;
     }
   public:
     Author(const std::string & first, const std::string & middle, const std::string & last)
-      : first_name(first), last_name(last) { middle_names.push_back(middle); }
+      : first_name(first), last_name(last) {
+      middle_names.push_back(middle);
+    }
+
     Author(const std::string & first, const std::string & last)
-      : first_name(first), last_name(last) { ; }
-    Author(const std::string & last)
-      : last_name(last) { ; }
+      : first_name(first), last_name(last) {
+      ;
+    }
+
+    Author(const std::string & last) : last_name(last) { ; }
+
     Author(const Author &) = default;
+
     ~Author() { ; }
+
     Author & operator=(const Author &) = default;
 
     bool operator==(const Author & other) const {
       return (prefix == other.prefix) && (first_name == other.first_name) &&
-        (middle_names == other.middle_names) &&
-        (last_name == other.last_name) && (suffix == other.suffix);
+             (middle_names == other.middle_names) && (last_name == other.last_name) &&
+             (suffix == other.suffix);
     }
+
     bool operator!=(const Author & other) const { return !(*this == other); }
+
     bool operator<(const Author & other) const {
-      if (last_name != other.last_name) return (last_name < other.last_name);
-      if (first_name != other.first_name) return (first_name < other.first_name);
+      if (last_name != other.last_name) { return (last_name < other.last_name); }
+      if (first_name != other.first_name) { return (first_name < other.first_name); }
       for (size_t i = 0; i < middle_names.size(); i++) {
-        if (other.middle_names.size() <= i) return false;
+        if (other.middle_names.size() <= i) { return false; }
         if (middle_names[i] != other.middle_names[i]) {
           return (middle_names[i] < other.middle_names[i]);
         }
       }
-      if (middle_names.size() < other.middle_names.size()) return true;
-      if (suffix != other.suffix) return (suffix < other.suffix);
-      if (prefix != other.prefix) return (prefix < other.prefix);
-      return false; // Must be equal!
+      if (middle_names.size() < other.middle_names.size()) { return true; }
+      if (suffix != other.suffix) { return (suffix < other.suffix); }
+      if (prefix != other.prefix) { return (prefix < other.prefix); }
+      return false;  // Must be equal!
     }
+
     bool operator>(const Author & other) const { return other < *this; }
+
     bool operator>=(const Author & other) const { return !(*this < other); }
+
     bool operator<=(const Author & other) const { return !(*this > other); }
 
     bool HasPrefix() const { return prefix.size(); }
+
     bool HasFirstName() const { return first_name.size(); }
+
     bool HasMiddleName() const { return middle_names.size(); }
+
     bool HasLastName() const { return last_name.size(); }
+
     bool HasSuffix() const { return suffix.size(); }
 
     const std::string & GetPrefix() const { return prefix; }
+
     const std::string & GetFirstName() const { return first_name; }
-    const std::string & GetMiddleName(size_t id=0) const {
-      if (middle_names.size() == 0) return emp::empty_string();
+
+    const std::string & GetMiddleName(size_t id = 0) const {
+      if (middle_names.size() == 0) { return emp::empty_string(); }
       return middle_names[id];
     }
+
     const std::string & GetLastName() const { return last_name; }
+
     const std::string & GetSuffix() const { return suffix; }
 
     std::string GetFullName() const {
       std::string full_name(prefix);
-      if (full_name.size() && HasFirstName()) full_name += " ";
+      if (full_name.size() && HasFirstName()) { full_name += " "; }
       full_name += first_name;
       for (const auto & middle_name : middle_names) {
-        if (full_name.size()) full_name += " ";
+        if (full_name.size()) { full_name += " "; }
         full_name += middle_name;
       }
-      if (full_name.size() && HasLastName()) full_name += " ";
+      if (full_name.size() && HasLastName()) { full_name += " "; }
       full_name += last_name;
-      if (full_name.size() && HasSuffix()) full_name += " ";
+      if (full_name.size() && HasSuffix()) { full_name += " "; }
       full_name += suffix;
       return full_name;
     }
+
     std::string GetReverseName() const {
       std::string full_name(last_name);
-      if (full_name.size() && HasFirstName()) full_name += ", ";
+      if (full_name.size() && HasFirstName()) { full_name += ", "; }
       full_name += first_name;
       for (const auto & middle_name : middle_names) {
-        if (full_name.size()) full_name += " ";
+        if (full_name.size()) { full_name += " "; }
         full_name += middle_name;
       }
-      if (full_name.size() && HasSuffix()) full_name += ", ";
+      if (full_name.size() && HasSuffix()) { full_name += ", "; }
       full_name += suffix;
       return full_name;
     }
@@ -124,14 +146,17 @@ namespace emp {
     std::string GetFirstInitial() const {
       return HasFirstName() ? to_string(first_name[0]) : emp::empty_string();
     }
+
     std::string GetMiddleInitials() const {
       std::string out;
-      for (const auto & m : middle_names) out += m[0];
+      for (const auto & m : middle_names) { out += m[0]; }
       return out;
     }
+
     std::string GetLastInitial() const {
       return HasLastName() ? to_string(last_name[0]) : emp::empty_string();
     }
+
     std::string GetInitials() const {
       std::string inits;
       inits += GetFirstInitial();
@@ -160,26 +185,42 @@ namespace emp {
     //
     //    GetName("f.m. L") would return "A.B. C. Davidson"
 
-    std::string GetName(std::string pattern="FML") {
+    std::string GetName(std::string pattern = "FML") {
       std::string out_name;
       Lexer & lexer = GetFormatLexer();
-      auto tokens = lexer.Tokenize(pattern);
+      auto tokens   = lexer.Tokenize(pattern);
       (void) tokens;
       return out_name;
     }
 
     Author & Clear() {
-      prefix=""; first_name=""; last_name=""; middle_names.resize(0); suffix="";
+      prefix     = "";
+      first_name = "";
+      last_name  = "";
+      middle_names.resize(0);
+      suffix = "";
       return *this;
     }
-    Author & SetFirst(const std::string & str) { first_name = str; return *this; }
-    Author & SetLast(const std::string & str) { last_name = str; return *this; }
-    Author & AddMiddle(const std::string & str) { middle_names.push_back(str); return *this; }
+
+    Author & SetFirst(const std::string & str) {
+      first_name = str;
+      return *this;
+    }
+
+    Author & SetLast(const std::string & str) {
+      last_name = str;
+      return *this;
+    }
+
+    Author & AddMiddle(const std::string & str) {
+      middle_names.push_back(str);
+      return *this;
+    }
   };
 
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_SCHOLAR_AUTHOR_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_SCHOLAR_AUTHOR_HPP_GUARD
 
 // Local settings for Empecable file checker.
-// empecable_words: lfml inits fml
+// empecable_words: fml inits lfml

@@ -31,15 +31,17 @@ namespace emp {
     BitVector unk_items;  ///< Items yet to be decided on
 
   public:
-    SolveState(size_t state_size=0) : in_items(state_size), unk_items(state_size) {
+    SolveState(size_t state_size = 0) : in_items(state_size), unk_items(state_size) {
       unk_items.SetAll();
     }
+
     SolveState(const SolveState &) = default;
-    SolveState(SolveState &&) = default;
+    SolveState(SolveState &&)      = default;
+
     ~SolveState() { ; }
 
     SolveState & operator=(const SolveState &) = default;
-    SolveState & operator=(SolveState &&) = default;
+    SolveState & operator=(SolveState &&)      = default;
 
     /// How many items are being considered in the current SolveState?
     size_t GetSize() const { return in_items.GetSize(); }
@@ -87,9 +89,7 @@ namespace emp {
     int GetNextUnk() const { return unk_items.FindOne(); }
 
     /// Get the ID of the next unknown item after a specified position.
-    int GetNextUnk(size_t prev_unk) const {
-      return unk_items.FindOne(prev_unk+1);
-    }
+    int GetNextUnk(size_t prev_unk) const { return unk_items.FindOne(prev_unk + 1); }
 
     /// Mark a specific item as to be included; okay if it was previously excluded.
     void Include(size_t id) {
@@ -126,6 +126,6 @@ namespace emp {
     }
   };
 
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_TOOLS_SOLVESTATE_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_TOOLS_SOLVE_STATE_HPP_GUARD

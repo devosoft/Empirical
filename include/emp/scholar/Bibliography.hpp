@@ -24,13 +24,12 @@ namespace emp {
     std::set<std::string> keywords;
   public:
     Bibliography() { ; }
+
     ~Bibliography() { ; }
 
-    void AddRef(const Citation & in_ref) {
-      refs.push_back(in_ref);
-    }
+    void AddRef(const Citation & in_ref) { refs.push_back(in_ref); }
   };
 
-};
+};  // namespace emp
 
-#endif // #ifndef EMP_SCHOLAR_BIBLIOGRAPHY_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_SCHOLAR_BIBLIOGRAPHY_HPP_GUARD

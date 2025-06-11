@@ -34,26 +34,32 @@ namespace emp {
     ActionManager action_m;
     SignalManager signal_m;
     // uint32_t next_signal_id;                                  // Give each signal a unique id.
-    std::unordered_map<uint32_t, SignalBase *> id_to_signal;     // Map signal ID to associated pointer
+    std::unordered_map<uint32_t, SignalBase *> id_to_signal;  // Map signal ID to associated pointer
 
   public:
-    SignalControl() : action_m(), signal_m(), id_to_signal() {;} // : next_signal_id(1) { ; }
+    SignalControl() : action_m(), signal_m(), id_to_signal() { ; }  // : next_signal_id(1) { ; }
+
     ~SignalControl() { ; }
 
     size_t GetNumActions() const { return action_m.GetSize(); }
+
     size_t GetNumSignals() const { return signal_m.GetSize(); }
 
     const ActionBase & GetAction(const std::string & name) const { return action_m[name]; }
+
     const SignalBase & GetSignal(const std::string & name) const { return signal_m[name]; }
 
     ActionManager & GetActionManager() { return action_m; }
+
     SignalManager & GetSignalManager() override { return signal_m; }
 
     template <typename... Ts>
-    auto & AddAction(Ts &&... act) { return action_m.Add( std::forward<Ts>(act)... ); }
+    auto & AddAction(Ts &&... act) {
+      return action_m.Add(std::forward<Ts>(act)...);
+    }
 
     template <typename... ARGS>
-    auto & AddSignal(const std::string & name="") {
+    auto & AddSignal(const std::string & name = "") {
       return signal_m.Add<ARGS...>(name);
     }
 
@@ -64,12 +70,16 @@ namespace emp {
 
     // Link a specified signal to a specified function.
     template <typename... ARGS>
-    auto Link(SignalBase & s, const std::function<void(ARGS...)> & f) { return s.AddAction(f); }
+    auto Link(SignalBase & s, const std::function<void(ARGS...)> & f) {
+      return s.AddAction(f);
+    }
 
     // If a name is passed in for the signal, convert it to a SignalBase.
     // Pass through anything for actions and return a unique key for the pairing.
     template <typename A>
-    auto Link(const std::string & s, A && a) { return Link(signal_m[s], std::forward<A>(a)); }
+    auto Link(const std::string & s, A && a) {
+      return Link(signal_m[s], std::forward<A>(a));
+    }
 
     // If a name is passed in for the action, convert it to an ActionBase.
     // (signal names were handled in the previous overload of this function)
@@ -78,25 +88,22 @@ namespace emp {
     // If we have base classes for both signals and actions.  Convert to derived versions!
     auto Link(SignalBase & s, ActionBase & a) { return s.AddAction(a); }
 
-
     template <typename... ARGS>
     void Trigger(const std::string & name, ARGS &&... args) {
       auto & base_signal = signal_m[name];
-      auto * signal = dynamic_cast< Signal<void(ARGS...)>* >(&base_signal);
-      emp_assert( signal != nullptr && "invalid signal conversion!" );
+      auto * signal      = dynamic_cast<Signal<void(ARGS...)> *>(&base_signal);
+      emp_assert(signal != nullptr && "invalid signal conversion!");
       signal->Trigger(std::forward<ARGS>(args)...);
     }
 
-
     void NotifyConstruct(SignalBase * sig_ptr) override { signal_m.NotifyConstruct(sig_ptr); }
 
-
-    void PrintNames(std::ostream & os=std::cout) {
+    void PrintNames(std::ostream & os = std::cout) {
       action_m.PrintNames(os);
       signal_m.PrintNames(os);
     }
   };
 
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_CONTROL_SIGNALCONTROL_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_CONTROL_SIGNAL_CONTROL_HPP_GUARD

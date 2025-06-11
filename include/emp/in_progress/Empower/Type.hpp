@@ -1,15 +1,16 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2018
-*/
 /**
- *  @file
- *  @brief A collection of information about how to manage variables of a specified type.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/in_progress/Empower/Type.hpp
+ * @brief A collection of information about how to manage variables of a specified type.
  */
 
-#ifndef EMP_IN_PROGRESS_EMPOWER_TYPE_HPP_INCLUDE
-#define EMP_IN_PROGRESS_EMPOWER_TYPE_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_IN_PROGRESS_EMPOWER_TYPE_HPP_GUARD
+#define INCLUDE_EMP_IN_PROGRESS_EMPOWER_TYPE_HPP_GUARD
 
 #include <functional>
 #include <stddef.h>
@@ -26,20 +27,28 @@ namespace emp {
   class Type {
   public:
     Type() { ; }
+
     virtual ~Type() { ; }
 
     virtual std::string GetName() const = 0;
-    virtual size_t GetID() const = 0;
-    virtual size_t GetSize() const = 0;
+    virtual size_t GetID() const        = 0;
+    virtual size_t GetSize() const      = 0;
 
     virtual void DefaultConstruct(size_t mem_pos, MemoryImage & mem_image) const = 0;
-    virtual void CopyConstruct(size_t mem_pos, const MemoryImage & mem_from, MemoryImage & mem_to) const = 0;
-    virtual void CopyAssign(size_t mem_pos, const MemoryImage & mem_from, MemoryImage & mem_to) const = 0;
-    virtual void Destruct(size_t mem_pos, MemoryImage & mem_image) const = 0;
+    virtual void CopyConstruct(size_t mem_pos,
+                               const MemoryImage & mem_from,
+                               MemoryImage & mem_to) const                       = 0;
+    virtual void CopyAssign(size_t mem_pos,
+                            const MemoryImage & mem_from,
+                            MemoryImage & mem_to) const                          = 0;
+    virtual void Destruct(size_t mem_pos, MemoryImage & mem_image) const         = 0;
 
-    template <typename T> bool IsType() const;
+    template <typename T>
+    bool IsType() const;
 
-    virtual void SetString(size_t mem_pos, MemoryImage & mem_image, const std::string & val) const = 0;
+    virtual void SetString(size_t mem_pos,
+                           MemoryImage & mem_image,
+                           const std::string & val) const = 0;
 
     virtual std::string AsString(size_t mem_pos, MemoryImage & mem_image) const = 0;
   };
@@ -52,9 +61,11 @@ namespace emp {
   public:
     TypeInfo() { ; }
 
-    std::string GetName() const { return typeid(base_t).name(); } ///< Name of type.
-    size_t GetID() const { return GetTypeValue<base_t>(); }       ///< Unique ID for type.
-    size_t GetSize() const { return sizeof(T); };                 ///< How many bytes in type?
+    std::string GetName() const { return typeid(base_t).name(); }  ///< Name of type.
+
+    size_t GetID() const { return GetTypeValue<base_t>(); }  ///< Unique ID for type.
+
+    size_t GetSize() const { return sizeof(T); }  ///< How many bytes in type?
 
     /// Construct an object of type T at a specified MemoryImage position.
     void DefaultConstruct(size_t mem_pos, MemoryImage & mem_image) const {
@@ -79,9 +90,7 @@ namespace emp {
     /// Set the variable of the provided type at this memory position to the provided string.
     //  Developer note: should use a more dynamic from_string.
     void SetString(size_t mem_pos, MemoryImage & mem_image, const std::string & val) const {
-      if constexpr (std::is_same<T,std::string>()) {
-        mem_image.GetRef<T>(mem_pos) = val;
-      }
+      if constexpr (std::is_same<T, std::string>()) { mem_image.GetRef<T>(mem_pos) = val; }
     }
 
     /// Dynamically convert the variable at this memory position to a string.
@@ -94,7 +103,6 @@ namespace emp {
     /// @todo ADD move function and move constructor?
     /// @todo ADD:  double ToDouble(size_t mem_pos, MemoryImage & mem_image)
     /// @todo ADD:  std::string ToString(size_t mem_pos, MemoryImage & mem_image)
-
   };
 
   template <typename T>
@@ -102,6 +110,6 @@ namespace emp {
     return dynamic_cast<const TypeInfo<T> *>(this);
   }
 
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_IN_PROGRESS_EMPOWER_TYPE_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_IN_PROGRESS_EMPOWER_TYPE_HPP_GUARD

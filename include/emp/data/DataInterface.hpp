@@ -66,7 +66,7 @@ namespace emp {
     /// Print debug information about this node to the provided stream
     /// Useful for tracking which modifiers are included.
     /// @param os The stream to print debug information to
-    virtual void PrintDebug(std::ostream & os=std::cout) = 0;
+    virtual void PrintDebug(std::ostream & os = std::cout) = 0;
 
     /// Returns this node's name. Requires that the data::Info module was
     /// added to this DataNode, and that a name was set.
@@ -77,10 +77,9 @@ namespace emp {
     /// Returns this node's keyword. Requires that the data::Info module was
     /// added to this DataNode, and that a keyword was set.
     virtual void GetKeyword() = 0;
-
   };
 
-  #ifndef DOXYGEN_SHOULD_SKIP_THIS
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 
   template <typename VAL_TYPE, emp::data... EXTRA>
   class DataInterface_Impl : public DataInterface {
@@ -93,13 +92,18 @@ namespace emp {
 
   public:
     DataInterface_Impl() : node(new node_t), owner(true) { ; }
+
     DataInterface_Impl(node_t * n) : node(n), owner(false) { ; }
+
     DataInterface_Impl(const DataInterface_Impl &) = delete;
-    DataInterface_Impl(DataInterface_Impl &&) = delete;
-    ~DataInterface_Impl() { if (owner) delete node; }
+    DataInterface_Impl(DataInterface_Impl &&)      = delete;
+
+    ~DataInterface_Impl() {
+      if (owner) { delete node; }
+    }
 
     DataInterface_Impl & operator=(const DataInterface_Impl &) = delete;
-    DataInterface_Impl & operator=(DataInterface_Impl &&) = delete;
+    DataInterface_Impl & operator=(DataInterface_Impl &&)      = delete;
 
     /// Returns the number values added to this node since the last reset.
     size_t GetCount() const { return node->GetCount(); }
@@ -150,7 +154,7 @@ namespace emp {
 
     /// Print debug information about this node to @param os
     /// Useful for tracking which modifiers are included.
-    void PrintDebug(std::ostream & os=std::cout) { node->PrintDebug(os); }
+    void PrintDebug(std::ostream & os = std::cout) { node->PrintDebug(os); }
 
     /// Returns this node's name. Requires that the data::Info module was
     /// added to this DataNode, and that a name was set.
@@ -163,16 +167,15 @@ namespace emp {
     /// Returns this node's keyword. Requires that the data::Info module was
     /// added to this DataNode, and that a keyword was set.
     void GetKeyword() { node->GetKeyword(); }
-
   };
 
-  #endif /*DOXYGEN_SHOULD_SKIP_THIS*/
+#endif /*DOXYGEN_SHOULD_SKIP_THIS*/  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
   template <typename VAL_TYPE, emp::data... EXTRA>
   DataInterface * MakeDataInterface() {
     return new DataInterface_Impl<VAL_TYPE, EXTRA...>();
   }
 
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_DATA_DATAINTERFACE_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_DATA_DATA_INTERFACE_HPP_GUARD

@@ -17,8 +17,7 @@
 #include "Listeners.hpp"
 #include "Style.hpp"
 
-namespace emp {
-namespace web {
+namespace emp { namespace web {
 
   struct WidgetExtras {
     Style style;       ///< CSS Style
@@ -26,15 +25,25 @@ namespace web {
     Listeners listen;  ///< Listen for web events
 
     template <typename SET_TYPE>
-    void SetStyle(const std::string & s, SET_TYPE v) { style.Set(s, emp::to_string(v)); }
+    void SetStyle(const std::string & s, SET_TYPE v) {
+      style.Set(s, emp::to_string(v));
+    }
+
     bool HasStyle(const std::string & setting) const { return style.Has(setting); }
+
     const std::string & GetStyle(const std::string & setting) const { return style.Get(setting); }
+
     void RemoveStyle(const std::string & setting) { style.Remove(setting); }
 
     template <typename SET_TYPE>
-    void SetAttr(const std::string & s, SET_TYPE v) { attr.Set(s, emp::to_string(v)); }
+    void SetAttr(const std::string & s, SET_TYPE v) {
+      attr.Set(s, emp::to_string(v));
+    }
+
     bool HasAttr(const std::string & setting) const { return attr.Has(setting); }
+
     const std::string & GetAttr(const std::string & setting) const { return attr.Get(setting); }
+
     void RemoveAttr(const std::string & setting) { attr.Remove(setting); }
 
     /// Apply all HTML details associated with this widget.
@@ -52,10 +61,9 @@ namespace web {
     }
 
     /// Have any details been set?
-    operator bool() const { return style || attr || listen; } // Return true if any extras are set.
+    operator bool() const { return style || attr || listen; }  // Return true if any extras are set.
   };
 
-}
-}
+}}  // namespace emp::web
 
-#endif // #ifndef EMP_WEB_WIDGETEXTRAS_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_WEB_WIDGET_EXTRAS_HPP_GUARD

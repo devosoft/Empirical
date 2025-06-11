@@ -43,31 +43,34 @@ namespace emp {
 
   public:
     ConfigManager_Base(const std::string & _type, const std::string & _command)
-      : type_keyword(_type), command_keyword(_command) { ; }
+      : type_keyword(_type), command_keyword(_command) {
+      ;
+    }
+
     virtual ~ConfigManager_Base() = default;
 
     const std::string & GetTypeKeyword() const { return type_keyword; }
+
     const std::string & GetCommandKeyword() const { return command_keyword; }
 
-    virtual void NewObject(const std::string & obj_name) = 0;
-    virtual void UseObject(const std::string & obj_name) = 0;
+    virtual void NewObject(const std::string & obj_name)      = 0;
+    virtual void UseObject(const std::string & obj_name)      = 0;
     virtual bool CommandCallback(const std::string & command) = 0;
   };
 
-  template <class MANAGED_TYPE> class ConfigManager : public ConfigManager_Base {
+  template <class MANAGED_TYPE>
+  class ConfigManager : public ConfigManager_Base {
   private:
     std::map<std::string, MANAGED_TYPE *> name_map;
     MANAGED_TYPE * cur_obj;
     std::function<bool(MANAGED_TYPE &, std::string)> callback_fun;
 
   public:
-    ConfigManager(const std::string & _type, const std::string & _command,
+    ConfigManager(const std::string & _type,
+                  const std::string & _command,
                   std::function<bool(MANAGED_TYPE &, std::string)> _fun)
-      : ConfigManager_Base(_type, _command)
-      , cur_obj(nullptr)
-      , callback_fun(_fun)
-    {
-    }
+      : ConfigManager_Base(_type, _command), cur_obj(nullptr), callback_fun(_fun) {}
+
     ~ConfigManager() = default;
 
     bool HasObject(const std::string & obj_name) {
@@ -77,20 +80,20 @@ namespace emp {
     void NewObject(const std::string & obj_name) {
       if (HasObject(obj_name) == true) {
         std::stringstream ss;
-        ss << "Building new object of type '" << type_keyword << "' named '"
-           << obj_name << "' when one already exists. Replacing." << std::endl;
+        ss << "Building new object of type '" << type_keyword << "' named '" << obj_name
+           << "' when one already exists. Replacing." << std::endl;
         NotifyError(ss.str());
         delete name_map[obj_name];
       }
-      cur_obj = new MANAGED_TYPE;
+      cur_obj            = new MANAGED_TYPE;
       name_map[obj_name] = cur_obj;
     }
 
     void UseObject(const std::string & obj_name) {
       if (HasObject(obj_name) == false) {
         std::stringstream ss;
-        ss << "Trying to use object of type '" << type_keyword << "' named '"
-           << obj_name << "', but does not exist. Ignoring." << std::endl;
+        ss << "Trying to use object of type '" << type_keyword << "' named '" << obj_name
+           << "', but does not exist. Ignoring." << std::endl;
         NotifyError(ss.str());
         return;
       }
@@ -110,6 +113,6 @@ namespace emp {
     }
   };
 
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_CONFIG_CONFIGMANAGER_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_CONFIG_CONFIG_MANAGER_HPP_GUARD

@@ -1,23 +1,24 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2018
-*/
 /**
- *  @file
- *  @brief A collection of information about a single, instantiated variable in Empower
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/in_progress/Empower2/Var.hpp
+ * @brief A collection of information about a single, instantiated variable in Empower
  *
  *
- *  DEVELOPER NOTES
- *  Pros & Cons vs. Other version of Var being developed
- *    + MUCH simpler code; most details handled inside the Var class
- *    + More extensible memory management is possible where all variables are clustered
- *    - Slightly more overhead since each variable needs to know its type, not just each set of variables.
- *    - Potentially slower at going through different variables in an org since not all clustered.
+ * DEVELOPER NOTES
+ * Pros & Cons vs. Other version of Var being developed
+ *   + MUCH simpler code; most details handled inside the Var class
+ *   + More extensible memory management is possible where all variables are clustered
+ *   - Slightly more overhead since each variable needs to know its type, not just each set of variables.
+ *   - Potentially slower at going through different variables in an org since not all clustered.
  */
 
-#ifndef EMP_IN_PROGRESS_EMPOWER2_VAR_HPP_INCLUDE
-#define EMP_IN_PROGRESS_EMPOWER2_VAR_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_IN_PROGRESS_EMPOWER2_VAR_HPP_GUARD
+#define INCLUDE_EMP_IN_PROGRESS_EMPOWER2_VAR_HPP_GUARD
 
 #include <stddef.h>
 #include <string>
@@ -30,16 +31,15 @@ namespace emp {
 
   class VarBase {
   public:
-    virtual Ptr<VarBase> Clone() const = 0;      ///< Make a copy of the derived version of this Var.
+    virtual Ptr<VarBase> Clone() const = 0;  ///< Make a copy of the derived version of this Var.
 
-    virtual std::string GetName() const = 0;     ///< Get the name of this variable
-    virtual std::string GetDesc() const = 0;     ///< Get a description of this variable
+    virtual std::string GetName() const = 0;  ///< Get the name of this variable
+    virtual std::string GetDesc() const = 0;  ///< Get a description of this variable
 
-    virtual size_t GetTypeID() const = 0;        ///< Get the unique type ID for this variable
-    virtual std::string GetTypeName() const = 0; ///< Get the (C++ mangled) name for this type
+    virtual size_t GetTypeID() const        = 0;  ///< Get the unique type ID for this variable
+    virtual std::string GetTypeName() const = 0;  ///< Get the (C++ mangled) name for this type
 
-    virtual void SetDefault() = 0;               ///< Restore this variable to its default value.
-
+    virtual void SetDefault() = 0;  ///< Restore this variable to its default value.
   };
 
   /// A version of Var that knows its type.
@@ -49,13 +49,17 @@ namespace emp {
     TYPE value;
   public:
     VarType() { ; }
+
     VarType(TYPE & in_val) : value(in_val) { ; }
 
     using var_t = TYPE;
 
     size_t GetTypeID() const override { return GetTypeValue<var_t>(); }
+
     std::string GetTypeName() const override { return typeid(var_t).name(); }
+
     TYPE & GetValue() { return value; }
+
     const TYPE & GetValue() const { return value; }
   };
 
@@ -63,27 +67,29 @@ namespace emp {
   template <typename TYPE, typename NAME, typename DESC>
   class VarInfo : public VarType<TYPE> {
   private:
-    using this_t = VarInfo<TYPE,NAME,DESC>;
+    using this_t   = VarInfo<TYPE, NAME, DESC>;
     using parent_t = VarType<TYPE>;
     using parent_t::value;
 
   public:
     VarInfo() { ; }
+
     VarInfo(TYPE in_val) : VarType<TYPE>(in_val) { ; }
+
     VarInfo(const VarInfo &) = default;
-    VarInfo(VarInfo &&) = default;
+    VarInfo(VarInfo &&)      = default;
 
     VarInfo & operator=(const VarInfo &) = default;
-    VarInfo & operator=(VarInfo &&) = default;
+    VarInfo & operator=(VarInfo &&)      = default;
 
     Ptr<VarBase> Clone() const override { return NewPtr<this_t>(value); }
 
     std::string GetName() const override { return NAME.AsString(); }
+
     std::string GetDesc() const override { return DESC.AsString(); }
 
     void SetDefault() override { value = TYPE(); }
   };
-
 
   class Var {
   private:
@@ -98,10 +104,14 @@ namespace emp {
 
   public:
     Var() : var_info(nullptr) { ; }
+
     Var(const Var & _in) : var_info(_in.var_info->Clone()) { ; }
+
     Var(Var && _in) : var_info(_in.var_info) { _in.var_info = nullptr; }
 
-    ~Var() { if (var_info) var_info.Delete(); }
+    ~Var() {
+      if (var_info) { var_info.Delete(); }
+    }
 
     Var & operator=(const Var & _in) {
       var_info = _in.var_info->Clone();
@@ -109,7 +119,7 @@ namespace emp {
     }
 
     Var & operator=(Var && _in) {
-      var_info = _in.var_info;
+      var_info     = _in.var_info;
       _in.var_info = nullptr;
       return *this;
     }
@@ -129,10 +139,9 @@ namespace emp {
     }
   };
 
-
   template <typename TYPE, typename NAME, typename DESC>
   Var MakeVar() {
-    return Var( NewPtr< VarInfo<TYPE,NAME,DEFAULT,DESC> >() );
+    return Var(NewPtr<VarInfo<TYPE, NAME, DEFAULT, DESC>>());
   }
 
   // template <typename T>
@@ -144,9 +153,9 @@ namespace emp {
   //   return Var( NewPtr< VarInfo<T>(name, desc, default_val) );
   // }
 
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_IN_PROGRESS_EMPOWER2_VAR_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_IN_PROGRESS_EMPOWER2_VAR_HPP_GUARD
 
 // Local settings for Empecable file checker.
 // empecable_words: vinfo

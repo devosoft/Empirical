@@ -11,67 +11,108 @@
 
 #pragma once
 
-#ifndef INCLUDE_EMP_WEB_TABLE_ROW_HPP_GUARD
-#define INCLUDE_EMP_WEB_TABLE_ROW_HPP_GUARD
+#ifndef INCLUDE_EMP_WEB_TABLE_ROW_HPP_impl_GUARD
+#define INCLUDE_EMP_WEB_TABLE_ROW_HPP_impl_GUARD
 
 #include <stddef.h>
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-namespace emp {
-namespace web {
+namespace emp { namespace web {
 
   /// An object that focuses on a single column in a specified table.
   class TableRow : public TableWidget {
   private:
     size_t row_id = 0;
   public:
-    TableRow(size_t r, size_t c, const std::string & in_id="") : TableWidget(r,c,in_id), row_id(r) { ; }
+    TableRow(size_t r, size_t c, const std::string & in_id = "")
+      : TableWidget(r, c, in_id), row_id(r) {
+      ;
+    }
+
     TableRow(const TableRow &) = default;
+
     TableRow(const TableWidget & in) : TableWidget(in) { ; }
+
     TableRow(const Widget & in) : TableWidget(in) { ; }
-    TableRow(internal::TableInfo * in_info, size_t _row=0) : TableWidget(in_info, _row, 0), row_id(_row) { ; }
+
+    TableRow(internal::TableInfo * in_info, size_t _row = 0)
+      : TableWidget(in_info, _row, 0), row_id(_row) {
+      ;
+    }
 
     TableRow & operator=(const TableRow &) = default;
 
     TableCell GetCell(size_t col_id) const { return TableWidget::GetCell(row_id, col_id); }
+
     TableCell operator[](size_t col_id) const { return GetCell(col_id); }
 
     // Apply CSS to appropriate component based on current state.
     void DoCSS(const std::string & setting, const std::string & value) override {
       Info()->rows[cur_row].extras.style.Set(setting, value);
-      if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
+      if (IsActive()) {
+        Info()->ReplaceHTML();  // @CAO only should replace cell's CSS
+      }
     }
 
     void DoAttr(const std::string & setting, const std::string & value) override {
       Info()->rows[cur_row].extras.attr.Set(setting, value);
-      if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
+      if (IsActive()) {
+        Info()->ReplaceHTML();  // @CAO only should replace cell's CSS
+      }
     }
 
     void DoListen(const std::string & event_name, size_t fun_id) override {
       Info()->rows[cur_row].extras.listen.Set(event_name, fun_id);
-      if (IsActive()) Info()->ReplaceHTML();   // @CAO only should replace cell's CSS
+      if (IsActive()) {
+        Info()->ReplaceHTML();  // @CAO only should replace cell's CSS
+      }
     }
 
     bool InStateRow() const { return true; }
 
-    TableRow & Clear() { Info()->ClearRow(cur_row); return *this; }
-    TableRow & ClearStyle() { Info()->rows[cur_row].extras.style.Clear(); return *this; }
-    TableRow & ClearAttr() { Info()->rows[cur_row].extras.attr.Clear(); return *this; }
-    TableRow & ClearListen() { Info()->rows[cur_row].extras.listen.Clear(); return *this; }
-    TableRow & ClearExtras() { Info()->rows[cur_row].extras.Clear(); return *this; }
-    TableRow & ClearChildren() { Info()->ClearRowChildren(cur_row); return *this; }
-    TableRow & ClearCells() { Info()->ClearRow(cur_row); return *this; }
+    TableRow & Clear() {
+      Info()->ClearRow(cur_row);
+      return *this;
+    }
+
+    TableRow & ClearStyle() {
+      Info()->rows[cur_row].extras.style.Clear();
+      return *this;
+    }
+
+    TableRow & ClearAttr() {
+      Info()->rows[cur_row].extras.attr.Clear();
+      return *this;
+    }
+
+    TableRow & ClearListen() {
+      Info()->rows[cur_row].extras.listen.Clear();
+      return *this;
+    }
+
+    TableRow & ClearExtras() {
+      Info()->rows[cur_row].extras.Clear();
+      return *this;
+    }
+
+    TableRow & ClearChildren() {
+      Info()->ClearRowChildren(cur_row);
+      return *this;
+    }
+
+    TableRow & ClearCells() {
+      Info()->ClearRow(cur_row);
+      return *this;
+    }
 
     const std::string & GetCSS(const std::string & setting) const override {
       return Info()->rows[cur_row].extras.GetStyle(setting);
     }
-
   };
 
-}
-}
+}}  // namespace emp::web
 
-#endif // DOXYGEN_SHOULD_SKIP_THIS
+#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-#endif // #ifndef EMP_WEB__TABLEROW_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_WEB_TABLE_ROW_HPP_impl_GUARD

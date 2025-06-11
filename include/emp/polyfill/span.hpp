@@ -14,4 +14,4 @@
 
 #include <span>
 
-#endif // #ifndef EMP_POLYFILL_SPAN_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_POLYFILL_SPAN_HPP_GUARD

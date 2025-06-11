@@ -20,44 +20,43 @@
 
 #include "Widget.hpp"
 
-namespace emp {
-namespace web {
+namespace emp { namespace web {
 
   /// A TextFeed widget handles putting text on a web page that can be controlled and modified.
 
   class TextFeed : public internal::WidgetFacet<TextFeed> {
-    #ifndef DOXYGEN_SHOULD_SKIP_THIS
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
     friend class TextFeedInfo;
-    #endif // DOXYGEN_SHOULD_SKIP_THIS
+#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
   protected:
-    #ifndef DOXYGEN_SHOULD_SKIP_THIS
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
     class TextFeedInfo : public internal::WidgetInfo {
       friend TextFeed;
     protected:
-      std::deque<std::string> strings;    ///< All strings in TextFeed widget.
+      std::deque<std::string> strings;  ///< All strings in TextFeed widget.
 
-      std::string separator; ///< Text to print between strings.
+      std::string separator;  ///< Text to print between strings.
 
-      size_t max_size; ///< How many strings can this TextFeed hold before old strings are expunged?
+      size_t max_size;  ///< How many strings can this TextFeed hold before old strings are expunged?
 
-      bool append_ok{ true };           ///< Can this TextFeed widget be extended?
+      bool append_ok{true};  ///< Can this TextFeed widget be extended?
 
-      TextFeedInfo(
-        const std::string & in_id_="",
-        const std::string & separator_="",
-        const size_t max_size_=std::numeric_limits< size_t >::max()
-      ) : internal::WidgetInfo( in_id_ )
-      , separator( separator_ )
-      , max_size( max_size_ )
-      { ; }
+      TextFeedInfo(const std::string & in_id_     = "",
+                   const std::string & separator_ = "",
+                   const size_t max_size_         = std::numeric_limits<size_t>::max())
+        : internal::WidgetInfo(in_id_), separator(separator_), max_size(max_size_) {
+        ;
+      }
 
-      TextFeedInfo(const TextFeedInfo &) = delete;               // No copies of INFO allowed
-      TextFeedInfo & operator=(const TextFeedInfo &) = delete;   // No copies of INFO allowed
+      TextFeedInfo(const TextFeedInfo &)             = delete;  // No copies of INFO allowed
+      TextFeedInfo & operator=(const TextFeedInfo &) = delete;  // No copies of INFO allowed
+
       virtual ~TextFeedInfo() { ; }
 
       std::string GetTypeName() const override { return "TextFeedInfo"; }
 
       bool AppendOK() const override { return append_ok; }
+
       void PreventAppend() override { append_ok = false; }
 
       /// Add new text to this string.
@@ -67,34 +66,37 @@ namespace web {
       virtual void GetHTML(std::stringstream & HTML) override {
         HTML.str("");                         // Clear the current text.
         HTML << "<span id=\'" << id << "'>";  // Initial span tag to keep id.
-        for (const auto& item : strings) {
-          if ( &item != &strings.front() ) HTML << separator;
+        for (const auto & item : strings) {
+          if (&item != &strings.front()) { HTML << separator; }
           HTML << item;
         }
-        HTML << "</span>";                    // Close span tag.
+        HTML << "</span>";  // Close span tag.
       }
 
     public:
       virtual std::string GetType() override { return "web::TextFeedInfo"; }
     };  // End of TextFeedInfo
-    #endif // DOXYGEN_SHOULD_SKIP_THIS
+#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
     // Get a properly cast version of info.
     TextFeedInfo * Info() { return (TextFeedInfo *) info; }
+
     const TextFeedInfo * Info() const { return (TextFeedInfo *) info; }
 
     TextFeed(TextFeedInfo * in_info) : WidgetFacet(in_info) { ; }
   public:
-    TextFeed(
-      const std::string & in_id="",
-      const std::string & separator="",
-      const size_t max_size=std::numeric_limits< size_t >::max()
-    ) : WidgetFacet(in_id) {
+    TextFeed(const std::string & in_id     = "",
+             const std::string & separator = "",
+             const size_t max_size         = std::numeric_limits<size_t>::max())
+      : WidgetFacet(in_id) {
       // When a name is provided, create an associated Widget info.
       info = new TextFeedInfo(in_id, separator, max_size);
     }
+
     TextFeed(const TextFeed & in) : WidgetFacet(in) { ; }
+
     TextFeed(const Widget & in) : WidgetFacet(in) { emp_assert(in.IsTextFeed()); }
+
     ~TextFeed() { ; }
 
     using INFO_TYPE = TextFeedInfo;
@@ -103,42 +105,51 @@ namespace web {
     size_t GetSize() const { return Info()->strings.size(); }
 
     /// Erase current text.
-    TextFeed & Clear() { Info()->strings.clear(); return *this; }
+    TextFeed & Clear() {
+      Info()->strings.clear();
+      return *this;
+    }
 
     /// Remove last text item.
-    TextFeed & PopBack() { Info()->strings.pop_back(); return *this; }
+    TextFeed & PopBack() {
+      Info()->strings.pop_back();
+      return *this;
+    }
   };
 
-  #ifndef DOXYGEN_SHOULD_SKIP_THIS
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
   // Add new text to this string.
   Widget TextFeed::TextFeedInfo::Append(const std::string & text) {
     // If text widget cannot append, forward to parent.
-    if (!append_ok) return ForwardAppend(text);
+    if (!append_ok) { return ForwardAppend(text); }
 
     if (state == Widget::ACTIVE) {
       const std::string to_append = strings.empty() ? text : (separator + text);
       // ideally, we would use MAIN_THREAD_ASYNC_EM_ASM but that seems to
       // garble string arguments (as of emscripten 1.38.48)
-      MAIN_THREAD_EM_ASM({
-        var content = document.createElement('span');
-        content.innerHTML = UTF8ToString($1);
-        var elementId = UTF8ToString($0);
-        var element = document.getElementById(elementId);
-        if (element) element.insertAdjacentHTML('beforeend', content);
-      }, id.c_str(), to_append.c_str() );
+      MAIN_THREAD_EM_ASM(
+        {
+          var content       = document.createElement('span');
+          content.innerHTML = UTF8ToString($1);
+          var elementId     = UTF8ToString($0);
+          var element       = document.getElementById(elementId);
+          if (element) { element.insertAdjacentHTML('beforeend', content); }
+        },
+        id.c_str(),
+        to_append.c_str());
     }
 
-    strings.push_back(text); // Record the new string being added.
+    strings.push_back(text);  // Record the new string being added.
 
-    if ( strings.size() > max_size ) {
-
+    if (strings.size() > max_size) {
       strings.pop_front();
-      MAIN_THREAD_ASYNC_EM_ASM({
-        var elementId = UTF8ToString($0);  // Convert UTF-8 encoded string to JavaScript string
-        var targetElement = document.getElementById(elementId);
-        if (targetElement) targetElement.removeChild(targetElement.firstChild);
-      }, id.c_str() );
-
+      MAIN_THREAD_ASYNC_EM_ASM(
+        {
+          var elementId = UTF8ToString($0);  // Convert UTF-8 encoded string to JavaScript string
+          var targetElement = document.getElementById(elementId);
+          if (targetElement) { targetElement.removeChild(targetElement.firstChild); }
+        },
+        id.c_str());
     }
 
     // prevent runaway async execution! do this every N?
@@ -147,10 +158,8 @@ namespace web {
     // });
 
     return web::TextFeed(this);
-
   }
-  #endif // DOXYGEN_SHOULD_SKIP_THIS
-} // namespace web
-} // namespace emp
+#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
+}}  // namespace emp::web
 
-#endif // #ifndef EMP_WEB_TEXTFEED_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_WEB_TEXT_FEED_HPP_GUARD

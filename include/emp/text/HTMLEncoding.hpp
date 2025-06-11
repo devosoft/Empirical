@@ -18,46 +18,45 @@
 #include <string>
 #include <unordered_map>
 
-#include "TextEncoding.hpp"
 #include "Text.hpp"
 #include "Text_utils.hpp"
+#include "TextEncoding.hpp"
 
 namespace emp {
 
   class HTMLEncoding : public emp::TextEncoding {
   private:
-
     void SetupTags() {
       const auto & code_map = GetTextStyleMap_FromHTML();
       for (auto & [html_tag, style] : code_map) {
-        AddStyleTags(style, MakeString("<",html_tag,">"), MakeString("</",html_tag,">"));
+        AddStyleTags(style, MakeString("<", html_tag, ">"), MakeString("</", html_tag, ">"));
       }
 
       AddReplaceTag("&amp;", '&');
-      AddReplaceTag("&gt;",  '>');
-      AddReplaceTag("&lt;",  '<');
+      AddReplaceTag("&gt;", '>');
+      AddReplaceTag("&lt;", '<');
       AddReplaceTag("&tab;", '\t');
-      AddReplaceTag("&nbsp;",    ' ', "no_break");
+      AddReplaceTag("&nbsp;", ' ', "no_break");
 
       // For generic symbols
       AddReplaceControl("&", ';', ' ', "symbol");
 
 
-      AddReplaceTag("<br>",  '\n');           // A line break
+      AddReplaceTag("<br>", '\n');  // A line break
       // AddReplaceTag("\\b",  ' ', "page_break");       // A page break
-      AddReplaceTag("<p>",  ' ', "para_break");       // A paragraph break
-      AddReplaceTag("<hr>",  '-', "horizontal_rule");  // A horizontal rule
+      AddReplaceTag("<p>", ' ', "para_break");        // A paragraph break
+      AddReplaceTag("<hr>", '-', "horizontal_rule");  // A horizontal rule
     }
 
 
   public:
     HTMLEncoding() { SetupTags(); }
+
     ~HTMLEncoding() = default;
 
     String GetName() const override { return "html"; }
-    emp::Ptr<TextEncoding_Interface> Clone() const override {
-      return emp::NewPtr<HTMLEncoding>();
-    }
+
+    emp::Ptr<TextEncoding_Interface> Clone() const override { return emp::NewPtr<HTMLEncoding>(); }
   };
 
   using HTMLText = EncodedText<HTMLEncoding>;
@@ -66,6 +65,6 @@ namespace emp {
   emp::Text MakeHTMLText(Ts &&... args) {
     return MakeEncodedText<HTMLEncoding>(std::forward<Ts>(args)...);
   }
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_TEXT_HTMLENCODING_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_TEXT_HTMLENCODING_HPP_GUARD

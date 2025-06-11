@@ -42,16 +42,21 @@ namespace emp {
     static constexpr size_t CountCombos(size_t max_count, size_t combo_size);
   public:
     ComboIDs(size_t in_max, size_t combo_size);
+
     ~ComboIDs() { ; }
 
     // Accessors
     const emp::vector<size_t> & GetCombo() const { return cur_combo; }
+
     const emp::vector<size_t> & GetMaxCombo() const { return max_combo; }
+
     size_t GetComboSize() const { return cur_combo.size(); }
+
     size_t GetNumCombos() const { return num_combos; }
 
-    size_t & operator[](const size_t index) { return cur_combo[index];  }
-    const size_t & operator[](const size_t index) const { return cur_combo[index];  }
+    size_t & operator[](const size_t index) { return cur_combo[index]; }
+
+    const size_t & operator[](const size_t index) const { return cur_combo[index]; }
 
     // General Use manipulators
     const emp::vector<size_t> & Reset();
@@ -62,33 +67,38 @@ namespace emp {
     emp::vector<size_t> GetInverseCombo();
 
     // Make sure obvious operators also work plus standard library compatibility.
-    ComboIDs & operator++() { NextCombo(); return *this; }
-    ComboIDs & operator++(int) { NextCombo(); return *this; }
+    ComboIDs & operator++() {
+      NextCombo();
+      return *this;
+    }
+
+    ComboIDs & operator++(int) {
+      NextCombo();
+      return *this;
+    }
+
     size_t size() { return num_combos; }
   };
 
   ComboIDs::ComboIDs(size_t in_max, size_t combo_size)
-    : max_count(in_max), cur_combo(combo_size), max_combo(combo_size),
-      num_combos(CountCombos(in_max, combo_size))
-  {
+    : max_count(in_max)
+    , cur_combo(combo_size)
+    , max_combo(combo_size)
+    , num_combos(CountCombos(in_max, combo_size)) {
     emp_assert(combo_size <= in_max);
     const size_t diff = in_max - combo_size;
     for (size_t i = 0; i < cur_combo.size(); i++) {
       cur_combo[i] = i;
-      max_combo[i] = i+diff;
+      max_combo[i] = i + diff;
     }
   }
 
-  const emp::vector<size_t> & ComboIDs::Reset()
-  {
-    for (size_t i = 0; i < cur_combo.size(); i++) {
-      cur_combo[i] = i;
-    }
+  const emp::vector<size_t> & ComboIDs::Reset() {
+    for (size_t i = 0; i < cur_combo.size(); i++) { cur_combo[i] = i; }
     return cur_combo;
   }
 
-  bool ComboIDs::NextCombo()
-  {
+  bool ComboIDs::NextCombo() {
     size_t inc_pos = cur_combo.size() - 1;
     cur_combo[inc_pos]++;
 
@@ -105,15 +115,12 @@ namespace emp {
     }
 
     // Update all of the positions after the current one.
-    for (size_t i = inc_pos + 1; i < cur_combo.size(); i++) {
-      cur_combo[i] = cur_combo[i-1] + 1;
-    }
+    for (size_t i = inc_pos + 1; i < cur_combo.size(); i++) { cur_combo[i] = cur_combo[i - 1] + 1; }
 
     return true;
   }
 
-  void ComboIDs::ResizeCombos(size_t new_size)
-  {
+  void ComboIDs::ResizeCombos(size_t new_size) {
     emp_assert(new_size < max_count);
 
     // Reset internal state...
@@ -124,44 +131,42 @@ namespace emp {
     const size_t diff = max_count - new_size;
     for (size_t i = 0; i < new_size; i++) {
       cur_combo[i] = i;
-      max_combo[i] = i+diff;
+      max_combo[i] = i + diff;
     }
   }
 
-
-  emp::vector<size_t> ComboIDs::GetInverseCombo()
-  {
+  emp::vector<size_t> ComboIDs::GetInverseCombo() {
     size_t inverse_size = max_count - cur_combo.size();
     emp::vector<size_t> inverse_combo(inverse_size);
 
     size_t norm_pos = 0;
-    size_t inv_pos = 0;
+    size_t inv_pos  = 0;
     for (size_t i = 0; i < max_count; i++) {
       if (norm_pos < cur_combo.size() && cur_combo[norm_pos] == i) {
         norm_pos++;  // Found in cur combo...
-     } else inverse_combo[inv_pos++] = i;         // Not in cur; put in inverse.
+      } else {
+        inverse_combo[inv_pos++] = i;  // Not in cur; put in inverse.
+      }
     }
     return inverse_combo;
   }
 
-
-  constexpr size_t ComboIDs::CountCombos(size_t max_count, size_t combo_size)
-  {
-    if (combo_size * 2 > max_count) combo_size = max_count - combo_size;
+  constexpr size_t ComboIDs::CountCombos(size_t max_count, size_t combo_size) {
+    if (combo_size * 2 > max_count) { combo_size = max_count - combo_size; }
 
     size_t choose_product = 1;
-    size_t total_product = 1;
+    size_t total_product  = 1;
     for (size_t i = 0; i < combo_size; i++) {
-      choose_product *= i+1;
+      choose_product *= i + 1;
       total_product *= max_count - i;
     }
 
     return total_product / choose_product;
   }
 
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_MATH_COMBOS_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_MATH_COMBOS_HPP_GUARD
 
 // Local settings for Empecable file checker.
 // empecable_words: inv

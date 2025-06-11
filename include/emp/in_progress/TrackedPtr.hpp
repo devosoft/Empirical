@@ -38,21 +38,22 @@ namespace emp {
     TrackedPtr(const TrackedPtr<TYPE> & _in) : Ptr<TYPE>(_in) {}
 
     /// Construct from raw ptr
-    template <typename T2> Ptr(T2 * in_ptr, bool=false) : BasePtr<TYPE>(in_ptr) {}
+    template <typename T2>
+    Ptr(T2 * in_ptr, bool = false) : BasePtr<TYPE>(in_ptr) {}
 
     /// Construct from array
-    template <typename T2> Ptr(T2 * _ptr, size_t, bool) : BasePtr<TYPE>(_ptr) {}
+    template <typename T2>
+    Ptr(T2 * _ptr, size_t, bool) : BasePtr<TYPE>(_ptr) {}
 
     /// From compatible Ptr
-    template <typename T2> Ptr(Ptr<T2> _in) : BasePtr<TYPE>(_in.Raw()) {}
+    template <typename T2>
+    Ptr(Ptr<T2> _in) : BasePtr<TYPE>(_in.Raw()) {}
 
     /// From nullptr
     Ptr(std::nullptr_t) : Ptr() {}
 
     /// Destructor
     ~Ptr() { ; }
+  }
 
-
-}
-
-#endif // #ifndef EMP_IN_PROGRESS_TRACKEDPTR_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_IN_PROGRESS_TRACKED_PTR_HPP_GUARD

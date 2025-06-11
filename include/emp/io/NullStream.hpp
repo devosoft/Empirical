@@ -19,26 +19,24 @@ namespace emp {
 
   /// A no-operation buffer class
   class NullBuffer : public std::streambuf {
-    public:
-      int overflow(int c) {
-        return c;
-      }
+  public:
+    int overflow(int c) { return c; }
   };
 
   /// A no-operation output stream class
   class NullStream : public std::ostream {
-    public:
-      NullStream() : std::ostream(&m_sb) { ; }
-    private:
-      NullBuffer m_sb{};
+  public:
+    NullStream() : std::ostream(&m_sb) { ; }
+  private:
+    NullBuffer m_sb{};
   };
 
   /// No-operation drop-in replacement for std::cout
   static NullStream nout;
 
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_IO_NULLSTREAM_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_IO_NULL_STREAM_HPP_GUARD
 
 // Local settings for Empecable file checker.
 // empecable_words: nout

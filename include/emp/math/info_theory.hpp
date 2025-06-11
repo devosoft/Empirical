@@ -32,11 +32,11 @@
 namespace emp {
 
   /// Convert a vector of weights to probabilities and return the entropy of the system.
-  template<typename CONTAINER>
+  template <typename CONTAINER>
   double Entropy(const CONTAINER & weights) {
-    double total = 0.0;
+    double total   = 0.0;
     double entropy = 0.0;
-    for (auto w : weights) total += w;
+    for (auto w : weights) { total += w; }
     for (auto w : weights) {
       double p = ((double) w) / total;
       entropy -= p * Log2(p);
@@ -46,10 +46,12 @@ namespace emp {
 
   /// Calculate the entropy in a container of arbitrary objects.
   /// Args are a container, a function to extract the weight of each member, and an (optional) total weight.
-  template<typename CONTAINER, typename WEIGHT_FUN>
-  double Entropy(const CONTAINER & objs, WEIGHT_FUN fun, double total=0.0) {
+  template <typename CONTAINER, typename WEIGHT_FUN>
+  double Entropy(const CONTAINER & objs, WEIGHT_FUN fun, double total = 0.0) {
     // If we don't know the total, calculate it.
-    if (total == 0.0) for (auto & o : objs) total += (double) fun(o);
+    if (total == 0.0) {
+      for (auto & o : objs) { total += (double) fun(o); }
+    }
 
     // we *can* calculate the entropy of the empty set
     // https://www.askamathematician.com/2011/02/q-what-is-the-entropy-of-nothing/
@@ -64,13 +66,11 @@ namespace emp {
   }
 
   /// Calculate the entropy when their are two possible states based on one state's probability.
-  constexpr double Entropy2(const double p) {
-    return -(p * Log2(p) + (1.0-p)*Log2(1.0-p));
-  }
+  constexpr double Entropy2(const double p) { return -(p * Log2(p) + (1.0 - p) * Log2(1.0 - p)); }
 
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_MATH_INFO_THEORY_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_MATH_INFO_THEORY_HPP_GUARD
 
 // Local settings for Empecable file checker.
 // empecable_words: askamathematician
