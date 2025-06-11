@@ -1,23 +1,23 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2023-2025
- */
-
 /**
- *  @file
- *  @brief Simple class to facilitate string manipulations
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2023-2025 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  @todo Make constexpr
- *  @todo Make handle non-'char' strings (i.e., use CharT template parameter)
- *  @todo Make handle allocators
- *  @todo Make work more broadly with string_views
- *  @todo Maybe add special construct types like RESERVE, REPEAT, and TO_STRING for special builds?
+ * @file include/emp/tools/String.hpp
+ * @brief Simple class to facilitate string manipulations
+ * @note Status: ALPHA
+ *
+ * @todo Make constexpr
+ * @todo Make handle non-'char' strings (i.e., use CharT template parameter)
+ * @todo Make handle allocators
+ * @todo Make work more broadly with string_views
+ * @todo Maybe add special construct types like RESERVE, REPEAT, and TO_STRING for special builds?
  */
 
-#ifndef EMP_TOOLS_STRING_HPP_INCLUDE
-#define EMP_TOOLS_STRING_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_TOOLS_STRING_HPP_GUARD
+#define INCLUDE_EMP_TOOLS_STRING_HPP_GUARD
 
 #include <algorithm>         // std::count
 #include <cctype>            // std::toupper and std::tolower
@@ -68,6 +68,7 @@ namespace emp {
   [[nodiscard]] inline String MakeUpper(const String & value);
   [[nodiscard]] inline String MakeLower(const String & value);
   [[nodiscard]] inline String MakeTitleCase(String value);
+  [[nodiscard]] inline String PascalToCaps(String value);
   [[nodiscard]] inline String MakeCount(int val, const String & item, const String & plural_suffix);
   [[nodiscard]] inline String MakeRoman(int val);
   template <typename CONTAINER_T>
@@ -649,12 +650,16 @@ namespace emp {
     }
 
     // Replace all instance of one character with another, from starting point.
-    // Return true/false: was a change made?
+    // Return number of changes made.
     inline size_t ReplaceAll(char from, char to, size_t start = 0);
 
     // Replace all instance of one string with another, from starting point.
-    // Return true/false: was a change made?
+    // Return number of changes made.
     inline size_t ReplaceAll(const String & from, const String & to, size_t start = 0);
+
+    // Replace all members from one character set with a specific char, from starting point.
+    // Return number of changes made.
+    inline String & ReplaceSet(CharSet from, char to, size_t start = 0);
 
     String & ReplaceRange(size_t start, size_t end, const String & value) {
       return replace(start, end - start, value);
@@ -665,7 +670,7 @@ namespace emp {
     String AsReplaceVars(const MAP_T & var_map,
                          const String & symbol = "$",
                          const Syntax & syntax = Syntax::Full());
-    
+
     // Find any instances of ${X} and replace with dictionary lookup of X in this variable.
     template <typename MAP_T>
     String & SetReplaceVars(const MAP_T & var_map,
@@ -1089,6 +1094,10 @@ namespace emp {
 
     [[nodiscard]] String AsTitleCase() const { return MakeTitleCase(*this); }
 
+    String & SetPascalToCaps() { return (*this = PascalToCaps(*this)); }
+
+    [[nodiscard]] String AsPascalToCaps() const { return PascalToCaps(*this); }
+
     String & AppendCount(int val, const String & item, const String & suffix = "s") {
       *this += MakeCount(val, item, suffix);
       return *this;
@@ -1222,11 +1231,19 @@ namespace emp {
       return *this = MakeCompressed(in, chars, compress_to, trim_start, trim_end);
     }
 
+  /// Compress all consecutive instances from a set of chars to a single specified char.
     String & Compress(const CharSet & chars = WhitespaceCharSet(),
                       char compress_to      = ' ',
                       bool trim_start       = true,
                       bool trim_end         = true) {
       return *this = MakeCompressed(*this, chars, compress_to, trim_start, trim_end);
+    }
+
+    /// Compress multiple consecutive instances of whitespace to just one instance.
+    String & Compress(char ch,
+                      bool trim_start       = true,
+                      bool trim_end         = true) {
+      return *this = MakeCompressed(*this, ch, ch, trim_start, trim_end);
     }
 
     [[nodiscard]] String AsCompressed(const CharSet & chars = WhitespaceCharSet(),
@@ -2160,7 +2177,7 @@ namespace emp {
   }
 
   // Replace all instance of one character with another, from starting point.
-  // Return true/false: was a change made?
+  // Return number of changes made.
   size_t String::ReplaceAll(char from, char to, size_t start) {
     size_t count = 0;
     for (size_t pos = find(from, start); pos != npos; pos = find(from, pos + 1)) {
@@ -2171,7 +2188,7 @@ namespace emp {
   }
 
   // Replace all instance of one string with another, from starting point.
-  // Return true/false: was a change made?
+  // Return number of changes made.
   size_t String::ReplaceAll(const String & from, const String & to, size_t start) {
     size_t count = 0;
     for (size_t pos = find(from, start); pos != npos; pos = find(from, pos + to.size())) {
@@ -2179,6 +2196,15 @@ namespace emp {
       ++count;
     }
     return count;
+  }
+
+  // Replace all members from one character set with a specific char, from starting point.
+  // Return number of changes made.
+  String & String::ReplaceSet(CharSet from, char to, size_t start) {
+    for (size_t pos = Find(from, start); pos != npos; pos = Find(from, pos + 1)) {
+      operator[](pos) = to;
+    }
+    return *this;
   }
 
   /// Find any instances of ${X} and replace with dictionary lookup of X in this variable
@@ -2566,6 +2592,27 @@ namespace emp {
     return value;
   }
 
+  // Convert letters in this string from PascalCase to ALL_CAPS
+  [[nodiscard]] inline String PascalToCaps(String value) {
+    bool last_lower = false;
+    for (size_t i = 0; i < value.size(); ++i) {
+      char & ch = value[i];
+      if (is_lower_letter(ch)) {
+        ch = std::toupper(ch);
+        last_lower = true;
+      }
+      else if (is_upper_letter(ch)) {
+        if (last_lower) {
+          value.insert(i, "_");
+          ++i;
+        }
+        last_lower = false;
+      }
+      else { last_lower = false; } // Something else...
+    }
+    return value;
+  }
+
   /// Make a string with the correct pluralization of the item being counted.  For example,
   /// MakeCount(1, "cow") would produce "1 cow", but MakeCount(2, "cow") would produce "2 cows".
   [[nodiscard]] String MakeCount(int val, const String & item, const String & plural_suffix) {
@@ -2821,8 +2868,7 @@ struct std::hash<emp::String> {
   size_t operator()(const emp::String & str) const noexcept { return str.Hash(); }
 };
 
-
-#endif  // #ifndef EMP_TOOLS_STRING_HPP_INCLUDE
+#endif // #ifndef INCLUDE_EMP_TOOLS_STRING_HPP_GUARD
 
 // Local settings for Empecable file checker.
 // empecable_words: quot apos nrt
