@@ -203,13 +203,13 @@ namespace emp { namespace notify {
           alert(msg);
         },
         msg.c_str());
-#else
+#else  // #if defined(__EMSCRIPTEN__)
       if (to_cerr) {
         std::cerr << msg << std::endl;
       } else {
         std::cout << msg << std::endl;
       }
-#endif
+#endif  // #if defined(__EMSCRIPTEN__) : #else
     }
 
     NotifyData() {
@@ -223,13 +223,13 @@ namespace emp { namespace notify {
         .Add(
 #ifdef NDEBUG
           [](id_arg_t, message_arg_t) { return true; }
-#else
+#else  // #ifdef NDEBUG
           [](id_arg_t, message_arg_t msg) {
             const std::string tag = ColorTypeID(Type::DEBUG);
             DefaultPrint(tag + ": " + msg);
             return true;
           }
-#endif
+#endif  // #ifdef NDEBUG : #else
         );
 
       GetHandler(Type::WARNING).Add([](id_arg_t, message_arg_t msg) {
@@ -367,9 +367,9 @@ namespace emp { namespace notify {
     if (!success) {
 #ifdef NDEBUG
       Exit(1);
-#else
+#else  // #ifdef NDEBUG
       abort();
-#endif
+#endif  // #ifdef NDEBUG : #else
     }
     return success;
   }

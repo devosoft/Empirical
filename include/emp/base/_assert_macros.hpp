@@ -11,8 +11,8 @@
 
 #pragma once
 
-#ifndef INCLUDE_EMP_BASE_ASSERT_MACROS_HPP_GUARD
-#define INCLUDE_EMP_BASE_ASSERT_MACROS_HPP_GUARD
+#ifndef INCLUDE_EMP_BASE_ASSERT_MACROS_HPP_impl_GUARD
+#define INCLUDE_EMP_BASE_ASSERT_MACROS_HPP_impl_GUARD
 
 /// Basic helper macros...
 #define emp_assert_STRINGIFY(...) emp_assert_STRINGIFY_IMPL(__VA_ARGS__)
@@ -52,4 +52,4 @@
 #define emp_assert_TO_PAIRS19(X, ...) emp_assert_TO_PAIR(X) , emp_assert_TO_PAIRS18(__VA_ARGS__)
 #define emp_assert_TO_PAIRS20(X, ...) emp_assert_TO_PAIR(X) , emp_assert_TO_PAIRS19(__VA_ARGS__)
 
-#endif  // #ifndef EMP_BASE_ASSERT_MACROS_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_BASE_ASSERT_MACROS_HPP_impl_GUARD

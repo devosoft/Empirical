@@ -45,7 +45,7 @@
 #define emp_always_assert_warning_impl(TEST) \
     emp_always_assert_warning_msvc_impl(TEST)
 
-#else
+#else  // #if defined(_MSC_VER)
 
 #define emp_always_assert_warning_impl(...)                            \
     do {                                                               \
@@ -57,7 +57,7 @@
       );                                                               \
     } while(0)
 
-#endif
+#endif  // #if defined(_MSC_VER) : #else
 
 /// Require a specified condition to be true. If it is false, immediately
 /// halt execution. Print also extra information on any variables or
@@ -66,8 +66,8 @@
 #ifndef EMP_NO_WARNINGS
 #define emp_always_assert_warning(...)          \
     emp_always_assert_warning_impl(__VA_ARGS__)
-#else
+#else  // #ifndef EMP_NO_WARNINGS
 #define emp_always_assert_warning(...)
-#endif
+#endif  // #ifndef EMP_NO_WARNINGS : #else
 
-#endif  // #ifndef EMP_BASE_ALWAYS_ASSERT_WARNING_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_BASE_ALWAYS_ASSERT_WARNING_HPP_GUARD

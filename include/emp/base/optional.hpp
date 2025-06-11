@@ -41,7 +41,7 @@ namespace emp {
 
 }  // namespace emp
 
-#else  // #EMP_NDEBUG *not* set
+#else  // #ifdef EMP_NDEBUG
 
 namespace emp {
 
@@ -95,10 +95,10 @@ namespace std {
   };
 
 }  // namespace std
-#endif  // DOXYGEN_SHOULD_SKIP_THIS
-#endif
+#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
+#endif  // #ifdef EMP_NDEBUG : #else
 
-#endif  // #ifndef EMP_BASE_OPTIONAL_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_BASE_OPTIONAL_HPP_GUARD
 
 // Local settings for Empecable file checker.
 // empecable_words: elem

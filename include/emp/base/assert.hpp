@@ -35,7 +35,7 @@
 /// NDEBUG should trigger its EMP equivalent.
 #ifdef NDEBUG
 #define EMP_NDEBUG
-#endif
+#endif  // #ifdef NDEBUG
 
 #if defined(EMP_NDEBUG)
 /// Ideally, this assert should use the expression (to prevent compiler
@@ -48,7 +48,7 @@
 
 namespace emp { static constexpr bool is_debug_mode = false; }
 
-#else
+#else  // #if defined(EMP_NDEBUG)
 /// Require a specified condition to be true. If it is false, immediately
 /// halt execution. Print also extra information on any variables or
 /// expressions provided as variadic args. Note: If NDEBUG is defined,
@@ -58,7 +58,7 @@ namespace emp { static constexpr bool is_debug_mode = false; }
 
 namespace emp { static constexpr bool is_debug_mode = true; }
 
-#endif
+#endif  // #if defined(EMP_NDEBUG) : #else
 
 
-#endif  // #ifndef EMP_BASE_ASSERT_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_BASE_ASSERT_HPP_GUARD

@@ -9,8 +9,8 @@
 
 #pragma once
 
-#ifndef INCLUDE_EMP_BASE_OPTIONAL_THROW_HPP_GUARD
-#define INCLUDE_EMP_BASE_OPTIONAL_THROW_HPP_GUARD
+#ifndef INCLUDE_EMP_BASE_OPTIONAL_THROW_HPP_impl_GUARD
+#define INCLUDE_EMP_BASE_OPTIONAL_THROW_HPP_impl_GUARD
 
 #include <sstream>
 #include <string>
@@ -75,4 +75,4 @@ namespace emp {
   }
 }  // namespace emp
 
-#endif  // #ifndef EMP_BASE_OPTIONAL_THROW_IMPL_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_BASE_OPTIONAL_THROW_HPP_impl_GUARD

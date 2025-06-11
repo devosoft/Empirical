@@ -34,10 +34,10 @@ namespace emp {
 #ifdef NDEBUG
   template <typename T, typename... Ts>
   using vector = std::vector<T, Ts...>;
-#else
+#else  // #ifdef NDEBUG
   template <typename T, typename... Ts>
   class vector;
-#endif
+#endif  // #ifdef NDEBUG : #else
 
 
   // === Concepts to check for Standard Library member functions.
@@ -133,4 +133,4 @@ namespace emp {
 
 }  // namespace emp
 
-#endif  // #ifndef EMP_META_TYPE_TRAITS_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_BASE_CONCEPTS_HPP_GUARD

@@ -20,7 +20,7 @@
 /// NDEBUG should trigger its EMP equivalent.
 #ifdef NDEBUG
 #define EMP_NDEBUG
-#endif
+#endif  // #ifdef NDEBUG
 
 
 #if defined(EMP_OPTIONAL_THROW_ON)
@@ -32,11 +32,11 @@
       }                                                                   \
     } while(0)
 
-#elif defined(EMP_NDEBUG)
+#elif defined(EMP_NDEBUG)  // #if defined(EMP_OPTIONAL_THROW_ON)
 
 #define emp_optional_throw(...)
 
-#else
+#else  // #if defined(EMP_OPTIONAL_THROW_ON) : #elif defined(EMP_NDEBUG)
 /// Require a specified condition to be true. If it is false, immediately
 /// halt execution. Print also extra information on any variables or
 /// expressions provided as variadic args. Note: If NDEBUG is defined,
@@ -44,10 +44,10 @@
 /// information will not be printed when compiling with MSVC.
 #define emp_optional_throw(...) emp_assert(__VA_ARGS__)
 
-#endif
+#endif  // #if defined(EMP_OPTIONAL_THROW_ON) : #elif defined(EMP_NDEBUG) : #else
 
 
-#endif  // #ifndef EMP_BASE_OPTIONAL_THROW_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_BASE_OPTIONAL_THROW_HPP_GUARD
 
 // Local settings for Empecable file checker.
 // empecable_words: mscv

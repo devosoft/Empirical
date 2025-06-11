@@ -39,7 +39,7 @@ namespace emp {
 }
 
 
-#else  // #EMP_NDEBUG *not* set
+#else  // #ifdef EMP_NDEBUG
 
 namespace emp {
 
@@ -389,10 +389,10 @@ namespace emp {
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   template <typename... Ts>
   class vector<bool, Ts...> : public std::vector<bool, Ts...> {
-#else
+#else  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
   template <typename t>
   class vector<bool> {
-#endif
+#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS : #else
   private:
     using this_t = emp::vector<bool, Ts...>;
     using stdv_t = std::vector<bool, Ts...>;
@@ -491,7 +491,7 @@ namespace emp {
   }
 }  // namespace emp
 
-#endif  // EMP_NDEBUG
+#endif  // #ifdef EMP_NDEBUG : #else
 
 
 #endif  // #ifndef INCLUDE_EMP_BASE_VECTOR_HPP_GUARD

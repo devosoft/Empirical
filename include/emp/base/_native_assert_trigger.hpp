@@ -10,8 +10,8 @@
 
 #pragma once
 
-#ifndef INCLUDE_EMP_BASE_NATIVE_ASSERT_TRIGGER_HPP_GUARD
-#define INCLUDE_EMP_BASE_NATIVE_ASSERT_TRIGGER_HPP_GUARD
+#ifndef INCLUDE_EMP_BASE_NATIVE_ASSERT_TRIGGER_HPP_impl_GUARD
+#define INCLUDE_EMP_BASE_NATIVE_ASSERT_TRIGGER_HPP_impl_GUARD
 
 #include <iostream>
 #include <sstream>
@@ -57,4 +57,4 @@ namespace emp {
 }  // namespace emp
 
 
-#endif  // #ifndef EMP_BASE_NATIVE_ASSERT_TRIGGER_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_BASE_NATIVE_ASSERT_TRIGGER_HPP_impl_GUARD

@@ -49,7 +49,7 @@
       );                                                                 \
     } while(0)
 
-#elif defined(_MSC_VER)
+#elif defined(_MSC_VER)  // #if defined(__EMSCRIPTEN__)
 
 #define emp_always_assert_msvc_impl(TEST)                                \
     do {                                                                 \
@@ -60,7 +60,7 @@
 
 #define emp_always_assert_impl(TEST) emp_always_assert_msvc_impl(TEST)
 
-#elif defined(EMP_OPTIONAL_THROW_ON)
+#elif defined(EMP_OPTIONAL_THROW_ON)  // #if defined(__EMSCRIPTEN__) : #elif defined(_MSC_VER)
 
 #define emp_always_assert_impl(...)                                       \
     do {                                                                  \
@@ -73,7 +73,7 @@
     } while(0)
 
 
-#else
+#else  // #if defined(__EMSCRIPTEN__) : #elif defined(_MSC_VER) : #elif defined(EMP_OPTIONAL_THROW_ON)
 
 #define emp_always_assert_impl(...)                                       \
     do {                                                                  \
@@ -87,7 +87,7 @@
       && (std::abort(), false);                                           \
     } while(0)
 
-#endif
+#endif  // #if defined(__EMSCRIPTEN__) : #elif defined(_MSC_VER) : #elif defined(EMP_OPTIONAL_THROW_ON) : #else
 
 /// Require a specified condition to be true. If it is false, immediately
 /// halt execution. Print also extra information on any variables or
@@ -95,7 +95,7 @@
 /// both debug and release mode.
 #define emp_always_assert(...) emp_always_assert_impl(__VA_ARGS__)
 
-#endif  // #ifndef EMP_BASE_ALWAYS_ASSERT_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_BASE_ALWAYS_ASSERT_HPP_GUARD
 
 // Local settings for Empecable file checker.
 // empecable_words: boolean

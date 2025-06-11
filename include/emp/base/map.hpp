@@ -41,7 +41,7 @@ namespace emp {
   using multimap = std::multimap<Ts...>;
 }
 
-#else  // #EMP_NDEBUG *not* set, so debug is ON.
+#else  // #ifdef EMP_NDEBUG
 
 namespace emp {
 
@@ -166,8 +166,8 @@ namespace emp {
   };
 }  // namespace emp
 
-#endif
+#endif  // #ifdef EMP_NDEBUG : #else
 
 
 
-#endif  // #ifndef EMP_BASE_MAP_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_BASE_MAP_HPP_GUARD

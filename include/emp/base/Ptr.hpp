@@ -66,7 +66,7 @@ namespace emp {
     /// An anonymous log2 calculator for hashing below.
     static constexpr size_t Log2(size_t x) { return x <= 1 ? 0 : (Log2(x / 2) + 1); }
   }  // namespace internal
-#endif  // DOXYGEN_SHOULD_SKIP_THIS
+#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
   [[nodiscard]] static inline bool & GetPtrDebug() {
     static bool ptr_debug = false;
@@ -316,7 +316,7 @@ namespace emp {
         std::cerr << "Aborting at creation of Ptr id " << id << std::endl;
         abort();
       }
-#endif
+#endif  // #ifdef EMP_ABORT_PTR_NEW
       if (GetPtrDebug()) { std::cout << "New:    " << id << " (" << ptr << ")" << std::endl; }
       // Make sure pointer is not already stored -OR- has been deleted (since re-use is possible).
       emp_assert(!HasPtr(ptr) || IsDeleted(GetCurID(ptr)), id);
@@ -364,7 +364,7 @@ namespace emp {
         std::cerr << "Aborting at deletion of Ptr id " << id << std::endl;
         abort();
       }
-#endif
+#endif  // #ifdef EMP_ABORT_PTR_DELETE
       if (GetPtrDebug()) { std::cout << "Delete: " << id << std::endl; }
       emp_assert(id_info[id].IsActive(), "Deleting same emp::Ptr a second time!", id);
       id_info[id].MarkDeleted();
@@ -430,7 +430,7 @@ namespace emp {
     BasePtr(TYPE * in_ptr, size_t in_id) : ptr(in_ptr), id(in_id) {
 #ifdef EMP_NO_PTR_TO_PTR
       emp_assert(!std::is_pointer_v<TYPE>, "Pointers to pointers are disallowed!");
-#endif
+#endif  // #ifdef EMP_NO_PTR_TO_PTR
     }
 
     static PtrTracker & Tracker() { return PtrTracker::Get(); }  // Single tracker for al Ptr types
@@ -633,7 +633,7 @@ namespace emp {
       emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.", id);
 #ifdef EMP_NO_PTR_TO_PTR
       emp_assert(!std::is_pointer_v<TYPE>, "Reinterpreting as pointers to pointers is disallowed!");
-#endif
+#endif  // #ifdef EMP_NO_PTR_TO_PTR
       return reinterpret_cast<T2 *>(ptr);
     }
 
@@ -922,7 +922,7 @@ namespace emp {
     // }
   };
 
-#else  // EMP_MEM_TRACK off...
+#else  // #ifdef EMP_TRACK_MEM
 
 
   template <typename TYPE>
@@ -1157,7 +1157,7 @@ namespace emp {
     [[nodiscard]] bool OK() const { return true; }
   };
 
-#endif  // #ifdef EMP_TRACK_MEM
+#endif  // #ifdef EMP_TRACK_MEM : #else
 
   // IO
   template <typename T>
@@ -1295,4 +1295,4 @@ namespace emp {
 
 }  // namespace emp
 
-#endif  // #ifndef EMP_BASE_PTR_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_BASE_PTR_HPP_GUARD

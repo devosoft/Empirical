@@ -38,7 +38,7 @@ namespace emp {
   using array = std::array<T, N>;
 }  // namespace emp
 
-#else
+#else  // #ifdef EMP_NDEBUG
 
 namespace emp {
 
@@ -306,7 +306,7 @@ namespace emp {
 template <class T, size_t N>
 struct std::tuple_size<emp::array<T, N> > : public integral_constant<size_t, N> {};
 
-#endif  // NDEBUG off
+#endif  // #ifdef EMP_NDEBUG : #else
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 namespace std {
@@ -322,7 +322,7 @@ namespace std {
     for (T & x : v) { is >> x; }
     return is;
   }
-#endif  // DOXYGEN_SHOULD_SKIP_THIS
+#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
 }
 
-#endif  // #ifndef EMP_BASE_ARRAY_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_BASE_ARRAY_HPP_GUARD

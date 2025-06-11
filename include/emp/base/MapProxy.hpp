@@ -427,7 +427,7 @@ namespace emp {
   auto operator,(T1 v1, const MapProxy<T2> & v2) {
     return v1, v2.emp_GetValue();
   }
-#endif /*DOXYGEN_SHOULD_SKIP_THIS*/
+#endif /*DOXYGEN_SHOULD_SKIP_THIS*/  // Doxygen is getting tripped up by the enable_ifs : #ifndef DOXYGEN_SHOULD_SKIP_THIS
 }  // namespace emp
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -443,6 +443,6 @@ std::istream & operator>>(std::istream & is, typename emp::MapProxy<T> & p) {
   is >> p.emp_GetValue();
   return is;
 }
-#endif  // DOXYGEN_SHOULD_SKIP_THIS
+#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-#endif  // #ifndef EMP_BASE_MAPPROXY_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_BASE_MAP_PROXY_HPP_GUARD

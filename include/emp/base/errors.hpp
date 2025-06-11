@@ -50,7 +50,7 @@
 // If we are in emscripten, make sure to include the header.
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
-#endif
+#endif  // #ifdef __EMSCRIPTEN__
 
 namespace emp {
 
@@ -148,9 +148,9 @@ namespace emp {
         alert(msg);
       },
       ss.str().c_str());
-#else
+#else  // #ifdef __EMSCRIPTEN__
     std::cerr << ss.str() << std::endl;
-#endif
+#endif  // #ifdef __EMSCRIPTEN__ : #else
   }
 
   /// End user has done something possibly a problem.
@@ -186,4 +186,4 @@ namespace emp {
 }  // namespace emp
 
 
-#endif  // #ifndef EMP_BASE_ERRORS_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_BASE_ERRORS_HPP_GUARD
