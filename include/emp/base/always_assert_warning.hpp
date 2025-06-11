@@ -34,27 +34,27 @@
 #include "_assert_macros.hpp"
 #include "_assert_trigger.hpp"
 
-#if defined( _MSC_VER )
+#if defined(_MSC_VER)
 
-  #define emp_always_assert_warning_msvc_impl(TEST)                            \
-    do {                                                                       \
-      !(TEST)                                                                  \
-      && emp::assert_trigger(__FILE__, __LINE__, #TEST, 0);                    \
+#define emp_always_assert_warning_msvc_impl(TEST)                      \
+    do {                                                               \
+      !(TEST)                                                          \
+      && emp::assert_trigger(__FILE__, __LINE__, #TEST, 0);            \
     } while(0)
 
-  #define emp_always_assert_warning_impl(TEST) \
+#define emp_always_assert_warning_impl(TEST) \
     emp_always_assert_warning_msvc_impl(TEST)
 
 #else
 
-  #define emp_always_assert_warning_impl(...)                                  \
-    do {                                                                       \
-      !(emp_assert_GET_ARG_1(__VA_ARGS__, ~))                                  \
-      && emp::assert_trigger(                                                  \
-        __FILE__, __LINE__,                                                    \
-        emp_assert_STRINGIFY( emp_assert_GET_ARG_1(__VA_ARGS__, ~) ),          \
-        emp_assert_TO_PAIRS(__VA_ARGS__)                                       \
-      );                                                                       \
+#define emp_always_assert_warning_impl(...)                            \
+    do {                                                               \
+      !(emp_assert_GET_ARG_1(__VA_ARGS__, ~))                          \
+      && emp::assert_trigger(                                          \
+        __FILE__, __LINE__,                                            \
+        emp_assert_STRINGIFY( emp_assert_GET_ARG_1(__VA_ARGS__, ~) ),  \
+        emp_assert_TO_PAIRS(__VA_ARGS__)                               \
+      );                                                               \
     } while(0)
 
 #endif
@@ -64,10 +64,10 @@
 /// expressions provided as variadic args. Will be evaluated when compiled in
 /// both debug and release mode. Can be disabled with -DEMP_NO_WARNINGS.
 #ifndef EMP_NO_WARNINGS
-  #define emp_always_assert_warning(...) \
+#define emp_always_assert_warning(...)          \
     emp_always_assert_warning_impl(__VA_ARGS__)
 #else
-  #define emp_always_assert_warning(...)
+#define emp_always_assert_warning(...)
 #endif
 
-#endif // #ifndef EMP_BASE_ALWAYS_ASSERT_WARNING_HPP_INCLUDE
+#endif  // #ifndef EMP_BASE_ALWAYS_ASSERT_WARNING_HPP_INCLUDE

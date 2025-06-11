@@ -37,32 +37,32 @@
 #include "_assert_trigger.hpp"
 #include "_optional_throw.hpp"
 
-#if defined( __EMSCRIPTEN__ )
+#if defined(__EMSCRIPTEN__)
 
-  #define emp_always_assert_impl(...)                                     \
-    do {                                                                  \
-      !(emp_assert_GET_ARG_1(__VA_ARGS__, ~))                             \
-      && emp::assert_trigger(                                             \
-        __FILE__, __LINE__,                                               \
-        emp_assert_STRINGIFY( emp_assert_GET_ARG_1(__VA_ARGS__, ~),  ),   \
-        emp_assert_TO_PAIRS(__VA_ARGS__)                                  \
-      );                                                                  \
+#define emp_always_assert_impl(...)                                      \
+    do {                                                                 \
+      !(emp_assert_GET_ARG_1(__VA_ARGS__, ~))                            \
+      && emp::assert_trigger(                                            \
+        __FILE__, __LINE__,                                              \
+        emp_assert_STRINGIFY( emp_assert_GET_ARG_1(__VA_ARGS__, ~),  ),  \
+        emp_assert_TO_PAIRS(__VA_ARGS__)                                 \
+      );                                                                 \
     } while(0)
 
-#elif defined( _MSC_VER )
+#elif defined(_MSC_VER)
 
-  #define emp_always_assert_msvc_impl(TEST)                               \
-    do {                                                                  \
-      !(TEST)                                                             \
-      && emp::assert_trigger(__FILE__, __LINE__, #TEST, 0)                \
-      && (std::abort(), false);                                           \
+#define emp_always_assert_msvc_impl(TEST)                                \
+    do {                                                                 \
+      !(TEST)                                                            \
+      && emp::assert_trigger(__FILE__, __LINE__, #TEST, 0)               \
+      && (std::abort(), false);                                          \
     } while(0)
 
-  #define emp_always_assert_impl(TEST) emp_always_assert_msvc_impl(TEST)
+#define emp_always_assert_impl(TEST) emp_always_assert_msvc_impl(TEST)
 
 #elif defined(EMP_OPTIONAL_THROW_ON)
 
-  #define emp_always_assert_impl(...)                                     \
+#define emp_always_assert_impl(...)                                       \
     do {                                                                  \
       if (!(emp_assert_GET_ARG_1(__VA_ARGS__, ~))) {                      \
         emp::assert_throw(                                                \
@@ -75,7 +75,7 @@
 
 #else
 
-  #define emp_always_assert_impl(...)                                     \
+#define emp_always_assert_impl(...)                                       \
     do {                                                                  \
       /* NOLINTNEXTLINE(readability-simplify-boolean-expr) */             \
       !(emp_assert_GET_ARG_1(__VA_ARGS__, ~))                             \
@@ -95,7 +95,7 @@
 /// both debug and release mode.
 #define emp_always_assert(...) emp_always_assert_impl(__VA_ARGS__)
 
-#endif // #ifndef EMP_BASE_ALWAYS_ASSERT_HPP_INCLUDE
+#endif  // #ifndef EMP_BASE_ALWAYS_ASSERT_HPP_INCLUDE
 
 // Local settings for Empecable file checker.
 // empecable_words: boolean

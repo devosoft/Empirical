@@ -186,7 +186,7 @@ namespace emp {
     PtrTracker & operator=(PtrTracker &&)      = delete;
 
     ~PtrTracker() {
-      constexpr size_t MAX_ERRORS = 10; // Max errors to output (to not overwhelm user.)
+      constexpr size_t MAX_ERRORS = 10;  // Max errors to output (to not overwhelm user.)
 
       // Track stats about pointer record.
       size_t total  = 0;
@@ -237,9 +237,7 @@ namespace emp {
     }
 
     /// Get the info associated with an existing pointer.
-    [[nodiscard]] const PtrInfo & GetInfo(const void * ptr) const {
-      return id_info[GetCurID(ptr)];
-    }
+    [[nodiscard]] const PtrInfo & GetInfo(const void * ptr) const { return id_info[GetCurID(ptr)]; }
 
     [[nodiscard]] const PtrInfo & GetInfo(size_t id) const { return id_info[id]; }
 
@@ -618,7 +616,7 @@ namespace emp {
     template <typename T2>
     [[nodiscard]] Ptr<T2> ConstCast() const {
       emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.", id);
-      emp_assert((std::same_as<std::remove_const_t<TYPE>, std::remove_const_t<T2>>));
+      emp_assert((std::same_as<std::remove_const_t<TYPE>, std::remove_const_t<T2>>) );
       return const_cast<T2 *>(ptr);
     }
 

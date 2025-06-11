@@ -20,14 +20,13 @@
 
 namespace emp {
   template <typename... Ts>
-  void trigger_emp_error(const std::string& filename, const size_t line, Ts &&... args) {
-    std::cerr << "Fatal Error (In " << filename << " line " << line
-              <<  "): ";
+  void trigger_emp_error(const std::string & filename, const size_t line, Ts &&... args) {
+    std::cerr << "Fatal Error (In " << filename << " line " << line << "): ";
     (std::cerr << ... << args);
     std::cerr << "\n";
     abort();
   }
 
-} // namespace emp
+}  // namespace emp
 
-#endif // #ifndef EMP_BASE_EMSCRIPTEN_ERROR_TRIGGER_HPP_INCLUDE
+#endif  // #ifndef EMP_BASE_EMSCRIPTEN_ERROR_TRIGGER_HPP_INCLUDE

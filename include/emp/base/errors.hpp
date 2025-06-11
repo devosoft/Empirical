@@ -63,7 +63,7 @@ namespace emp {
 
   /// Function to generate an empty exception (returned when an exception is checked, but none exist.)
   static const ExceptInfo & GetEmptyExcept() {
-    static ExceptInfo fail_info{"","",false};
+    static ExceptInfo fail_info{"", "", false};
     return fail_info;
   }
 
@@ -74,24 +74,29 @@ namespace emp {
   }
 
   /// Provide information about an exception that needs to be triggered.
-  inline void TriggerExcept(const std::string & in_id, const std::string & in_desc, bool in_error=true) {
+  inline void TriggerExcept(const std::string & in_id,
+                            const std::string & in_desc,
+                            bool in_error = true) {
     GetExceptMap().emplace(in_id, ExceptInfo({in_id, in_desc, in_error}));
   }
 
   /// Get the first waiting exception.
   inline const ExceptInfo & GetExcept(const std::string & id) {
     auto & fail_map = GetExceptMap();
-    auto it = fail_map.find(id);
-    if (it != fail_map.end()) return it->second;
+    auto it         = fail_map.find(id);
+    if (it != fail_map.end()) { return it->second; }
     return GetEmptyExcept();
   }
 
   /// Get and *remove* a waiting exception.
   inline ExceptInfo PopExcept(const std::string & id) {
     auto & fail_map = GetExceptMap();
-    auto it = fail_map.find(id);
-    auto out = GetEmptyExcept();
-    if (it != fail_map.end()) { out = it->second; fail_map.erase(it); }
+    auto it         = fail_map.find(id);
+    auto out        = GetEmptyExcept();
+    if (it != fail_map.end()) {
+      out = it->second;
+      fail_map.erase(it);
+    }
     return out;
   }
 
@@ -110,8 +115,8 @@ namespace emp {
   /// Remove all waiting exceptions of the designated type.
   inline void ClearExcept(const std::string & id) {
     auto & fail_map = GetExceptMap();
-    auto it = fail_map.find(id);
-    if (it != fail_map.end()) fail_map.erase(it);
+    auto it         = fail_map.find(id);
+    if (it != fail_map.end()) { fail_map.erase(it); }
   }
 
   namespace {
@@ -125,7 +130,7 @@ namespace emp {
       ss << std::forward<T>(arg1);
       Notify_impl(ss, std::forward<Ts>(args)...);
     }
-  }
+  }  // namespace
 
   /// Send information to a program user (via standard error in native mode, or alert in Emscripten)
   template <typename... Ts>
@@ -133,14 +138,16 @@ namespace emp {
     std::stringstream ss;
     Notify_impl(ss, std::forward<Ts>(args)...);
 #ifdef __EMSCRIPTEN__
-    EM_ASM_ARGS({
-      msg = UTF8ToString($0);
-      if (typeof alert == "undefined") {
-        // node polyfill
-        globalThis.alert = console.log;
-      }
-      alert(msg);
-    }, ss.str().c_str());
+    EM_ASM_ARGS(
+      {
+        msg = UTF8ToString($0);
+        if (typeof alert == "undefined") {
+          // node polyfill
+          globalThis.alert = console.log;
+        }
+        alert(msg);
+      },
+      ss.str().c_str());
 #else
     std::cerr << ss.str() << std::endl;
 #endif
@@ -148,25 +155,35 @@ namespace emp {
 
   /// End user has done something possibly a problem.
   template <typename... Ts>
-  void NotifyWarning(Ts &&... msg) { Notify("WARNING: ", std::forward<Ts>(msg)...); }
+  void NotifyWarning(Ts &&... msg) {
+    Notify("WARNING: ", std::forward<Ts>(msg)...);
+  }
 
   /// End user has done something resulting in an non-recoverable problem.
   template <typename... Ts>
-  void NotifyError(Ts &&... msg) { Notify("ERROR: ", std::forward<Ts>(msg)...); }
+  void NotifyError(Ts &&... msg) {
+    Notify("ERROR: ", std::forward<Ts>(msg)...);
+  }
 
   /// Library user has made an error in how they are using the library.
   template <typename... Ts>
-  void LibraryWarning(Ts &&... msg) { Notify("EMPIRICAL USE WARNING: ", std::forward<Ts>(msg)...); }
+  void LibraryWarning(Ts &&... msg) {
+    Notify("EMPIRICAL USE WARNING: ", std::forward<Ts>(msg)...);
+  }
 
   /// Library user has made an error in how they are using the library.
   template <typename... Ts>
-  void LibraryError(Ts &&... msg) { Notify("EMPIRICAL USE ERROR: ", std::forward<Ts>(msg)...); }
+  void LibraryError(Ts &&... msg) {
+    Notify("EMPIRICAL USE ERROR: ", std::forward<Ts>(msg)...);
+  }
 
   /// Original library implementers must have made an error.
   template <typename... Ts>
-  void InternalError(Ts &&... msg) { Notify("INTERNAL EMPIRICAL ERROR: ", std::forward<Ts>(msg)...); }
+  void InternalError(Ts &&... msg) {
+    Notify("INTERNAL EMPIRICAL ERROR: ", std::forward<Ts>(msg)...);
+  }
 
-}
+}  // namespace emp
 
 
-#endif // #ifndef EMP_BASE_ERRORS_HPP_INCLUDE
+#endif  // #ifndef EMP_BASE_ERRORS_HPP_INCLUDE

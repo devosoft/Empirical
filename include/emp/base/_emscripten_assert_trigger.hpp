@@ -13,12 +13,11 @@
 #ifndef INCLUDE_EMP_BASE_EMSCRIPTEN_ASSERT_TRIGGER_HPP_GUARD
 #define INCLUDE_EMP_BASE_EMSCRIPTEN_ASSERT_TRIGGER_HPP_GUARD
 
+#include <emscripten.h>
 #include <iostream>
 #include <sstream>
 #include <stddef.h>
 #include <string>
-
-#include <emscripten.h>
 
 #include "concepts.hpp"
 
@@ -37,9 +36,11 @@ namespace emp {
   /// Print out information about the next variable and recurse...
   template <typename T, typename... EXTRA>
   void assert_print(std::stringstream & ss, std::string name, T && val, EXTRA &&... extra) {
-    if constexpr ( emp::is_streamable<T>::value ) {
+    if constexpr (emp::is_streamable<T>::value) {
       ss << name << ": [" << val << "]" << std::endl;
-    } else ss << name << ": (non-streamable type)" << std::endl;
+    } else {
+      ss << name << ": (non-streamable type)" << std::endl;
+    }
     assert_print(ss, std::forward<EXTRA>(extra)...);
   }
 
@@ -49,25 +50,26 @@ namespace emp {
     ss << "Assert Error (In " << filename << " line " << line << "): " << expr << '\n';
     assert_print(ss, std::forward<EXTRA>(extra)...);
     if (emp::TripAssert() <= 3) {
-      EM_ASM({
-        msg = UTF8ToString($0);
-        if (typeof alert == "undefined") {
-          // node polyfill
-          globalThis.alert = console.log;
-        }
-        alert(msg);
-      }, ss.str().c_str());
+      EM_ASM(
+        {
+          msg = UTF8ToString($0);
+          if (typeof alert == "undefined") {
+            // node polyfill
+            globalThis.alert = console.log;
+          }
+          alert(msg);
+        },
+        ss.str().c_str());
     }
 
     // Print the current state of the stack.
-    EM_ASM( console.log('Callstack:\n' + stackTrace()); );
+    EM_ASM(console.log('Callstack:\n' + stackTrace()););
 
     return false;
-
   }
 
-} // namespace emp
+}  // namespace emp
 
 #endif /*DOXYGEN_SHOULD_SKIP_THIS*/
 
-#endif // #ifndef EMP_BASE_EMSCRIPTEN_ASSERT_TRIGGER_HPP_INCLUDE
+#endif  // #ifndef EMP_BASE_EMSCRIPTEN_ASSERT_TRIGGER_HPP_INCLUDE

@@ -18,12 +18,12 @@
 #define EMP_TDEBUG 1
 #endif
 
-#if defined( __EMSCRIPTEN__ )
-  #include "_emscripten_assert_trigger.hpp"
-#elif defined( EMP_TDEBUG )
-  #include "_tdebug_assert_trigger.hpp"
+#if defined(__EMSCRIPTEN__)
+#include "_emscripten_assert_trigger.hpp"
+#elif defined(EMP_TDEBUG)
+#include "_tdebug_assert_trigger.hpp"
 #else
-  #include "_native_assert_trigger.hpp"
+#include "_native_assert_trigger.hpp"
 #endif
 
-#endif // #ifndef EMP_BASE_ASSERT_TRIGGER_HPP_INCLUDE
+#endif  // #ifndef EMP_BASE_ASSERT_TRIGGER_HPP_INCLUDE

@@ -21,4 +21,4 @@
     emp::trigger_emp_error(__FILE__, __LINE__, __VA_ARGS__);                   \
   } while(0)
 
-#endif // #ifndef EMP_BASE_ERROR_HPP_INCLUDE
+#endif  // #ifndef EMP_BASE_ERROR_HPP_INCLUDE

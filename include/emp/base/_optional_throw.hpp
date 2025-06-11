@@ -25,37 +25,54 @@ namespace emp {
   /// Print out information about the next variable and recurse...
   template <typename T, typename... EXTRA>
   void assert_print_opt(std::stringstream & ss, std::string name, T && val, EXTRA &&... extra) {
-    if constexpr ( emp::is_streamable<T>() ) {
+    if constexpr (emp::is_streamable<T>()) {
       ss << name << ": [" << val << "]" << std::endl;
-    } else ss << name << ": (non-streamable type)" << std::endl;
+    } else {
+      ss << name << ": (non-streamable type)" << std::endl;
+    }
     assert_print_opt(ss, std::forward<EXTRA>(extra)...);
   }
 
   template <typename T, typename... EXTRA>
-  void assert_print_second_opt(std::stringstream & ss, std::string /*name*/, T && /*val*/, EXTRA &&... extra) {
+  void assert_print_second_opt(std::stringstream & ss,
+                               std::string /*name*/,
+                               T && /*val*/,
+                               EXTRA &&... extra) {
     assert_print_opt(ss, std::forward<EXTRA>(extra)...);
   }
 
   template <typename T>
-  void assert_print_second_opt(std::stringstream & /*ss*/, std::string /*name*/, T && /*val*/) {;}
+  void assert_print_second_opt(std::stringstream & /*ss*/, std::string /*name*/, T && /*val*/) {
+    ;
+  }
 
   template <typename T, typename... EXTRA>
-  void assert_print_first_opt(std::stringstream & ss, std::string name, T && val, EXTRA &&... extra) {
-    if constexpr ( emp::is_streamable<T>() ) {
+  void assert_print_first_opt(std::stringstream & ss,
+                              std::string name,
+                              T && val,
+                              EXTRA &&... extra) {
+    if constexpr (emp::is_streamable<T>()) {
       ss << name << ": [" << val << "]" << std::endl;
-    } else ss << name << ": (non-streamable type)" << std::endl;
+    } else {
+      ss << name << ": (non-streamable type)" << std::endl;
+    }
     assert_print_second_opt(ss, std::forward<EXTRA>(extra)...);
   }
 
-  [[maybe_unused]] static void assert_print_first_opt(std::stringstream &, int) { }
+  [[maybe_unused]] static void assert_print_first_opt(std::stringstream &, int) {}
 
   template <typename... EXTRA>
-  void assert_throw_opt(std::string filename, size_t line, std::string expr, std::string message, EXTRA &&... extra) {
+  void assert_throw_opt(std::string filename,
+                        size_t line,
+                        std::string expr,
+                        std::string message,
+                        EXTRA &&... extra) {
     std::stringstream ss;
-    ss << "Internal Error (in " << filename << " line " << line << "): " << expr << ".\n\n Message: " << message << "\n\n";
+    ss << "Internal Error (in " << filename << " line " << line << "): " << expr
+       << ".\n\n Message: " << message << "\n\n";
     assert_print_first_opt(ss, std::forward<EXTRA>(extra)...);
     throw(std::runtime_error(ss.str()));
   }
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_BASE_OPTIONAL_THROW_IMPL_HPP_INCLUDE
+#endif  // #ifndef EMP_BASE_OPTIONAL_THROW_IMPL_HPP_INCLUDE

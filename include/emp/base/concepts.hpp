@@ -19,7 +19,7 @@
 #define INCLUDE_EMP_BASE_CONCEPTS_HPP_GUARD
 
 
-#include <cstdint>       // uint8_t, uint16_t, etc.
+#include <cstdint>  // uint8_t, uint16_t, etc.
 #include <functional>
 #include <span>
 #include <tuple>
@@ -29,25 +29,28 @@
 namespace emp {
 
   // === Predeclarations used below ===
-  template <typename TYPE> class Ptr;
-  #ifdef NDEBUG
-  template <typename T, typename... Ts> using vector = std::vector<T, Ts...>;
-  #else
-  template <typename T, typename... Ts> class vector;
-  #endif
+  template <typename TYPE>
+  class Ptr;
+#ifdef NDEBUG
+  template <typename T, typename... Ts>
+  using vector = std::vector<T, Ts...>;
+#else
+  template <typename T, typename... Ts>
+  class vector;
+#endif
 
 
   // === Concepts to check for Standard Library member functions.
-  template<typename T>
+  template <typename T>
   concept has_size = requires(T & v) { v.size(); };
 
-  template<typename T>
+  template <typename T>
   concept has_resize = requires(T & v, size_t size) { v.resize(size); };
 
-  template<typename T>
+  template <typename T>
   concept has_begin = requires(T & v) { v.begin(); };
 
-  template<typename T>
+  template <typename T>
   concept has_end = requires(T & v) { v.end(); };
 
 
@@ -56,13 +59,13 @@ namespace emp {
   /// Concept to identify if a type can be sent into an ostream.
   template <typename STREAM_T, typename OBJ_T>
   concept canStreamTo = requires(STREAM_T & stream, OBJ_T value) {
-    { stream << value } -> std::convertible_to<std::ostream&>;
+    { stream << value } -> std::convertible_to<std::ostream &>;
   };
 
   /// Concept to identify if a type can be set from an istream.
   template <typename STREAM_T, typename OBJ_T>
   concept canStreamFrom = requires(STREAM_T & stream, OBJ_T value) {
-    { stream >> value } -> std::convertible_to<std::istream&>;
+    { stream >> value } -> std::convertible_to<std::istream &>;
   };
 
 
@@ -81,16 +84,16 @@ namespace emp {
   };
 
   /// Does a type have a FromString() member function?
-  template<typename T>
-  concept hasFromString = requires(T t, const std::string& s, const char* c) {
-      { t.FromString(s) }; // Test with std::string
-      { t.FromString(c) }; // Test with const char*
+  template <typename T>
+  concept hasFromString = requires(T t, const std::string & s, const char * c) {
+    { t.FromString(s) };  // Test with std::string
+    { t.FromString(c) };  // Test with const char*
   };
 
   /// Does a type have a FromString() member function?
-  template<typename T>
+  template <typename T>
   concept hasFromDouble = requires(T t, double d) {
-      { t.FromDouble(d) };
+    { t.FromDouble(d) };
   };
 
   // ===== Concepts to identify particular template types =====
@@ -109,12 +112,14 @@ namespace emp {
   template <template <typename, auto> class TEMPLATE, typename ARG1, auto ARG2>
   struct is_template_tn<TEMPLATE<ARG1, ARG2>, TEMPLATE> : std::true_type {};
 
-
-  template <typename T> using is_std_function = is_template<T, std::function>;
-  template <typename T> using is_std_vector = is_template<T, std::vector>;
-  template <typename T> using is_emp_vector = is_template<T, emp::vector>;
-  template <typename T> using is_span = is_template_tn<T, std::span>;
-
+  template <typename T>
+  using is_std_function = is_template<T, std::function>;
+  template <typename T>
+  using is_std_vector = is_template<T, std::vector>;
+  template <typename T>
+  using is_emp_vector = is_template<T, emp::vector>;
+  template <typename T>
+  using is_span = is_template_tn<T, std::span>;
 
   // ===== For backward compatibility only =====
 
@@ -128,4 +133,4 @@ namespace emp {
 
 }  // namespace emp
 
-#endif // #ifndef EMP_META_TYPE_TRAITS_HPP_INCLUDE
+#endif  // #ifndef EMP_META_TYPE_TRAITS_HPP_INCLUDE

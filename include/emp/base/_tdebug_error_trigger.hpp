@@ -31,19 +31,18 @@ namespace emp {
   void error_clear() { emp::error_thrown = false; }
 
   template <typename... Ts>
-  void trigger_emp_error(const std::string& filename, const size_t line, Ts &&... args) {
-    std::cout << "Would-be fatal error (In " << filename << " line " << line
-              <<  "): ";
+  void trigger_emp_error(const std::string & filename, const size_t line, Ts &&... args) {
+    std::cout << "Would-be fatal error (In " << filename << " line " << line << "): ";
     (std::cout << ... << args);
     std::cout << "\n";
     std::stringstream tmp_stream;
     (tmp_stream << ... << args);
     emp::error_info.filename = filename;
     emp::error_info.line_num = line;
-    emp::error_info.output = tmp_stream.str();
-    emp::error_thrown = true;
+    emp::error_info.output   = tmp_stream.str();
+    emp::error_thrown        = true;
   }
 
-} // namespace emp
+}  // namespace emp
 
-#endif // #ifndef EMP_BASE_TDEBUG_ERROR_TRIGGER_HPP_INCLUDE
+#endif  // #ifndef EMP_BASE_TDEBUG_ERROR_TRIGGER_HPP_INCLUDE

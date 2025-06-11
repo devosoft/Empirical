@@ -18,12 +18,12 @@
 #define EMP_TDEBUG 1
 #endif
 
-#if defined( __EMSCRIPTEN__ )
-  #include "_emscripten_error_trigger.hpp"
-#elif defined( EMP_TDEBUG )
-  #include "_tdebug_error_trigger.hpp"
+#if defined(__EMSCRIPTEN__)
+#include "_emscripten_error_trigger.hpp"
+#elif defined(EMP_TDEBUG)
+#include "_tdebug_error_trigger.hpp"
 #else
-  #include "_native_error_trigger.hpp"
+#include "_native_error_trigger.hpp"
 #endif
 
-#endif // #ifndef EMP_BASE_ERROR_TRIGGER_HPP_INCLUDE
+#endif  // #ifndef EMP_BASE_ERROR_TRIGGER_HPP_INCLUDE

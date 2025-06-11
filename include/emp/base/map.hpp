@@ -31,119 +31,143 @@
 
 // Seamlessly translate emp::map to std::map
 namespace emp {
-  template <typename... Ts> using map = std::map<Ts...>;
+  template <typename... Ts>
+  using map = std::map<Ts...>;
 }
 
 // Seamlessly translate emp::multimap to std::multimap
 namespace emp {
-  template <typename... Ts> using multimap = std::multimap<Ts...>;
+  template <typename... Ts>
+  using multimap = std::multimap<Ts...>;
 }
 
-#else // #EMP_NDEBUG *not* set, so debug is ON.
+#else  // #EMP_NDEBUG *not* set, so debug is ON.
 
 namespace emp {
 
-  template < class Key, class T, class... Ts >
+  template <class Key, class T, class... Ts>
   class map : public std::map<Key, T, Ts...> {
   private:
-    using this_t = emp::map<Key,T,Ts...>;
-    using base_t = std::map<Key,T,Ts...>;
-    using proxy_t = MapProxy<std::decay_t<T>>;
+    using this_t  = emp::map<Key, T, Ts...>;
+    using base_t  = std::map<Key, T, Ts...>;
+    using proxy_t = MapProxy<std::decay_t<T> >;
 
   public:
-    using key_type = Key;
-    using mapped_type = T;
-    using value_type = std::pair<const key_type,mapped_type>;
-    using key_compare = typename base_t::key_compare;
-    using value_compare = typename base_t::value_compare;
-    using allocator_type = typename base_t::allocator_type;
-    using reference = typename base_t::reference;
-    using const_reference = typename base_t::const_reference;
-    using pointer = typename base_t::pointer;
-    using const_pointer = typename base_t::const_pointer;
-    using iterator = typename base_t::iterator;
-    using const_iterator = typename base_t::const_iterator;
-    using reverse_iterator = typename base_t::reverse_iterator;
+    using key_type               = Key;
+    using mapped_type            = T;
+    using value_type             = std::pair<const key_type, mapped_type>;
+    using key_compare            = typename base_t::key_compare;
+    using value_compare          = typename base_t::value_compare;
+    using allocator_type         = typename base_t::allocator_type;
+    using reference              = typename base_t::reference;
+    using const_reference        = typename base_t::const_reference;
+    using pointer                = typename base_t::pointer;
+    using const_pointer          = typename base_t::const_pointer;
+    using iterator               = typename base_t::iterator;
+    using const_iterator         = typename base_t::const_iterator;
+    using reverse_iterator       = typename base_t::reverse_iterator;
     using const_reverse_iterator = typename base_t::const_reverse_iterator;
-    using difference_type = typename base_t::difference_type;
-    using size_type = typename base_t::size_type;
+    using difference_type        = typename base_t::difference_type;
+    using size_type              = typename base_t::size_type;
 
-    explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type())
-      : base_t(comp, alloc) { }
-    explicit map (const allocator_type& alloc) : base_t(alloc) { }
+    explicit map(const key_compare & comp     = key_compare(),
+                 const allocator_type & alloc = allocator_type())
+      : base_t(comp, alloc) {}
+
+    explicit map(const allocator_type & alloc) : base_t(alloc) {}
+
     template <class InputIterator>
-    map (InputIterator first, InputIterator last,
-         const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type())
-      : base_t(first, last, comp, alloc) { }
-    map (const this_t& x) : base_t(x) { }
-    map (const this_t& x, const allocator_type& alloc) : base_t(x, alloc) { }
-    map (this_t && x) : base_t(std::move(x)) { }
-    map (this_t && x, const allocator_type& alloc) : base_t(std::move(x), alloc) { }
-    map (std::initializer_list<value_type> il, const key_compare& comp = key_compare(),
-         const allocator_type& alloc = allocator_type())
-      : base_t(il, comp, alloc) { }
+    map(InputIterator first,
+        InputIterator last,
+        const key_compare & comp     = key_compare(),
+        const allocator_type & alloc = allocator_type())
+      : base_t(first, last, comp, alloc) {}
+
+    map(const this_t & x) : base_t(x) {}
+
+    map(const this_t & x, const allocator_type & alloc) : base_t(x, alloc) {}
+
+    map(this_t && x) : base_t(std::move(x)) {}
+
+    map(this_t && x, const allocator_type & alloc) : base_t(std::move(x), alloc) {}
+
+    map(std::initializer_list<value_type> il,
+        const key_compare & comp     = key_compare(),
+        const allocator_type & alloc = allocator_type())
+      : base_t(il, comp, alloc) {}
 
     this_t & operator=(const this_t &) = default;
-    this_t & operator=(this_t &&) = default;
+    this_t & operator=(this_t &&)      = default;
 
-    proxy_t operator[] (const Key & k) {
+    proxy_t operator[](const Key & k) {
       const bool is_init = (this->find(k) != this->end());
       return proxy_t(base_t::operator[](k), is_init);
     }
   };
 
-  template < class Key, class T, class... Ts >
+  template <class Key, class T, class... Ts>
   class multimap : public std::multimap<Key, T, Ts...> {
   private:
-    using this_t = emp::multimap<Key,T,Ts...>;
-    using base_t = std::multimap<Key,T,Ts...>;
-    using proxy_t = MapProxy<std::decay_t<T>>;
+    using this_t  = emp::multimap<Key, T, Ts...>;
+    using base_t  = std::multimap<Key, T, Ts...>;
+    using proxy_t = MapProxy<std::decay_t<T> >;
 
   public:
-    using key_type = Key;
-    using mapped_type = T;
-    using value_type = std::pair<const key_type,mapped_type>;
-    using key_compare = typename base_t::key_compare;
-    using value_compare = typename base_t::value_compare;
-    using allocator_type = typename base_t::allocator_type;
-    using reference = typename base_t::reference;
-    using const_reference = typename base_t::const_reference;
-    using pointer = typename base_t::pointer;
-    using const_pointer = typename base_t::const_pointer;
-    using iterator = typename base_t::iterator;
-    using const_iterator = typename base_t::const_iterator;
-    using reverse_iterator = typename base_t::reverse_iterator;
+    using key_type               = Key;
+    using mapped_type            = T;
+    using value_type             = std::pair<const key_type, mapped_type>;
+    using key_compare            = typename base_t::key_compare;
+    using value_compare          = typename base_t::value_compare;
+    using allocator_type         = typename base_t::allocator_type;
+    using reference              = typename base_t::reference;
+    using const_reference        = typename base_t::const_reference;
+    using pointer                = typename base_t::pointer;
+    using const_pointer          = typename base_t::const_pointer;
+    using iterator               = typename base_t::iterator;
+    using const_iterator         = typename base_t::const_iterator;
+    using reverse_iterator       = typename base_t::reverse_iterator;
     using const_reverse_iterator = typename base_t::const_reverse_iterator;
-    using difference_type = typename base_t::difference_type;
-    using size_type = typename base_t::size_type;
+    using difference_type        = typename base_t::difference_type;
+    using size_type              = typename base_t::size_type;
 
-    explicit multimap (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type())
-      : base_t(comp, alloc) { }
-    explicit multimap (const allocator_type& alloc) : base_t(alloc) { }
+    explicit multimap(const key_compare & comp     = key_compare(),
+                      const allocator_type & alloc = allocator_type())
+      : base_t(comp, alloc) {}
+
+    explicit multimap(const allocator_type & alloc) : base_t(alloc) {}
+
     template <class InputIterator>
-    multimap (InputIterator first, InputIterator last,
-         const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type())
-      : base_t(first, last, comp, alloc) { }
-    multimap (const this_t & x) : base_t(x) { }
-    multimap (const this_t & x, const allocator_type& alloc) : base_t(x, alloc) { }
-    multimap (this_t && x) : base_t(std::move(x)) { }
-    multimap (this_t && x, const allocator_type& alloc) : base_t(std::move(x), alloc) { }
-    multimap (std::initializer_list<value_type> il, const key_compare& comp = key_compare(),
-         const allocator_type& alloc = allocator_type())
-      : base_t(il, comp, alloc) { }
+    multimap(InputIterator first,
+             InputIterator last,
+             const key_compare & comp     = key_compare(),
+             const allocator_type & alloc = allocator_type())
+      : base_t(first, last, comp, alloc) {}
+
+    multimap(const this_t & x) : base_t(x) {}
+
+    multimap(const this_t & x, const allocator_type & alloc) : base_t(x, alloc) {}
+
+    multimap(this_t && x) : base_t(std::move(x)) {}
+
+    multimap(this_t && x, const allocator_type & alloc) : base_t(std::move(x), alloc) {}
+
+    multimap(std::initializer_list<value_type> il,
+             const key_compare & comp     = key_compare(),
+             const allocator_type & alloc = allocator_type())
+      : base_t(il, comp, alloc) {}
 
     this_t & operator=(const this_t &) = default;
-    this_t & operator=(this_t &&) = default;
+    this_t & operator=(this_t &&)      = default;
 
-    proxy_t operator[] (const Key & k) {
+    proxy_t operator[](const Key & k) {
       const bool is_init = (this->find(k) != this->end());
       return proxy_t(base_t::operator[](k), is_init);
     }
   };
-}
+}  // namespace emp
 
 #endif
 
 
 
-#endif // #ifndef EMP_BASE_MAP_HPP_INCLUDE
+#endif  // #ifndef EMP_BASE_MAP_HPP_INCLUDE
