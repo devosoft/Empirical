@@ -3,7 +3,7 @@
  * Copyright (C) 2024-2025 Michigan State University
  * MIT Software license; see doc/LICENSE.md
  *
- * @file
+ * @file demos/Empecable/Empecable.cpp
  * @brief Load a series of filenames and clean up each file.
  *
  * Features:
@@ -13,21 +13,18 @@
  * - Ensure the file ends in a newline
  * - Track any special features about files or projects including custom spelling.
  * - Find the .Empirical/ directory for configurations
+ * - Ensure include guards or #pragma once (or both) exist for header files.
  *
  * Some features will also be covered by clang-format
  * - Ensure 2 spaces are used for indent levels.
  * - Group and track include files
  *
  * Additional TODO:
- * + Ensure include guards or #pragma once (or both) exist for header files.
  * + Ensure no merge conflict markers are in the file (and help with merge?)
  * + Create config files that don't already exist.
- * + Dynamic control over boilerplate (for easy scaling to other projects)
- *
  * + Fully configure actions with a Empecable.cfg file in .Empirical/
  * + Allow configure overrides in individual files.
  * + Produce a levelization map
- * + Guided shifting of boilerplate to a new format
  * + Make sure emp/include/ header (.hpp) files have corresponding test files.
  * + Make sure test files are not empty (or effectively empty)
  * + Better suggestions where 'y' always gives you what Empecable thinks is correct action.
@@ -606,6 +603,24 @@ public:
     }
   }
 
+  emp::String GenerateGuardName() {
+    emp::String guard_name = fs::relative(File().GetPath(), file_handler.BasePath()).string();
+    guard_name.SetPascalToCaps()                             // Change to ALL_CAPS
+              .ReplaceSet(!emp::AlphanumericCharSet(), '_')  // Change all punctuation to '_'
+              .Append("_GUARD")                              // Make name end in GUARD
+              .Compress('_');                                // Compress multiple '_' to just one
+    return guard_name;
+  }
+
+  // Helper for recording include guard names (to prevent duplicates)
+  void RecordGuardName(const emp::String & guard_name) {
+    bool ok = file_handler.AddIncludeGuard(guard_name);
+
+    if (!ok) {
+      File().ReportIssue("Include guard '", ToBoldGreen(guard_name), "' already used!");
+    }
+  }
+
   // Make sure the appropriate include guards / pragma once are in place.
   void ValidateFileHeading_UpdateGuards() {
     using namespace emplex;
@@ -626,27 +641,51 @@ public:
 
     // Check for include guards.
     File().SkipNewLines();
-    emp::String guard_name = fs::relative(File().GetPath(), file_handler.BasePath()).string();
-    guard_name.SetPascalToCaps()                             // Change to ALL_CAPS
-              .ReplaceSet(!emp::AlphanumericCharSet(), '_')  // Change all punctuation to '_'
-              .Append("_GUARD")                              // Make name end in GUARD
-              .Compress('_');                                // Compress multiple '_' to just one
+    emp::String guard_name = GenerateGuardName();
     if (File().GetToken() != Lexer::ID_IFNDEF) {
-      File().ReportIssue("Did not find include guards: ", guard_name);
-      if (IsInteractive() && AskYesNo("Insert it?")) {
+      File().ReportIssue("Did not find include guard");
+      if (IsInteractive() && AskYesNo("Insert guard '" + ToBoldGreen(guard_name) + "'?")) {
         File().InsertLexeme("#ifndef " + guard_name + "\n#define " + guard_name + "\n\n");
         File().InsertBack("\n#endif // #ifndef" + guard_name + "\n");
+        RecordGuardName(guard_name);
       }
     }
+    else {  // There ARE existing include guards.
+      // Determine the current guard.
+      emp::String cur_guard = File().GetLexeme();
+      cur_guard.PopWord();
+
+      // If guard is different from expected, offer to change it.
+      if (cur_guard != guard_name) {
+        File().ReportIssue("Mis-named include guard."
+                           "\n...Found: ", ToBoldRed(cur_guard),
+                           "\nExpected: ", ToBoldGreen(guard_name));
+        if (IsInteractive() && AskYesNo("Swap it?")) {
+          File().SetLexeme("#ifndef " + guard_name);
+          File().NextToken();
+          File().SkipNewLines();
+          if (File().GetToken() != Lexer::ID_DEFINE) {
+            File().ReportIssue("Missing #define in include guard.");
+            if (AskYesNo("Add?")) {
+              File().InsertLexeme("#define " + guard_name + "\n\n");
+            }
+          } else {
+            File().SetLexeme("#define " + guard_name);
+          }
+  
+          // @CAO Should update end...
+          // File().InsertBack("\n#endif // #ifndef" + guard_name + "\n");
+  
+          RecordGuardName(guard_name); // Changed to suggested name.
+        }
+        else RecordGuardName(cur_guard); // Choose to not change; record current name.
+
+      }
+      else RecordGuardName(guard_name); // Name was already correct.
+    }
+
   }
 
-  // To be called after a new file is open to ensure that the file begins correctly.
-  // Each file should begin with (in order):
-  // - Copyright / Description comment
-  // - Pragma once (if activated)
-  // - Include guards
-  // - Include blocks, in order (std, emp, local)
-  // - namespace opening
   void ValidateFileHeading() {
     using namespace emplex;
 
