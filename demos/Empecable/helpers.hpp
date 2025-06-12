@@ -131,15 +131,17 @@ emp::String AdjustCommentStars(emp::String comment, const emp::String prefix = "
 // ========== Text Processing Helpers ==========
 
 struct PPLine {
+  size_t indent;
   emp::String command;
   emp::String args;
   emp::String comment;
 
   PPLine(emp::String line) {
-    line.TrimFront();                // Remove any leading whitespace
-    command = line.PopWord();        // Command goes to next whitespace
-    args = line.PopTo("//").Trim();  // Args come before comment.
-    comment = line.Trim();           // Everything left is comment.
+    indent = line.CountFrontWhitespace();  // How much to indent line
+    line.TrimFront();                      // Remove any leading whitespace
+    command = line.PopWord();              // Command goes to next whitespace
+    args = line.PopTo("//").Trim();        // Args come before comment
+    comment = line.Trim();                 // Everything left is comment
   }
   PPLine(const std::string & line) : PPLine(emp::String(line)) { }
 
@@ -153,10 +155,11 @@ struct PPLine {
 
   // Convert this line back to the lexeme that SHOULD be in the file.
   emp::String AsLexeme() {
-    if (args == "") return command + "  // " + comment;
-    return command + " " + args + "  // " + comment;
+    emp::String out = emp::String(indent, ' ') + command;
+    if (args != "") out += " " + args;
+    return out + "  // " + comment;
   }
 };
 
-#endif // #ifndefDEMOS_EMPECABLE_HELPERS_HPP_GUARD
+#endif // #ifndef DEMOS_EMPECABLE_HELPERS_HPP_GUARD
 
