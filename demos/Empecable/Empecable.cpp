@@ -241,7 +241,8 @@ private:
   }
 
   void TestExpected(const emp::String & expected_lexeme, emp::String test_name) {
-    if (File().GetLexeme() != expected_lexeme) {
+    // Check differences other than in whitespace (clang-format will deal with that)
+    if (File().GetLexeme().AsRemoveWhitespace() != expected_lexeme.AsRemoveWhitespace()) {
       ReportIssue("Found unexpected ", test_name, " statement/comment."
                   "\n...Found: ", ToBoldRed(File().GetLexeme()),
                   "\nExpected: ", ToBoldGreen(expected_lexeme));
