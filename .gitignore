@@ -33,6 +33,7 @@ tmp/
 **/bak/
 **/BAK/
 
+.clang-bak/
 .vscode/
 
 */*/coverage_cov*
@@ -44,6 +45,7 @@ doc/api
 doc/doxyoutput
 doc/_build
 
+demos/Empecable/Empecable
 demos/Graphs/Steiner/Steiner
 demos/Graphs/Steiner/hw-tests/
 demos/LexerGenerator/Emplex
