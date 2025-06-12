@@ -11,7 +11,7 @@ on:
 jobs:
   tidy:
     name: Enforce Tidyness
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v3
         with:
@@ -40,7 +40,7 @@ jobs:
       - run: ./ci/test_tidy.sh
   test:
     name: Tests
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -62,11 +62,11 @@ jobs:
       - name: Set up GCC
         uses: egor-tensin/setup-gcc@v1
         with:
-          version: 11
+          version: 14
       - name: Set up clang
         uses: egor-tensin/setup-clang@v1
         with:
-          version: 15
+          version: 18
       - run: sudo apt-get update -qq
       - run: sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
       - run: sudo apt-get update -qq
@@ -79,7 +79,7 @@ jobs:
           make ${TEST_SET} CXX=${CXX}
   test-web:
     name: Web Tests
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v3
         with:
@@ -87,7 +87,7 @@ jobs:
       - name: Set up GCC
         uses: egor-tensin/setup-gcc@v1
         with:
-          version: 11
+          version: 14
       - run: sudo apt-get update -qq
       - run: sudo apt-get install -qq cmake build-essential python3-pip python3-virtualenv nodejs tar gzip libpthread-stubs0-dev libc6-dbg gdb
       - run: make install-test-dependencies
@@ -97,12 +97,12 @@ jobs:
           run: make test-web
   test-coverage:
     name: Measure Test Coverage
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Set up clang
         uses: egor-tensin/setup-clang@v1
         with:
-          version: 15
+          version: 18
       - uses: actions/checkout@v3
         with:
           submodules: 'recursive'
@@ -116,7 +116,7 @@ jobs:
   # adapted from https://docs.github.com/en/packages/managing-github-packages-using-github-actions-workflows/publishing-and-installing-a-package-with-github-actions#publishing-a-package-using-an-action
   build-container:
     name: Build Docker Image
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     env:
       REGISTRY: ghcr.io
       IMAGE_NAME: ${{ github.repository }}
@@ -148,7 +148,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
   test-documentation:
     name: Test Documentation Build
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: build-container
     container:
       image: ghcr.io/devosoft/empirical:ACTIONS_BUILD_${{ github.run_number }}
@@ -170,7 +170,7 @@ jobs:
           path: doc/doc-coverage.json
   deploy-documentation-coverage:
     name: Deploy Documentation Coverage
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     if: github.ref == 'refs/heads/master'
     needs: test-documentation
     steps:
@@ -204,7 +204,7 @@ jobs:
           path: paper.pdf
   deploy-container:
     name: Deploy to DockerHub
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       packages: write
