@@ -1740,7 +1740,7 @@ namespace emp {
     emp_assert(stop_pos <= GetSize());
 
     const size_t target_size = stop_pos - start_pos;
-    emp_assert(target_ones <= target_size);
+    emp_assert(static_cast<size_t>(target_ones) <= target_size);
 
     // Approximate the probability of ones as a starting point.
     double p = static_cast<double>(target_ones) / static_cast<double>(target_size);
