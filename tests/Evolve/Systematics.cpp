@@ -666,8 +666,8 @@ TEST_CASE("Test Data Struct", "[evo]") {
   auto tax2 = sys2->AddOrg(2, new_tax);
   tax2->GetData().RecordFitness(1);
 
-  sys->GetDataNode("deleterious_steps")->PullData();
-  CHECK(sys->GetDataNode("deleterious_steps")->GetMean() == Approx(.5));
+  sys2->GetDataNode("deleterious_steps")->PullData();
+  CHECK(sys2->GetDataNode("deleterious_steps")->GetMean() == Approx(.5));
 
 
   sys2.Delete();
@@ -712,6 +712,8 @@ TEST_CASE("World systematics integration", "[evo]") {
 
   CHECK(old_taxon->GetNumOrgs() == 0);
   CHECK(old_taxon->GetNumOff() == 1);
+  CHECK(old_taxon != sys->GetTaxonAt(0));
+  CHECK(sys->GetTaxonAt(0)->GetParent());
   CHECK(sys->GetTaxonAt(0)->GetParent()->GetData().phenotype == 10);
   CHECK((*sys->GetActive().begin())->GetNumOrgs() == 1);
 
@@ -1451,6 +1453,38 @@ TEST_CASE("Test tracking position", "[Evolve]") {
   CHECK(Has(sys.GetAncestors(), id4));
 }
 
+TEST_CASE("Test Remove Org After Repro") {
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
+
+  auto org1 = sys.AddOrg(1, nullptr);
+  auto org2 = sys.AddOrg(2, org1);
+  auto org3 = sys.AddOrg(3, org2);
+  auto org4 = sys.AddOrg(4, org3);
+  auto org5 = sys.AddOrg(5, org3);
+  auto org6 = sys.AddOrg(6, org2);
+  auto org7 = sys.AddOrg(7, org6);
+  auto org8 = sys.AddOrg(8, org6);
+  auto org9 = sys.AddOrg(9, org1);
+  auto org10 = sys.AddOrg(10, org9);
+  auto org11 = sys.AddOrg(11, org9);
+  auto org12 = sys.AddOrg(12, org1);
+  auto org13 = sys.AddOrg(13, org4);
+
+  sys.RemoveOrgAfterRepro(org1);
+  sys.RemoveOrgAfterRepro(org2);
+  sys.RemoveOrgAfterRepro(org3);
+
+  CHECK(emp::Has(sys.GetActive(), org1));
+  CHECK(emp::Has(sys.GetActive(), org2));
+  CHECK(emp::Has(sys.GetActive(), org3));
+
+  auto org14 = sys.AddOrg(14, org13);
+
+  CHECK(!emp::Has(sys.GetActive(), org1));
+  CHECK(!emp::Has(sys.GetActive(), org2));
+  CHECK(!emp::Has(sys.GetActive(), org3));
+}
+
 TEST_CASE("Test Total Offspring") {
   emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
 
@@ -1677,6 +1711,62 @@ TEST_CASE("Test LoadFromFile and Snapshot behavior") {
     }
   }
 
+}
+
+TEST_CASE("Test LoadFromFile MPD Hang") {
+  emp::Systematics<int, int> sys2([](const int & i){return i;}, true, true, true, true);
+  sys2.LoadFromFile("assets/hang_test.bad", "id", true, true);
+  sys2.GetMeanPairwiseDistance();
+
+}
+
+TEST_CASE("Collapse Unifurcations") {
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, false);
+  sys.SetCollapseUnifurcations(true);
+  CHECK(sys.GetCollapseUnifurcations());  
+  int unifurcation_count = 0;
+  std::function<void(emp::Ptr<emp::Taxon<int>>)> unifurcation_fun = [&unifurcation_count](emp::Ptr<emp::Taxon<int>> tax){unifurcation_count++;};
+  sys.OnCollapseUnifurcation(unifurcation_fun);
+  auto id1 = sys.AddOrg(3, nullptr);
+  sys.SetUpdate(1);
+  auto id2 = sys.AddOrg(4, id1);
+  sys.SetUpdate(2);
+  auto id3 = sys.AddOrg(5, id2);
+  sys.SetUpdate(3);
+  auto id4a = sys.AddOrg(6, id2);  
+  CHECK(unifurcation_count == 0);
+  CHECK(!sys.RemoveOrg(id4a));
+  CHECK(unifurcation_count == 0);  
+  CHECK(sys.GetNumOutside() == 1);
+  CHECK(sys.GetNumAncestors() == 0);
+  CHECK(sys.GetNumTaxa() == 4);
+  CHECK(!sys.RemoveOrg(id2));
+  CHECK(sys.GetNumAncestors() == 0);
+  CHECK(sys.GetNumTaxa() == 3);
+  CHECK(id3->GetParent() == id1);
+  CHECK(emp::Has(id1->GetOffspring(), id3));
+  CHECK(!emp::Has(id1->GetOffspring(), id2));
+  CHECK(id1->GetNumOff() == 1);
+  CHECK(id1->GetOriginationTime() == 0);
+  CHECK(id1->GetDestructionTime() == std::numeric_limits<double>::infinity());
+  CHECK(unifurcation_count == 1);
+  sys.SetUpdate(4);
+  CHECK(!sys.RemoveOrg(id1));
+  CHECK(unifurcation_count == 2);
+  CHECK(!id3->GetParent());
+  CHECK(sys.GetNumAncestors() == 0);
+  CHECK(sys.GetNumTaxa() == 2);
+  auto id4 = sys.AddOrg(6, id3);
+  auto id5 = sys.AddOrg(7, id4);
+  auto id6 = sys.AddOrg(8, id5);
+  auto id7 = sys.AddOrg(9, id5);
+  auto id8 = sys.AddOrg(10, id5);
+  sys.RemoveOrg(id5);
+  CHECK(sys.GetNumAncestors() == 1);
+  sys.RemoveOrg(id7);
+  CHECK(sys.GetNumAncestors() == 1);
+  sys.RemoveOrg(id6);    
+  CHECK(sys.GetNumAncestors() == 0);
 }
 
 // Local settings for Empecable file checker.
