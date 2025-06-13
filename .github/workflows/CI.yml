@@ -9,16 +9,18 @@ on:
     - cron: '0 0 * * 0'
   workflow_dispatch:
 jobs:
+  # === Test that code is tidy (i.e., follows Empirical standards) ===
   tidy:
     name: Enforce Tidyness
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: 'recursive'
       - run: sudo apt-get update -qq
       - run: sudo apt-get install -qq rename python3-sphinx
       - run: ./ci/test_tidy.sh
+  # === Test that tidiness is ALSO true on MacOS
   test-macos-tidy:
     name: Test Tidy Enforcement on macOS
     runs-on: macos-14
@@ -38,6 +40,7 @@ jobs:
       - run: echo "/usr/local/bin:$PATH" > $GITHUB_PATH
       - run: echo $PATH
       - run: ./ci/test_tidy.sh
+  # === Run all of the compilation tests on a (relatively) new version of Ubuntu ===
   test:
     name: Tests
     runs-on: ubuntu-24.04
@@ -56,7 +59,7 @@ jobs:
       CXX: ${{ matrix.cxx }}
       TEST_SET: ${{ matrix.test-set }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: 'recursive'
       - name: Set up GCC
@@ -77,11 +80,12 @@ jobs:
       - run: |
           source third-party/emsdk/emsdk_env.sh
           make ${TEST_SET} CXX=${CXX}
+  # === Make sure all of the web-based tests work when compiling with Emscripten ===
   test-web:
     name: Web Tests
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: 'recursive'
       - name: Set up GCC
@@ -95,6 +99,7 @@ jobs:
         uses: GabrielBB/xvfb-action@v1
         with:
           run: make test-web
+  # === Check that our unit tests cover as much code as possible ===
   test-coverage:
     name: Measure Test Coverage
     runs-on: ubuntu-24.04
@@ -103,7 +108,7 @@ jobs:
         uses: egor-tensin/setup-clang@v1
         with:
           version: 18
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: 'recursive'
       - run: sudo apt-get update -qq
@@ -124,7 +129,7 @@ jobs:
       contents: read
       packages: write
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: 'recursive'
       - name: Log in to GitHub Container Registry
@@ -146,6 +151,7 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+  # === Make sure our documentation can still be auto-built ===
   test-documentation:
     name: Test Documentation Build
     runs-on: ubuntu-24.04
@@ -155,7 +161,7 @@ jobs:
       # github actions requires root to access mounted volumes
       options: --user root
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: 'recursive'
       - run: doxygen
@@ -187,7 +193,7 @@ jobs:
     name: Paper Draft
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Build draft PDF
         uses: openjournals/openjournals-draft-action@master
         with:
@@ -217,7 +223,7 @@ jobs:
       - test-documentation
       - test-macos-tidy
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: 'recursive'
       - name: Push to Docker Hub
