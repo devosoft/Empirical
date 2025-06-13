@@ -28,8 +28,8 @@
 #define BITS_TEST(TYPE, CONSTRUCT, ...) { TYPE CONSTRUCT; __VA_ARGS__ }
 
 #define BITS_TEST_ALL(BASE_SIZE, CONSTRUCT, ...)                      \
-  BITS_TEST(emp::BitVector, CONSTRUCT, __VA_ARGS__)                   \
   BITS_TEST(emp::BitValue, CONSTRUCT, __VA_ARGS__)                    \
+  BITS_TEST(emp::BitVector, CONSTRUCT, __VA_ARGS__)                   \
   BITS_TEST(emp::StaticBitVector<BASE_SIZE>, CONSTRUCT, __VA_ARGS__)  \
   BITS_TEST(emp::StaticBitValue<BASE_SIZE>, CONSTRUCT, __VA_ARGS__)   \
   BITS_TEST(emp::BitArray<BASE_SIZE>, CONSTRUCT, __VA_ARGS__)         \
