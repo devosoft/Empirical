@@ -98,4 +98,4 @@ namespace emp {
 #endif  // #ifndef INCLUDE_EMP_MATH_RANDOM_MSWS_HPP_GUARD
 
 // Local settings for Empecable file checker.
-// empecable_words: nonswap msws weyl
+// empecable_words: c'e weyl msws ece'da nonswap

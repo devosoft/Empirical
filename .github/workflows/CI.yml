@@ -19,7 +19,7 @@ jobs:
           submodules: 'recursive'
       - run: sudo apt-get update -qq
       - run: cd demos/Empecable ; make ; cd ../../
-      - run: demos/Empecable/Empecable include/emp/*/*.hpp
+      - run: demos/Empecable/Empecable include/emp/*/*.hpp -v
   # === Test that tidiness is ALSO true on MacOS
   test-macos-tidy:
     name: Test Tidy Enforcement on macOS

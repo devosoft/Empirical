@@ -1375,7 +1375,7 @@ namespace emp {
         }
         to_be_removed.clear();
         removal_pos.clear();
-      }    
+      }
   }
 
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
@@ -1444,7 +1444,7 @@ namespace emp {
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::CollapseUnifurcation(Ptr<taxon_t> taxon) {
     // Give user a chance to do something with taxon before collapsing
     on_collapse_unifurcation_sig.Trigger(taxon);
-    
+
     Ptr<taxon_t> parent = taxon->GetParent();
 
     for (Ptr<taxon_t> offspring_taxon : taxon->GetOffspring()) {
@@ -1460,16 +1460,16 @@ namespace emp {
       // Update stats by merging appropriate ones
       parent->tot_orgs += taxon->GetNumOrgs();
       parent->destruction_time = std::max(parent->destruction_time, taxon->GetDestructionTime());
-      parent->origination_time = std::min(parent->origination_time, taxon->GetOriginationTime());      
+      parent->origination_time = std::min(parent->origination_time, taxon->GetOriginationTime());
       parent->RemoveOffspring(taxon);
       parent->RemoveTotalOffspring();
-      
+
       // other stats:
       // - depth is handled in offspring
       // - num_orgs must be 0 for both taxa already
       // - num_offspring handled above
     }
-    taxon.Delete();      
+    taxon.Delete();
     return;
   }
 
@@ -2545,4 +2545,4 @@ namespace emp {
 #endif  // #ifndef INCLUDE_EMP_EVOLVE_SYSTEMATICS_HPP_GUARD
 
 // Local settings for Empecable file checker.
-// empecable_words: Colless Sackin phylotrackpy sackin phen mrca unifurcations distj mir trifurcations multifurcating disti
+// empecable_words: disti multifurcating trifurcations mir distj unifurcations mrca phen sackin phylotrackpy Sackin Colless
