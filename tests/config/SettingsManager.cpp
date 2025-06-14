@@ -9,8 +9,8 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
-#include "emp/config/SettingConfig.hpp"
+#include "emp/config/SettingsManager.hpp"
 
-TEST_CASE("Test SettingConfig", "[config]")
+TEST_CASE("Test SettingManager", "[config]")
 {
 }
