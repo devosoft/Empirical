@@ -18,7 +18,6 @@
 
 
 #include <span>
-#include <string>
 
 #include "../base/array.hpp"
 #include "../base/assert.hpp"

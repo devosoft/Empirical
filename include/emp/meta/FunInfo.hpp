@@ -44,7 +44,6 @@ namespace emp {
   template <typename CLASS_T, typename RETURN_T, typename PARAM1_T, typename... PARAM_Ts>
   struct FunInfo<RETURN_T (CLASS_T::*)(PARAM1_T, PARAM_Ts...) const> {
   private:
-
     /// Helper function to lock an argument at a designated position in a function.
     template <typename BOUND_T, typename... BEFORE_Ts, typename... AFTER_Ts>
     static auto BindAt_impl(CLASS_T fun,

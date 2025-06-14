@@ -859,7 +859,7 @@ namespace emp {
     std::deque<event_t>
       event_queue;  //< Hardware's event queue. Where events go to be handled (in order of reception).
     TRAIT_T
-      traits;  //< Generic traits vector. Whatever uses the hardware must define/keep track of what traits mean.
+    traits;  //< Generic traits vector. Whatever uses the hardware must define/keep track of what traits mean.
     size_t errors;  //< Errors committed by hardware while executing. (e.g. divide by 0, etc.)
     size_t
       max_cores;  //< Maximum number of parallel execution stacks that can be spawned. Increasing this value drastically slows things down.

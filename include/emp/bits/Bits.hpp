@@ -195,8 +195,11 @@ namespace emp {
         SetIf(std::forward<T>(init_val));
         ClearExcessBits();
       } else if constexpr (std::integral<std::remove_reference_t<T>>) {
-        if (init_val == 0) Clear();
-        else SetAll();
+        if (init_val == 0) {
+          Clear();
+        } else {
+          SetAll();
+        }
       } else if constexpr (std::same_as<std::remove_reference_t<T>, Random>) {
         Randomize(std::forward<T>(init_val));  // Pass random generator to Randomize.
         ClearExcessBits();
@@ -210,7 +213,7 @@ namespace emp {
     explicit Bits(const std::bitset<NUM_BITS> & bitset);
 
     /// @brief Constructor to generate a Bits from a string of '0's and '1's or indices
-    Bits(const emp::String & bitstring) :  _data(static_cast<size_t>(bitstring.size())) {
+    Bits(const emp::String & bitstring) : _data(static_cast<size_t>(bitstring.size())) {
       Set(bitstring);
       ClearExcessBits();
     }

@@ -110,20 +110,21 @@
 
 
 #define EMP_BUILD_CONCEPT(WRAPPER_NAME, BASE_NAME, ...)
-/* Do error-checking on the inputs! */                       \
-  EMP_WRAP_EACH(EMP_BUILD_CONCEPT__ERROR_CHECK, __VA_ARGS__)   \
-  /* Build the interface class. */                             \
-  class BASE_NAME {                                            \
-  public:                                                      \
-    EMP_WRAP_EACH(EMP_BUILD_CONCEPT__BASE, __VA_ARGS__)        \
-  };                                                           \
-  /* Build the wrapper class. */                               \
-  template <typename WRAPPED_T>                                \
-  class WRAPPER_NAME : public WRAPPED_T, public BASE_NAME {    \
-    using this_t = WRAPPER_NAME<WRAPPED_T>;                    \
-    EMP_WRAP_EACH(EMP_BUILD_CONCEPT__PROCESS, __VA_ARGS__)     \
-  }
+/* Do error-checking on the inputs! */
+EMP_WRAP_EACH(EMP_BUILD_CONCEPT__ERROR_CHECK, __VA_ARGS__) /* Build the interface class. */
 
+class BASE_NAME {
+public:
+  EMP_WRAP_EACH(EMP_BUILD_CONCEPT__BASE, __VA_ARGS__)
+}; /* Build the wrapper class. */
+
+template <typename WRAPPED_T>
+class WRAPPER_NAME
+  : public WRAPPED_T
+  , public BASE_NAME {
+  using this_t = WRAPPER_NAME<WRAPPED_T>;
+  EMP_WRAP_EACH(EMP_BUILD_CONCEPT__PROCESS, __VA_ARGS__)
+}
 
 // ***************************************************************************
 // We want to do error checking to minimize confusing errors that come out of the compiler.
