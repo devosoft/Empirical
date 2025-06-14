@@ -199,7 +199,7 @@ namespace emp {
     explicit Bits(const std::bitset<NUM_BITS> & bitset);
 
     /// @brief Constructor to generate a Bits from a string of '0's and '1's or indices
-    Bits(const emp::String & bitstring) { Set(bitstring); }
+    Bits(const emp::String & bitstring) : Bits(bitstring.size()) { Set(bitstring); }
 
     /// @brief Constructor to generate a Bits from a literal string of '0's and '1's.
     Bits(const char * bitstring) : Bits(emp::String(bitstring)) {}
@@ -1566,7 +1566,7 @@ namespace emp {
   ///  2: a string of indexes between braces, e.g.: "{12,19,25,32,33,91}" (does not change size)
   template <typename DATA_T, bool ZERO_LEFT>
   Bits<DATA_T, ZERO_LEFT> & Bits<DATA_T, ZERO_LEFT>::Set(emp::String str) {
-    if (str.size() == 0) { return *this; }
+    if (str.size() == 0) { return Resize(0); }
 
     Clear();
     if (str.PopIf('{')) {
