@@ -63,8 +63,11 @@ PRAGMA_ONCE ^[ ]*\#[ ]*"pragma"[ ]+"once"
 INCLUDE_SYS ^[ ]*\#[ ]*"include"[ ]*\<\S*\>
 INCLUDE_LOCAL ^[ ]*\#[ ]*"include"[ ]*\"\S*\"
 
-#Specific Doxygen commands
+# Doxygen commands
 DOX_BRIEF "@brief"
+
+# Git merge conflict markers
+GIT_MERGE_CONFLICT ^("<<<<<<< HEAD"|"======="|">>>>>>>")
 
 # "Other" will represent arbitrary characters OR inserted tokens during fixes.
 OTHER .

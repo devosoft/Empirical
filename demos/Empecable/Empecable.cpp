@@ -768,6 +768,10 @@ public:
         ReportIssue("Illegal whitespace:");
         AskRemoveToken("illegal whitespace");
         break;
+      case Lexer::ID_GIT_MERGE_CONFLICT:
+        ReportIssue("Git merge conflict marker");
+        if (IsVerbose()) emp::PrintLn("...Please resolve outside of Empecable (for now).");
+        break;
       case Lexer::ID_EMP_META_START_OLD:
         ReportIssue("Old-style EMP meta-data:");
         AskRemoveToken("old meta data");
