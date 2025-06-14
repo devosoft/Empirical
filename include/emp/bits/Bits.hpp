@@ -191,7 +191,18 @@ namespace emp {
     /// @brief Build a new Bits with specified bit count and initialization
     template <typename T>
     Bits(std::integral auto num_bits, T && init_val) : _data(static_cast<size_t>(num_bits)) {
-      SetAll(std::forward<T>(init_val));
+      if constexpr (std::invocable<T, size_t>) {
+        SetIf(std::forward<T>(init_val));
+        ClearExcessBits();
+      } else if constexpr (std::integral<std::remove_reference_t<T>>) {
+        if (init_val == 0) Clear();
+        else SetAll();
+      } else if constexpr (std::same_as<std::remove_reference_t<T>, Random>) {
+        Randomize(std::forward<T>(init_val));  // Pass random generator to Randomize.
+        ClearExcessBits();
+      } else {
+        emp::notify::Error("Calling SetAll with unknown setting type: ", GetTypeName<T>());
+      }
     }
 
     /// @brief Constructor to generate a Bits from a std::bitset.
@@ -199,7 +210,10 @@ namespace emp {
     explicit Bits(const std::bitset<NUM_BITS> & bitset);
 
     /// @brief Constructor to generate a Bits from a string of '0's and '1's or indices
-    Bits(const emp::String & bitstring) : Bits(bitstring.size()) { Set(bitstring); }
+    Bits(const emp::String & bitstring) :  _data(static_cast<size_t>(bitstring.size())) {
+      Set(bitstring);
+      ClearExcessBits();
+    }
 
     /// @brief Constructor to generate a Bits from a literal string of '0's and '1's.
     Bits(const char * bitstring) : Bits(emp::String(bitstring)) {}
@@ -1609,11 +1623,7 @@ namespace emp {
     if constexpr (std::invocable<T, size_t>) {
       SetIf(std::forward<T>(value));
     } else if constexpr (std::integral<std::remove_reference_t<T>>) {
-      if (value == true) {
-        SetAll();
-      } else {
-        Clear();
-      }
+      return (value == 0) ? Clear() : SetAll();
     } else if constexpr (std::same_as<std::remove_reference_t<T>, Random>) {
       Randomize(std::forward<T>(value));  // Pass random generator to Randomize.
     } else {
