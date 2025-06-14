@@ -11,15 +11,15 @@ on:
 jobs:
   # === Test that code is tidy (i.e., follows Empirical standards) ===
   tidy:
-    name: Enforce Tidyness
+    name: Enforce Tidyness using Empecable
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: 'recursive'
       - run: sudo apt-get update -qq
-      - run: sudo apt-get install -qq rename python3-sphinx
-      - run: ./ci/test_tidy.sh
+      - run: cd demos/Empecable ; make ; cd ../../
+      - run: demos/Empecable/Empecable include/emp/*/*.hpp
   # === Test that tidiness is ALSO true on MacOS
   test-macos-tidy:
     name: Test Tidy Enforcement on macOS
