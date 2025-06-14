@@ -9,6 +9,7 @@ Combute Compute
 Consruct Construct
 Constucts Constructs
 Contaier Container
+Contructor Constructor
 Conver Convert
 Corect Correct
 Cosntructor Constructor
@@ -174,6 +175,8 @@ nunmber number
 occurances occurrences
 occured occurred
 occuring occurring
+offsrping offspring
+ommitted omitted
 onlay only
 oranism organism
 ordred ordered
@@ -219,6 +222,7 @@ substituion substitution
 sudoku Sudoku
 surpress suppress
 swtich switch
+taxons taxa
 tempalted templated
 termianted terminated
 tha the
@@ -240,5 +244,7 @@ velocites velocities
 verison version
 vertics vertices
 visable visible
+wheneven whenever
 wheter whether
+who's whose
 wil will

@@ -19,28 +19,29 @@ jobs:
           submodules: 'recursive'
       - run: sudo apt-get update -qq
       - run: cd demos/Empecable ; make ; cd ../../
-      - run: demos/Empecable/Empecable include/emp/*/*.hpp -v
-  # === Test that tidiness is ALSO true on MacOS
-  test-macos-tidy:
-    name: Test Tidy Enforcement on macOS
-    runs-on: macos-14
+      - run: demos/Empecable/Empecable include/emp/*/*.hpp include/emp/web/d3/*.hpp -v
+  # Test that the code has been formatted with clang format.
+  check-clang-format:
+    name: Check Clang Format
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
-          # sometimes checkout action doesn't result in clean directory?
-          fetch-depth: 0
-          ref: ${{ github.event.pull_request.head.sha || github.ref }}
           submodules: 'recursive'
-      - run: git status --ignored
-      - run: brew install coreutils findutils gnu-sed gawk grep rename sphinx-doc
-      # adapted from https://stackoverflow.com/a/42878119
-      - run: brew link sphinx-doc --force
-      # updates PATH to use Homebrew-installed tools first
-      # see https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#adding-a-system-path
-      - run: echo "/usr/local/bin:$PATH" > $GITHUB_PATH
-      - run: echo $PATH
-      - run: ./ci/test_tidy.sh
-  # === Run all of the compilation tests on a (relatively) new version of Ubuntu ===
+      - run: sudo apt-get update -qq
+      - run: sudo apt-get install -qq clang-format
+      - name: Verify clang-format compliance
+        run: |
+          FILES=$(find include/emp -type f -name "*.hpp")
+          FAIL=0
+          for FILE in $FILES; do
+            if ! clang-format --dry-run --Werror "$FILE"; then
+              echo "::error file=$FILE::File is not clang-formatted"
+              FAIL=1
+            fi
+          done
+          exit $FAIL
+  # === Run all of the compilation tests on Ubuntu ===
   test:
     name: Tests
     runs-on: ubuntu-24.04
