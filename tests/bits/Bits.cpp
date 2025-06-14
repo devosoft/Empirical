@@ -70,17 +70,8 @@ void TestBasics(const T & bits, size_t _size, std::string vals="") {
 TEST_CASE("0: Diagnosing current problems", "[bits]"){
   // Feel free to delete or change anything here; it's just to diagnose issues with CI.
   std::string init("10011001010000011101");
-  emp::BitVector bv(20);
+  emp::BitVector bv(init);
 
-  bv.PrintDebug();
-  std::cout << "bv    : " << bv << std::endl;
-  std::cout << "DEBUG : ";
-  bv.PrintDebug();
-  CHECK(bv.CountOnes() == 0);
-
-  bv = init;
-
-  bv.PrintDebug();
   std::cout << "init bv : " << bv << std::endl;
   std::cout << "DEBUG   : ";
   bv.PrintDebug();
