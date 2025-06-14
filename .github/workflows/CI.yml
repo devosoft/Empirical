@@ -30,17 +30,7 @@ jobs:
           submodules: 'recursive'
       - run: sudo apt-get update -qq
       - run: sudo apt-get install -qq clang-format
-      - name: Verify clang-format compliance
-        run: |
-          FILES=$(find include/emp -type f -name "*.hpp")
-          FAIL=0
-          for FILE in $FILES; do
-            if ! clang-format --dry-run --Werror "$FILE"; then
-              echo "::error file=$FILE::File is not clang-formatted"
-              FAIL=1
-            fi
-          done
-          exit $FAIL
+      - run: clang-format --dry-run --Werror include/emp/*/*.?pp
   # === Run all of the compilation tests on Ubuntu ===
   test:
     name: Tests
