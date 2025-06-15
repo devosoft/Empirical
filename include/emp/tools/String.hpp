@@ -2648,7 +2648,7 @@ namespace emp {
     for (size_t i = 0; i < value.size(); ++i) {
       char & ch = value[i];
       if (is_lower_letter(ch)) {
-        ch         = std::toupper(ch);
+        ch         = static_cast<char>(std::toupper(ch));
         last_lower = true;
       } else if (is_upper_letter(ch)) {
         if (last_lower) {

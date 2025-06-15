@@ -16,7 +16,7 @@
 #include <functional>
 
 #include "../debug/alert.hpp"
-#include "../tools/string_utils.hpp"
+#include "../tools/String.hpp"
 
 #include "JSWrap.hpp"
 

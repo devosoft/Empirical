@@ -39,6 +39,8 @@ namespace emp {
 
   /// Full information about the states available in a state grid and meanings of each state.
   class StateGridInfo {
+  public:
+    using key_t = uint32_t;
   protected:
     /// Information about what a particular state type means in a state grid.
     struct StateInfo {
@@ -68,15 +70,15 @@ namespace emp {
 
     emp::vector<StateInfo> states;  ///< All available states.  Position is key ID
 
-    std::map<int, size_t> state_map;         ///< Map of state_id to key ID (state_id can be < 0)
-    std::map<char, size_t> symbol_map;       ///< Map of symbols to associated key ID
-    std::map<std::string, size_t> name_map;  ///< Map of names to associated key ID
+    std::map<int, key_t> state_map;         ///< Map of state_id to key ID (state_id can be < 0)
+    std::map<char, key_t> symbol_map;       ///< Map of symbols to associated key ID
+    std::map<std::string, key_t> name_map;  ///< Map of names to associated key ID
 
-    [[nodiscard]] size_t GetKey(int state_id) const { return Find(state_map, state_id, 0); }
+    [[nodiscard]] key_t GetKey(int state_id) const { return Find(state_map, state_id, 0); }
 
-    [[nodiscard]] size_t GetKey(char symbol) const { return Find(symbol_map, symbol, 0); }
+    [[nodiscard]] key_t GetKey(char symbol) const { return Find(symbol_map, symbol, 0); }
 
-    [[nodiscard]] size_t GetKey(const std::string & name) const { return Find(name_map, name, 0); }
+    [[nodiscard]] key_t GetKey(const std::string & name) const { return Find(name_map, name, 0); }
   public:
     size_t GetNumStates() const { return states.size(); }
 
@@ -110,7 +112,7 @@ namespace emp {
                   double mult      = 1.0,
                   std::string name = "",
                   std::string desc = "") {
-      size_t key_id = states.size();
+      key_t key_id = states.size();
       states.emplace_back(id, symbol, mult, name, desc);
       state_map[id]      = key_id;
       symbol_map[symbol] = key_id;
@@ -120,16 +122,19 @@ namespace emp {
 
   /// A StateGrid describes a map of grid positions to the current state of each position.
   class StateGrid {
+  public:
+    using key_t = StateGridInfo::key_t;
+
   protected:
-    size_t width  = 0;        ///< Width of the overall grid
-    size_t height = 0;        ///< Height of the overall grid
+    key_t width  = 0;        ///< Width of the overall grid
+    key_t height = 0;        ///< Height of the overall grid
     emp::vector<int> states;  ///< Specific states at each position in the grid.
     StateGridInfo info;       ///< Information about the set of states used in this grid.
 
   public:
     StateGrid() = default;
 
-    StateGrid(StateGridInfo & _i, size_t _w = 1, size_t _h = 1, int init_val = 0)
+    StateGrid(StateGridInfo & _i, key_t _w = 1, key_t _h = 1, int init_val = 0)
       : width(_w), height(_h), states(_w * _h, init_val), info(_i) {
       ;
     }
@@ -146,9 +151,9 @@ namespace emp {
     StateGrid & operator=(const StateGrid &) = default;
     StateGrid & operator=(StateGrid &&)      = default;
 
-    [[nodiscard]] size_t GetWidth() const { return width; }
+    [[nodiscard]] key_t GetWidth() const { return width; }
 
-    [[nodiscard]] size_t GetHeight() const { return height; }
+    [[nodiscard]] key_t GetHeight() const { return height; }
 
     [[nodiscard]] size_t GetSize() const { return states.size(); }
 
@@ -156,46 +161,46 @@ namespace emp {
 
     [[nodiscard]] const StateGridInfo & GetInfo() const { return info; }
 
-    [[nodiscard]] int & operator()(size_t x, size_t y) {
+    [[nodiscard]] int & operator()(key_t x, key_t y) {
       emp_assert(x < width, x, width);
       emp_assert(y < height, y, height);
       return states[y * width + x];
     }
 
-    [[nodiscard]] int operator()(size_t x, size_t y) const {
+    [[nodiscard]] int operator()(key_t x, key_t y) const {
       emp_assert(x < width, x, width);
       emp_assert(y < height, y, height);
       return states[y * width + x];
     }
 
-    [[nodiscard]] int GetState(size_t x, size_t y) const {
+    [[nodiscard]] int GetState(key_t x, key_t y) const {
       emp_assert(x < width, x, width);
       emp_assert(y < height, y, height);
       return states[y * width + x];
     }
 
-    [[nodiscard]] int GetState(size_t id) const { return states[id]; }
+    [[nodiscard]] int GetState(key_t id) const { return states[id]; }
 
-    StateGrid & SetState(size_t x, size_t y, int in) {
+    StateGrid & SetState(key_t x, key_t y, int in) {
       emp_assert(x < width, x, width);
       emp_assert(y < height, y, height);
       states[y * width + x] = in;
       return *this;
     }
 
-    [[nodiscard]] char GetSymbol(size_t x, size_t y) const {
+    [[nodiscard]] char GetSymbol(key_t x, key_t y) const {
       emp_assert(x < width, x, width);
       emp_assert(y < height, y, height);
       return info.GetSymbol(GetState(x, y));
     }
 
-    [[nodiscard]] double GetScoreChange(size_t x, size_t y) const {
+    [[nodiscard]] double GetScoreChange(key_t x, key_t y) const {
       emp_assert(x < width, x, width);
       emp_assert(y < height, y, height);
       return info.GetScoreChange(GetState(x, y));
     }
 
-    [[nodiscard]] const std::string & GetName(size_t x, size_t y) const {
+    [[nodiscard]] const std::string & GetName(key_t x, key_t y) const {
       emp_assert(x < width, x, width);
       emp_assert(y < height, y, height);
       return info.GetName(GetState(x, y));
@@ -230,13 +235,13 @@ namespace emp {
       emp_assert(width > 0);
 
       // Now that we have the new size, resize the state grid.
-      size_t size = width * height;
+      key_t size = width * height;
       states.resize(size);
 
       // Load in the specific states.
-      for (size_t row = 0; row < height; row++) {
+      for (key_t row = 0; row < height; row++) {
         emp_assert(file[row].size() == width);  // Make sure all rows are the same size.
-        for (size_t col = 0; col < width; col++) {
+        for (key_t col = 0; col < width; col++) {
           states[row * width + col] = info.GetState(file[row][col]);
         }
       }
@@ -248,9 +253,9 @@ namespace emp {
     template <typename... Ts>
     const StateGrid & Print(std::ostream & os = std::cout) const {
       std::string out(width * 2 - 1, ' ');
-      for (size_t i = 0; i < height; i++) {
+      for (key_t i = 0; i < height; i++) {
         out[0] = info.GetSymbol(states[i * width]);
-        for (size_t j = 1; j < width; j++) { out[j * 2] = info.GetSymbol(states[i * width + j]); }
+        for (key_t j = 1; j < width; j++) { out[j * 2] = info.GetSymbol(states[i * width + j]); }
         os << out << std::endl;
       }
       return *this;
@@ -261,10 +266,10 @@ namespace emp {
     const StateGrid & Write(Ts &&... args) const {
       File file;
       std::string out;
-      for (size_t i = 0; i < height; i++) {
+      for (key_t i = 0; i < height; i++) {
         out.resize(0);
         out += info.GetSymbol(states[i * width]);
-        for (size_t j = 1; j < width; j++) {
+        for (key_t j = 1; j < width; j++) {
           out += ' ';
           out += info.GetSymbol(states[i * width + j]);
         }
@@ -277,17 +282,20 @@ namespace emp {
 
   /// Information about a particular agent on a state grid.
   class StateGridStatus {
+  public:
+    using key_t = StateGridInfo::key_t;
+
   protected:
     struct State {
-      size_t x   = 0;  ///< X-coordinate of this agent
-      size_t y   = 0;  ///< Y-coordinate of this agent.
+      key_t x   = 0;  ///< X-coordinate of this agent
+      key_t y   = 0;  ///< Y-coordinate of this agent.
       int facing = 1;  ///< 0=UL, 1=Up, 2=UR, 3=Right, 4=DR, 5=Down, 6=DL, 7=Left (+=Clockwise)
 
       State() = default;
 
-      State(size_t _x, size_t _y, size_t _f = 1) : x(_x), y(_y), facing((int) _f) { ; }
+      State(key_t _x, key_t _y, key_t _f = 1) : x(_x), y(_y), facing((int) _f) { ; }
 
-      bool IsAt(size_t _x, size_t _y) const { return x == _x && y == _y; }
+      bool IsAt(key_t _x, key_t _y) const { return x == _x && y == _y; }
     };
 
     State cur_state;             ///< Position and facing currently used.
@@ -304,13 +312,13 @@ namespace emp {
     /// Move explicitly in the x direction (regardless of facing).
     void MoveX(const StateGrid & grid, int steps = 1) {
       emp_assert(grid.GetWidth(), grid.GetWidth());
-      cur_state.x = (size_t) Mod(steps + (int) cur_state.x, (int) grid.GetWidth());
+      cur_state.x = (key_t) Mod(steps + (int) cur_state.x, (int) grid.GetWidth());
     }
 
     /// Move explicitly in the y direction (regardless of facing).
     void MoveY(const StateGrid & grid, int steps = 1) {
       emp_assert(grid.GetHeight(), grid.GetHeight());
-      cur_state.y = (size_t) Mod(steps + (int) cur_state.y, (int) grid.GetHeight());
+      cur_state.y = (key_t) Mod(steps + (int) cur_state.y, (int) grid.GetHeight());
     }
 
   public:
@@ -322,18 +330,18 @@ namespace emp {
     StateGridStatus & operator=(const StateGridStatus &) = default;
     StateGridStatus & operator=(StateGridStatus &&)      = default;
 
-    [[nodiscard]] size_t GetX() const { return cur_state.x; }
+    [[nodiscard]] key_t GetX() const { return cur_state.x; }
 
-    [[nodiscard]] size_t GetY() const { return cur_state.y; }
+    [[nodiscard]] key_t GetY() const { return cur_state.y; }
 
-    [[nodiscard]] size_t GetFacing() const {
+    [[nodiscard]] key_t GetFacing() const {
       emp_assert(cur_state.facing >= 0 && cur_state.facing < 8);
-      return (size_t) cur_state.facing;
+      return (key_t) cur_state.facing;
     }
 
-    [[nodiscard]] bool IsAt(size_t x, size_t y) const { return cur_state.IsAt(x, y); }
+    [[nodiscard]] bool IsAt(key_t x, key_t y) const { return cur_state.IsAt(x, y); }
 
-    [[nodiscard]] bool WasAt(size_t x, size_t y) const {
+    [[nodiscard]] bool WasAt(key_t x, key_t y) const {
       for (const State & state : history) {
         if (state.IsAt(x, y)) { return true; }
       }
@@ -344,7 +352,7 @@ namespace emp {
     [[nodiscard]] emp::BitVector GetVisited(const StateGrid & grid) const {
       emp::BitVector at_array(grid.GetSize());
       for (const State & state : history) {
-        size_t pos = state.x + grid.GetWidth() * state.y;
+        key_t pos = state.x + grid.GetWidth() * state.y;
         at_array.Set(pos);
       }
       return at_array;
@@ -361,7 +369,7 @@ namespace emp {
       return *this;
     }
 
-    StateGridStatus & Set(size_t _x, size_t _y, size_t _f) {
+    StateGridStatus & Set(key_t _x, key_t _y, key_t _f) {
       cur_state.x      = _x;
       cur_state.y      = _y;
       cur_state.facing = (int) _f;
@@ -369,26 +377,26 @@ namespace emp {
       return *this;
     }
 
-    StateGridStatus & SetX(size_t _x) {
+    StateGridStatus & SetX(key_t _x) {
       cur_state.x = _x;
       UpdateHistory();
       return *this;
     }
 
-    StateGridStatus & SetY(size_t _y) {
+    StateGridStatus & SetY(key_t _y) {
       cur_state.y = _y;
       UpdateHistory();
       return *this;
     }
 
-    StateGridStatus & SetPos(size_t _x, size_t _y) {
+    StateGridStatus & SetPos(key_t _x, key_t _y) {
       cur_state.x = _x;
       cur_state.y = _y;
       UpdateHistory();
       return *this;
     }
 
-    StateGridStatus & SetFacing(size_t _f) {
+    StateGridStatus & SetFacing(key_t _f) {
       cur_state.facing = (int) _f;
       UpdateHistory();
       return *this;
@@ -435,7 +443,9 @@ namespace emp {
 
     /// Move the current status to a random position and orientation.
     void Randomize(const StateGrid & grid, Random & random) {
-      Set(random.GetUInt(grid.GetWidth()), random.GetUInt(grid.GetHeight()), random.GetUInt(8));
+      const uint32_t width = grid.GetWidth();
+      const uint32_t height = grid.GetHeight();
+      Set(random.GetUInt32(width), random.GetUInt32(height), random.GetUInt32(8));
     }
 
     /// Examine state of current position.
@@ -452,11 +462,11 @@ namespace emp {
     /// Print the history of an organism moving around a state grid.
     void PrintHistory(StateGrid & grid, std::ostream & os = std::cout) const {
       emp_assert(history.size(), "You can only print history of a StateGrid if you track it!");
-      const size_t width  = grid.GetWidth();
-      const size_t height = grid.GetHeight();
+      const key_t width  = grid.GetWidth();
+      const key_t height = grid.GetHeight();
       std::string out(width * 2 - 1, ' ');
-      for (size_t i = 0; i < height; i++) {
-        for (size_t j = 1; j < width; j++) {
+      for (key_t i = 0; i < height; i++) {
+        for (key_t j = 1; j < width; j++) {
           out[j * 2] = grid.GetSymbol(j, i);
           if (WasAt(j, i)) { out[j * 2] = '*'; }
         }

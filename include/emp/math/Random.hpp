@@ -212,9 +212,7 @@ namespace emp {
     /// @return A pseudo-random 64-bit unsigned int value between [0, max)
     /// This is a high-precision accessor with perfectly even probabilities in the range.
     inline uint64_t GetUInt64(const uint64_t max) noexcept {
-      if (max <= VAL32_CAP) {
-        return GetUInt(max);  // Don't need extra precision.
-      }
+      if (max <= VAL32_CAP) { return GetUInt(max); } // Don't need extra precision.
 
       const uint64_t mask = emp::MaskUsed(max);  // Create a mask for just the bits we need.
       uint64_t val        = GetUInt64() & mask;  // Grab a value using just the current bits.
@@ -234,7 +232,32 @@ namespace emp {
     /// @return A pseudo-random 64-bit unsigned int value in the provided range.
     template <typename T>
     [[nodiscard]] uint64_t GetUInt64(const Range<T> range) noexcept {
-      return GetUInt(range.GetLower(), range.GetUpper());
+      return GetUInt64(range.GetLower(), range.GetUpper());
+    }
+
+    /// @return A pseudo-random value that fits perfectly in size_t.
+    [[nodiscard]] size_t GetSizeT() noexcept {
+      if constexpr (sizeof(size_t) == 4) return Get32();
+      else return Get64();
+    }
+
+    /// @return A pseudo-random size_t value between [0, max)
+    /// This is a high-precision accessor with perfectly even probabilities in the range.
+    inline size_t GetSizeT(const size_t max) noexcept {
+      if constexpr (sizeof(size_t) == 4) return GetUInt32(max);
+      else return GetUInt64(max);
+    }
+
+    /// @return A pseudo-random 64-bit unsigned int value between [min, max)
+    template <typename T1, typename T2>
+    [[nodiscard]] size_t GetSizeT(const T1 min, const T2 max) noexcept {
+      return GetSizeT(max - min) + min;
+    }
+
+    /// @return A pseudo-random 64-bit unsigned int value in the provided range.
+    template <typename T>
+    [[nodiscard]] size_t GetSizeT(const Range<T> range) noexcept {
+      return GetSizeT(range.GetLower(), range.GetUpper());
     }
 
     /// @return A pseudo-random int value in [0, max)
@@ -612,9 +635,8 @@ namespace emp {
     /// This function is exact, but slow.
     /// @see Random_Base::GetApproxRandBinomial
     /// @see emp::Binomial in source/tools/Distribution.h
-    [[nodiscard]] uint64_t GetBinomial(const double n, const double p) {  // Exact
+    [[nodiscard]] uint64_t GetBinomial(const uint64_t n, const double p) {  // Exact
       emp_assert(p >= 0.0 && p <= 1.0, p);
-      emp_assert(n >= 0.0, n);
       // Actually try n Bernoulli events, each with probability p
       uint64_t k = 0;
       for (uint64_t i = 0; i < n; ++i) {

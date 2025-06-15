@@ -1792,7 +1792,7 @@ namespace emp {
 
     // Do we need to add more ones?
     while (cur_ones < static_cast<size_t>(target_ones)) {
-      size_t pos = random.GetUInt(start_pos, stop_pos);
+      size_t pos = random.GetSizeT(start_pos, stop_pos);
       auto bit   = operator[](pos);
       if (!bit) {
         bit.Set();
@@ -1802,7 +1802,7 @@ namespace emp {
 
     // See if we have too many ones.
     while (cur_ones > static_cast<size_t>(target_ones)) {
-      size_t pos = random.GetUInt(start_pos, stop_pos);
+      size_t pos = random.GetSizeT(start_pos, stop_pos);
       auto bit   = operator[](pos);
       if (bit) {
         bit.Clear();
