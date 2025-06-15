@@ -3,7 +3,7 @@
  * Copyright (C) 2018-2021 Michigan State University
  * MIT Software license; see doc/LICENSE.md
  *
- * @file include/emp/meta/ConceptWrapper.hpp
+ * @file include/emp/deprecated/ConceptWrapper.hpp
  * @brief A template wrapper that will either enforce functionality or provide default functions.
  *
  * Starting in future versions of C++, a concept is a set of requirements for a class to be used
@@ -96,8 +96,8 @@
 
 #pragma once
 
-#ifndef INCLUDE_EMP_META_CONCEPT_WRAPPER_HPP_GUARD
-#define INCLUDE_EMP_META_CONCEPT_WRAPPER_HPP_GUARD
+#ifndef INCLUDE_EMP_DEPRECATED_CONCEPT_WRAPPER_HPP_GUARD
+#define INCLUDE_EMP_DEPRECATED_CONCEPT_WRAPPER_HPP_GUARD
 
 #include <stddef.h>
 #include <string>
@@ -346,4 +346,4 @@ class WRAPPER_NAME
 
 
 
-#endif  // #ifndef INCLUDE_EMP_META_CONCEPT_WRAPPER_HPP_GUARD
+#endif  // #ifndef INCLUDE_EMP_DEPRECATED_CONCEPT_WRAPPER_HPP_GUARD

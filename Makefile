@@ -10,6 +10,14 @@ test-examples: test-native-examples test-web-examples
 
 test-native: test-native-regular test-native-fulldebug test-native-opt test-native-examples
 
+tidy-emp:
+	demos/Empecable/Empecable -i include/emp/*/*.?pp include/emp/web/d3/*.?pp
+
+tidy-clang:
+	clang-format -i include/emp/*/*.?pp include/emp/web/d3/*.?pp
+
+tidy: tidy-emp tidy-clang
+
 test-native-regular:
 	cd tests && make test
 
