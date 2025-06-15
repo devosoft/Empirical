@@ -33,6 +33,7 @@ jobs:
           wget https://apt.llvm.org/llvm.sh
           chmod +x llvm.sh
           sudo ./llvm.sh 20       # installs clang-format-20 and friends
+          sudo apt-get install -y clang-format-20
       - run: clang-format-20 --version
       - run: clang-format-20 --dry-run --Werror include/emp/*/*.?pp
   # === Run all of the compilation tests on Ubuntu ===
