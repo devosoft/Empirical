@@ -21,7 +21,7 @@ jobs:
       - run: cd demos/Empecable ; make ; cd ../../
       - run: demos/Empecable/Empecable include/emp/*/*.hpp include/emp/web/d3/*.hpp -v
   # Test that the code has been formatted with clang format.
-  check-clang-format:
+  format:
     name: Check Clang Format
     runs-on: ubuntu-24.04
     steps:
@@ -208,11 +208,11 @@ jobs:
     if: github.ref == 'refs/heads/master'
     needs:
       - tidy
+      - format
       - test
       - test-web
       - test-coverage
       - test-documentation
-      - test-macos-tidy
     steps:
       - uses: actions/checkout@v4
         with:
