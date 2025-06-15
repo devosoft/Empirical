@@ -28,11 +28,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: 'recursive'
-      - run: sudo apt-get update -qq
       - run: |
+          # Fetch and run LLVM's official installer script
           wget https://apt.llvm.org/llvm.sh
           chmod +x llvm.sh
-          sudo ./llvm.sh 20
+          sudo ./llvm.sh 20       # installs clang-format-20 and friends
       - run: clang-format-20 --version
       - run: clang-format-20 --dry-run --Werror include/emp/*/*.?pp
   # === Run all of the compilation tests on Ubuntu ===
