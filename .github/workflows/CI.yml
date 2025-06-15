@@ -45,11 +45,11 @@ jobs:
       matrix:
         cxx: [clang++, g++]
         test-set:
-          - test-native-regular
           - test-native-fulldebug
           - test-native-opt
           - test-examples
           - test-demos
+          # - test-native-regular
           # - test-cookiecutter
     env:
       CXX: ${{ matrix.cxx }}
