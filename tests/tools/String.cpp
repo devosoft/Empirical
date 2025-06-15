@@ -134,7 +134,7 @@ TEST_CASE("Test Accessors", "[tools]")
   CHECK(str.Get(emp::String::npos) == '\0');
 
   // Get should allow setting.
-  str.Get(2) == 'm';
+  str.Get(2) = 'm';
   CHECK(str == "ghmjkl");
 
   // Setting non-existant character with Get() should have no effect.
@@ -142,7 +142,7 @@ TEST_CASE("Test Accessors", "[tools]")
   CHECK(str == "ghmjkl");
   CHECK(str.Get(6) == '\0');
 
-  
+
 }
 
 TEST_CASE("Test String Composition-ID Functions", "[tools]")
@@ -201,15 +201,15 @@ TEST_CASE("Test String Composition-ID Functions", "[tools]")
   CHECK(!emp::String("f").IsLiteralChar());
   CHECK(emp::String("'\n'").IsLiteralChar());
   CHECK(!emp::String("'\\'").IsLiteralChar());
-  CHECK(emp::MakeFromLiteral_Char("'f'") == 'f');
-  CHECK(emp::MakeFromLiteral_Char("'\n'") == '\n');
+  CHECK(emp::MakeCharFromLiteral("'f'") == 'f');
+  CHECK(emp::MakeCharFromLiteral("'\n'") == '\n');
 
   CHECK(emp::String("\"He llo!\"").IsLiteralString());
   CHECK(!emp::String("\"\\\\He\"llo!\"").IsLiteralString());
   CHECK(emp::String("\"Hel\n\t\r\\\'lo!\"").IsLiteralString());
   CHECK(emp::String("\"Hel\n \t \r \'lo!\"").IsLiteralString());
-  CHECK(emp::MakeFromLiteral_String("\"Hello!\"") == "Hello!");
-  CHECK(emp::MakeFromLiteral_String("\"Hel\n \t \r \'lo!\"") == "Hel\n \t \r \'lo!");
+  CHECK(emp::MakeStringFromLiteral("\"Hello!\"") == "Hello!");
+  CHECK(emp::MakeStringFromLiteral("\"Hel\n \t \r \'lo!\"") == "Hel\n \t \r \'lo!");
 
   // Make sure that we can properly identify different types of characters.
   const emp::String special_string = "This\t5tr1ng\nis\non THREE (3) \"lines\".";
