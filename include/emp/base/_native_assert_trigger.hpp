@@ -14,7 +14,6 @@
 #define INCLUDE_EMP_BASE_NATIVE_ASSERT_TRIGGER_HPP_impl_GUARD
 
 #include <iostream>
-#include <sstream>
 #include <stddef.h>
 #include <string>
 
@@ -24,32 +23,26 @@ namespace emp {
 
   constexpr bool assert_on = true;
 
-  /// Base case for assert_print...
-  inline void assert_print() { ; }
+  /// Base case for assert_to_stream...
+  inline void assert_to_stream(std::ostream &) { ; }
 
-  /// Print out information about the next variable and recurse...
+  /// Convert information about the next variable to a string and recurse...
   template <typename T, typename... EXTRA>
-  void assert_print(std::string name, T && val, EXTRA &&... extra) {
-    if constexpr (emp::canStreamTo<decltype(std::cerr), T>) {
-      // If we had a literal string fed in, print it as a message.
-      if (name[0] == '"') {
-        std::cerr << "MESSAGE: " << val << std::endl;
-      }
-      // Otherwise assume that we have a variable and print that.
-      else {
-        std::cerr << name << ": [" << val << "]" << std::endl;
-      }
+  void assert_to_stream(std::ostream & ss, std::string name, T && val, EXTRA &&... extra) {
+    ss << ((name[0] == '"') ? std::string{"MESSAGE: "} : (name + " = "));
+    if constexpr (emp::is_streamable<T>()) {
+      ss << val << '\n';
     } else {
-      std::cerr << name << ": (non-streamable type)" << std::endl;
+      ss << "(non-streamable type)" << '\n';
     }
 
-    assert_print(std::forward<EXTRA>(extra)...);
+    assert_to_stream(ss, std::forward<EXTRA>(extra)...);
   }
 
   template <typename... EXTRA>
   bool assert_trigger(std::string filename, size_t line, std::string expr, EXTRA &&... extra) {
-    std::cerr << "Assert Error (In " << filename << " line " << line << "): " << expr << std::endl;
-    assert_print(std::forward<EXTRA>(extra)...);
+    std::cerr << "Assert Error (In " << filename << ":" << line << "): " << expr << std::endl;
+    assert_to_stream(std::cerr, std::forward<EXTRA>(extra)...);
 
     return true;  // do process subsequent abort
   }
