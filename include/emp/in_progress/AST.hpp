@@ -16,7 +16,6 @@
 #include <string>
 
 #include "../base/assert.hpp"
-#include "../base/error.hpp"
 #include "../meta/TypeID.hpp"
 
 namespace emp {
@@ -46,7 +45,7 @@ namespace emp {
       virtual size_t GetNumChildren() const { return 0; }
 
       virtual emp::Ptr<Node> GetChild(size_t /* id */) {
-        emp_error("Calling GetChild on AST::Node with no children."));
+        emp_assert(false, "Calling GetChild on AST::Node with no children.");
         return nullptr;
       }
 

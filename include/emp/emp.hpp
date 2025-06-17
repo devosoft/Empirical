@@ -21,7 +21,6 @@
 #include "base/assert_warning.hpp"
 #include "base/concepts.hpp"
 #include "base/emscripten_assert.hpp"
-#include "base/error.hpp"
 #include "base/errors.hpp"
 #include "base/map.hpp"
 #include "base/notify.hpp"

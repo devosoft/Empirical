@@ -19,7 +19,6 @@
 
 #include "../base/array.hpp"
 #include "../base/assert.hpp"
-#include "../base/error.hpp"
 #include "../base/notify.hpp"
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
@@ -48,7 +47,7 @@ namespace emp {
       emp::Ptr<T> EndPoolPtr() const { return &((&pool)[1]); }
 
       void Initialize(size_t /*_mem_count*/, size_t /*_pool_count*/) {
-        emp_error("Cannot re-initialize a static MemoryFactory.");
+        emp_assert(false, "Cannot re-initialize a static MemoryFactory.");
       }
 
       auto FreeBegin() const { return free_ids.begin(); }

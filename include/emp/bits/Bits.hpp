@@ -59,7 +59,6 @@
 
 #include "../base/array.hpp"
 #include "../base/assert.hpp"
-#include "../base/error.hpp"
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
 #include "../datastructs/hash_utils.hpp"

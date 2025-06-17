@@ -38,7 +38,6 @@
 #include <stddef.h>
 #include <string>
 
-#include "../base/error.hpp"
 #include "../base/errors.hpp"
 #include "../base/vector.hpp"
 #include "../control/Signal.hpp"
@@ -295,10 +294,10 @@ namespace emp { namespace web {
 
       virtual void UnregisterChildren(DivInfo * /*registrar*/) { ; }  // No children by default.
 
-      virtual void AddChild(Widget /*in*/) { emp_error("Invalid Widget for AddChild!", id); }
+      virtual void AddChild(Widget /*in*/) { emp_assert(false, "Invalid Widget for AddChild!", id); }
 
       virtual void RemoveChild(Widget & /*child*/) {
-        emp_error("Invalid Widget for RemoveChild!", id);
+        emp_assert(false, "Invalid Widget for RemoveChild!", id);
       }
 
       // Record dependants.  Dependants are only acted upon when this widget's action is

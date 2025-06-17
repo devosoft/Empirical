@@ -13,7 +13,6 @@
 #ifndef INCLUDE_EMP_HARDWARE_VIRTUAL_CPU_INST_LIB_HPP_GUARD
 #define INCLUDE_EMP_HARDWARE_VIRTUAL_CPU_INST_LIB_HPP_GUARD
 
-#include "../base/error.hpp"
 #include "../math/math.hpp"
 
 #include "InstLib.hpp"

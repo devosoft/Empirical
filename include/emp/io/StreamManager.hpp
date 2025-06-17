@@ -24,7 +24,6 @@
 #include <unordered_map>
 
 #include "../base/assert.hpp"
-#include "../base/error.hpp"
 #include "../base/Ptr.hpp"
 #include "../datastructs/map_utils.hpp"
 
@@ -120,7 +119,7 @@ namespace emp {
 
       std::istream & GetInputStream() override {
         if constexpr (!INPUT_OK) {
-          emp_error("No input stream!");
+          emp_assert(false, "No input stream!");
           return GetDefaultStream();
         } else {
           return *ptr;
@@ -129,7 +128,7 @@ namespace emp {
 
       std::ostream & GetOutputStream() override {
         if constexpr (!OUTPUT_OK) {
-          emp_error("No output stream!");
+          emp_assert(false, "No output stream!");
           return GetDefaultStream();
         } else {
           return *ptr;
@@ -138,7 +137,7 @@ namespace emp {
 
       std::iostream & GetIOStream() override {
         if constexpr (ACCESS != Access::IO) {
-          emp_error("No IO stream!");
+          emp_assert(false, "No IO stream!");
           return GetDefaultStream();
         } else {
           return *ptr;
@@ -157,7 +156,7 @@ namespace emp {
           } else if constexpr (ACCESS == Access::IO) {
             ptr = NewPtr<std::fstream>(name);
           } else {
-            emp_error("Unknown access type for file creation in StreamManager.");
+            emp_assert(false, "Unknown access type for file creation in StreamManager.");
           }
         }
 
@@ -174,7 +173,7 @@ namespace emp {
           } else if constexpr (ACCESS == Access::OUTPUT) {
             ptr = &std::cout;
           } else if constexpr (ACCESS == Access::IO) {
-            emp_error("Disallowed stream type...");
+            emp_assert(false, "Disallowed stream type...");
             ptr = nullptr;
           }
         }
@@ -190,17 +189,17 @@ namespace emp {
       Access GetAccess() const override { return Access::NONE; }
 
       std::istream & GetInputStream() override {
-        emp_error("No input stream!");
+        emp_assert(false, "No input stream!");
         return GetDefaultStream();
       }
 
       std::ostream & GetOutputStream() override {
-        emp_error("No output stream!");
+        emp_assert(false, "No output stream!");
         return GetDefaultStream();
       }
 
       std::iostream & GetIOStream() override {
-        emp_error("No IO stream!");
+        emp_assert(false, "No IO stream!");
         return GetDefaultStream();
       }
     };
@@ -317,7 +316,7 @@ namespace emp {
         case Type::FILE:   return AddInputFile(name);
         case Type::STRING: return AddStringStream(name);
         case Type::OTHER:  return AddStream(name, std::cin);
-        default:           emp_error("Default input streams not allowed!", name); return GetDefaultStream();
+        default:           emp_assert(false, "Default input streams not allowed!", name); return GetDefaultStream();
       };
       return GetDefaultStream();
     }
@@ -329,7 +328,7 @@ namespace emp {
         case Type::FILE:   return AddOutputFile(name);
         case Type::STRING: return AddStringStream(name);
         case Type::OTHER:  return AddStream(name, std::cout);
-        default:           emp_error("Default output streams not allowed!", name); return GetDefaultStream();
+        default:           emp_assert(false, "Default output streams not allowed!", name); return GetDefaultStream();
       };
     }
 
@@ -339,7 +338,7 @@ namespace emp {
       switch (default_io_type) {
         case Type::FILE:   return AddFile(name);
         case Type::STRING: return AddStringStream(name);
-        default:           emp_error("Default output streams not allowed!", name); return GetDefaultStream();
+        default:           emp_assert(false, "Default output streams not allowed!", name); return GetDefaultStream();
       };
     }
 

@@ -13,7 +13,6 @@
 #include <string>
 
 #include "emp/base/array.hpp"
-#include "emp/base/error.hpp"
 #include "emp/bits/BitVector.hpp"
 #include "emp/math/math.hpp"
 
@@ -70,7 +69,7 @@ private:
       case 'E': case 'e': results[i] = ELSEWHERE; break;
       case 'H': case 'h': results[i] = HERE;      break;
       default:
-        emp_error("Invalid character in result string", result_str[i]);
+        emp_assert(false, "Invalid character in result string", result_str[i]);
       };
     }
   }

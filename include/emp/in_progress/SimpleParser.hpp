@@ -23,7 +23,6 @@
 #include <cmath>
 #include <string>
 
-#include "../base/error.hpp"
 #include "../compiler/Lexer.hpp"
 
 #include "SimpleLexer.hpp"

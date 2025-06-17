@@ -16,7 +16,6 @@
 #include <cmath>
 #include <string>
 
-#include "../base/error.hpp"
 #include "../compiler/Lexer.hpp"
 
 namespace emp {
