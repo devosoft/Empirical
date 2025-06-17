@@ -126,8 +126,8 @@ namespace emp {
     using key_t = StateGridInfo::key_t;
 
   protected:
-    key_t width  = 0;        ///< Width of the overall grid
-    key_t height = 0;        ///< Height of the overall grid
+    key_t width  = 0;         ///< Width of the overall grid
+    key_t height = 0;         ///< Height of the overall grid
     emp::vector<int> states;  ///< Specific states at each position in the grid.
     StateGridInfo info;       ///< Information about the set of states used in this grid.
 
@@ -287,8 +287,8 @@ namespace emp {
 
   protected:
     struct State {
-      key_t x   = 0;  ///< X-coordinate of this agent
-      key_t y   = 0;  ///< Y-coordinate of this agent.
+      key_t x    = 0;  ///< X-coordinate of this agent
+      key_t y    = 0;  ///< Y-coordinate of this agent.
       int facing = 1;  ///< 0=UL, 1=Up, 2=UR, 3=Right, 4=DR, 5=Down, 6=DL, 7=Left (+=Clockwise)
 
       State() = default;
@@ -443,7 +443,7 @@ namespace emp {
 
     /// Move the current status to a random position and orientation.
     void Randomize(const StateGrid & grid, Random & random) {
-      const uint32_t width = grid.GetWidth();
+      const uint32_t width  = grid.GetWidth();
       const uint32_t height = grid.GetHeight();
       Set(random.GetUInt32(width), random.GetUInt32(height), random.GetUInt32(8));
     }
