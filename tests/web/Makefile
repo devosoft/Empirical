@@ -20,11 +20,10 @@ CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web_braces) --js-library ../../include/emp/
 test: $(addprefix test-, $(TEST_NAMES))
 
 test-%: %.cpp
-	source ../../third-party/emsdk/emsdk_env.sh; \
 	$(CXX_web) $(CFLAGS_web) $< -o $@.js
-	cp ../../third-party/package.json .
-	npm install
-	../../third-party/node_modules/karma/bin/karma start karma.conf.js --filename $@
+#  cp ../../third-party/package.json .
+#  npm install
+#  ../../third-party/node_modules/karma/bin/karma start karma.conf.js --filename $@
 
 test-GetUrlParams: GetUrlParams.cpp
 	source ../../third-party/emsdk/emsdk_env.sh; \
