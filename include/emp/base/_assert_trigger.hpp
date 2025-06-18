@@ -20,6 +20,10 @@
 
 #include "concepts.hpp"
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
+
 /// TDEBUG should trigger its EMP equivalent.
 #ifdef TDEBUG
 #define EMP_TDEBUG 1
@@ -48,8 +52,6 @@ namespace emp {
   // Include the appropriate version of assert.
   // Options are __EMSCRIPTEN__, EMP_TDEBUG, or regular.
 #if defined(__EMSCRIPTEN__)
-
-#include <emscripten.h>
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 

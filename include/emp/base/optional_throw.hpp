@@ -4,9 +4,9 @@
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/base/optional_throw.hpp
- * @brief A version of emp_assert that throws a runtime error if compiled with -DEMP_OPTIONAL_THROW_ON.
+ * @brief Like emp_assert, but throws a runtime error if compiled with -DEMP_OPTIONAL_THROW_ON.
  *
- * This is useful if you want the option to throw a runtime error outside of debug mode. A common use
+ * Useful if you want the option to throw a runtime error outside of debug mode. A common use
  * case is wrapping C++ code in Python, since segfaults kill the entire Python interpreter.
  */
 
@@ -15,6 +15,7 @@
 #ifndef INCLUDE_EMP_BASE_OPTIONAL_THROW_HPP_GUARD
 #define INCLUDE_EMP_BASE_OPTIONAL_THROW_HPP_GUARD
 
+#include "_optional_throw.hpp"
 #include "assert.hpp"
 
 /// NDEBUG should trigger its EMP equivalent.
