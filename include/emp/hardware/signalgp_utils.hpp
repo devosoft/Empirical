@@ -22,7 +22,7 @@
 #include <unordered_set>
 
 #include "../base/errors.hpp"
-#include "../bits/BitSet.hpp"
+#include "../bits/Bits.hpp"
 #include "../datastructs/map_utils.hpp"
 #include "../hardware/EventDrivenGP.hpp"
 #include "../math/math.hpp"

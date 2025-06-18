@@ -24,7 +24,7 @@
 
 #include "../base/array.hpp"
 #include "../base/assert.hpp"
-#include "../bits/BitSet.hpp"
+#include "../bits/Bits.hpp"
 #include "../math/ComboSet.hpp"
 #include "../math/Random.hpp"
 #include "../tools/String.hpp"

@@ -63,11 +63,10 @@
 #include "../base/vector.hpp"
 #include "../datastructs/hash_utils.hpp"
 #include "../math/constants.hpp"
-#include "../math/math.hpp"
+include "../math/math.hpp"
 #include "../math/Random.hpp"
 #include "../math/Range.hpp"
 #include "../meta/type_traits.hpp"
-#include "../meta/TypeID.hpp"
 #include "../tools/String.hpp"
 
 #include "_bitset_helpers.hpp"

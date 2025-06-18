@@ -17,7 +17,7 @@
 #include <stddef.h>
 #include <typeinfo>
 
-#include "BitSet.hpp"
+#include "Bits.hpp"
 #include "bitset_utils.hpp"
 
 namespace emp {

@@ -31,7 +31,6 @@
 
 #include "../base/vector.hpp"
 #include "../bits/Bits.hpp"
-#include "../bits/BitSet.hpp"
 #include "../datastructs/set_utils.hpp"
 #include "../tools/String.hpp"
 

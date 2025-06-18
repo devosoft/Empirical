@@ -24,7 +24,7 @@
 #include <stddef.h>
 
 #include "../base/vector.hpp"
-#include "../bits/BitVector.hpp"
+#include "../bits/Bits.hpp"
 #include "../functional/memo_function.hpp"
 #include "../math/math.hpp"
 #include "../math/Random.hpp"

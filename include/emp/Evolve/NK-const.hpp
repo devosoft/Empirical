@@ -19,7 +19,7 @@
 #include <stddef.h>
 
 #include "../base/assert.hpp"
-#include "../bits/BitSet.hpp"
+#include "../bits/Bits.hpp"
 #include "../math/math.hpp"
 #include "../math/Random.hpp"
 

@@ -50,7 +50,7 @@
 
 #include "../base/assert.hpp"
 #include "../base/notify.hpp"
-#include "../bits/BitVector.hpp"
+#include "../bits/Bits.hpp"
 #include "../datastructs/map_utils.hpp"
 #include "../tools/String.hpp"
 

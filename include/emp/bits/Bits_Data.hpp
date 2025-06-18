@@ -22,7 +22,6 @@
 #include "../base/array.hpp"
 #include "../base/assert.hpp"
 #include "../base/Ptr.hpp"
-#include "../math/math.hpp"
 
 #include "bitset_utils.hpp"
 

@@ -38,7 +38,6 @@
 #include "../base/errors.hpp"
 #include "../base/optional.hpp"
 #include "../base/vector.hpp"
-#include "../bits/BitSet.hpp"
 #include "../data/DataFile.hpp"
 #include "../data/DataNode.hpp"
 #include "../datastructs/IndexMap.hpp"

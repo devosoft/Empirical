@@ -33,7 +33,7 @@
 #include "../base/array.hpp"
 #include "../base/assert.hpp"
 #include "../base/vector.hpp"
-#include "../bits/BitSet.hpp"
+#include "../bits/Bits.hpp"
 #include "../datastructs/hash_utils.hpp"
 #include "../datastructs/IndexMap.hpp"
 #include "../datastructs/tuple_utils.hpp"

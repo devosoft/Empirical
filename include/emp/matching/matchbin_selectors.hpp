@@ -31,7 +31,6 @@
 #include "../base/assert.hpp"
 #include "../base/optional.hpp"
 #include "../base/vector.hpp"
-#include "../bits/BitSet.hpp"
 #include "../datastructs/hash_utils.hpp"
 #include "../datastructs/IndexMap.hpp"
 #include "../math/Distribution.hpp"

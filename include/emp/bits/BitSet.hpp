@@ -5,8 +5,7 @@
  *
  * @file include/emp/bits/BitSet.hpp
  * @brief A drop-in replacement for std::bitset, with additional bit magic features; aliases BitArray.
- * Status: RELEASE
- *
+ * Status: DEPRECATED (used Bits.hpp instead)
  */
 
 #pragma once
@@ -14,16 +13,6 @@
 #ifndef INCLUDE_EMP_BITS_BIT_SET_HPP_GUARD
 #define INCLUDE_EMP_BITS_BIT_SET_HPP_GUARD
 
-#include <stddef.h>
-
-#include "BitArray.hpp"
 #include "Bits.hpp"  // New version of BitSet is in Bits.hpp
-
-namespace emp::old {
-
-  template <size_t NUM_BITS>
-  using BitSet = emp::old::BitArray<NUM_BITS, false>;
-
-}
 
 #endif  // #ifndef INCLUDE_EMP_BITS_BIT_SET_HPP_GUARD

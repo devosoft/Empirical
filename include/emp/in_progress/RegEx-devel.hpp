@@ -52,7 +52,6 @@
 
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
-#include "../bits/BitSet.hpp"
 #include "../tools/String.hpp"
 #include "../tools/string_utils.hpp"
 

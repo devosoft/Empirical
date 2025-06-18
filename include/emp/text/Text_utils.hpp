@@ -20,7 +20,6 @@
 
 #include "../base/assert.hpp"
 #include "../base/notify.hpp"
-#include "../bits/BitVector.hpp"
 #include "../datastructs/map_utils.hpp"
 #include "../tools/String.hpp"
 

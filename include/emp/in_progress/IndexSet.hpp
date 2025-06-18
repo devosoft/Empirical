@@ -14,7 +14,7 @@
 #define INCLUDE_EMP_IN_PROGRESS_INDEX_SET_HPP_GUARD
 
 #include "../base/Ptr.hpp"
-#include "../bits/BitVector.hpp"
+#include "../bits/Bits.hpp"
 #include "../math/constants.hpp"
 
 namespace emp {

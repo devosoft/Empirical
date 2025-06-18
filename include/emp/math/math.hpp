@@ -100,7 +100,7 @@ namespace emp {
   int inline UnbiasedDivide(int dividend, int divisor, emp::Random & r) {
     // TODO add emp_assert to check for overflow
     int res = RoundedDivide(dividend, divisor);
-    // if dividend/divisor % 1 == 0.5...
+    // if dividend/divisor leaves a remainder exactly 1/2 of the divisor...
     if (Abs(dividend % divisor) * 2 == Abs(divisor)) {
       // ... by default, the result is rounded up;
       // with 1/2 probability round down instead
@@ -116,7 +116,7 @@ namespace emp {
   inline size_t UnbiasedDivide(size_t dividend, size_t divisor, emp::Random & r) {
     // TODO add emp_assert to check for overflow
     size_t res = RoundedDivide(dividend, divisor);
-    // if dividend/divisor % 1 == 0.5...
+    // if dividend/divisor leaves a remainder exactly 1/2 of the divisor...
     if ((dividend % divisor) * 2 == divisor) {
       // ... by default, the result is rounded up;
       // with 1/2 probability round down instead

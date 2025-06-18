@@ -33,7 +33,7 @@
 
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
-#include "../bits/BitSet.hpp"
+#include "../bits/Bits.hpp"
 #include "../control/Signal.hpp"
 #include "../control/SignalControl.hpp"
 #include "../data/DataFile.hpp"

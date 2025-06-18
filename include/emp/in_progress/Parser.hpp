@@ -32,7 +32,6 @@
 #include <stddef.h>
 
 #include "../base/vector.hpp"
-#include "../bits/BitVector.hpp"
 
 #include "../compiler/Lexer.hpp"
 

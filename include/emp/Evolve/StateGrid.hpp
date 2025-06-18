@@ -29,7 +29,7 @@
 #include "../base/assert.hpp"
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
-#include "../bits/BitVector.hpp"
+#include "../bits/Bits.hpp"
 #include "../datastructs/map_utils.hpp"
 #include "../io/File.hpp"
 #include "../math/math.hpp"
