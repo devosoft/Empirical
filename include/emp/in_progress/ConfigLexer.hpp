@@ -20,7 +20,6 @@
 #include <string>
 
 #include "../base/errors.hpp"
-
 #include "../compiler/_Token.hpp"
 
 namespace emp {

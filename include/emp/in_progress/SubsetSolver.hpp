@@ -17,7 +17,6 @@
 #include <stddef.h>
 
 #include "../base/assert.hpp"
-
 #include "../tools/SolveState.hpp"
 
 namespace emp {

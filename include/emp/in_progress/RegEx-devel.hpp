@@ -52,11 +52,10 @@
 
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
-#include "../tools/String.hpp"
-#include "../tools/string_utils.hpp"
-
 #include "../compiler/lexer_utils.hpp"
 #include "../compiler/NFA.hpp"
+#include "../tools/String.hpp"
+#include "../tools/string_utils.hpp"
 
 namespace emp {
 

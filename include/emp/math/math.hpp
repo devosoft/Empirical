@@ -1,6 +1,6 @@
 /**
  * This file is part of Empirical, https://github.com/devosoft/Empirical
- * Copyright (C) 2016-2024 Michigan State University
+ * Copyright (C) 2016-2025 Michigan State University
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/math/math.hpp
@@ -420,4 +420,4 @@ namespace emp {
 #endif  // #ifndef INCLUDE_EMP_MATH_MATH_HPP_GUARD
 
 // Local settings for Empecable file checker.
-// empecable_words: bools lst sgn
+// empecable_words: sgn lst bools
