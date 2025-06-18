@@ -18,7 +18,7 @@
 
 #include "../base/assert.hpp"
 
-#include "SolveState.hpp"
+#include "../tools/SolveState.hpp"
 
 namespace emp {
 

@@ -35,8 +35,8 @@
 #include <cstring>
 #include <unordered_map>
 
-#include "assert.hpp"
-#include "vector.hpp"
+#include "../base/assert.hpp"
+#include "../base/vector.hpp"
 
 namespace emp {
 

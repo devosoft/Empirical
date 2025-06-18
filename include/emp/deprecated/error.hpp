@@ -14,7 +14,7 @@
 #define INCLUDE_EMP_DEPRECATED_ERROR_HPP_GUARD
 
 
-#include "_error_trigger.hpp"
+#include "../base/_error_trigger.hpp"
 
 #define emp_error(...)                                                         \
   do {                                                                         \

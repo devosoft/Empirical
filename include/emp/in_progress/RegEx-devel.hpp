@@ -56,8 +56,8 @@
 #include "../tools/String.hpp"
 #include "../tools/string_utils.hpp"
 
-#include "lexer_utils.hpp"
-#include "NFA.hpp"
+#include "../compiler/lexer_utils.hpp"
+#include "../compiler/NFA.hpp"
 
 namespace emp {
 

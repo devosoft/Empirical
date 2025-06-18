@@ -21,7 +21,7 @@
 
 #include "../base/errors.hpp"
 
-#include "Token.h"
+#include "../compiler/_Token.hpp"
 
 namespace emp {
 

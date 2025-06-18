@@ -14,7 +14,7 @@
 #ifndef INCLUDE_EMP_IN_PROGRESS_TRACKED_PTR_HPP_GUARD
 #define INCLUDE_EMP_IN_PROGRESS_TRACKED_PTR_HPP_GUARD
 
-#include "Ptr.hpp"
+#include "../base/Ptr.hpp"
 
 namespace emp {
 

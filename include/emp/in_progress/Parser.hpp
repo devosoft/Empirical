@@ -34,7 +34,7 @@
 #include "../base/vector.hpp"
 #include "../bits/BitVector.hpp"
 
-#include "Lexer.hpp"
+#include "../compiler/Lexer.hpp"
 
 namespace emp {
 

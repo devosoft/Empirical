@@ -103,9 +103,9 @@
 #include <string>
 #include <utility>
 
-#include "macros.hpp"
-#include "meta.hpp"
-#include "TypePack.hpp"
+#include "../meta/macros.hpp"
+#include "../meta/meta.hpp"
+#include "../meta/TypePack.hpp"
 
 
 
