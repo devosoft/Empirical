@@ -40,6 +40,9 @@ private:
 
   static constexpr emplex::Token empty_token{0,"",0};  // Token for out-of-range positions.
 
+  std::unordered_set<emp::String> system_includes;  // Standard library includes.
+  std::unordered_set<emp::String> local_includes;   // Includes within this project.
+
 public:
   static constexpr size_t npos = static_cast<size_t>(-1); // ID for "beyond the end of the file"
 
@@ -65,6 +68,13 @@ public:
 
   [[nodiscard]] size_t GetPragmaOnce() const { return pragma_once_line; }
   void SetPragmaOnce() { pragma_once_line = GetLineID(token_pos); }
+
+  [[nodiscard]] const std::unordered_set<emp::String> & GetSystemIncludes() const {
+    return system_includes;
+  }
+  [[nodiscard]] const std::unordered_set<emp::String> & GetLocalIncludes() const {
+    return local_includes;
+  }
 
   // ======= Dictionary Management =======
 
@@ -295,13 +305,28 @@ public:
       return false;
     }
 
-    // Scan through file for Empecable instructions.
+    // Scan through file for include-tracking or Empecable instructions (no user interaction)
     for (auto & token : tokens) {
       switch (token) {
-      case emplex::Lexer::ID_EMP_META_START:
+        using namespace emplex;
+      case Lexer::ID_INCLUDE_SYS:
+      case Lexer::ID_INCLUDE_LOCAL: {
+        emp::String include_name = token.lexeme;
+        include_name.RemoveWhitespace().PopFixed(8); // Remove #include at front.
+        if (include_name[0] == '<') { // System include.
+          system_includes.insert(include_name);
+        }
+        else if (include_name[0] == '\"') { // Local include.
+          local_includes.insert(include_name.Trim('\"'));
+        }
+        else PrintError("Unknown include type: ", include_name);
+
+        break;
+      }
+      case Lexer::ID_EMP_META_START:
         token.lexeme = ""; // Clear out this lexeme; we will reconstruct it when saving.
         break;
-      case emplex::Lexer::ID_EMP_META_WORDS: {
+      case Lexer::ID_EMP_META_WORDS: {
         const emp::String line = token.lexeme;
         token.lexeme = ""; // Clear out this lexeme; we will reconstruct it if we save.
 

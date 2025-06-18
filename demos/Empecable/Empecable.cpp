@@ -90,7 +90,7 @@ private:
   bool track_replacements = true;
   bool interactive = false;
   bool remove_illegal_chars = true;
-  bool map_levels = true;
+  bool map_levels = false;
   Mode mode = Mode::Normal;
 
   emp::FlagManager flags;         // Tracker for command-line flags that were set.
@@ -161,6 +161,8 @@ private:
     flags.AddOption('h', "help", [this](){ PrintHelp(); },
       "Get additional information about options.");
     flags.AddOption('i', "interactive", [this](){ mode = Mode::Interactive; },
+      "Interactively fix file problems");
+    flags.AddOption('l', "map-levels", [this](){ map_levels = true; },
       "Interactively fix file problems");
     // -r : recursive
     flags.AddOption('s', "suggest_filename",
@@ -462,6 +464,9 @@ public:
     for (file_handler.ResetActiveFile(); file_handler.HasActiveFile(); file_handler.NextFile()) {
       ProcessFile();
     }
+
+    if (map_levels) file_handler.MapLevels();
+
     file_handler.SaveProjectConfig();
     if (!IsSilent()) emp::PrintLn("\nTotal Issues = ", total_issues);
   }
@@ -500,7 +505,7 @@ public:
 
     // Each 'file_id' is a path/name relative to the project.
     // For example, this file is: 'demos/Empecable/Empecable.cpp'
-    var_map["file_id"] = fs::relative(File().GetPath(), file_handler.BasePath());
+    var_map["file_id"] = file_handler.RelativePath(File());
 
     // Assume no heading to build from unless one is found.
     var_map["old_heading"] = "";
@@ -654,7 +659,7 @@ public:
   }
 
   emp::String GenerateGuardName() {
-    emp::String guard_name = fs::relative(File().GetPath(), file_handler.BasePath()).string();
+    emp::String guard_name = file_handler.RelativePath(File()).string();
     guard_name.SetPascalToCaps();                            // Change to ALL_CAPS
 
     // If this filename begins with '_', assume it is an implementation file.
@@ -753,7 +758,7 @@ public:
     file_handler.RefreshActiveFile();  // Incorporate all previous changes.
 
     // Track if's and ends in the pre-processor to provide useful comments.
-    emp::vector<emplex::Token> pp_stack;
+    emp::vector<Token> pp_stack;
 
     for (File().ResetTokens(); File().GetToken() != 0; File().NextToken()) {
       switch (File().GetToken()) {
