@@ -17,17 +17,17 @@
 #include <stddef.h>
 #include <string>
 
-  /// TDEBUG should trigger its EMP equivalent.
+/// TDEBUG should trigger its EMP equivalent.
 #ifdef TDEBUG
 #define EMP_TDEBUG 1
 #endif  // #ifdef TDEBUG
 
 namespace emp {
 
-// Choose the correct version of trigger_emp_error in the pre-processor.  Options are:
-// - _EMSCRIPTEN_ if compiling for the web
-// - TDEBUG - if in test mode
-// - native - otherwise
+  // Choose the correct version of trigger_emp_error in the pre-processor.  Options are:
+  // - _EMSCRIPTEN_ if compiling for the web
+  // - TDEBUG - if in test mode
+  // - native - otherwise
 
 #if defined(__EMSCRIPTEN__)
 

@@ -22,7 +22,7 @@
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
-#endif
+#endif  // #ifdef __EMSCRIPTEN__
 
 /// TDEBUG should trigger its EMP equivalent.
 #ifdef TDEBUG
@@ -47,7 +47,6 @@ namespace emp {
 
     assert_to_stream(ss, std::forward<EXTRA>(extra)...);
   }
-
 
   // Include the appropriate version of assert.
   // Options are __EMSCRIPTEN__, EMP_TDEBUG, or regular.

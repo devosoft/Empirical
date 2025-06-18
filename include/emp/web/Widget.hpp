@@ -294,7 +294,9 @@ namespace emp { namespace web {
 
       virtual void UnregisterChildren(DivInfo * /*registrar*/) { ; }  // No children by default.
 
-      virtual void AddChild(Widget /*in*/) { emp_assert(false, "Invalid Widget for AddChild!", id); }
+      virtual void AddChild(Widget /*in*/) {
+        emp_assert(false, "Invalid Widget for AddChild!", id);
+      }
 
       virtual void RemoveChild(Widget & /*child*/) {
         emp_assert(false, "Invalid Widget for RemoveChild!", id);

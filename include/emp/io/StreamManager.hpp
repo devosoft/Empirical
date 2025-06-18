@@ -316,7 +316,9 @@ namespace emp {
         case Type::FILE:   return AddInputFile(name);
         case Type::STRING: return AddStringStream(name);
         case Type::OTHER:  return AddStream(name, std::cin);
-        default:           emp_assert(false, "Default input streams not allowed!", name); return GetDefaultStream();
+        default:
+          emp_assert(false, "Default input streams not allowed!", name);
+          return GetDefaultStream();
       };
       return GetDefaultStream();
     }
@@ -328,7 +330,9 @@ namespace emp {
         case Type::FILE:   return AddOutputFile(name);
         case Type::STRING: return AddStringStream(name);
         case Type::OTHER:  return AddStream(name, std::cout);
-        default:           emp_assert(false, "Default output streams not allowed!", name); return GetDefaultStream();
+        default:
+          emp_assert(false, "Default output streams not allowed!", name);
+          return GetDefaultStream();
       };
     }
 
@@ -338,7 +342,9 @@ namespace emp {
       switch (default_io_type) {
         case Type::FILE:   return AddFile(name);
         case Type::STRING: return AddStringStream(name);
-        default:           emp_assert(false, "Default output streams not allowed!", name); return GetDefaultStream();
+        default:
+          emp_assert(false, "Default output streams not allowed!", name);
+          return GetDefaultStream();
       };
     }
 
