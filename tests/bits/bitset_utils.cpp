@@ -37,4 +37,7 @@ TEST_CASE("Test bitset_utils", "[bits]")
   REQUIRE(emp::MaskUsed<uint32_t>(30000) == 32767);
   REQUIRE(emp::MaskUsed<uint64_t>(40000000000) == 0xfffffffff);
   REQUIRE(emp::MaskUsed<uint64_t>(5000000000000) == 0x7ffffffffff);
+
+  unsigned long long large = 0x8000000000000000;
+  REQUIRE(emp::MaskHigh<unsigned long long>(1) == large);
 }

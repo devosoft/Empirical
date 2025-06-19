@@ -12,6 +12,7 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
+#include "emp/data/DataNode.hpp"
 #include "emp/math/random_utils.hpp"
 
 TEST_CASE("Test random_utils", "[math]")
@@ -60,6 +61,77 @@ TEST_CASE("Test random_utils", "[math]")
     REQUIRE(doubleVec[i] >= -15.0);
   }
 
+  auto MeanUnbiasedDivide = [](int dividend, int divisor, size_t rc){
+    emp::Random r = emp::Random(1);
+    emp::DataNode<double, emp::data::Current, emp::data::Range, emp::data::Log> data;
+    for(size_t i=0;i<rc;++i) data.Add(emp::UnbiasedDivide(dividend,divisor,r));
+    return data.GetMean();
+  };
+
+  REQUIRE(MeanUnbiasedDivide(0,4,100) == 0);
+  REQUIRE(MeanUnbiasedDivide(1,4,100) == 0);
+  REQUIRE(MeanUnbiasedDivide(2,4,100) > 0);
+  REQUIRE(MeanUnbiasedDivide(2,4,100) < 1);
+  REQUIRE(MeanUnbiasedDivide(3,4,100) == 1);
+  REQUIRE(MeanUnbiasedDivide(4,4,100) == 1);
+  REQUIRE(MeanUnbiasedDivide(6,4,100) > 1);
+  REQUIRE(MeanUnbiasedDivide(6,4,100) < 2);
+  REQUIRE(MeanUnbiasedDivide(5,3,100) == 2);
+  REQUIRE(MeanUnbiasedDivide(6,3,100) == 2);
+  REQUIRE(MeanUnbiasedDivide(7,3,100) == 2);
+
+  REQUIRE(MeanUnbiasedDivide(-1,4,100) == 0);
+  REQUIRE(MeanUnbiasedDivide(-2,4,100) < 0);
+  REQUIRE(MeanUnbiasedDivide(-2,4,100) > -1);
+  REQUIRE(MeanUnbiasedDivide(-3,4,100) == -1);
+  REQUIRE(MeanUnbiasedDivide(-4,4,100) == -1);
+  REQUIRE(MeanUnbiasedDivide(-6,4,100) < -1);
+  REQUIRE(MeanUnbiasedDivide(-6,4,100) > -2);
+  REQUIRE(MeanUnbiasedDivide(-5,3,100) == -2);
+  REQUIRE(MeanUnbiasedDivide(-6,3,100) == -2);
+  REQUIRE(MeanUnbiasedDivide(-7,3,100) == -2);
+
+  REQUIRE(MeanUnbiasedDivide(0,-4,100) == 0);
+  REQUIRE(MeanUnbiasedDivide(1,-4,100) == 0);
+  REQUIRE(MeanUnbiasedDivide(2,-4,100) < 0);
+  REQUIRE(MeanUnbiasedDivide(2,-4,100) > -1);
+  REQUIRE(MeanUnbiasedDivide(3,-4,100) == -1);
+  REQUIRE(MeanUnbiasedDivide(4,-4,100) == -1);
+  REQUIRE(MeanUnbiasedDivide(6,-4,100) < -1);
+  REQUIRE(MeanUnbiasedDivide(6,-4,100) > -2);
+  REQUIRE(MeanUnbiasedDivide(5,-3,100) == -2);
+  REQUIRE(MeanUnbiasedDivide(6,-3,100) == -2);
+  REQUIRE(MeanUnbiasedDivide(7,-3,100) == -2);
+
+  REQUIRE(MeanUnbiasedDivide(-1,-4,100) == 0);
+  REQUIRE(MeanUnbiasedDivide(-2,-4,100) > 0);
+  REQUIRE(MeanUnbiasedDivide(-2,-4,100) < 1);
+  REQUIRE(MeanUnbiasedDivide(-3,-4,100) == 1);
+  REQUIRE(MeanUnbiasedDivide(-4,-4,100) == 1);
+  REQUIRE(MeanUnbiasedDivide(-6,-4,100) > 1);
+  REQUIRE(MeanUnbiasedDivide(-6,-4,100) < 2);
+  REQUIRE(MeanUnbiasedDivide(-5,-3,100) == 2);
+  REQUIRE(MeanUnbiasedDivide(-6,-3,100) == 2);
+  REQUIRE(MeanUnbiasedDivide(-7,-3,100) == 2);
+
+  auto SztMeanUnbiasedDivide = [](size_t dividend, size_t divisor, size_t rc){
+    emp::Random r = emp::Random(1);
+    emp::DataNode<double, emp::data::Current, emp::data::Range, emp::data::Log> data;
+    for(size_t i=0;i<rc;++i) data.Add(emp::UnbiasedDivide(dividend,divisor,r));
+    return data.GetMean();
+  };
+
+  REQUIRE(SztMeanUnbiasedDivide((size_t)0,(size_t)4,100) == 0);
+  REQUIRE(SztMeanUnbiasedDivide((size_t)1,(size_t)4,100) == 0);
+  REQUIRE(SztMeanUnbiasedDivide((size_t)2,(size_t)4,100) > 0);
+  REQUIRE(SztMeanUnbiasedDivide((size_t)2,(size_t)4,100) < 1);
+  REQUIRE(SztMeanUnbiasedDivide((size_t)3,(size_t)4,100) == 1);
+  REQUIRE(SztMeanUnbiasedDivide((size_t)4,(size_t)4,100) == 1);
+  REQUIRE(SztMeanUnbiasedDivide((size_t)6,(size_t)4,100) > 1);
+  REQUIRE(SztMeanUnbiasedDivide((size_t)6,(size_t)4,100) < 2);
+  REQUIRE(SztMeanUnbiasedDivide((size_t)5,(size_t)3,100) == 2);
+  REQUIRE(SztMeanUnbiasedDivide((size_t)6,(size_t)3,100) == 2);
+  REQUIRE(SztMeanUnbiasedDivide((size_t)7,(size_t)3,100) == 2);
 }
 
 TEST_CASE("Test CountRngTouches", "[math]") {
