@@ -83,12 +83,10 @@ namespace emp {
     if constexpr (is_introspective_tuple<T>()) {
       using JSON_TYPE = T;
       // std::cout << "Loading ARGNID: " << ARG_ID << std::endl;
-      MAIN_THREAD_EM_ASM(
-        {
+      MAIN_THREAD_EM_ASM({
           emp_i.object_queue = [];
           emp_i.curr_obj     = emp_i.cb_args[$0];
-        },
-        ARG_ID);
+        }, ARG_ID);
       LoadTuple<JSON_TYPE, ARG_ID, JSON_TYPE::n_fields> load_tuple =
         LoadTuple<JSON_TYPE, ARG_ID, JSON_TYPE::n_fields>();
       load_tuple.LoadJSDataArg(arg_var);
@@ -631,8 +629,8 @@ void empCppCallback(const size_t cb_id) {
   // dispatch the callback to the worker thread main was proxied to
 
   const pthread_t proxy_pthread_id = EM_ASM_INT({
-    if (Object.keys(PThread.pthreads).length != = 0) {
-      console.assert(Object.keys(PThread.pthreads).length == = 1);
+    if (Object.keys(PThread.pthreads).length !== 0) {
+      console.assert(Object.keys(PThread.pthreads).length === 1);
       return Object.keys(PThread.pthreads)[0];
     } else {
       return 0;

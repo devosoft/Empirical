@@ -42,13 +42,13 @@ namespace emp { namespace web {
         location.search.includes('?')
           ? location.search.substring(1)
               .split('&')
-              .map(expr = > expr.split("="))
-              .map((list) = > [list[0].split("+").join(" ")]
+              .map(expr => expr.split("="))
+              .map((list) => [list[0].split("+").join(" ")]
                                 .concat(list[1] && list[1].split('+'))
-                                .filter(item = > item != = undefined))
-              .map(list = > list.map(decodeURIComponent))
-              .map(p = > p[0].split(" ").join("").length == 0 ? ["_illegal", "_empty=" + p[1]] : p)
-              .map(p = > p[0].includes(" ") ? ["_illegal", p[0] + "=" + p[1]] : p)
+                                .filter(item => item !== undefined))
+              .map(list => list.map(decodeURIComponent))
+              .map(p => p[0].split(" ").join("").length == 0 ? ["_illegal", "_empty=" + p[1]] : p)
+              .map(p => p[0].includes(" ") ? ["_illegal", p[0] + "=" + p[1]] : p)
           : [];
     });
 

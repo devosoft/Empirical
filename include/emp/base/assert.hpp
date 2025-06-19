@@ -43,9 +43,6 @@
 /// For now, just make it blank (other options commented out).
 #define emp_assert(...)
 
-// #define emp_assert(EXPR) ((void) sizeof(EXPR) )
-// #define emp_assert(EXPR, ...) { constexpr bool __emp_assert_tmp = false && (EXPR); (void) __emp_assert_tmp; }
-
 namespace emp { static constexpr bool is_debug_mode = false; }
 
 #else  // #if defined(EMP_NDEBUG)

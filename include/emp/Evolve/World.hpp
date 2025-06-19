@@ -1274,7 +1274,7 @@ namespace emp {
 
     if (synchronous_gen) {
       // Place births in a neighboring position in the new grid.
-      fun_find_birth_pos = [this](Ptr<ORG> new_org, WorldPosition parent_pos) {
+      fun_find_birth_pos = [this]([[maybe_unused]] Ptr<ORG> new_org, WorldPosition parent_pos) {
         emp_assert(new_org);                                    // New organism must exist.
         WorldPosition next_pos = fun_get_neighbor(parent_pos);  // Place near parent.
         return next_pos.SetPopID(1);  // Adjust position to next pop and place..
@@ -1444,7 +1444,7 @@ namespace emp {
 
     if (synchronous_gen) {
       // Place births in a neighboring position in the new grid.
-      fun_find_birth_pos = [this](Ptr<ORG> new_org, WorldPosition parent_pos) {
+      fun_find_birth_pos = [this]([[maybe_unused]] Ptr<ORG> new_org, WorldPosition parent_pos) {
         emp_assert(new_org);                                    // New organism must exist.
         WorldPosition next_pos = fun_get_neighbor(parent_pos);  // Place near parent.
         return next_pos.SetPopID(1);  // Adjust position to next pop and place..

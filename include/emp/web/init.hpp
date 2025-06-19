@@ -67,10 +67,10 @@ static void InitializeBitmapListener() {
 
   // adapted from https://stackoverflow.com/a/18002694
   if (EM_ASM_INT({  // detect if we are a web worker
-        return typeof WorkerGlobalScope != = 'undefined' && self instanceof WorkerGlobalScope;
+        return typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
       })) {
     MAIN_THREAD_EM_ASM({
-      console.assert(Object.keys(PThread.pthreads).length == = 1);
+      console.assert(Object.keys(PThread.pthreads).length === 1);
       Object.values(PThread.pthreads)[0].worker.addEventListener(
         'message',
         function(event) {
@@ -93,7 +93,7 @@ static void InitializeOffscreenCanvasRegistries() {
 
   // adapted from https://stackoverflow.com/a/18002694
   if (EM_ASM_INT({  // detect if we are a web worker
-        return typeof WorkerGlobalScope != = 'undefined' && self instanceof WorkerGlobalScope;
+        return typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
       })) {
     EM_ASM({
       emp_i.offscreen_canvases           = {};
@@ -109,7 +109,7 @@ static void InitializeOffscreenCanvasRegistries() {
 static void SetupGlobalThisPolyfill() {
   EM_ASM({
     (function() {
-      if (typeof globalThis == = 'object') { return; }
+      if (typeof globalThis === 'object') { return; }
       Object.prototype.__defineGetter__('__magic__', function() { return this; });
       __magic__.globalThis = __magic__;  // lolwat
       delete Object.prototype.__magic__;
@@ -183,6 +183,7 @@ namespace web {
 #else  // #ifdef __EMSCRIPTEN__
 
 #define EM_ASM(...)
+#define EM_ASM_INT(...)
 #define EM_ASM_ARGS(...)
 #define MAIN_THREAD_EM_ASM(...)
 #define MAIN_THREAD_ASYNC_EM_ASM(...)

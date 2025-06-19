@@ -175,7 +175,7 @@ namespace emp {
       {
         const copy_text = UTF8ToString($0);
         navigator.clipboard.writeText(copy_text).catch(
-          err = > { alert("Unable to copy text to clipboard. Is your connection secure?"); });
+          err => { alert("Unable to copy text to clipboard. Is your connection secure?"); });
       },
       text.c_str());
   }

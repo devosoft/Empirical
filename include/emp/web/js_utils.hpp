@@ -678,7 +678,7 @@ namespace emp {
 #ifdef __EMSCRIPTEN__
     emp_assert(MAIN_THREAD_EM_ASM_INT({
                  emp_i.__incoming_map_keys.forEach(function(key) {
-                   if (typeof key == = "object" || typeof key == = "function") { return 0; }
+                   if (typeof key === "object" || typeof key === "function") { return 0; }
                  });
                  return 1;
                }),
@@ -718,7 +718,7 @@ namespace emp {
 #ifdef __EMSCRIPTEN__
     emp_assert(MAIN_THREAD_EM_ASM_INT({
                  emp_i.__incoming_map_keys.forEach(function(key) {
-                   if (typeof key == = "object" || typeof key == = "function") { return 0; }
+                   if (typeof key === "object" || typeof key === "function") { return 0; }
                  });
                  return 1;
                }),
