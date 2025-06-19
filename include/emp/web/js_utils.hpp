@@ -328,8 +328,7 @@ namespace emp {
                MAIN_THREAD_EM_ASM_INT({return emp_i.__outgoing_array.length}));
 
     // Write emp.__outgoing_array contents to a buffer
-    T * buffer = (T *) MAIN_THREAD_EM_ASM_INT(
-      {
+    T * buffer = (T *) MAIN_THREAD_EM_ASM_INT({
         var buffer = Module._malloc(emp_i.__outgoing_array.length * $0);
 
         for (i = 0; i < emp_i.__outgoing_array.length; i++) {
@@ -337,9 +336,7 @@ namespace emp {
         }
 
         return buffer;
-      },
-      type_size,
-      type_string.c_str());
+      }, type_size, type_string.c_str());
 
     // Populate array from buffer
     for (std::size_t i = 0; i < arr.size(); i++) { arr[i] = *(buffer + i); }
@@ -351,9 +348,7 @@ namespace emp {
 #else   // #ifdef __EMSCRIPTEN__
 
   template <std::size_t SIZE, typename T>
-  void pass_array_to_cpp(emp::array<T, SIZE> & arr, bool recurse = false) {
-    ;
-  }
+  void pass_array_to_cpp(emp::array<T, SIZE> & arr, bool recurse = false) { }
 #endif  // #ifdef __EMSCRIPTEN__ : #else
 
 /// Same as pass_array_to_cpp, but lets you store values in a vector instead

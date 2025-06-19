@@ -124,50 +124,50 @@ namespace emp {
   // Helper functions to load arguments from inside Javascript objects by name.
   template <int ARG_ID>
   static void LoadArg(int16_t & arg_var, std::string var) {
-    arg_var =
-      (int16_t) MAIN_THREAD_EM_ASM_INT({ return emp_i.curr_obj[UTF8ToString($0)]; }, var.c_str());
+    arg_var = static_cast<int16_t>(
+      MAIN_THREAD_EM_ASM_INT({ return emp_i.curr_obj[UTF8ToString($0)]; }, var.c_str()) );
   }
 
   template <int ARG_ID>
   static void LoadArg(int32_t & arg_var, std::string var) {
-    arg_var =
-      (int32_t) MAIN_THREAD_EM_ASM_INT({ return emp_i.curr_obj[UTF8ToString($0)]; }, var.c_str());
+    arg_var = static_cast<int32_t>(
+      MAIN_THREAD_EM_ASM_INT({ return emp_i.curr_obj[UTF8ToString($0)]; }, var.c_str()) );
   }
 
   template <int ARG_ID>
   static void LoadArg(int64_t & arg_var, std::string var) {
-    arg_var = (int64_t)
-      MAIN_THREAD_EM_ASM_DOUBLE({ return emp_i.curr_obj[UTF8ToString($0)]; }, var.c_str());
+    arg_var = static_cast<int64_t>(
+      MAIN_THREAD_EM_ASM_DOUBLE({ return emp_i.curr_obj[UTF8ToString($0)]; }, var.c_str()) );
   }
 
   template <int ARG_ID>
   static void LoadArg(uint16_t & arg_var, std::string var) {
-    arg_var =
-      (uint16_t) MAIN_THREAD_EM_ASM_INT({ return emp_i.curr_obj[UTF8ToString($0)]; }, var.c_str());
+    arg_var = static_cast<uint16_t>(
+      MAIN_THREAD_EM_ASM_INT({ return emp_i.curr_obj[UTF8ToString($0)]; }, var.c_str()) );
   }
 
   template <int ARG_ID>
   static void LoadArg(uint32_t & arg_var, std::string var) {
-    arg_var =
-      (uint32_t) MAIN_THREAD_EM_ASM_INT({ return emp_i.curr_obj[UTF8ToString($0)]; }, var.c_str());
+    arg_var = static_cast<uint32_t>(
+      MAIN_THREAD_EM_ASM_INT({ return emp_i.curr_obj[UTF8ToString($0)]; }, var.c_str()) );
   }
 
   template <int ARG_ID>
   static void LoadArg(uint64_t & arg_var, std::string var) {
-    arg_var = (uint64_t)
-      MAIN_THREAD_EM_ASM_DOUBLE({ return emp_i.curr_obj[UTF8ToString($0)]; }, var.c_str());
+    arg_var = static_cast<uint64_t>(
+      MAIN_THREAD_EM_ASM_DOUBLE({ return emp_i.curr_obj[UTF8ToString($0)]; }, var.c_str()) );
   }
 
   template <int ARG_ID>
   static void LoadArg(bool & arg_var, std::string var) {
     arg_var =
-      (bool) MAIN_THREAD_EM_ASM_INT({ return emp_i.curr_obj[UTF8ToString($0)]; }, var.c_str());
+      (MAIN_THREAD_EM_ASM_INT({ return emp_i.curr_obj[UTF8ToString($0)]; }, var.c_str()) != 0);
   }
 
   template <int ARG_ID>
   static void LoadArg(char & arg_var, std::string var) {
-    arg_var =
-      (char) MAIN_THREAD_EM_ASM_INT({ return emp_i.curr_obj[UTF8ToString($0)]; }, var.c_str());
+    arg_var = static_cast<char>(
+      (char) MAIN_THREAD_EM_ASM_INT({ return emp_i.curr_obj[UTF8ToString($0)]; }, var.c_str()) );
   }
 
   template <int ARG_ID>
@@ -177,8 +177,8 @@ namespace emp {
 
   template <int ARG_ID>
   static void LoadArg(float & arg_var, std::string var) {
-    arg_var =
-      (float) MAIN_THREAD_EM_ASM_DOUBLE({ return emp_i.curr_obj[UTF8ToString($0)]; }, var.c_str());
+    arg_var = static_cast<float>(
+      MAIN_THREAD_EM_ASM_DOUBLE({ return emp_i.curr_obj[UTF8ToString($0)]; }, var.c_str()) );
   }
 
   template <int ARG_ID>

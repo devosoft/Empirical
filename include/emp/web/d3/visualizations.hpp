@@ -562,33 +562,29 @@ public:
   // Needs to be a std::function object or else JSWrap complains
   void DrawPointsFromDataset() {
     // Adjust axes
-    x_min =
-      std::min(MAIN_THREAD_EM_ASM_DOUBLE(
+    x_min = std::min(MAIN_THREAD_EM_ASM_DOUBLE(
                  { return d3.min(js.objects[$0], window["emp"][UTF8ToString($1) + "return_x"]); },
                  dataset->GetID(),
                  this->GetID().c_str()),
-               x_min);
+                                                                                                        x_min);
 
-    x_max =
-      std::max(MAIN_THREAD_EM_ASM_DOUBLE(
+    x_max = std::max(MAIN_THREAD_EM_ASM_DOUBLE(
                  { return d3.max(js.objects[$0], window["emp"][UTF8ToString($1) + "return_x"]); },
                  dataset->GetID(),
                  this->GetID().c_str()),
-               x_max);
+                                                                                                        x_max);
 
-    y_min =
-      std::min(MAIN_THREAD_EM_ASM_DOUBLE(
+    y_min = std::min(MAIN_THREAD_EM_ASM_DOUBLE(
                  { return d3.min(js.objects[$0], window["emp"][UTF8ToString($1) + "return_y"]); },
                  dataset->GetID(),
                  this->GetID().c_str()),
-               y_min);
+                                                                                                        y_min);
 
-    y_max =
-      std::max(MAIN_THREAD_EM_ASM_DOUBLE(
+    y_max = std::max(MAIN_THREAD_EM_ASM_DOUBLE(
                  { return d3.max(js.objects[$0], window["emp"][UTF8ToString($1) + "return_y"]); },
                  dataset->GetID(),
                  this->GetID().c_str()),
-               y_max);
+                                                                                                        y_max);
 
     y_scale->SetDomain(y_max, y_min);
     x_scale->SetDomain(x_min, x_max);
@@ -1002,52 +998,51 @@ public:
   std::function<void(NODE, int)> node_mouseover = [this](NODE d, int i) {
     MAIN_THREAD_EM_ASM(
       {
-        var trace_lineage = function(root, id) {
-          if (root.name == id) { return [root.loc]; }
-          if (root.children) {
-            for (var k in root.children) {
-              if (root.children[k].name == id) {
-                return [root.children[k].loc];
-              } else if (root.children[k].children) {
-                result = trace_lineage(root.children[k], id);
-                if (result) {
-                  result.push(root.children[k].loc);
-                  return result;
-                }
+      var trace_lineage = function(root, id) {
+        if (root.name == id) { return [root.loc]; }
+        if (root.children) {
+          for (var k in root.children) {
+            if (root.children[k].name == id) {
+              return [root.children[k].loc];
+            } else if (root.children[k].children) {
+              result = trace_lineage(root.children[k], id);
+              if (result) {
+                result.push(root.children[k].loc);
+                return result;
               }
             }
           }
         }
-        //   console.log("about to trace");
-        var result = trace_lineage(js.objects[$0][0], $1);
-        var paths  = ([[result [0] % $2, Math.floor(result[0] / $2)]]);
-        for (i = 1; i < result.length; i++) {
-          var old_point = paths[paths.length - 1];
-          var new_point = ([result[i] % $2, Math.floor(result[i] / $2)]);
-          paths.push(new_point);
-        }
-        var scale = d3.scale.linear().domain([0, $2]).range([0, 500]);
-        var l     = d3.svg.line().x(function(d) { return scale(d[0]); }).y(function(d) {
-          return scale(d[1]);
-        });
-        var svg   = d3.select("body").append("svg");
-        svg.attr("width", 500).attr("height", 500);
-        //   console.log(paths);
-        svg.selectAll("path")
-          .data([paths])
-          .enter()
-          .append("path")
-          .attr(
-            "d",
-            function(d) {
-              console.log(d, l(d));
-              return l(d);
-            })
-          .attr("stroke", "white")
-          .attr("stroke-width", 1)
-          .attr("fill", "none");
-        //   console.log(path.length);
-        //   console.log(l(path));
+      }
+      //   console.log("about to trace");
+      var result = trace_lineage(js.objects[$0][0], $1);
+      var paths  = ([[result [0] % $2, Math.floor(result[0] / $2)]]);
+      for (i = 1; i < result.length; i++) {
+        var old_point = paths[paths.length - 1];
+        var new_point = ([result[i] % $2, Math.floor(result[i] / $2)]);
+        paths.push(new_point);
+      }
+      var scale = d3.scale.linear().domain([0, $2]).range([0, 500]);
+      var l =
+        d3.svg.line().x(function(d) { return scale(d[0]); }).y(function(d) { return scale(d[1]); });
+      var svg = d3.select("body").append("svg");
+      svg.attr("width", 500).attr("height", 500);
+      //   console.log(paths);
+      svg.selectAll("path")
+        .data([paths])
+        .enter()
+        .append("path")
+        .attr(
+          "d",
+          function(d) {
+            console.log(d, l(d));
+            return l(d);
+          })
+        .attr("stroke", "white")
+        .attr("stroke-width", 1)
+        .attr("fill", "none");
+      //   console.log(path.length);
+      //   console.log(l(path));
       },
       data->GetID(),
       d.name(),

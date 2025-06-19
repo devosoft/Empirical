@@ -266,17 +266,12 @@ namespace emp { namespace web {
     }
 
     void Apply() {
-      EM_ASM(
-        {
-          emp_i.ctx.beginPath();
-          emp_i.ctx.moveTo($0, $1);
-          emp_i.ctx.lineTo($2, $3);
-          //        emp_i.ctx.closePath();
-        },
-        p.GetX(),
-        p.GetY(),
-        x2,
-        y2);
+      EM_ASM({
+        emp_i.ctx.beginPath();
+        emp_i.ctx.moveTo($0, $1);
+        emp_i.ctx.lineTo($2, $3);
+        // emp_i.ctx.closePath();
+      }, p.GetX(), p.GetY(), x2, y2);
       // ApplyColor();
       LineWidth(line_width);
       Stroke(line_color);

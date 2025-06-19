@@ -187,33 +187,30 @@ namespace D3 {
     DERIVED Merge(DERIVED & other) {
       int new_id = NextD3ID();
       //   std::cout << "New id should be: " << new_id << std::endl;
-      MAIN_THREAD_EM_ASM(
-        {
-          js.objects[$2] = js.objects[$0].merge(js.objects[$1]);
-          //   console.log("Merged: ", js.objects[$2], $2);
-        },
-        this->id,
-        other.GetID(),
-        new_id);
+      MAIN_THREAD_EM_ASM({
+        js.objects[$2] = js.objects[$0].merge(js.objects[$1]);
+        //   console.log("Merged: ", js.objects[$2], $2);
+      }, this->id, other.GetID(), new_id);
       return DERIVED(new_id);
     }
 
-    /**************************************************************************/ /**
-                                                                                  * @name Setters
-                                                                                  *
-                                                                                  * There are three main types of values you might want to change about a selection:
-                                                                                  * attributes (use `SetAttr`), styles (use `SetStyle`), and properties (use `SetProperty`).
-                                                                                  * The distinction between these types is rooted in how they are represented in web languages
-                                                                                  * (Javascript, CSS, and HTML) and would ideally be abstracted in this wrapper but can't be.
-                                                                                  *
-                                                                                  * Additional traits you can set include text and html.
-                                                                                  *
-                                                                                  * Advanced note: In D3.js, the same functions are used to set and get values (depending on
-                                                                                  * whether an argument is passed). Because C++ needs to have clearly defined
-                                                                                  * return types we need separate getters for each return type.
-                                                                                  *
-                                                                                  * @{
-                                                                                  ***********************************************/
+    /**************************************************************************
+     *
+     * @name Setters
+     *
+     * There are three main types of values you might want to change about a selection:
+     * attributes (use `SetAttr`), styles (use `SetStyle`), and properties (use `SetProperty`).
+     * The distinction between these types is rooted in how they are represented in web languages
+     * (Javascript, CSS, and HTML) and would ideally be abstracted in this wrapper but can't be.
+     *
+     * Additional traits you can set include text and html.
+     *
+     * Advanced note: In D3.js, the same functions are used to set and get values (depending on
+     * whether an argument is passed). Because C++ needs to have clearly defined
+     * return types we need separate getters for each return type.
+     *
+     * @{
+     ***********************************************/
 
     /** Assigns [value] to the selection's [name] attribute. Value can be any primitive
     type, a string, a function object, or a lambda. If a string is passed, it can be a normal string, or
@@ -1759,12 +1756,9 @@ namespace D3 {
 
     // Tell tooltip to appear on mouseover and disappear on mouseout
     void BindToolTipMouseover(ToolTip & tip) {
-      MAIN_THREAD_EM_ASM(
-        {
-          js.objects[$0].on("mouseover", js.objects[$1].show).on("mouseout", js.objects[$1].hide);
-        },
-        this->id,
-        tip.GetID());
+      MAIN_THREAD_EM_ASM({
+        js.objects[$0].on("mouseover", js.objects[$1].show).on("mouseout", js.objects[$1].hide);
+      }, this->id, tip.GetID());
     }
 
     /// @endcond
