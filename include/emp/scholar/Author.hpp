@@ -19,19 +19,19 @@
 #define INCLUDE_EMP_SCHOLAR_AUTHOR_HPP_GUARD
 
 #include <stddef.h>
-#include <string>
 
 #include "../compiler/Lexer.hpp"
+#include "../tools/String.hpp"
 
 namespace emp {
 
   class Author {
   private:
-    std::string prefix;
-    std::string first_name;
-    emp::vector<std::string> middle_names;
-    std::string last_name;
-    std::string suffix;
+    String prefix;
+    String first_name;
+    emp::vector<String> middle_names;
+    String last_name;
+    String suffix;
 
     static size_t ID_type;
     static size_t ID_spacing;
@@ -45,17 +45,17 @@ namespace emp {
       return lexer;
     }
   public:
-    Author(const std::string & first, const std::string & middle, const std::string & last)
+    Author(const String & first, const String & middle, const String & last)
       : first_name(first), last_name(last) {
       middle_names.push_back(middle);
     }
 
-    Author(const std::string & first, const std::string & last)
+    Author(const String & first, const String & last)
       : first_name(first), last_name(last) {
       ;
     }
 
-    Author(const std::string & last) : last_name(last) { ; }
+    Author(const String & last) : last_name(last) { ; }
 
     Author(const Author &) = default;
 
@@ -102,21 +102,21 @@ namespace emp {
 
     bool HasSuffix() const { return suffix.size(); }
 
-    const std::string & GetPrefix() const { return prefix; }
+    const String & GetPrefix() const { return prefix; }
 
-    const std::string & GetFirstName() const { return first_name; }
+    const String & GetFirstName() const { return first_name; }
 
-    const std::string & GetMiddleName(size_t id = 0) const {
-      if (middle_names.size() == 0) { return emp::empty_string(); }
+    const String & GetMiddleName(size_t id = 0) const {
+      if (middle_names.size() == 0) { return String::StaticEmpty(); }
       return middle_names[id];
     }
 
-    const std::string & GetLastName() const { return last_name; }
+    const String & GetLastName() const { return last_name; }
 
-    const std::string & GetSuffix() const { return suffix; }
+    const String & GetSuffix() const { return suffix; }
 
-    std::string GetFullName() const {
-      std::string full_name(prefix);
+    String GetFullName() const {
+      String full_name(prefix);
       if (full_name.size() && HasFirstName()) { full_name += " "; }
       full_name += first_name;
       for (const auto & middle_name : middle_names) {
@@ -130,8 +130,8 @@ namespace emp {
       return full_name;
     }
 
-    std::string GetReverseName() const {
-      std::string full_name(last_name);
+    String GetReverseName() const {
+      String full_name(last_name);
       if (full_name.size() && HasFirstName()) { full_name += ", "; }
       full_name += first_name;
       for (const auto & middle_name : middle_names) {
@@ -143,22 +143,22 @@ namespace emp {
       return full_name;
     }
 
-    std::string GetFirstInitial() const {
-      return HasFirstName() ? to_string(first_name[0]) : emp::empty_string();
+    String GetFirstInitial() const {
+      return HasFirstName() ? first_name.substr(0,1) : "";
     }
 
-    std::string GetMiddleInitials() const {
-      std::string out;
+    String GetMiddleInitials() const {
+      String out;
       for (const auto & m : middle_names) { out += m[0]; }
       return out;
     }
 
-    std::string GetLastInitial() const {
-      return HasLastName() ? to_string(last_name[0]) : emp::empty_string();
+    String GetLastInitial() const {
+      return HasLastName() ? last_name.substr(0,1) : "";
     }
 
-    std::string GetInitials() const {
-      std::string inits;
+    String GetInitials() const {
+      String inits;
       inits += GetFirstInitial();
       inits += GetMiddleInitials();
       inits += GetLastInitial();
@@ -181,12 +181,12 @@ namespace emp {
     //    GetName("L, fm") would return "Davidson, ABC"
     //    GetName("f.m.x L") would return "A.B.C. Davidson"
     //
-    //  Note that without the 'x', the space would be associated with all middle names:
+    //  Note that without the 'x', the space would be linked to each middle name:
     //
     //    GetName("f.m. L") would return "A.B. C. Davidson"
 
-    std::string GetName(std::string pattern = "FML") {
-      std::string out_name;
+    String GetName(String pattern = "FML") {
+      String out_name;
       Lexer & lexer = GetFormatLexer();
       auto tokens   = lexer.Tokenize(pattern);
       (void) tokens;
@@ -202,17 +202,17 @@ namespace emp {
       return *this;
     }
 
-    Author & SetFirst(const std::string & str) {
+    Author & SetFirst(const String & str) {
       first_name = str;
       return *this;
     }
 
-    Author & SetLast(const std::string & str) {
+    Author & SetLast(const String & str) {
       last_name = str;
       return *this;
     }
 
-    Author & AddMiddle(const std::string & str) {
+    Author & AddMiddle(const String & str) {
       middle_names.push_back(str);
       return *this;
     }
