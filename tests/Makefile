@@ -33,8 +33,8 @@ cranky-%:
 
 cranky: $(addprefix cranky-, $(TEST_NAMES))
 
-test-web-js:
-	cd web && make test-web
+test-web:
+	cd web && make
 
 clean: $(addprefix clean-, $(TEST_NAMES)) clean-web
 	rm -f *.out

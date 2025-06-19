@@ -77,6 +77,24 @@ jobs:
           source third-party/emsdk/emsdk_env.sh
           make ${TEST_SET} CXX=${CXX}
   # === Make sure all of the web-based tests work when compiling with Emscripten ===
+  # test-web:
+  #   name: Web Tests
+  #   runs-on: ubuntu-24.04
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         submodules: 'recursive'
+  #     - name: Set up GCC
+  #       uses: egor-tensin/setup-gcc@v1
+  #       with:
+  #         version: 14
+  #     - run: sudo apt-get update -qq
+  #     - run: sudo apt-get install -qq cmake build-essential python3-pip python3-virtualenv nodejs tar gzip libpthread-stubs0-dev libc6-dbg gdb
+  #     - run: make install-test-dependencies
+  #     - name: Run headless test
+  #       uses: GabrielBB/xvfb-action@v1
+  #       with:
+  #         run: make test-web
   test-web:
     name: Web Tests
     runs-on: ubuntu-24.04
@@ -88,13 +106,25 @@ jobs:
         uses: egor-tensin/setup-gcc@v1
         with:
           version: 14
-      - run: sudo apt-get update -qq
-      - run: sudo apt-get install -qq cmake build-essential python3-pip python3-virtualenv nodejs tar gzip libpthread-stubs0-dev libc6-dbg gdb
-      - run: make install-test-dependencies
+      - name: Set up Dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -qq cmake build-essential python3-pip python3-virtualenv nodejs tar gzip libpthread-stubs0-dev libc6-dbg gdb
+          make install-test-dependencies
+      - name: Set up Emscripten
+        run: |
+          git clone https://github.com/emscripten-core/emsdk.git third-party/emsdk
+          cd third-party/emsdk
+          ./emsdk install 3.1.64
+          ./emsdk activate 3.1.64
+          source ./emsdk_env.sh
+          emcc --version
       - name: Run headless test
         uses: GabrielBB/xvfb-action@v1
         with:
-          run: make test-web
+          run: |
+            source third-party/emsdk/emsdk_env.sh
+            make test-web
   # === Check that our unit tests cover as much code as possible ===
   test-coverage:
     name: Measure Test Coverage
