@@ -31,7 +31,6 @@
 
 #include "../base/notify.hpp"
 #include "../compiler/Lexer.hpp"
-#include "../compiler/regex_utils.hpp"
 #include "../data/Datum.hpp"
 #include "../datastructs/ra_map.hpp"
 #include "../math/Random.hpp"
