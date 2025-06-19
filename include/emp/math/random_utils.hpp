@@ -147,6 +147,38 @@ namespace emp {
     return count;
   }
 
+  /// Regular integer division is truncated, not rounded.
+  /// Round the division result instead of truncating it.
+  /// Rounding ties (i.e., result % divisor == 0.5) are broken
+  /// by coin toss.
+  int inline UnbiasedDivide(int dividend, int divisor, emp::Random & r) {
+    // TODO add emp_assert to check for overflow
+    int res = RoundedDivide(dividend, divisor);
+    // if dividend/divisor leaves a remainder exactly 1/2 of the divisor...
+    if (Abs(dividend % divisor) * 2 == Abs(divisor)) {
+      // ... by default, the result is rounded up;
+      // with 1/2 probability round down instead
+      res -= r.GetInt(2);
+    }
+    return res;
+  }
+
+  /// Regular integer division is truncated, not rounded.
+  /// Round the division result instead of truncating it.
+  /// Rounding ties (i.e., result % divisor == 0.5) are broken
+  /// by coin toss.
+  inline size_t UnbiasedDivide(size_t dividend, size_t divisor, emp::Random & r) {
+    // TODO add emp_assert to check for overflow
+    size_t res = RoundedDivide(dividend, divisor);
+    // if dividend/divisor leaves a remainder exactly 1/2 of the divisor...
+    if ((dividend % divisor) * 2 == divisor) {
+      // ... by default, the result is rounded up;
+      // with 1/2 probability round down instead
+      res -= r.GetUInt(2);
+    }
+    return res;
+  }
+
   // Use random::P() in all cases.
   class RandProbability {
   private:
