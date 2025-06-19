@@ -323,9 +323,11 @@ namespace emp {
     std::string type_string = map_type_names[typeid(T).name()];
 
     // Make sure arrays have the same length
+    // clang-format off
     emp_assert(arr.size() == MAIN_THREAD_EM_ASM_INT({return emp_i.__outgoing_array.length}),
                arr.size(),
                MAIN_THREAD_EM_ASM_INT({return emp_i.__outgoing_array.length}));
+    // clang-format on
 
     // Write emp.__outgoing_array contents to a buffer
     T * buffer = (T *) MAIN_THREAD_EM_ASM_INT({
@@ -348,7 +350,7 @@ namespace emp {
 #else   // #ifdef __EMSCRIPTEN__
 
   template <std::size_t SIZE, typename T>
-  void pass_array_to_cpp(emp::array<T, SIZE> & arr, bool recurse = false) { }
+  void pass_array_to_cpp(emp::array<T, SIZE> & arr, bool recurse = false) {}
 #endif  // #ifdef __EMSCRIPTEN__ : #else
 
 /// Same as pass_array_to_cpp, but lets you store values in a vector instead

@@ -66,6 +66,7 @@ static void InitializeBitmapListener() {
 #ifdef __EMSCRIPTEN_PTHREADS__
 
   // adapted from https://stackoverflow.com/a/18002694
+  // clang-format off
   if (EM_ASM_INT({  // detect if we are a web worker
         return typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
       })) {
@@ -81,6 +82,7 @@ static void InitializeBitmapListener() {
           }
         })
     });
+  // clang-format on
   }
 
 #endif  // #ifdef __EMSCRIPTEN_PTHREADS__
@@ -92,6 +94,7 @@ static void InitializeOffscreenCanvasRegistries() {
 #ifdef __EMSCRIPTEN_PTHREADS__
 
   // adapted from https://stackoverflow.com/a/18002694
+  // clang-format off
   if (EM_ASM_INT({  // detect if we are a web worker
         return typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
       })) {
@@ -100,6 +103,7 @@ static void InitializeOffscreenCanvasRegistries() {
       emp_i.pending_offscreen_canvas_ids = new Set();
     });
   }
+  // clang-format on
 
 #endif  // #ifdef __EMSCRIPTEN_PTHREADS__
 }

@@ -383,8 +383,8 @@ namespace emp {
     /// Retrieve a reference to the organism as the specified position.
     /// Same as operator[]; will trip assert if cell is not occupied.
     ORG & GetOrg(size_t id) {
-      emp_assert(id < pop.size());         // Pop must be large enough.
-      emp_assert(pop[id] != nullptr, id);  // Should not index to a null organism!
+      emp_assert(id < pop.size());
+      emp_assert(pop[id] != nullptr, id);
       return *(pop[id]);
     }
 
@@ -399,8 +399,8 @@ namespace emp {
     /// Retrieve a reference to the organism at the specified position in the NEXT population.
     /// Will trip assert if cell is not occupied.
     ORG & GetNextOrg(size_t id) {
-      emp_assert(id < pops[1].size());         // Next pop must be large enough.
-      emp_assert(pops[1][id] != nullptr, id);  // Should not index to a null organism!
+      emp_assert(id < pops[1].size());
+      emp_assert(pops[1][id] != nullptr, id);
       return *(pops[1][id]);
     }
 

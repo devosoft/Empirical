@@ -1657,33 +1657,29 @@ namespace D3 {
 
       int new_id = NextD3ID();
 
-      MAIN_THREAD_EM_ASM(
-        {
-          var func_string = UTF8ToString($2);
-          if (typeof window[func_string] == = "function") { func_string = window[func_string]; }
-          for (name in{d3: "d3", emp: "emp"}) {
-            if (typeof window[name][func_string] == = "function") {
-              func_string = window[name][func_string];
-            }
+      // clang-format off
+      MAIN_THREAD_EM_ASM({
+        var func_string = UTF8ToString($2);
+        if (typeof window[func_string] == = "function") { func_string = window[func_string]; }
+        for (name in{d3: "d3", emp: "emp"}) {
+          if (typeof window[name][func_string] === "function") {
+            func_string = window[name][func_string];
           }
+        }
 
-          if (typeof func_string == = "function") {
-            js.objects[$0].on(
-              UTF8ToString($1),
-              function(d, i) {
-                js.objects[$4] = d3.select(this);
-                func_string(d, i, $4);
-              },
-              $3);
-          } else {
-            js.objects[$0].on(UTF8ToString($1), null);
-          }
-        },
-        this->id,
-        type.c_str(),
-        listener.c_str(),
-        capture,
-        new_id);
+        if (typeof func_string == = "function") {
+          js.objects[$0].on(
+            UTF8ToString($1),
+            function(d, i) {
+              js.objects[$4] = d3.select(this);
+              func_string(d, i, $4);
+            },
+            $3);
+        } else {
+          js.objects[$0].on(UTF8ToString($1), null);
+        }
+      }, this->id, type.c_str(), listener.c_str(), capture, new_id);
+      // clang-format on
 
       return (*this);
     }
@@ -1698,21 +1694,17 @@ namespace D3 {
       uint32_t fun_id = emp::JSWrap(listener, "", false);
       int new_id      = NextD3ID();
 
-      MAIN_THREAD_EM_ASM(
-        {
-          js.objects[$0].on(
-            UTF8ToString($1),
-            function() {
-              js.objects[$4] = d3.select(this);
-              emp.Callback($2, d, i, $4);
-            },
-            $3);
-        },
-        this->id,
-        type.c_str(),
-        fun_id,
-        capture,
-        new_id);
+      // clang-format off
+      MAIN_THREAD_EM_ASM({
+        js.objects[$0].on(
+          UTF8ToString($1),
+          function() {
+            js.objects[$4] = d3.select(this);
+            emp.Callback($2, d, i, $4);
+          },$3);
+      }, this->id, type.c_str(), fun_id, capture, new_id);
+      // clang-format on
+
 
       emp::JSDelete(fun_id);
       return (*this);
@@ -1756,9 +1748,11 @@ namespace D3 {
 
     // Tell tooltip to appear on mouseover and disappear on mouseout
     void BindToolTipMouseover(ToolTip & tip) {
+      // clang-format off
       MAIN_THREAD_EM_ASM({
         js.objects[$0].on("mouseover", js.objects[$1].show).on("mouseout", js.objects[$1].hide);
       }, this->id, tip.GetID());
+      // clang-format on
     }
 
     /// @endcond

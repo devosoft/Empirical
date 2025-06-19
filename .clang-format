@@ -1,6 +1,5 @@
 ---
 Language:        Cpp
-# BasedOnStyle:  Google
 AccessModifierOffset: -2       # private, etc, lines up with class name.
 AlignAfterOpenBracket: Align
 AlignArrayOfStructures: None
@@ -203,7 +202,7 @@ ReferenceAlignment: Middle
 ReflowComments:  IndentOnly
 RemoveBracesLLVM: false
 RemoveEmptyLinesInUnwrappedLines: true
-RemoveSemicolon: true
+RemoveSemicolon: false
 RequiresClausePosition: OwnLine
 RequiresExpressionIndentation: OuterScope
 SeparateDefinitionBlocks: Always
@@ -262,9 +261,6 @@ TypeNames:
   - String
 UseTab:          Never
 WhitespaceSensitiveMacros:
-  - BOOST_PP_STRINGIZE
-  - CF_SWIFT_NAME
-  - NS_SWIFT_NAME
   - PP_STRINGIZE
   - STRINGIZE
   - EM_ASM
@@ -276,5 +272,4 @@ WhitespaceSensitiveMacros:
   - MAIN_THREAD_EM_ASM_DOUBLE
   - MAIN_THREAD_EM_ASM_INT_V
   - MAIN_THREAD_EM_ASM_DOUBLE_V
-  - emp_assert
 ...
