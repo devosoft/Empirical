@@ -202,7 +202,7 @@ namespace emp {
         Randomize(std::forward<T>(init_val));  // Pass random generator to Randomize.
         ClearExcessBits();
       } else {
-        emp::notify::Error("Calling SetAll with unknown setting type: ", GetTypeName<T>());
+        emp::notify::Error("Calling SetAll with unknown setting type.");
       }
     }
 
@@ -1628,7 +1628,7 @@ namespace emp {
     } else if constexpr (std::same_as<std::remove_reference_t<T>, Random>) {
       Randomize(std::forward<T>(value));  // Pass random generator to Randomize.
     } else {
-      emp::notify::Error("Calling SetAll with unknown setting type: ", GetTypeName<T>());
+      emp::notify::Error("Calling Bits::SetAll with unknown setting type.");
     }
     return *this;
   }
