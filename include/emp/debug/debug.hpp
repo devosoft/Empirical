@@ -1,6 +1,6 @@
 /**
  * This file is part of Empirical, https://github.com/devosoft/Empirical
- * Copyright (C) 2015-2024 Michigan State University
+ * Copyright (C) 2015-2025 Michigan State University
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/debug/debug.hpp
@@ -61,7 +61,7 @@ namespace emp {
   }
 
 /// emp_debug_only() will print its contents as a message in debug mode and BLOCK release mode until
-/// it is removed.  It's a useful too for printing "Ping1", "Ping2", etc, but no forgetting to
+/// it is removed.  It's a useful too for printing "Ping1", "Ping2", etc, but not forgetting to
 /// remove them.
 #define emp_debug_only(...) { BlockRelease(true); emp::emp_debug_print(__VA_ARGS__); }
 
@@ -80,7 +80,7 @@ namespace emp {
   }
 
   static bool HasDebugLine(std::string name) {
-    return GetDebugLineMap().find(name) != GetDebugLineMap().end();
+    return GetDebugLineMap().contains(name);
   }
 
   static auto & GetDebugLine(std::string name) { return GetDebugLineMap()[name]; }
@@ -88,7 +88,7 @@ namespace emp {
   [[maybe_unused]] static void AddDebugLine(std::string name, std::string file, size_t line) {
     std::stringstream ss;
     ss << file << ':' << line;
-    notify::TestError(HasDebugLine(name), "Adding a second debug line named '", name, "'.");
+    notify::TestError(HasDebugLine(name), "REPLACING debug line named '", name, "'.");
     GetDebugLine(name) = ss.str();
   }
 
