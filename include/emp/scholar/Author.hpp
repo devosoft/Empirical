@@ -50,10 +50,7 @@ namespace emp {
       middle_names.push_back(middle);
     }
 
-    Author(const String & first, const String & last)
-      : first_name(first), last_name(last) {
-      ;
-    }
+    Author(const String & first, const String & last) : first_name(first), last_name(last) { ; }
 
     Author(const String & last) : last_name(last) { ; }
 
@@ -143,9 +140,7 @@ namespace emp {
       return full_name;
     }
 
-    String GetFirstInitial() const {
-      return HasFirstName() ? first_name.substr(0,1) : "";
-    }
+    String GetFirstInitial() const { return HasFirstName() ? first_name.substr(0, 1) : ""; }
 
     String GetMiddleInitials() const {
       String out;
@@ -153,9 +148,7 @@ namespace emp {
       return out;
     }
 
-    String GetLastInitial() const {
-      return HasLastName() ? last_name.substr(0,1) : "";
-    }
+    String GetLastInitial() const { return HasLastName() ? last_name.substr(0, 1) : ""; }
 
     String GetInitials() const {
       String inits;

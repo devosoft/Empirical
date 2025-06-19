@@ -79,9 +79,7 @@ namespace emp {
     return line_map;
   }
 
-  static bool HasDebugLine(std::string name) {
-    return GetDebugLineMap().contains(name);
-  }
+  static bool HasDebugLine(std::string name) { return GetDebugLineMap().contains(name); }
 
   static auto & GetDebugLine(std::string name) { return GetDebugLineMap()[name]; }
 
