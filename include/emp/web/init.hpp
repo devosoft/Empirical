@@ -82,8 +82,8 @@ static void InitializeBitmapListener() {
           }
         })
     });
-  // clang-format on
   }
+  // clang-format on
 
 #endif  // #ifdef __EMSCRIPTEN_PTHREADS__
 }
