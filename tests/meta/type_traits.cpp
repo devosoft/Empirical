@@ -54,29 +54,29 @@ TEST_CASE("Test type_traits", "[meta]")
   REQUIRE( emp::hasFromDouble<std::string> == false );
   REQUIRE( emp::hasFromDouble<int> == false );
 
-  REQUIRE( emp::is_std_function<int>() == false );
-  REQUIRE( emp::is_std_function<int(double)>() == false );
-  REQUIRE( emp::is_std_function<std::function<int(double)>>() == true );
+  REQUIRE( emp::is_std_function<int>::value == false );
+  REQUIRE( emp::is_std_function<int(double)>::value == false );
+  REQUIRE( emp::is_std_function<std::function<int(double)>>::value == true );
 
-  REQUIRE( std::is_same< emp::remove_std_function_t<std::function<int(double)>>, int(double) >() == true );
+  REQUIRE( std::is_same< emp::remove_std_function_t<std::function<int(double)>>, int(double) >::value == true );
 
-  REQUIRE( std::is_same< emp::element_t<int>, int >() == true );
-  REQUIRE( std::is_same< emp::element_t<std::vector<int>>, int >() == true );
+  REQUIRE( std::is_same< emp::element_t<int>, int >::value == true );
+  REQUIRE( std::is_same< emp::element_t<std::vector<int>>, int >::value == true );
 
-  REQUIRE( emp::is_emp_vector<char>() == false );
-  REQUIRE( emp::is_emp_vector<emp::vector<std::string>>() == true );
+  REQUIRE( emp::is_emp_vector<char>::value == false );
+  REQUIRE( emp::is_emp_vector<emp::vector<std::string>>::value == true );
 
-  REQUIRE( emp::is_ptr_type< bool >() == false);
-  REQUIRE( emp::is_ptr_type< bool * >() == true);
-  REQUIRE( emp::is_ptr_type< bool * const >() == true);
-  REQUIRE( emp::is_ptr_type< emp::Ptr<bool> >() == true);
-  REQUIRE( emp::is_ptr_type< bool & >() == false);
+  REQUIRE( emp::is_ptr_type< bool >::value == false);
+  REQUIRE( emp::is_ptr_type< bool * >::value == true);
+  REQUIRE( emp::is_ptr_type< bool * const >::value == true);
+  REQUIRE( emp::is_ptr_type< emp::Ptr<bool> >::value == true);
+  REQUIRE( emp::is_ptr_type< bool & >::value == false);
 
-  REQUIRE( std::is_same< emp::remove_pointer_t< bool >, bool >() == true );
-  REQUIRE( std::is_same< emp::remove_pointer_t< bool * >, bool >() == true );
-  REQUIRE( std::is_same< emp::remove_pointer_t< bool * const >, const bool >() == true );
-  REQUIRE( std::is_same< emp::remove_pointer_t< emp::Ptr<bool> >, bool >() == true );
-  REQUIRE( std::is_same< emp::remove_pointer_t< bool & >, bool & >() == true );
+  REQUIRE( std::is_same< emp::remove_pointer_t< bool >, bool >::value == true );
+  REQUIRE( std::is_same< emp::remove_pointer_t< bool * >, bool >::value == true );
+  REQUIRE( std::is_same< emp::remove_pointer_t< bool * const >, const bool >::value == true );
+  REQUIRE( std::is_same< emp::remove_pointer_t< emp::Ptr<bool> >, bool >::value == true );
+  REQUIRE( std::is_same< emp::remove_pointer_t< bool & >, bool & >::value == true );
 }
 
 TEST_CASE("Test is_streamable", "[meta]") {
