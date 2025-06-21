@@ -30,17 +30,17 @@ namespace emp {
   /// It is useful to include alongside debug code that you want to remember to remove when you
   /// are done debugging; it is automatically included with the emp_debug() function below.
   /// If you want to intentionally compile in release mode, make sure to define EMP_NO_BLOCK.
-#ifdef NDEBUG
-#ifdef EMP_NO_BLOCK
-#define BlockRelease(BLOCK)
-#else  // #ifdef EMP_NO_BLOCK
-#define BlockRelease(BLOCK) \\
-      std::cerr << "Release block at " << __FILE___ << ", line " << __LINE__ << std::endl;\\
-      static_assert(!BLOCK, "Release blocked due to debug material.")
-#endif  // #ifdef EMP_NO_BLOCK : #else
-#else   // #ifdef NDEBUG
-#define BlockRelease(BLOCK)
-#endif  // #ifdef NDEBUG : #else
+  #ifdef NDEBUG
+  #ifdef EMP_NO_BLOCK
+  #define BlockRelease(BLOCK)
+  #else  // #ifdef EMP_NO_BLOCK
+  #define BlockRelease(BLOCK) \\
+        std::cerr << "Release block at " << __FILE___ << ", line " << __LINE__ << std::endl;\\
+        static_assert(!BLOCK, "Release blocked due to debug material.")
+  #endif  // #ifdef EMP_NO_BLOCK : #else
+  #else   // #ifdef NDEBUG
+  #define BlockRelease(BLOCK)
+  #endif  // #ifdef NDEBUG : #else
 
   /// The EMP_DEBUG macro executes its contents in debug mode, but otherwise ignores them.
   /// test_debug() can be used inside of an if-constexpr for code you want only in debug mode.
@@ -83,7 +83,7 @@ namespace emp {
 
   static auto & GetDebugLine(std::string name) { return GetDebugLineMap()[name]; }
 
-  [[maybe_unused]] static void AddDebugLine(std::string name, std::string file, size_t line) {
+  [[maybe_unused]] static bool AddDebugLine(std::string name, std::string file, size_t line) {
     std::stringstream ss;
     ss << file << ':' << line;
     notify::TestError(HasDebugLine(name), "REPLACING debug line named '", name, "'.");
@@ -95,6 +95,7 @@ namespace emp {
 #else  // #ifdef NDEBUG
 #define EMP_TRACK_LINE(NAME) emp::AddDebugLine(NAME, __FILE__, __LINE__)
 #endif  // #ifdef NDEBUG : #else
+
 }  // namespace emp
 
 #endif  // #ifndef INCLUDE_EMP_DEBUG_DEBUG_HPP_GUARD
