@@ -60,6 +60,11 @@
 #include <unordered_map>
 #include <unordered_set>
 
+// If we are in emscripten, make sure to include the header.
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
+
 namespace emp::notify {
   using id_t          = std::string;
   using message_t     = std::string;
@@ -201,7 +206,7 @@ namespace emp::notify {
     HandlerSet & GetHandler(Type type) { return handler_map[NotifyTypeID(type)]; }
 
     static void DefaultPrint(const std::string & msg, [[maybe_unused]] bool to_cerr = false) {
-#if defined(__EMSCRIPTEN__)
+#ifdef __EMSCRIPTEN__
       EM_ASM({
         msg = UTF8ToString($0);
         if (typeof alert == "undefined") { globalThis.alert = console.log; }
