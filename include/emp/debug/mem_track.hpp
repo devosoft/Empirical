@@ -39,7 +39,6 @@
 #include <string>
 
 #include "../base/map.hpp"
-
 #include "../base/notify.hpp"
 
 #ifdef EMP_NO_MEM_CHECK

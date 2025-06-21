@@ -39,30 +39,33 @@ namespace emp {
     using this_t = emp::vector<T, Ts...>;
     using stdv_t = std::vector<T, Ts...>;
 
-    // Extra state only in debug mode:
-    #ifndef EMP_NDEBUG
+#ifndef EMP_NDEBUG
     /// Setup a threshold; if we try to make a vector bigger than MAX_SIZE, throw a warning.
     constexpr static const size_t MAX_SIZE = 2'000'000'001;  // 2x10^9 + 1
 
     /// Setup a revision number - iterators must match the revision of their vector.
     int revision = 0;
-    #endif
+#endif  // #ifndef EMP_NDEBUG
 
   public:
-
 #ifdef EMP_NDEBUG
     // Outside of debug mode, we just need to make constructors available.
     vector() : stdv_t() {}
+
     vector(const this_t & _in) : stdv_t(_in) {}
+
     vector(size_t size) : stdv_t(size) {}
+
     vector(size_t size, const T & val) : stdv_t(size, val) {}
+
     vector(std::initializer_list<T> in_list) : stdv_t(in_list) {}
+
     vector(const stdv_t & in) : stdv_t(in) {}  // Emergency fallback conversion.
 
     template <typename InputIt>
     vector(InputIt first, InputIt last) : stdv_t(first, last) {}
 
-#else  // #ifdef EMP_NDEBUG
+#else   // #ifdef EMP_NDEBUG
 
     /// Setup an iterator wrapper to make sure that they're not used again after a vector changes.
     template <typename ITERATOR_T>
@@ -389,15 +392,15 @@ namespace emp {
       stdv_t::emplace_back(std::forward<ARGS>(args)...);
       revision++;
     }
-#endif
+#endif  // #ifdef EMP_NDEBUG : #else
 
   };  // class vector
-
 
   /// Build a specialized debug wrapper for emp::vector<bool>
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   template <typename... Ts>
-  class vector<bool, Ts...> : public std::vector<bool, Ts...>
+  class vector<bool, Ts...>
+    : public std::vector<bool, Ts...>
 #else   // #ifndef DOXYGEN_SHOULD_SKIP_THIS
   template <typename t>
   class vector<bool>
@@ -407,10 +410,10 @@ namespace emp {
     using this_t = emp::vector<bool, Ts...>;
     using stdv_t = std::vector<bool, Ts...>;
 
-    #ifndef EMP_NDEBUG
+#ifndef EMP_NDEBUG
     /// Setup a threshold; if we try to make a vector bigger than MAX_SIZE, throw a warning.
     constexpr static const size_t MAX_SIZE = 2'000'000'001;
-    #endif
+#endif  // #ifndef EMP_NDEBUG
 
   public:
     using iterator        = typename stdv_t::iterator;

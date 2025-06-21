@@ -15,7 +15,7 @@
  * - Error: Something has gone horribly wrong and is impossible to recover from (exit)
  * - Exception: Something didn't go the way we expected, but we can still recover (exit if not handled)
  * - Debug: A simple notification that should only be printed when NDEBUG is not set (don't exit)
- * 
+ *
  * These can be called as functions in the notify namespace with the appropriate name.
  *
  *   emp::notify::Message("The file '", filename, "' has successfully loaded.");
@@ -23,10 +23,10 @@
  *
  * Messages default to "standard out"; all of the other default to "standard error".  Handling of
  * these notifications can all be overridden by either whole category or by specific tag.
- * 
+ *
  * All of these functions also have a Test* version where the first argument must be true for the
  * notification to occur.  For example:
- * 
+ *
  *   emp::notify::TestError(x > 10, "The value x must be <= 10, but x = ", x);
  *
  * There are three possible recipients for all errors/warnings.
@@ -39,7 +39,7 @@
  *
  * SHORTCUTS:
  * - emp::Alert(...) is a shortcut to emp::notify::Warning(...)
- * 
+ *
  * NOTES:
  * - Whenever possible, Exception() should be preferred over Error().  They are can be responded
  *   to or selectively disabled, rather than always automatically halting execution.
@@ -190,7 +190,7 @@ namespace emp::notify {
   struct NotifyData {
     // For each exception name we will keep a vector of handlers, appended to in the order
     // that they arrive (most recent will be last)
-    std::unordered_map<id_t, HandlerSet> handler_map;  // Full set of notification handlers.
+    std::unordered_map<id_t, HandlerSet> handler_map;   // Full set of notification handlers.
     std::unordered_map<std::string, bool> verbose_map;  // Set of categories for verbose messages.
     std::vector<exit_fun_t> exit_funs;                  // Set of handlers to run on exit.
     std::vector<ExceptInfo> except_queue;  // Unresolved exceptions after handlers have run
@@ -536,7 +536,7 @@ namespace emp {
     return notify::Warning(std::forward<Ts>(args)...);
   }
 
-    /// A version of Alert that will cap how many times it can go off
+  /// A version of Alert that will cap how many times it can go off
   template <typename... Ts>
   static bool CappedAlert(size_t cap, Ts... inputs) {
     static size_t cur_count = 0;
@@ -544,6 +544,6 @@ namespace emp {
     return false;
   }
 
-}
+}  // namespace emp
 
 #endif  // #ifndef INCLUDE_EMP_BASE_NOTIFY_HPP_GUARD

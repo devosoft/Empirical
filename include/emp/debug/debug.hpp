@@ -26,21 +26,21 @@
 
 namespace emp {
 
-  /// BlockRelease(true) will halt compilation if NDEBUG is on and EMP_NO_BLOCK is off.
-  /// It is useful to include alongside debug code that you want to remember to remove when you
-  /// are done debugging; it is automatically included with the emp_debug() function below.
-  /// If you want to intentionally compile in release mode, make sure to define EMP_NO_BLOCK.
-  #ifdef NDEBUG
-  #ifdef EMP_NO_BLOCK
-  #define BlockRelease(BLOCK)
-  #else  // #ifdef EMP_NO_BLOCK
-  #define BlockRelease(BLOCK) \\
+/// BlockRelease(true) will halt compilation if NDEBUG is on and EMP_NO_BLOCK is off.
+/// It is useful to include alongside debug code that you want to remember to remove when you
+/// are done debugging; it is automatically included with the emp_debug() function below.
+/// If you want to intentionally compile in release mode, make sure to define EMP_NO_BLOCK.
+#ifdef NDEBUG
+#ifdef EMP_NO_BLOCK
+#define BlockRelease(BLOCK)
+#else  // #ifdef EMP_NO_BLOCK
+#define BlockRelease(BLOCK) \\
         std::cerr << "Release block at " << __FILE___ << ", line " << __LINE__ << std::endl;\\
         static_assert(!BLOCK, "Release blocked due to debug material.")
-  #endif  // #ifdef EMP_NO_BLOCK : #else
-  #else   // #ifdef NDEBUG
-  #define BlockRelease(BLOCK)
-  #endif  // #ifdef NDEBUG : #else
+#endif  // #ifdef EMP_NO_BLOCK : #else
+#else   // #ifdef NDEBUG
+#define BlockRelease(BLOCK)
+#endif  // #ifdef NDEBUG : #else
 
   /// The EMP_DEBUG macro executes its contents in debug mode, but otherwise ignores them.
   /// test_debug() can be used inside of an if-constexpr for code you want only in debug mode.
