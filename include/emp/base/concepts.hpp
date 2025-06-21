@@ -31,14 +31,9 @@ namespace emp {
   // === Predeclarations used below ===
   template <typename TYPE>
   class Ptr;
-#ifdef NDEBUG
-  template <typename T, typename... Ts>
-  using vector = std::vector<T, Ts...>;
-#else   // #ifdef NDEBUG
+
   template <typename T, typename... Ts>
   class vector;
-#endif  // #ifdef NDEBUG : #else
-
 
   // === Concepts to check for Standard Library member functions.
   template <typename T>

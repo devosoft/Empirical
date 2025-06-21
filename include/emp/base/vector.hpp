@@ -30,33 +30,40 @@
 
 #include "assert.hpp"
 
-#ifdef EMP_NDEBUG
-
-// Seamlessly translate emp::vector to std::vector
-namespace emp {
-  template <typename T, typename... Ts>
-  using vector = std::vector<T, Ts...>;
-}
-
-
-#else  // #ifdef EMP_NDEBUG
-
 namespace emp {
 
-  /// Build a debug wrapper emp::vector around std::vector.
+  /// Build a wrapper for emp::vector around std::vector.
   template <typename T, typename... Ts>
   class vector : public std::vector<T, Ts...> {
   private:
     using this_t = emp::vector<T, Ts...>;
     using stdv_t = std::vector<T, Ts...>;
 
+    // Extra state only in debug mode:
+    #ifndef EMP_NDEBUG
     /// Setup a threshold; if we try to make a vector bigger than MAX_SIZE, throw a warning.
     constexpr static const size_t MAX_SIZE = 2'000'000'001;  // 2x10^9 + 1
 
     /// Setup a revision number - iterators must match the revision of their vector.
     int revision = 0;
+    #endif
 
   public:
+
+#ifdef EMP_NDEBUG
+    // Outside of debug mode, we just need to make constructors available.
+    vector() : stdv_t() {}
+    vector(const this_t & _in) : stdv_t(_in) {}
+    vector(size_t size) : stdv_t(size) {}
+    vector(size_t size, const T & val) : stdv_t(size, val) {}
+    vector(std::initializer_list<T> in_list) : stdv_t(in_list) {}
+    vector(const stdv_t & in) : stdv_t(in) {}  // Emergency fallback conversion.
+
+    template <typename InputIt>
+    vector(InputIt first, InputIt last) : stdv_t(first, last) {}
+
+#else  // #ifdef EMP_NDEBUG
+
     /// Setup an iterator wrapper to make sure that they're not used again after a vector changes.
     template <typename ITERATOR_T>
     struct iterator_wrapper : public ITERATOR_T {
@@ -234,7 +241,7 @@ namespace emp {
         emp_assert(OK(), ErrorCode());
         return wrapped_t::operator[](offset);
       }
-    };
+    };  // struct iterator_wrapper
 
     using iterator               = iterator_wrapper<typename stdv_t::iterator>;
     using const_iterator         = iterator_wrapper<typename stdv_t::const_iterator>;
@@ -382,22 +389,28 @@ namespace emp {
       stdv_t::emplace_back(std::forward<ARGS>(args)...);
       revision++;
     }
-  };
+#endif
 
-/// Build a specialized debug wrapper for emp::vector<bool>
+  };  // class vector
+
+
+  /// Build a specialized debug wrapper for emp::vector<bool>
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   template <typename... Ts>
-  class vector<bool, Ts...> : public std::vector<bool, Ts...> {
+  class vector<bool, Ts...> : public std::vector<bool, Ts...>
 #else   // #ifndef DOXYGEN_SHOULD_SKIP_THIS
   template <typename t>
-  class vector<bool> {
+  class vector<bool>
 #endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS : #else
+  {
   private:
     using this_t = emp::vector<bool, Ts...>;
     using stdv_t = std::vector<bool, Ts...>;
 
+    #ifndef EMP_NDEBUG
     /// Setup a threshold; if we try to make a vector bigger than MAX_SIZE, throw a warning.
     constexpr static const size_t MAX_SIZE = 2'000'000'001;
+    #endif
 
   public:
     using iterator        = typename stdv_t::iterator;
@@ -423,6 +436,9 @@ namespace emp {
     vector(InputIt first, InputIt last) : stdv_t(first, last) {
       ;
     }
+
+#ifndef EMP_NDEBUG
+    // In debug mode, wrap functions important to test.
 
     // operator stdv_t &() { return v; }
     // operator const stdv_t &() const { return v; }
@@ -474,6 +490,7 @@ namespace emp {
       emp_assert(stdv_t::size() > 0, stdv_t::size());
       stdv_t::pop_back();
     }
+#endif  // #ifndef EMP_NDEBUG
   };
 
   // A crude, generic printing function for vectors.
@@ -488,10 +505,8 @@ namespace emp {
     for (T & x : v) { is >> x; }
     return is;
   }
+
 }  // namespace emp
-
-#endif  // #ifdef EMP_NDEBUG : #else
-
 
 #endif  // #ifndef INCLUDE_EMP_BASE_VECTOR_HPP_GUARD
 
