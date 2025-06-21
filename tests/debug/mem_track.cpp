@@ -7,13 +7,16 @@
  *  @file
  */
 
+#ifndef EMP_TRACK_MEM
 #define EMP_TRACK_MEM
+#endif
 
 #include <sstream>
 #include <string>
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
+#include "emp/base/vector.hpp"
 #include "emp/debug/mem_track.hpp"
 
 struct TestClass1 {
