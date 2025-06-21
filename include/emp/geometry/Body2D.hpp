@@ -29,9 +29,9 @@
 #include <stddef.h>
 
 #include "../base/assert.hpp"
+#include "../base/notify.hpp"
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
-#include "../debug/alert.hpp"
 #include "../debug/mem_track.hpp"
 
 #include "Angle2D.hpp"

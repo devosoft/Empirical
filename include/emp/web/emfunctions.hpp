@@ -15,7 +15,7 @@
 #include <cstdint>
 #include <functional>
 
-#include "../debug/alert.hpp"
+#include "../base/notify.hpp"
 #include "../tools/String.hpp"
 
 #include "JSWrap.hpp"

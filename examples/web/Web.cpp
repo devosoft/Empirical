@@ -7,7 +7,6 @@
  *  @file
  */
 
-#include "emp/debug/alert.hpp"
 #include "emp/web/web.hpp"
 
 namespace UI = emp::web;

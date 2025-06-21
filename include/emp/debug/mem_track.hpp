@@ -40,7 +40,7 @@
 
 #include "../base/map.hpp"
 
-#include "alert.hpp"
+#include "../base/notify.hpp"
 
 #ifdef EMP_NO_MEM_CHECK
 

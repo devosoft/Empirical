@@ -1,6 +1,6 @@
 /**
  * This file is part of Empirical, https://github.com/devosoft/Empirical
- * Copyright (C) 2021-2024 Michigan State University
+ * Copyright (C) 2021-2025 Michigan State University
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/base/notify.hpp
@@ -15,23 +15,35 @@
  * - Error: Something has gone horribly wrong and is impossible to recover from (exit)
  * - Exception: Something didn't go the way we expected, but we can still recover (exit if not handled)
  * - Debug: A simple notification that should only be printed when NDEBUG is not set (don't exit)
+ * 
+ * These can be called as functions in the notify namespace with the appropriate name.
+ *
+ *   emp::notify::Message("The file '", filename, "' has successfully loaded.");
+ *   emp::notify::Warning("Unused variable: ", var_name);
  *
  * Messages default to "standard out"; all of the other default to "standard error".  Handling of
  * these notifications can all be overridden by either whole category or by specific tag.
+ * 
+ * All of these functions also have a Test* version where the first argument must be true for the
+ * notification to occur.  For example:
+ * 
+ *   emp::notify::TestError(x > 10, "The value x must be <= 10, but x = ", x);
  *
  * There are three possible recipients for all errors/warnings.
  * - The end-user if the problem stems from inputs they provided to the executable.
  * - The library user if the problem is due to mis-use of library functionality.
  * - The library developers if something that should be impossible occurs.
  *
- * The content of this file primarily targets the first group; developers should prefer asserts
- * to ensure that supposedly "impossible" situations do not occur.
+ * These functions target the first group; developers should prefer asserts to ensure that
+ * supposedly "impossible" situations do not occur.
  *
+ * SHORTCUTS:
+ * - emp::Alert(...) is a shortcut to emp::notify::Warning(...)
+ * 
  * NOTES:
- * - Whenever possible, exceptions should be preferred.  They are more specific than warnings
- *   and can be responded to rather than automatically halting execution like errors.
- * - Warnings should always detail what should be done differently to suppress that warning.
- *
+ * - Whenever possible, Exception() should be preferred over Error().  They are can be responded
+ *   to or selectively disabled, rather than always automatically halting execution.
+ * - Warning() should ideally detail what should be done differently to avoid that warning.
  */
 
 #pragma once
@@ -48,9 +60,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "vector.hpp"
-
-namespace emp { namespace notify {
+namespace emp::notify {
   using id_t          = std::string;
   using message_t     = std::string;
   using except_data_t = std::any;
@@ -71,7 +81,7 @@ namespace emp { namespace notify {
   static constexpr size_t num_types = static_cast<size_t>(Type::NUM_TYPES);
 
   /// Convert a type to a human-readable string.
-  static id_t TypeID(Type type) {
+  static id_t NotifyTypeID(Type type) {
     switch (type) {
       case Type::MESSAGE:   return "Message";
       case Type::DEBUG:     return "Debug";
@@ -108,7 +118,7 @@ namespace emp { namespace notify {
     using fun_t          = std::function<response_t>;
     using fun_no_data_t  = std::function<bool(id_arg_t, message_arg_t)>;
     using fun_msg_only_t = std::function<bool(message_arg_t)>;
-    emp::vector<fun_t> handlers;
+    std::vector<fun_t> handlers;
     bool exit_on_fail = false;
 
   public:
@@ -180,29 +190,23 @@ namespace emp { namespace notify {
   struct NotifyData {
     // For each exception name we will keep a vector of handlers, appended to in the order
     // that they arrive (most recent will be last)
-    std::unordered_map<id_t, HandlerSet>
-      handler_map;  // Map of all handlers to use for notifications.
+    std::unordered_map<id_t, HandlerSet> handler_map;  // Full set of notification handlers.
     std::unordered_map<std::string, bool> verbose_map;  // Set of categories for verbose messages.
-    emp::vector<exit_fun_t> exit_funs;                  // Set of handlers to run on exit.
-    emp::vector<ExceptInfo> except_queue;  // Unresolved exceptions after handlers have run
-    emp::vector<ExceptInfo> pause_queue;   // Unresolved notifications during pause
+    std::vector<exit_fun_t> exit_funs;                  // Set of handlers to run on exit.
+    std::vector<ExceptInfo> except_queue;  // Unresolved exceptions after handlers have run
+    std::vector<ExceptInfo> pause_queue;   // Unresolved notifications during pause
     bool lethal_exceptions = true;         // Should unresolved exceptions end the program?
     bool is_paused         = false;        // When paused, save notifications until unpaused.
 
-    HandlerSet & GetHandler(Type type) { return handler_map[TypeID(type)]; }
+    HandlerSet & GetHandler(Type type) { return handler_map[NotifyTypeID(type)]; }
 
     static void DefaultPrint(const std::string & msg, [[maybe_unused]] bool to_cerr = false) {
 #if defined(__EMSCRIPTEN__)
-      EM_ASM(
-        {
-          msg = UTF8ToString($0);
-          if (typeof alert == "undefined") {
-            // node polyfill
-            globalThis.alert = console.log;
-          }
-          alert(msg);
-        },
-        msg.c_str());
+      EM_ASM({
+        msg = UTF8ToString($0);
+        if (typeof alert == "undefined") { globalThis.alert = console.log; }
+        alert(msg);
+      }, msg.c_str());
 #else   // #if defined(__EMSCRIPTEN__)
       if (to_cerr) {
         std::cerr << msg << std::endl;
@@ -219,6 +223,7 @@ namespace emp { namespace notify {
         return true;
       });
 
+      // By default, debug printing occurs only in debug mode.
       GetHandler(Type::DEBUG)
         .Add(
 #ifdef NDEBUG
@@ -301,7 +306,7 @@ namespace emp { namespace notify {
   template <typename... Ts>
   static bool Notify(Type type, Ts... args) {
     NotifyData & data = GetData();
-    const id_t id     = TypeID(type);
+    const id_t id     = NotifyTypeID(type);
 
     // Setup the message in a string stream.
     std::stringstream ss;
@@ -372,6 +377,20 @@ namespace emp { namespace notify {
 #endif  // #ifdef NDEBUG : #else
     }
     return success;
+  }
+
+  // Print a message only if a specified condition is true.
+  template <typename... Ts>
+  static bool TestMessage(bool test, Ts... args) {
+    if (test) { return Message(std::forward<Ts>(args)...); }
+    return true;
+  }
+
+  // Trigger a debug output only if a specified condition is true.
+  template <typename... Ts>
+  static bool TestDebug(bool test, Ts... args) {
+    if (test) { return Debug(std::forward<Ts>(args)...); }
+    return true;
   }
 
   // Trigger a warning only if a specified condition is true.
@@ -449,8 +468,15 @@ namespace emp { namespace notify {
     return result;
   }
 
+  // Trigger a debug output only if a specified condition is true.
+  template <typename... Ts>
+  static bool TestException(bool test, Ts... args) {
+    if (test) { return Exception(std::forward<Ts>(args)...); }
+    return true;
+  }
+
   /// Retrieve a vector of ALL unresolved exceptions.
-  [[maybe_unused]] static const emp::vector<ExceptInfo> & GetExceptions() {
+  [[maybe_unused]] static const std::vector<ExceptInfo> & GetExceptions() {
     return GetData().except_queue;
   }
 
@@ -501,7 +527,22 @@ namespace emp { namespace notify {
     }
   }
 
-}}  // namespace emp::notify
+}  // namespace emp::notify
 
+// Shortcuts in emp for notify functions.
+namespace emp {
+  template <typename... Ts>
+  static void Alert(Ts... args) {
+    return notify::Warning(std::forward<Ts>(args)...);
+  }
+
+    /// A version of Alert that will cap how many times it can go off
+  template <typename... TYPE_SET>
+  static void CappedAlert(size_t cap, TYPE_SET... inputs) {
+    static size_t cur_count = 0;
+    if (++cur_count <= cap) { Alert(emp::to_string(inputs...)); }
+  }
+
+}
 
 #endif  // #ifndef INCLUDE_EMP_BASE_NOTIFY_HPP_GUARD
