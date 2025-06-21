@@ -532,15 +532,16 @@ namespace emp::notify {
 // Shortcuts in emp for notify functions.
 namespace emp {
   template <typename... Ts>
-  static void Alert(Ts... args) {
+  static bool Alert(Ts... args) {
     return notify::Warning(std::forward<Ts>(args)...);
   }
 
     /// A version of Alert that will cap how many times it can go off
-  template <typename... TYPE_SET>
-  static void CappedAlert(size_t cap, TYPE_SET... inputs) {
+  template <typename... Ts>
+  static bool CappedAlert(size_t cap, Ts... inputs) {
     static size_t cur_count = 0;
-    if (++cur_count <= cap) { Alert(emp::to_string(inputs...)); }
+    if (++cur_count <= cap) { return Alert(std::forward<Ts>(inputs)...); }
+    return false;
   }
 
 }

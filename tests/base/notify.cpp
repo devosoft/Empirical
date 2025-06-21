@@ -79,7 +79,7 @@ TEST_CASE("Test notifications", "[base]")
   emp::CappedAlert(2, "Capped ONE");
   emp::CappedAlert(2, "Capped TWO");
   emp::CappedAlert(2, "Capped THREE");
-  CHECK(warning_results.size() == 5);
+  CHECK(warning_results.size() == 6);
   CHECK(warning_results.back() == "Capped TWO");
 
   emp::notify::Error("ERROR!!!");
