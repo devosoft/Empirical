@@ -63,7 +63,7 @@
 // If we are in emscripten, make sure to include the header.
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
-#endif
+#endif  // #ifdef __EMSCRIPTEN__
 
 namespace emp::notify {
   using id_t          = std::string;
@@ -212,13 +212,13 @@ namespace emp::notify {
         if (typeof alert == "undefined") { globalThis.alert = console.log; }
         alert(msg);
       }, msg.c_str());
-#else   // #if defined(__EMSCRIPTEN__)
+#else   // #ifdef __EMSCRIPTEN__
       if (to_cerr) {
         std::cerr << msg << std::endl;
       } else {
         std::cout << msg << std::endl;
       }
-#endif  // #if defined(__EMSCRIPTEN__) : #else
+#endif  // #ifdef __EMSCRIPTEN__ : #else
     }
 
     NotifyData() {

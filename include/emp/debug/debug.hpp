@@ -83,7 +83,7 @@ namespace emp {
 
   static auto & GetDebugLine(std::string name) { return GetDebugLineMap()[name]; }
 
-  [[maybe_unused]] static bool AddDebugLine(std::string name, std::string file, size_t line) {
+  [[maybe_unused]] static void AddDebugLine(std::string name, std::string file, size_t line) {
     std::stringstream ss;
     ss << file << ':' << line;
     notify::TestError(HasDebugLine(name), "REPLACING debug line named '", name, "'.");
