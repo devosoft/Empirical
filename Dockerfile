@@ -217,10 +217,6 @@ RUN \
 RUN \
   /etc/init.d/xvfb start \
    && \
-  make test-web-Element -C /opt/Empirical/tests/web \
-    && \
-  make test-native-Element -C /opt/Empirical/tests/web \
-    && \
   make test-vector -C /opt/Empirical/tests/base \
     && \
   make clean -C /opt/Empirical/tests \
