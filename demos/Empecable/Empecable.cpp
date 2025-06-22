@@ -841,7 +841,11 @@ public:
     ValidateFileTokens();
 
     if (!IsSilent()) {
-      emp::PrintLn(ToBoldRed("=== ", File().GetNumIssues(), " issues found ==="));
+      if (File().GetNumIssues() == 0) {
+        emp::PrintLn(ToBoldRed("=== ", File().GetNumIssues(), " issues found ==="));
+      } else {
+        emp::PrintLn(ToBoldGreen("=== ", File().GetNumIssues(), " issues found ==="));
+      }
     }
     total_issues += File().GetNumIssues();
     if (IsVerbose()) emp::PrintLn();
