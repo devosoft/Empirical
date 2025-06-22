@@ -121,9 +121,7 @@ jobs:
       - name: Run headless test
         uses: GabrielBB/xvfb-action@v1
         with:
-          run: |
-            source third-party/emsdk/emsdk_env.sh
-            make test-web
+          run: bash -c "source third-party/emsdk/emsdk_env.sh && make test-web"
   # === Check that our unit tests cover as much code as possible ===
   test-coverage:
     name: Measure Test Coverage
