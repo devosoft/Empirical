@@ -65,12 +65,15 @@ namespace emp {
     template <typename InputIt>
     vector(InputIt first, InputIt last) : stdv_t(first, last) {}
 
+    this_t & operator=(const this_t &) & = default;
+    this_t & operator=(this_t &&) &      = default;
+
 #else   // #ifdef EMP_NDEBUG
 
     /// Setup an iterator wrapper to make sure that they're not used again after a vector changes.
     template <typename ITERATOR_T>
     struct iterator_wrapper : public ITERATOR_T {
-      using this_t    = iterator_wrapper<ITERATOR_T>;
+      using this_it_t = iterator_wrapper<ITERATOR_T>;
       using wrapped_t = ITERATOR_T;
       using vec_t     = emp::vector<T, Ts...>;
 
@@ -86,9 +89,9 @@ namespace emp {
         ;
       }
 
-      iterator_wrapper(const this_t &) = default;
-      iterator_wrapper(this_t &&)      = default;
-      iterator_wrapper()               = default;
+      iterator_wrapper(const this_it_t &) = default;
+      iterator_wrapper(this_it_t &&)      = default;
+      iterator_wrapper()                  = default;
 
       ~iterator_wrapper() { ; }
 
@@ -158,8 +161,8 @@ namespace emp {
         return true;
       }
 
-      this_t & operator=(const this_t &) & = default;
-      this_t & operator=(this_t &&) &      = default;
+      this_it_t & operator=(const this_it_t &) & = default;
+      this_it_t & operator=(this_it_t &&) &      = default;
 
       operator ITERATOR_T() { return *this; }
 
@@ -191,50 +194,50 @@ namespace emp {
         return wrapped_t::operator->();
       }
 
-      this_t & operator++() {
+      this_it_t & operator++() {
         emp_assert(OK(true, false, "++ (post)"), ErrorCode());
         wrapped_t::operator++();
         return *this;
       }
 
-      this_t operator++(int x) {
+      this_it_t operator++(int x) {
         emp_assert(OK(true, false, "++ (pre)"), ErrorCode());
-        return this_t(wrapped_t::operator++(x), v_ptr);
+        return this_it_t(wrapped_t::operator++(x), v_ptr);
       }
 
-      this_t & operator--() {
+      this_it_t & operator--() {
         emp_assert(OK(false, true, "-- (post)"), ErrorCode());
         wrapped_t::operator--();
         return *this;
       }
 
-      this_t operator--(int x) {
+      this_it_t operator--(int x) {
         emp_assert(OK(false, true, "-- (pre)"), ErrorCode());
-        return this_t(wrapped_t::operator--(x), v_ptr);
+        return this_it_t(wrapped_t::operator--(x), v_ptr);
       }
 
       auto operator+(int in) {
         emp_assert(OK(), ErrorCode());
-        return this_t(wrapped_t::operator+(in), v_ptr);
+        return this_it_t(wrapped_t::operator+(in), v_ptr);
       }
 
       auto operator-(int in) {
         emp_assert(OK(), ErrorCode());
-        return this_t(wrapped_t::operator-(in), v_ptr);
+        return this_it_t(wrapped_t::operator-(in), v_ptr);
       }
 
-      auto operator-(const this_t & in) {
+      auto operator-(const this_it_t & in) {
         emp_assert(OK(), ErrorCode());
         return ((wrapped_t) * this) - (wrapped_t) in;
       }
 
-      this_t & operator+=(int in) {
+      this_it_t & operator+=(int in) {
         emp_assert(OK(), ErrorCode());
         wrapped_t::operator+=(in);
         return *this;
       }
 
-      this_t & operator-=(int in) {
+      this_it_t & operator-=(int in) {
         emp_assert(OK(), ErrorCode());
         wrapped_t::operator-=(in);
         return *this;
