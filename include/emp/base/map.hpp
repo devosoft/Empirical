@@ -11,7 +11,7 @@
  * [square brackets] returns a proxy.  That proxy can either be assigned to OR convert an
  * existing value ONLY if it exists.  This mechanism ensures that we don't accidentally write
  * a default value to a map when all we meant to do was read from it, but had a typo.
- * If EMP_NDEBUG is set then it reverts back to std::map.
+ * If NDEBUG is set then it reverts back to std::map.
  */
 
 #pragma once
@@ -26,8 +26,8 @@
 #include "assert.hpp"
 #include "MapProxy.hpp"
 
-// If debug is turned out, translate back to std::map
-#ifdef EMP_NDEBUG
+// If debug is turned off, translate back to std::map
+#ifdef NDEBUG
 
 // Seamlessly translate emp::map to std::map
 namespace emp {
@@ -41,7 +41,7 @@ namespace emp {
   using multimap = std::multimap<Ts...>;
 }
 
-#else  // #ifdef EMP_NDEBUG
+#else  // #ifdef NDEBUG
 
 namespace emp {
 
@@ -166,7 +166,7 @@ namespace emp {
   };
 }  // namespace emp
 
-#endif  // #ifdef EMP_NDEBUG : #else
+#endif  // #ifdef NDEBUG : #else
 
 
 

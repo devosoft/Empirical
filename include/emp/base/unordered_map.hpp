@@ -21,7 +21,7 @@
 #include "MapProxy.hpp"
 
 // If debug is turned out, translate back to std::map
-#ifdef EMP_NDEBUG
+#ifdef NDEBUG
 
 // Seamlessly translate emp::unordered_map to std::unordered_map
 namespace emp {
@@ -35,7 +35,7 @@ namespace emp {
   using unordered_multimap = std::unordered_multimap<Ts...>;
 }
 
-#else  // #ifdef EMP_NDEBUG
+#else  // #ifdef NDEBUG
 
 namespace emp {
 
@@ -245,7 +245,7 @@ namespace emp {
   };
 }  // namespace emp
 
-#endif  // #ifdef EMP_NDEBUG : #else
+#endif  // #ifdef NDEBUG : #else
 
 
 
