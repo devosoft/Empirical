@@ -27,8 +27,7 @@
 #include "Canvas.hpp"
 #include "color_map.hpp"
 
-namespace emp { namespace web {
-
+namespace emp::web {
 
   /// Draw a Circle onto the canvas.
   /// @param canvas The Canvas to draw on.
@@ -346,6 +345,6 @@ namespace emp { namespace web {
   }
 
 
-}}  // namespace emp::web
+}  // namespace emp::web
 
 #endif  // #ifndef INCLUDE_EMP_WEB_CANVAS_UTILS_HPP_GUARD

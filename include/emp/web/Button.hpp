@@ -37,7 +37,7 @@
 #include "init.hpp"
 #include "Widget.hpp"
 
-namespace emp { namespace web {
+namespace emp::web {
 
   /// Create or control an HTML Button object that you can manipulate and update as needed.
   class Button : public internal::WidgetFacet<Button> {
@@ -167,6 +167,6 @@ namespace emp { namespace web {
   };
 
 
-}}  // namespace emp::web
+}  // namespace emp::web
 
 #endif  // #ifndef INCLUDE_EMP_WEB_BUTTON_HPP_GUARD

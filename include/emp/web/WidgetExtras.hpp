@@ -17,7 +17,7 @@
 #include "Listeners.hpp"
 #include "Style.hpp"
 
-namespace emp { namespace web {
+namespace emp::web {
 
   struct WidgetExtras {
     Style style;       ///< CSS Style
@@ -64,6 +64,6 @@ namespace emp { namespace web {
     operator bool() const { return style || attr || listen; }  // Return true if any extras are set.
   };
 
-}}  // namespace emp::web
+}  // namespace emp::web
 
 #endif  // #ifndef INCLUDE_EMP_WEB_WIDGET_EXTRAS_HPP_GUARD

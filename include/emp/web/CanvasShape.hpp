@@ -26,7 +26,7 @@
 
 #include "CanvasAction.hpp"
 
-namespace emp { namespace web {
+namespace emp::web {
 
   /// Define an arbitrary shape to draw on a canvas (base class)
   class CanvasShape : public CanvasAction {
@@ -86,27 +86,21 @@ namespace emp { namespace web {
                  const std::string & fc = "",
                  const std::string & lc = "",
                  double lw              = 1.0)
-      : CanvasShape(_x, _y, fc, lc, lw), radius(_r) {
-      ;
-    }
+      : CanvasShape(_x, _y, fc, lc, lw), radius(_r) {}
 
     CanvasCircle(Point _p,
                  double _r,
                  const std::string & fc = "",
                  const std::string & lc = "",
                  double lw              = 1.0)
-      : CanvasShape(_p, fc, lc, lw), radius(_r) {
-      ;
-    }
+      : CanvasShape(_p, fc, lc, lw), radius(_r) {}
 
     CanvasCircle(emp::Circle circle,
                  const std::string & fc = "",
                  const std::string & lc = "",
                  double lw              = 1.0)
       : CanvasShape(circle.GetCenterX(), circle.GetCenterY(), fc, lc, lw)
-      , radius(circle.GetRadius()) {
-      ;
-    }
+      , radius(circle.GetRadius()) {}
 
     void Apply() {
       EM_ASM(
@@ -365,7 +359,7 @@ namespace emp { namespace web {
     CanvasAction * Clone() const { return new CanvasText(*this); }
   };
 
-}}  // namespace emp::web
+}  // namespace emp::web
 
 #endif  // #ifndef INCLUDE_EMP_WEB_CANVAS_SHAPE_HPP_GUARD
 

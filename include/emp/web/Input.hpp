@@ -36,7 +36,7 @@
 
 #include "Widget.hpp"
 
-namespace emp { namespace web {
+namespace emp::web {
 
   /// Create or control an HTML Input object that you can manipulate and update as needed.
   class Input : public internal::WidgetFacet<Input> {
@@ -441,7 +441,7 @@ namespace emp { namespace web {
   };
 
 
-}}  // namespace emp::web
+}  // namespace emp::web
 
 #endif  // #ifndef INCLUDE_EMP_WEB_INPUT_HPP_GUARD
 

@@ -55,7 +55,7 @@
 #include "events.hpp"
 #include "JSWrap.hpp"
 
-namespace emp { namespace web {
+namespace emp::web {
 
   using namespace std::placeholders;
 
@@ -173,7 +173,7 @@ namespace emp { namespace web {
     }
   };
 
-}; };  // namespace emp::web
+}  // namespace emp::web
 
 #endif  // #ifndef INCLUDE_EMP_WEB_KEYPRESS_MANAGER_HPP_GUARD
 

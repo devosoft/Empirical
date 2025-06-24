@@ -50,7 +50,7 @@
 #include "init.hpp"
 #include "WidgetExtras.hpp"
 
-namespace emp { namespace web {
+namespace emp::web {
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   // Setup some types we will need later
@@ -1187,7 +1187,7 @@ namespace emp { namespace web {
   }  // namespace internal
 #endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-}}  // namespace emp::web
+}  // namespace emp::web
 
 
 #endif  // #ifndef INCLUDE_EMP_WEB_WIDGET_HPP_GUARD

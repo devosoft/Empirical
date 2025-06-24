@@ -1,6 +1,6 @@
 /**
  * This file is part of Empirical, https://github.com/devosoft/Empirical
- * Copyright (C) 2015-2018 Michigan State University
+ * Copyright (C) 2015-2025 Michigan State University
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/web/Document.hpp
@@ -40,12 +40,13 @@
 #include "Text.hpp"
 #include "TextArea.hpp"
 
-// Create an optional alternative to main, emp_main, that is only available after a document
+// Create an optional alternative to main(), emp_main(), that will run only after a document
 // has loaded and is ready.
 #ifdef EMPIRICAL
 
 #define emp_main() emp_main_on_ready();              \
   int main() {                                       \
+    emp::web::Initialize();                          \
     emp::web::OnDocumentReady( emp_main_on_ready );  \
   }                                                  \
   emp_main_on_ready()
@@ -54,7 +55,7 @@
 #define emp_main main
 #endif  // #ifdef EMPIRICAL : #else
 
-namespace emp { namespace web {
+namespace emp::web {
 
   class Document : public web::Div {
   public:
@@ -161,7 +162,7 @@ namespace emp { namespace web {
     web::TextArea TextArea(const std::string & in_id) { return web::TextArea(Find(in_id)); }
   };
 
-}}  // namespace emp::web
+}  // namespace emp::web
 
 
 #endif  // #ifndef INCLUDE_EMP_WEB_DOCUMENT_HPP_GUARD

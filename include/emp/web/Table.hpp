@@ -36,7 +36,7 @@
 #include "Widget.hpp"
 #include "WidgetExtras.hpp"
 
-namespace emp { namespace web {
+namespace emp::web {
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   class TableWidget;
@@ -872,7 +872,7 @@ namespace emp { namespace web {
       return *this;
     }
   };
-}}  // namespace emp::web
+}  // namespace emp::web
 
 #include "_TableCell.hpp"
 #include "_TableCol.hpp"
@@ -880,7 +880,7 @@ namespace emp { namespace web {
 #include "_TableRow.hpp"
 #include "_TableRowGroup.hpp"
 
-namespace emp { namespace web {
+namespace emp::web {
 
   // Fill out members of Table that require extra classes...
 
@@ -963,7 +963,7 @@ namespace emp { namespace web {
     return GetLastCol();
   }
 
-}}  // namespace emp::web
+}  // namespace emp::web
 
 #endif  // #ifndef INCLUDE_EMP_WEB_TABLE_HPP_GUARD
 

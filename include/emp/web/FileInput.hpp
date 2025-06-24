@@ -22,7 +22,7 @@
 
 #include "Widget.hpp"
 
-namespace emp { namespace web {
+namespace emp::web {
 
   ///  FileInput will convert the file to a std::string and pass the result to a
   ///  designated function.
@@ -170,6 +170,6 @@ namespace emp { namespace web {
   };
 
 
-}}  // namespace emp::web
+}  // namespace emp::web
 
 #endif  // #ifndef INCLUDE_EMP_WEB_FILE_INPUT_HPP_GUARD

@@ -24,7 +24,7 @@
 
 #include "../tools/string_utils.hpp"
 
-namespace emp { namespace web {
+namespace emp::web {
 
   /// Track a set of JavaScript Listeners with their callback IDs.
   class Listeners {
@@ -136,7 +136,7 @@ namespace emp { namespace web {
   };
 
 
-}}  // namespace emp::web
+}  // namespace emp::web
 
 
 #endif  // #ifndef INCLUDE_EMP_WEB_LISTENERS_HPP_GUARD

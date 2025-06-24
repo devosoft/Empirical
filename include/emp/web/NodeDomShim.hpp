@@ -20,7 +20,7 @@
 
 #include "Document.hpp"
 
-namespace emp { namespace web {
+namespace emp::web {
 
   struct NodeDomShim {
     NodeDomShim(const emp::vector<std::string> & init_divs = {}) {
@@ -47,7 +47,7 @@ namespace emp { namespace web {
     }
   };
 
-}}  // namespace emp::web
+}  // namespace emp::web
 
 #endif  // #ifndef INCLUDE_EMP_WEB_NODE_DOM_SHIM_HPP_GUARD
 

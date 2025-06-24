@@ -39,7 +39,7 @@
 #include "init.hpp"
 #include "Widget.hpp"
 
-namespace emp { namespace web {
+namespace emp::web {
 
   /// Create or control an HTML CheckBox object that you can manipulate and update as needed.
   class CheckBox : public internal::WidgetFacet<CheckBox> {
@@ -160,6 +160,6 @@ namespace emp { namespace web {
   };
 
 
-}}  // namespace emp::web
+}  // namespace emp::web
 
 #endif  // #ifndef INCLUDE_EMP_WEB_CHECK_BOX_HPP_GUARD

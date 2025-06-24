@@ -19,7 +19,7 @@
 #include "js_utils.hpp"
 #include "JSWrap.hpp"
 
-namespace emp { namespace web {
+namespace emp::web {
   /**
    * Extracts the query portion of a url and parses for key value pairs.
    *
@@ -64,6 +64,6 @@ namespace emp { namespace web {
     return res;
   }
 
-}}  // namespace emp::web
+}  // namespace emp::web
 
 #endif  // #ifndef INCLUDE_EMP_WEB_URL_PARAMS_HPP_GUARD

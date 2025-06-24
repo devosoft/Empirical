@@ -19,7 +19,7 @@
 #include "Text.hpp"
 #include "Widget.hpp"
 
-namespace emp { namespace web {
+namespace emp::web {
 
   /// A widget to track a div in an HTML file, and all of its contents.
   class DocuExtras : private Widget {
@@ -127,7 +127,7 @@ namespace emp { namespace web {
     operator bool() const { return static_cast<bool>(Info()->extras); }
   };
 
-}}  // namespace emp::web
+}  // namespace emp::web
 
 #endif  // #ifndef INCLUDE_EMP_WEB_DOCU_EXTRAS_HPP_GUARD
 

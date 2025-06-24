@@ -19,7 +19,7 @@
 #include "color_map.hpp"
 #include "Style.hpp"
 
-namespace emp { namespace web {
+namespace emp::web {
 
   /// Maintain information about an HTML font.
   class Font {
@@ -248,6 +248,6 @@ namespace emp { namespace web {
     bool operator!=(const Font & _in) const { return !operator==(_in); }
   };
 
-}}  // namespace emp::web
+}  // namespace emp::web
 
 #endif  // #ifndef INCLUDE_EMP_WEB_FONT_HPP_GUARD

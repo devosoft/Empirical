@@ -23,7 +23,7 @@
 #include "Text.hpp"
 #include "Widget.hpp"
 
-namespace emp { namespace web {
+namespace emp::web {
 
   /// A widget to track an element in an HTML file, and all of its contents.
   class Element : public Div {
@@ -39,6 +39,6 @@ namespace emp { namespace web {
     Element(const Widget & in) : Div(in) { ; }
   };
 
-}}  // namespace emp::web
+}  // namespace emp::web
 
 #endif  // #ifndef INCLUDE_EMP_WEB_ELEMENT_HPP_GUARD

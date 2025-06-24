@@ -14,7 +14,7 @@
 
 #include "Widget.hpp"
 
-namespace emp { namespace web {
+namespace emp::web {
 
   /// The Close command will prevent the specified widget from accepting further appends
   /// (and instead revert to trying parent widgets)
@@ -55,6 +55,6 @@ namespace emp { namespace web {
   static const PrintStr endl("<br>");
 #endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-}}  // namespace emp::web
+}  // namespace emp::web
 
 #endif  // #ifndef INCLUDE_EMP_WEB_COMMANDS_HPP_GUARD

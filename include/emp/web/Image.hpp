@@ -15,7 +15,7 @@
 
 #include "Widget.hpp"
 
-namespace emp { namespace web {
+namespace emp::web {
 
   ///  The Image widget will load an image from a specified URL.  For example, you can use
   ///  emp::web::Image("http://kripken.github.io/emscripten-site/_static/Emscripten_logo_full.png")
@@ -102,7 +102,7 @@ namespace emp { namespace web {
     }
   };
 
-}}  // namespace emp::web
+}  // namespace emp::web
 
 #endif  // #ifndef INCLUDE_EMP_WEB_IMAGE_HPP_GUARD
 

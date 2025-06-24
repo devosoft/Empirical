@@ -33,7 +33,7 @@
 #include "JSWrap.hpp"
 #include "Widget.hpp"
 
-namespace emp { namespace web {
+namespace emp::web {
 
   class Selector : public internal::WidgetFacet<Selector> {
     friend class SelectorInfo;
@@ -206,7 +206,7 @@ namespace emp { namespace web {
   };
 
 
-}}  // namespace emp::web
+}  // namespace emp::web
 
 #endif  // #ifndef INCLUDE_EMP_WEB_SELECTOR_HPP_GUARD
 

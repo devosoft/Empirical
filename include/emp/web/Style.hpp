@@ -25,7 +25,7 @@
 
 #include "../tools/string_utils.hpp"
 
-namespace emp { namespace web {
+namespace emp::web {
 
   ///  Class to maintain a map of setting names to values that can be easily ported
   ///  over to JavaScript.  A companion class, Attributes, also exists.
@@ -228,7 +228,7 @@ namespace emp { namespace web {
   };
 
 
-}}  // namespace emp::web
+}  // namespace emp::web
 
 
 #endif  // #ifndef INCLUDE_EMP_WEB_STYLE_HPP_GUARD

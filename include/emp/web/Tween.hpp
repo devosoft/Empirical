@@ -39,7 +39,7 @@
 #include "emfunctions.hpp"
 #include "Widget.hpp"
 
-namespace emp { namespace web {
+namespace emp::web {
 
   class Tween {
   private:
@@ -198,7 +198,7 @@ namespace emp { namespace web {
     }
   };
 
-}}  // namespace emp::web
+}  // namespace emp::web
 
 
 #endif  // #ifndef INCLUDE_EMP_WEB_TWEEN_HPP_GUARD

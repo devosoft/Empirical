@@ -25,14 +25,13 @@
 
 #include "JSWrap.hpp"
 
-namespace emp { namespace web {
+namespace emp::web {
 
-  /// Runs the specified function when the document is finished loading and being set up.
+  /// Runs the specified function when the document is finished loading AND being set up.
   template <typename FUN_TYPE>
   void OnDocumentReady(FUN_TYPE && fun) {
     // const size_t fun_id = JSWrapOnce(fun);
-    const size_t fun_id = JSWrap(std::forward<FUN_TYPE>(fun), "", true);
-    (void) fun_id;
+    [[maybe_unused]] const size_t fun_id = JSWrap(std::forward<FUN_TYPE>(fun), "", true);
 
     MAIN_THREAD_EM_ASM({
       if (document.readyState !== 'loading') {
@@ -159,6 +158,6 @@ namespace emp { namespace web {
       deltaMode = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].deltaMode; }, ARG_ID);
     }
   };
-}}  // namespace emp::web
+}  // namespace emp::web
 
 #endif  // #ifndef INCLUDE_EMP_WEB_EVENTS_HPP_GUARD

@@ -19,7 +19,7 @@
 
 #include "Widget.hpp"
 
-namespace emp { namespace web {
+namespace emp::web {
 
   /// An input field for text data.  A function provided at creation time will be called
   /// each time the contents of the TextWidget are changed.  The current text contents
@@ -184,6 +184,6 @@ namespace emp { namespace web {
   };
 
 
-}}  // namespace emp::web
+}  // namespace emp::web
 
 #endif  // #ifndef INCLUDE_EMP_WEB_TEXT_AREA_HPP_GUARD

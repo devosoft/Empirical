@@ -20,7 +20,7 @@
 
 #include "Widget.hpp"
 
-namespace emp { namespace web {
+namespace emp::web {
 
   /// A TextFeed widget handles putting text on a web page that can be controlled and modified.
 
@@ -160,6 +160,6 @@ namespace emp { namespace web {
     return web::TextFeed(this);
   }
 #endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
-}}  // namespace emp::web
+}  // namespace emp::web
 
 #endif  // #ifndef INCLUDE_EMP_WEB_TEXT_FEED_HPP_GUARD
