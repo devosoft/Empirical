@@ -15,13 +15,13 @@
 
 #include <cmath>
 #include <functional>
+#include <map>
 #include <set>
 #include <type_traits>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
 
-#include "../base/map.hpp"
 #include "../base/vector.hpp"
 #include "../datastructs/vector_utils.hpp"
 #include "../meta/type_traits.hpp"
@@ -57,7 +57,7 @@ namespace emp {
   template <typename C>
   double ShannonEntropy(C & elements) {
     // Count number of each value present
-    emp::map<typename emp::remove_ptr_type<typename C::value_type>::type, int> counts;
+    std::map<typename emp::remove_ptr_type<typename C::value_type>::type, int> counts;
     for (auto element : elements) {
       // If we have a container of pointers, dereference them
       if constexpr (emp::is_ptr_type<typename C::value_type>::value) {

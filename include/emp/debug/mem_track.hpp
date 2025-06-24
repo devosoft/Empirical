@@ -34,11 +34,10 @@
 #define EMP_NO_MEM_CHECK
 #endif  // #ifdef EMP_NDEBUG
 
-
+#include <map>
 #include <sstream>
 #include <string>
 
-#include "../base/map.hpp"
 #include "../base/notify.hpp"
 
 #ifdef EMP_NO_MEM_CHECK
@@ -60,9 +59,9 @@ namespace emp {
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
 
-    static emp::map<std::string, int> & TrackMem_GetMap() {
-      static emp::map<std::string, int> * track_mem_class_map = nullptr;
-      if (!track_mem_class_map) { track_mem_class_map = new emp::map<std::string, int>; }
+    static std::map<std::string, int> & TrackMem_GetMap() {
+      static std::map<std::string, int> * track_mem_class_map = nullptr;
+      if (!track_mem_class_map) { track_mem_class_map = new std::map<std::string, int>; }
       return *track_mem_class_map;
     }
 

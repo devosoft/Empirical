@@ -46,10 +46,10 @@
 #include <sstream>
 #include <stddef.h>
 #include <string>
+#include <unordered_map>
 #include <unordered_set>
 
 #include "../base/errors.hpp"
-#include "../base/unordered_map.hpp"
 #include "../base/vector.hpp"
 #include "../datastructs/map_utils.hpp"
 #include "../meta/macros.hpp"
@@ -426,23 +426,23 @@ namespace emp {
 
     // === Protected member variables ===
     emp::vector<std::string> class_names;                    // Names in class hierarchy.
-    emp::unordered_map<std::string, ConfigEntry *> var_map;  // All variables across groups.
+    std::unordered_map<std::string, ConfigEntry *> var_map;  // All variables across groups.
     std::string version_id;                // Unique version ID to ensure synced config.
     emp::vector<ConfigGroup *> group_set;  // All of the config groups.
     std::stringstream warnings;            // Aggregate warnings for combined display.
     int delay_warnings;                    // Count of delays to collect warnings for printing.
-    emp::unordered_map<std::string, std::string> alias_map;  // Map all aliases to original name.
+    std::unordered_map<std::string, std::string> alias_map;  // Map all aliases to original name.
 
     // Map namespaces to the appropriate config object.
-    emp::unordered_map<std::string, Config *> namespace_map;
+    std::unordered_map<std::string, Config *> namespace_map;
 
     // Map new type names to the manager that handles them.
-    emp::unordered_map<std::string, ConfigManager_Base *> type_manager_map;
+    std::unordered_map<std::string, ConfigManager_Base *> type_manager_map;
 
     // Build a map of extra input commands to the function that they should call if triggered.
-    emp::unordered_map<std::string, std::function<bool(std::string)> > command_map;
-    emp::unordered_map<std::string, std::function<bool(std::string)> > new_map;
-    emp::unordered_map<std::string, std::function<bool(std::string)> > use_map;
+    std::unordered_map<std::string, std::function<bool(std::string)> > command_map;
+    std::unordered_map<std::string, std::function<bool(std::string)> > new_map;
+    std::unordered_map<std::string, std::function<bool(std::string)> > use_map;
 
     // Instructions on how config should behave.
     bool expand_ok;  // Should we expand variables in the config file.

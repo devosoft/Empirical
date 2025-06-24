@@ -12,12 +12,12 @@
 #ifndef INCLUDE_EMP_SCHOLAR_CITATION_HPP_GUARD
 #define INCLUDE_EMP_SCHOLAR_CITATION_HPP_GUARD
 
+#include <map>
 #include <ostream>
 #include <set>
 #include <stddef.h>
 #include <string>
 
-#include "../base/map.hpp"
 #include "../base/vector.hpp"
 #include "../datastructs/map_utils.hpp"
 #include "../tools/string_utils.hpp"
@@ -51,10 +51,10 @@ namespace emp {
     emp::vector<std::string> notes;  // An optional note.
     std::set<std::string> keywords;  // Optional keywords.
 
-    emp::map<std::string, std::string> setting_map;
+    std::map<std::string, std::string> setting_map;
 
-    static const emp::map<std::string, CITE_TYPE> & GetNameMap() {
-      static emp::map<std::string, CITE_TYPE> name_map;
+    static const std::map<std::string, CITE_TYPE> & GetNameMap() {
+      static std::map<std::string, CITE_TYPE> name_map;
       if (name_map.size() == 0) {
         name_map["unknown"]       = UNKNOWN;
         name_map["article"]       = ARTICLE;
@@ -75,8 +75,8 @@ namespace emp {
     }
 
     // Name map in opposite direction (enum -> name)
-    static const emp::multimap<CITE_TYPE, std::string> & GetRNameMap() {
-      static const emp::multimap<CITE_TYPE, std::string> rname_map = emp::flip_map(GetNameMap());
+    static const std::multimap<CITE_TYPE, std::string> & GetRNameMap() {
+      static const std::multimap<CITE_TYPE, std::string> rname_map = emp::flip_map(GetNameMap());
       return rname_map;
     }
 

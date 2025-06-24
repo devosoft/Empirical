@@ -25,8 +25,8 @@
 #define INCLUDE_EMP_DATASTRUCTS_STRING_MAP_HPP_GUARD
 
 #include <stddef.h>
+#include <unordered_map>
 
-#include "../base/unordered_map.hpp"
 #include "../tools/string_utils.hpp"
 
 namespace emp {
@@ -69,7 +69,7 @@ namespace emp {
   template <typename T>
   class StringMap {
   private:
-    emp::unordered_map<size_t, T> str_map;
+    std::unordered_map<size_t, T> str_map;
   public:
     StringMap()                  = default;
     StringMap(const StringMap &) = default;

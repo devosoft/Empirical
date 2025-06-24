@@ -22,10 +22,10 @@
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <unordered_map>
 
 #include "../base/array.hpp"
 #include "../base/Ptr.hpp"
-#include "../base/unordered_map.hpp"
 #include "../base/vector.hpp"
 #include "../datastructs/map_utils.hpp"
 #include "../datastructs/vector_utils.hpp"
@@ -141,7 +141,7 @@ namespace emp {
     size_t cooldown_timer = 0;                ///< Do not process inst if value > 0.
                                               ///< Decrease this value instead
     //////// HELPER CONSTRUCTS
-    emp::unordered_map<size_t, size_t> nop_id_map; /**< NOP inst id -> Nop index
+    std::unordered_map<size_t, size_t> nop_id_map; /**< NOP inst id -> Nop index
                                                         (e.g., NopA -> 0, NopB -> 1,
                                                           NopE -> 5) */
     emp::vector<size_t> label_idx_vec;  ///< Vector of LABEL instructions indices in genome

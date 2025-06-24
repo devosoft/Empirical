@@ -18,8 +18,8 @@
 #define INCLUDE_EMP_DATASTRUCTS_RA_MAP_HPP_GUARD
 
 #include <map>
+#include <unordered_map>
 
-#include "../base/unordered_map.hpp"
 #include "../base/vector.hpp"
 #include "../math/constants.hpp"
 
@@ -51,7 +51,7 @@ namespace emp {
     using pointer         = typename std::allocator_traits<Allocator>::pointer;
     using const_pointer   = typename std::allocator_traits<Allocator>::const_pointer;
 
-    using layout_t = emp::unordered_map<KEY_T, size_t, Hash, KeyEqual>;
+    using layout_t = std::unordered_map<KEY_T, size_t, Hash, KeyEqual>;
 
   private:
     layout_t id_map;               ///< Map to find keys in vector.

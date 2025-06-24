@@ -15,10 +15,10 @@
 
 #include <stddef.h>
 #include <string>
+#include <unordered_map>
 
 #include "../base/assert.hpp"
 #include "../base/Ptr.hpp"
-#include "../base/unordered_map.hpp"
 #include "../base/vector.hpp"
 #include "../datastructs/map_utils.hpp"
 #include "../meta/TypeID.hpp"
@@ -54,7 +54,7 @@ namespace emp {
     };
 
     emp::vector < emp::Ptr < VarBase >> vars;        ///< Vector of all current variables.
-    emp::unordered_map<std::string, size_t> id_map;  ///< Map of names to vector positions.
+    std::unordered_map<std::string, size_t> id_map;  ///< Map of names to vector positions.
 
   public:
     VarMap() { ; }
