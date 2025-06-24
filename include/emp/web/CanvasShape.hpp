@@ -42,16 +42,12 @@ namespace emp::web {
                 const std::string & fc = "",
                 const std::string & lc = "",
                 double lw              = 1.0)
-      : p(_x, _y), fill_color(fc), line_color(lc), line_width(lw) {
-      ;
-    }
+      : p(_x, _y), fill_color(fc), line_color(lc), line_width(lw) {}
 
     CanvasShape(Point _p, const std::string & fc = "", const std::string & lc = "", double lw = 1.0)
-      : p(_p), fill_color(fc), line_color(lc), line_width(lw) {
-      ;
-    }
+      : p(_p), fill_color(fc), line_color(lc), line_width(lw) {}
 
-    virtual ~CanvasShape() { ; }
+    virtual ~CanvasShape() {}
 
     /// Shift the position of this shape to a point.
     void MoveTo(Point _p) { p = _p; }
@@ -103,15 +99,13 @@ namespace emp::web {
       , radius(circle.GetRadius()) {}
 
     void Apply() {
-      EM_ASM(
-        {
-          emp_i.ctx.beginPath();
-          emp_i.ctx.arc($0, $1, $2, 0, Math.PI * 2);
-        },
-        p.GetX(),
-        p.GetY(),
-        radius);  // Draw the circle
+      // clang-format off
+      EM_ASM({
+        emp_i.ctx.beginPath();
+        emp_i.ctx.arc($0, $1, $2, 0, Math.PI * 2);
+      }, p.GetX(), p.GetY(), radius);  // Draw the circle
       ApplyColor();
+      // clang-format on
     }
 
     CanvasAction * Clone() const { return new CanvasCircle(*this); }
@@ -127,9 +121,7 @@ namespace emp::web {
                double _h,
                const std::string & fc = "",
                const std::string & lc = "")
-      : CanvasShape(_p, fc, lc), w(_w), h(_h) {
-      ;
-    }
+      : CanvasShape(_p, fc, lc), w(_w), h(_h) {}
 
     CanvasRect(double _x,
                double _y,
@@ -137,20 +129,11 @@ namespace emp::web {
                double _h,
                const std::string & fc = "",
                const std::string & lc = "")
-      : CanvasShape(_x, _y, fc, lc), w(_w), h(_h) {
-      ;
-    }
+      : CanvasShape(_x, _y, fc, lc), w(_w), h(_h) {}
 
     void Apply() {
-      EM_ASM(
-        {
-          emp_i.ctx.beginPath();
-          emp_i.ctx.rect($0, $1, $2, $3);
-        },
-        p.GetX(),
-        p.GetY(),
-        w,
-        h);  // Draw the rectangle
+      // Draw the rectangle
+      EM_ASM({ emp_i.ctx.beginPath(); emp_i.ctx.rect($0, $1, $2, $3); }, p.GetX(), p.GetY(), w, h);
       ApplyColor();
     }
 
@@ -162,10 +145,10 @@ namespace emp::web {
     double w;  ///< Rectangle width.
     double h;  ///< Rectangle height.
   public:
-    CanvasClearRect(Point _p, double _w, double _h) : CanvasShape(_p), w(_w), h(_h) { ; }
+    CanvasClearRect(Point _p, double _w, double _h) : CanvasShape(_p), w(_w), h(_h) {}
 
     void Apply() {
-      EM_ASM({ emp_i.ctx.clearRect($0, $1, $2, $3); }, p.GetX(), p.GetY(), w, h);  // Draw the rectangle
+      EM_ASM({ emp_i.ctx.clearRect($0, $1, $2, $3); }, p.GetX(), p.GetY(), w, h);  // Draw rectangle
     }
 
     CanvasAction * Clone() const { return new CanvasClearRect(*this); }
@@ -177,26 +160,18 @@ namespace emp::web {
     emp::vector<Point> points;  ///< Series of points defining the perimeter of the Polygon.
   public:
     CanvasPolygon(const std::string & fc = "", const std::string & lc = "")
-      : CanvasShape(0, 0, fc, lc) {
-      ;
-    }
+      : CanvasShape(0, 0, fc, lc) {}
 
     CanvasPolygon(const emp::vector<Point> & p,
                   const std::string & fc = "",
                   const std::string & lc = "")
-      : CanvasShape(0, 0, fc, lc), points(p) {
-      ;
-    }
+      : CanvasShape(0, 0, fc, lc), points(p) {}
 
     CanvasPolygon(Point _p, const std::string & fc = "", const std::string & lc = "")
-      : CanvasShape(_p, fc, lc) {
-      ;
-    }
+      : CanvasShape(_p, fc, lc) {}
 
     CanvasPolygon(double _x, double _y, const std::string & fc = "", const std::string & lc = "")
-      : CanvasShape(_x, _y, fc, lc) {
-      ;
-    }
+      : CanvasShape(_x, _y, fc, lc) {}
 
     CanvasPolygon & AddPoint(double x, double y) {
       points.emplace_back(x, y);
@@ -209,29 +184,21 @@ namespace emp::web {
     }
 
     void Apply() {
-      EM_ASM(
-        {
-          emp_i.ctx.translate($0, $1);
-          emp_i.ctx.beginPath();
-          emp_i.ctx.moveTo($2, $3);
-        },
-        p.GetX(),
-        p.GetY(),
-        points[0].GetX(),
-        points[0].GetY());  // Setup the polygon
+      // clang-format off
+      EM_ASM({
+        emp_i.ctx.translate($0, $1);
+        emp_i.ctx.beginPath();
+        emp_i.ctx.moveTo($2, $3);
+      }, p.GetX(), p.GetY(), points[0].GetX(), points[0].GetY());  // Setup the polygon
+      // clang-format on
+
       for (size_t i = 1; i < points.size(); i++) {
-        EM_ASM(
-          { emp_i.ctx.lineTo($0, $1); },
-          points[i].GetX(),
-          points[i].GetY());  // Draw the lines for the polygon
+        // Draw the lines for the polygon
+        EM_ASM({ emp_i.ctx.lineTo($0, $1); }, points[i].GetX(), points[i].GetY());
       }
-      EM_ASM(
-        {
-          emp_i.ctx.closePath();
-          emp_i.ctx.translate($0, $1);
-        },
-        -p.GetX(),
-        -p.GetY());  // Close the polygon
+  
+      // Close the polygon
+      EM_ASM({ emp_i.ctx.closePath(); emp_i.ctx.translate($0, $1); }, -p.GetX(), -p.GetY());
       ApplyColor();
     }
 
@@ -300,13 +267,8 @@ namespace emp::web {
 
     void Apply() {
       // Startup the line path.
-      EM_ASM(
-        {
-          emp_i.ctx.beginPath();
-          emp_i.ctx.moveTo($0, $1);
-        },
-        p.GetX(),
-        p.GetY());
+      EM_ASM({ emp_i.ctx.beginPath(); emp_i.ctx.moveTo($0, $1); }, p.GetX(), p.GetY());
+
       // Loop through all internal points...
       for (auto p : points) {
         EM_ASM({ emp_i.ctx.lineTo($0, $1); }, p.GetX(), p.GetY());
@@ -329,25 +291,20 @@ namespace emp::web {
                const std::string & _text,
                const std::string & fc = "",
                const std::string & lc = "")
-      : CanvasShape(p, fc, lc), text(_text), center(false) {
-      ;
-    }
+      : CanvasShape(p, fc, lc), text(_text), center(false) { }
 
     void Apply() {
       if (center) {
         EM_ASM({ emp_i.ctx.textAlign = "center"; });
         EM_ASM({ emp_i.ctx.textBaseline = "middle"; });
       }
-      EM_ASM(
-        {
-          emp_i.ctx.fillStyle = UTF8ToString($3);
-          var text            = UTF8ToString($2);
-          emp_i.ctx.fillText(text, $0, $1);
-        },
-        p.GetX(),
-        p.GetY(),
-        text.c_str(),
-        fill_color.c_str());
+      // clang-format off
+      EM_ASM({
+        emp_i.ctx.fillStyle = UTF8ToString($3);
+        var text            = UTF8ToString($2);
+        emp_i.ctx.fillText(text, $0, $1);
+      }, p.GetX(), p.GetY(), text.c_str(), fill_color.c_str());
+      // clang-format on
     }
 
     /// Center this text.
