@@ -1,6 +1,6 @@
 /**
  * This file is part of Empirical, https://github.com/devosoft/Empirical
- * Copyright (C) 2015-2022 Michigan State University
+ * Copyright (C) 2015-2025 Michigan State University
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/web/js_utils.hpp
@@ -29,7 +29,7 @@ namespace emp {
   /// strings to describe those types in Javascript. This is useful when using
   /// getValue() from within MAIN_THREAD_EM_ASM macros.
   ///
-  ///  For example, say we have a templated function that takes a pointer to type
+  /// For example, say we have a templated function that takes a pointer to type
   /// T. We find out the appropriate string for type T :
   /// @code
   /// std::map<const char*, std::string> type_map = GetTypeToStringMap();
@@ -43,26 +43,28 @@ namespace emp {
   ///  }, pointer, type_string.c_str();
   /// @endcode
 
-  std::map<std::string, std::string> get_type_to_string_map() {
-    // Using typeid().name() could create problems because it varies by
-    // implementation. All that matters is consistency, but obscure could
-    // technically be given the same name. So far it seems to not be an issue
-    // with Emscripten, which is most critical for this code.
-    std::map<std::string, std::string> map_type_names;
-    map_type_names[typeid(int8_t).name()]      = "i8";
-    map_type_names[typeid(int16_t).name()]     = "i16";
-    map_type_names[typeid(int32_t).name()]     = "i32";
-    map_type_names[typeid(int64_t).name()]     = "i64";
-    map_type_names[typeid(float).name()]       = "float";
-    map_type_names[typeid(double).name()]      = "double";
-    map_type_names[typeid(int8_t *).name()]    = "i8*";
-    map_type_names[typeid(int16_t *).name()]   = "i16*";
-    map_type_names[typeid(int32_t *).name()]   = "i32*";
-    map_type_names[typeid(int64_t *).name()]   = "i64*";
-    map_type_names[typeid(float *).name()]     = "float*";
-    map_type_names[typeid(double *).name()]    = "double*";
-    map_type_names[typeid(void *).name()]      = "*";
-    map_type_names[typeid(std::string).name()] = "string";
+  static const std::map<std::string, std::string> & get_type_to_string_map() {
+    // Using typeid().name() could create problems because it varies by implementation.
+    // All that matters is consistency, but two obscure types could technically be given
+    // the same name. So far it seems to not be an issue with Emscripten, which is most
+    // critical for this code.
+    static std::map<std::string, std::string> map_type_names;
+    if (map_type_names.size() == 0) {
+      map_type_names[typeid(int8_t).name()]      = "i8";
+      map_type_names[typeid(int16_t).name()]     = "i16";
+      map_type_names[typeid(int32_t).name()]     = "i32";
+      map_type_names[typeid(int64_t).name()]     = "i64";
+      map_type_names[typeid(float).name()]       = "float";
+      map_type_names[typeid(double).name()]      = "double";
+      map_type_names[typeid(int8_t *).name()]    = "i8*";
+      map_type_names[typeid(int16_t *).name()]   = "i16*";
+      map_type_names[typeid(int32_t *).name()]   = "i32*";
+      map_type_names[typeid(int64_t *).name()]   = "i64*";
+      map_type_names[typeid(float *).name()]     = "float*";
+      map_type_names[typeid(double *).name()]    = "double*";
+      map_type_names[typeid(void *).name()]      = "*";
+      map_type_names[typeid(std::string).name()] = "string";
+    }
 
     return map_type_names;
   }
@@ -85,9 +87,8 @@ namespace emp {
     using T = typename C::value_type;
     // Figure out what string to use for the type we've been given
     std::map<std::string, std::string> map_type_names = get_type_to_string_map();
-    emp_assert((map_type_names.find(typeid(T).name()) != map_type_names.end()));
+    emp_assert((map_type_names.contains(typeid(T).name())));
     int type_size = sizeof(T);
-    (void) type_size;
     std::string type_string = map_type_names[typeid(T).name()];
 
     // Clear array, if this isn't a recursive call
@@ -95,26 +96,23 @@ namespace emp {
       MAIN_THREAD_EM_ASM({ emp_i.__incoming_array = []; });
     }
 
-    MAIN_THREAD_EM_ASM(
-      {
-        var curr_array = emp_i.__incoming_array;
-        var depth      = 0;
+    // clang-format off
+    MAIN_THREAD_EM_ASM({
+      var curr_array = emp_i.__incoming_array;
+      var depth      = 0;
 
-        // Make sure that we're at the right depth, in case of recursive call.
-        while (curr_array.length > 0) {
-          var next_index = getValue($4 + (depth * 4), "i32");
-          depth += 1;
-          curr_array = curr_array[next_index];
-        }
+      // Make sure that we're at the right depth, in case of recursive call.
+      while (curr_array.length > 0) {
+        var next_index = getValue($4 + (depth * 4), "i32");
+        depth += 1;
+        curr_array = curr_array[next_index];
+      }
 
-        // Iterate over array, get values, and add them to incoming array.
-        for (i = 0; i < $1; i++) { curr_array.push(getValue($0 + (i * $2), UTF8ToString($3))); }
-      },
-      &values[0],
-      values.size(),
-      type_size,
-      type_string.c_str(),
-      recursive_el.data());
+      // Iterate over array, get values, and add them to incoming array.
+      for (i = 0; i < $1; i++) { curr_array.push(getValue($0 + (i * $2), UTF8ToString($3))); }
+    }, &values[0], values.size(), type_size, type_string.c_str(), recursive_el.data());
+    // clang-format on
+
   }
 
   // Specialization for strings
@@ -126,19 +124,19 @@ namespace emp {
       MAIN_THREAD_EM_ASM({ emp_i.__incoming_array = []; });
     };
 
-    MAIN_THREAD_EM_ASM(
-      {
-        emp_i.__curr_array = emp_i.__incoming_array;
-        var depth          = 0;
+    // clang-format off
+    MAIN_THREAD_EM_ASM({
+      emp_i.__curr_array = emp_i.__incoming_array;
+      var depth          = 0;
 
-        // Make sure that we are at the right depth, in case of recursive call.
-        while (emp_i.__curr_array.length > 0) {
-          var next_index = getValue($0 + (depth * 4), "i32");
-          depth += 1;
-          emp_i.__curr_array = emp_i.__curr_array[next_index];
-        };
-      },
-      recursive_el.data());
+      // Make sure that we are at the right depth, in case of recursive call.
+      while (emp_i.__curr_array.length > 0) {
+        var next_index = getValue($0 + (depth * 4), "i32");
+        depth += 1;
+        emp_i.__curr_array = emp_i.__curr_array[next_index];
+      };
+    }, recursive_el.data());
+    // clang-format on
 
     // Iterate over array, get values, and add them to incoming array.
     for (auto val : values) {
@@ -160,26 +158,26 @@ namespace emp {
     }
 
     // Initialize objects in Javascript
-    MAIN_THREAD_EM_ASM(
-      {
-        var curr_array = emp_i.__incoming_array;
-        var depth      = 0;
+    // clang-format off
+    MAIN_THREAD_EM_ASM({
+      var curr_array = emp_i.__incoming_array;
+      var depth      = 0;
 
-        // Make sure that we're at the right depth, in case of recursive call.
-        while (curr_array.length > 0) {
-          var next_index = getValue($1 + (depth * 4), "i32");
-          depth += 1;
-          curr_array = curr_array[next_index];
-        }
+      // Make sure that we're at the right depth, in case of recursive call.
+      while (curr_array.length > 0) {
+        var next_index = getValue($1 + (depth * 4), "i32");
+        depth += 1;
+        curr_array = curr_array[next_index];
+      }
 
-        // Append empty objects
-        for (i = 0; i < $0; i++) {
-          var new_obj = {};
-          curr_array.push(new_obj);
-        }
-      },
-      values.size(),
-      recursive_el.data());
+      // Append empty objects
+      for (i = 0; i < $0; i++) {
+        var new_obj = {};
+        curr_array.push(new_obj);
+      }
+    }, values.size(), recursive_el.data());
+    // clang-format on
+
 
     for (std::size_t j = 0; j < values.size(); j++) {                 // Iterate over array
       for (std::size_t i = 0; i < values[j].var_names.size(); i++) {  // Iterate over object members
@@ -192,29 +190,26 @@ namespace emp {
                    values[j].var_types[i].name());
 
         // Load data into array of objects
-        MAIN_THREAD_EM_ASM(
-          {
-            var curr_array = emp_i.__incoming_array;
-            var depth      = 0;
+        // clang-format off
+        MAIN_THREAD_EM_ASM({
+          var curr_array = emp_i.__incoming_array;
+          var depth      = 0;
 
-            // Make sure we are at the right depth, in case of recursive call.
-            while (curr_array[0].length > 0) {
-              var next_index = getValue($4 + (depth * 4), "i32");
-              depth += 1;
-              curr_array = curr_array[next_index];
-            }
+          // Make sure we are at the right depth, in case of recursive call.
+          while (curr_array[0].length > 0) {
+            var next_index = getValue($4 + (depth * 4), "i32");
+            depth += 1;
+            curr_array = curr_array[next_index];
+          }
 
-            if (UTF8ToString($1) == "string") {
-              curr_array[$3][UTF8ToString($2)] = UTF8ToString($0);
-            } else {
-              curr_array[$3][UTF8ToString($2)] = getValue($0, UTF8ToString($1));
-            }
-          },
-          values[j].pointers[i],
-          type_string.c_str(),
-          var_name.c_str(),
-          j,
-          recursive_el.data());
+          if (UTF8ToString($1) == "string") {
+            curr_array[$3][UTF8ToString($2)] = UTF8ToString($0);
+          } else {
+            curr_array[$3][UTF8ToString($2)] = getValue($0, UTF8ToString($1));
+          }
+        }, values[j].pointers[i], type_string.c_str(), var_name.c_str(), j, recursive_el.data());
+        // clang-format on
+
       }
     }
   }
@@ -240,19 +235,18 @@ namespace emp {
     }
 
     // Append empty arrays to array that we are currently handling in recursion
-    MAIN_THREAD_EM_ASM(
-      {
-        var curr_array = emp_i.__incoming_array;
-        var depth      = 0;
-        while (curr_array.length > 0) {
-          var next_index = getValue($0 + (depth * 4), "i32");
-          depth += 1;
-          curr_array = curr_array[next_index];
-        }
-        for (i = 0; i < $1; i++) { curr_array.push([]); }
-      },
-      recursive_el.data(),
-      values.size());
+    // clang-format off
+    MAIN_THREAD_EM_ASM({
+      var curr_array = emp_i.__incoming_array;
+      var depth      = 0;
+      while (curr_array.length > 0) {
+        var next_index = getValue($0 + (depth * 4), "i32");
+        depth += 1;
+        curr_array = curr_array[next_index];
+      }
+      for (i = 0; i < $1; i++) { curr_array.push([]); }
+    }, recursive_el.data(), values.size());
+    // clang-format on
 
     // Make recursive calls - recursive_els specifies coordinates of array we're
     // currently operating on
@@ -274,19 +268,18 @@ namespace emp {
     }
 
     // Append empty arrays to array that we are currently handling in recursion
-    MAIN_THREAD_EM_ASM(
-      {
-        var curr_array = emp_i.__incoming_array;
-        var depth      = 0;
-        while (curr_array.length > 0) {
-          var next_index = getValue($0 + (depth * 4), "i32");
-          depth += 1;
-          curr_array = curr_array[next_index];
-        }
-        for (i = 0; i < $1; i++) { curr_array.push([]); }
-      },
-      recursive_el.data(),
-      values.size());
+    // clang-format off
+    MAIN_THREAD_EM_ASM({
+      var curr_array = emp_i.__incoming_array;
+      var depth      = 0;
+      while (curr_array.length > 0) {
+        var next_index = getValue($0 + (depth * 4), "i32");
+        depth += 1;
+        curr_array = curr_array[next_index];
+      }
+      for (i = 0; i < $1; i++) { curr_array.push([]); }
+    }, recursive_el.data(), values.size());
+    // clang-format on
 
     // Make recursive calls - recursive_els specifies coordinates of array we are
     // currently operating on
@@ -299,17 +292,16 @@ namespace emp {
 
 /// @endcond
 
-/// This function lets you pass an array from javascript to C++!
-/// It takes a reference to the array as an argument and populates it
-/// with the contents of emp.__outgoing_array.
-///
-/// Currently accepts arrays of ints, floats, doubles, chars, and std::strings
-/// The size of the passed array must be equal to the size of the array stored
-/// in emp.__outgoing_array
-//
-// Don't worry about the recurse argument - it's for handling nested arrays
-// internally
-#ifdef __EMSCRIPTEN__
+  /// This function lets you pass an array from javascript to C++!
+  /// It takes a reference to the array as an argument and populates it
+  /// with the contents of emp.__outgoing_array.
+  ///
+  /// Currently accepts arrays of ints, floats, doubles, chars, and std::strings
+  /// The size of the passed array must be equal to the size of the array stored
+  /// in emp.__outgoing_array
+  //
+  // Don't worry about the recurse argument - it's for handling nested arrays
+  // internally
   template <std::size_t SIZE, typename T>
   void pass_array_to_cpp(emp::array<T, SIZE> & arr, bool recurse = false) {
     (void) recurse;  // Unused?
@@ -329,15 +321,17 @@ namespace emp {
     // clang-format on
 
     // Write emp.__outgoing_array contents to a buffer
+    // clang-format off
     T * buffer = (T *) MAIN_THREAD_EM_ASM_INT({
-        var buffer = Module._malloc(emp_i.__outgoing_array.length * $0);
+      var buffer = Module._malloc(emp_i.__outgoing_array.length * $0);
 
-        for (i = 0; i < emp_i.__outgoing_array.length; i++) {
-          setValue(buffer + (i * $0), emp_i.__outgoing_array[i], UTF8ToString($1));
-        }
+      for (i = 0; i < emp_i.__outgoing_array.length; i++) {
+        setValue(buffer + (i * $0), emp_i.__outgoing_array[i], UTF8ToString($1));
+      }
 
-        return buffer;
-      }, type_size, type_string.c_str());
+      return buffer;
+    }, type_size, type_string.c_str());
+    // clang-format on
 
     // Populate array from buffer
     for (std::size_t i = 0; i < arr.size(); i++) { arr[i] = *(buffer + i); }
@@ -346,14 +340,7 @@ namespace emp {
     free(buffer);
   }
 
-#else   // #ifdef __EMSCRIPTEN__
-
-  template <std::size_t SIZE, typename T>
-  void pass_array_to_cpp(emp::array<T, SIZE> & arr, bool recurse = false) {}
-#endif  // #ifdef __EMSCRIPTEN__ : #else
-
-/// Same as pass_array_to_cpp, but lets you store values in a vector instead
-#ifdef __EMSCRIPTEN__
+  /// Same as pass_array_to_cpp, but lets you store values in a vector instead
   template <typename T>
   void pass_vector_to_cpp(emp::vector<T> & arr, bool recurse = false) {
     (void) recurse;  // Unused?
@@ -366,18 +353,17 @@ namespace emp {
     std::string type_string = map_type_names[typeid(T).name()];
 
     // Write emp.__outgoing_array contents to a buffer
-    T * buffer = (T *) MAIN_THREAD_EM_ASM_INT(
-      {
-        var buffer = Module._malloc(emp_i.__outgoing_array.length * $0);
+    // clang-format off
+    T * buffer = (T *) MAIN_THREAD_EM_ASM_INT({
+      var buffer = Module._malloc(emp_i.__outgoing_array.length * $0);
 
-        for (i = 0; i < emp_i.__outgoing_array.length; i++) {
-          setValue(buffer + (i * $0), emp_i.__outgoing_array[i], UTF8ToString($1));
-        }
+      for (i = 0; i < emp_i.__outgoing_array.length; i++) {
+        setValue(buffer + (i * $0), emp_i.__outgoing_array[i], UTF8ToString($1));
+      }
 
-        return buffer;
-      },
-      type_size,
-      type_string.c_str());
+      return buffer;
+    }, type_size, type_string.c_str());
+    // clang-format on
 
     // Populate array from buffer
     for (int i = 0; i < MAIN_THREAD_EM_ASM_INT({return emp_i.__outgoing_array.length}); i++) {
@@ -388,50 +374,8 @@ namespace emp {
     free(buffer);
   }
 
-#else   // #ifdef __EMSCRIPTEN__
-  template <typename T>
-  void pass_vector_to_cpp(emp::vector<T> & arr, bool recurse = false) {
-    ;
-  }
-#endif  // #ifdef __EMSCRIPTEN__ : #else
-
-/// @cond TEMPLATES
-
-
-// template <typename T>
-// typename std::enable_if<C::value_type::n_fields != -1, void>::type
-// pass_vector_to_cpp(emp::vector<T> & arr, bool recurse = false) {
-//
-//   // Figure out type stuff
-//   std::map<std::string, std::string> map_type_names = get_type_to_string_map();
-//   emp_assert((map_type_names.find(typeid(T).name()) != map_type_names.end()), typeid(T).name());
-//   int type_size = sizeof(T);
-//   (void) type_size;
-//   std::string type_string = map_type_names[typeid(T).name()];
-//
-//   // Write emp.__outgoing_array contents to a buffer
-//   T * buffer = (T*) MAIN_THREAD_EM_ASM_INT({
-//       var buffer = Module._malloc(emp_i.__outgoing_array.length*$0);
-//
-//       for (i=0; i<emp_i.__outgoing_array.length; i++) {
-//         setValue(buffer+(i*$0), emp_i.__outgoing_array[i], UTF8ToString($1));
-//       }
-//
-//       return buffer;
-//   }, type_size, type_string.c_str());
-//
-//   // Populate array from buffer
-//   for (int i=0; i < MAIN_THREAD_EM_ASM_INT({return emp_i.__outgoing_array.length}); i++) {
-//     arr.push_back(*(buffer + i));
-//   }
-//
-//   //Free the memory we allocated in Javascript
-//   free(buffer);
-// }
-
-// Chars aren't one of the types supported by setValue, but by treating them
-// as strings in Javascript we can pass them out to a C++ array
-#ifdef __EMSCRIPTEN__
+  // Chars aren't one of the types supported by setValue, but by treating them
+  // as strings in Javascript we can pass them out to a C++ array
   template <std::size_t SIZE>
   void pass_array_to_cpp(emp::array<char, SIZE> & arr, bool recurse = false) {
     (void) recurse;  // Unused?
@@ -455,16 +399,9 @@ namespace emp {
 
     free(buffer);
   }
-#else   // #ifdef __EMSCRIPTEN__
-  template <std::size_t SIZE>
-  void pass_array_to_cpp(emp::array<char, SIZE> & arr, bool recurse = false) {
-    ;
-  }
-#endif  // #ifdef __EMSCRIPTEN__ : #else
 
-// Chars aren't one of the types supported by setValue, but by treating them
-// as strings in Javascript we can pass them out to a C++ array
-#ifdef __EMSCRIPTEN__
+  // Chars aren't one of the types supported by setValue, but by treating them
+  // as strings in Javascript we can pass them out to a C++ array
   void pass_vector_to_cpp(emp::vector<char> & arr, bool recurse = false) {
     (void) recurse;  // Unused?
 
@@ -486,12 +423,8 @@ namespace emp {
 
     free(buffer);
   }
-#else   // #ifdef __EMSCRIPTEN__
-  void pass_vector_to_cpp(emp::vector<char> & arr, bool recurse = false) { ; }
-#endif  // #ifdef __EMSCRIPTEN__ : #else
 
-// We can handle strings in a similar way
-#ifdef __EMSCRIPTEN__
+  // We can handle strings in a similar way
   template <std::size_t SIZE>
   void pass_array_to_cpp(emp::array<std::string, SIZE> & arr, bool recurse = false) {
     (void) recurse;  // Unused?
@@ -529,15 +462,8 @@ namespace emp {
 
     free(buffer);
   }
-#else   // #ifdef __EMSCRIPTEN__
-  template <std::size_t SIZE>
-  void pass_array_to_cpp(emp::array<std::string, SIZE> & arr, bool recurse = false) {
-    ;
-  }
-#endif  // #ifdef __EMSCRIPTEN__ : #else
 
-// We can handle strings in a similar way
-#ifdef __EMSCRIPTEN__
+  // We can handle strings in a similar way
   void pass_vector_to_cpp(emp::vector<std::string> & arr, bool recurse = false) {
     (void) recurse;  // Unused?
 
@@ -572,12 +498,8 @@ namespace emp {
 
     free(buffer);
   }
-#else   // #ifdef __EMSCRIPTEN__
-  void pass_vector_to_cpp(emp::vector<std::string> & arr, bool recurse = false) { ; }
-#endif  // #ifdef __EMSCRIPTEN__ : #else
 
-// We can handle nested arrays through recursive calls on chunks of them
-#ifdef __EMSCRIPTEN__
+  // We can handle nested arrays through recursive calls on chunks of them
   template <std::size_t SIZE, std::size_t SIZE2, typename T>
   void pass_array_to_cpp(emp::array<emp::array<T, SIZE2>, SIZE> & arr, bool recurse = false) {
     emp_assert(arr.size() == MAIN_THREAD_EM_ASM_INT({return emp_i.__outgoing_array.length}));
@@ -605,15 +527,8 @@ namespace emp {
       MAIN_THREAD_EM_ASM({ emp_i.__temp_array.pop(); });
     }
   }
-#else   // #ifdef __EMSCRIPTEN__
-  template <std::size_t SIZE, std::size_t SIZE2, typename T>
-  void pass_array_to_cpp(emp::array<emp::array<T, SIZE2>, SIZE> & arr, bool recurse = false) {
-    ;
-  }
-#endif  // #ifdef __EMSCRIPTEN__ : #else
 
-/// We can handle nested arrays through recursive calls on chunks of them
-#ifdef __EMSCRIPTEN__
+  /// We can handle nested arrays through recursive calls on chunks of them
   template <typename T>
   void pass_vector_to_cpp(emp::vector<emp::vector < T> > &arr, bool recurse = false) {
     // Create temp array to hold whole array while pieces are passed in
@@ -642,12 +557,6 @@ namespace emp {
       MAIN_THREAD_EM_ASM({ emp_i.__temp_array.pop(); });
     }
   }
-#else   // #ifdef __EMSCRIPTEN__
-  template <typename T>
-  void pass_vector_to_cpp(emp::vector<emp::vector < T> > &arr, bool recurse = false) {
-    ;
-  }
-#endif  // #ifdef __EMSCRIPTEN__ : #else
 
   /// @endcond
 
@@ -670,16 +579,15 @@ namespace emp {
     emp::pass_array_to_javascript(keys);
     MAIN_THREAD_EM_ASM({ emp_i.__incoming_map_keys = emp_i.__incoming_array; });
 
-// check to make sure each key is not an object or a function
-#ifdef __EMSCRIPTEN__
+    // check to make sure each key is not an object or a function
+    // clang-format off
     emp_assert(MAIN_THREAD_EM_ASM_INT({
-                 emp_i.__incoming_map_keys.forEach(function(key) {
-                   if (typeof key === "object" || typeof key === "function") { return 0; }
-                 });
-                 return 1;
-               }),
-               "Keys cannot be an object or a function");
-#endif  // #ifdef __EMSCRIPTEN__
+      emp_i.__incoming_map_keys.forEach(function(key) {
+        if (typeof key === "object" || typeof key === "function") { return 0; }
+      });
+      return 1;
+    }), "Keys cannot be an object or a function");
+    // clang-format on
 
     // pass in extracted values vector to JS
     emp::pass_array_to_javascript(values);
@@ -710,16 +618,13 @@ namespace emp {
     emp::pass_array_to_javascript(keys);
     MAIN_THREAD_EM_ASM({ emp_i.__incoming_map_keys = emp_i.__incoming_array; });
 
-// check to make sure each key is not an object or a function
-#ifdef __EMSCRIPTEN__
+    // check to make sure each key is not an object or a function
     emp_assert(MAIN_THREAD_EM_ASM_INT({
                  emp_i.__incoming_map_keys.forEach(function(key) {
                    if (typeof key === "object" || typeof key === "function") { return 0; }
                  });
                  return 1;
-               }),
-               "Keys cannot be an object or a function");
-#endif  // #ifdef __EMSCRIPTEN__
+               }), "Keys cannot be an object or a function");
 
     // pass in values vector to JS
     emp::pass_array_to_javascript(values);
