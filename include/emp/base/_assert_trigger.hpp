@@ -18,16 +18,12 @@
 #include <stddef.h>
 #include <string>
 
+#include "compile_consts.hpp"
 #include "concepts.hpp"
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif  // #ifdef __EMSCRIPTEN__
-
-/// TDEBUG should trigger its EMP equivalent.
-#ifdef TDEBUG
-#define EMP_TDEBUG 1
-#endif  // #ifdef TDEBUG
 
 namespace emp {
 
@@ -49,7 +45,7 @@ namespace emp {
   }
 
   // Include the appropriate version of assert.
-  // Options are __EMSCRIPTEN__, EMP_TDEBUG, or regular.
+  // Options are __EMSCRIPTEN__, TDEBUG, or NDEBUG (regular).
 #if defined(__EMSCRIPTEN__)
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -85,7 +81,7 @@ namespace emp {
 
 #endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-#elif defined(EMP_TDEBUG)  // #if defined(__EMSCRIPTEN__)
+#elif defined(TDEBUG)  // #if defined(__EMSCRIPTEN__)
 
   constexpr bool assert_on = true;
 
@@ -110,7 +106,7 @@ namespace emp {
 
   void assert_clear() { emp::assert_last_fail = false; }
 
-#else  // #if defined(__EMSCRIPTEN__) : #elif defined(EMP_TDEBUG)
+#else  // #if defined(__EMSCRIPTEN__) : #elif defined(TDEBUG)
 
   constexpr bool assert_on = true;
 
@@ -122,7 +118,7 @@ namespace emp {
     return true;  // do process subsequent abort
   }
 
-#endif  // #if defined(__EMSCRIPTEN__) : #elif defined(EMP_TDEBUG) : #else
+#endif  // #if defined(__EMSCRIPTEN__) : #elif defined(TDEBUG) : #else
 
 }  // namespace emp
 

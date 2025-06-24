@@ -10,7 +10,7 @@
  * This class is a drop-in wrapper for std::vector, adding on bounds checking, both for the
  * indexing operator and for the use of iterators (ensure that iterators do not outlive the
  * version of vector for which it was created.)
- * If EMP_NDEBUG is set then it reverts back to std::vector.
+ * If NDEBUG is set then it reverts back to std::vector.
  *
  * @todo Debug code: member functions that take iterators should also take emp iterators that verify
  *       whether those iterators are valid.
@@ -39,16 +39,16 @@ namespace emp {
     using this_t = emp::vector<T, Ts...>;
     using stdv_t = std::vector<T, Ts...>;
 
-#ifndef EMP_NDEBUG
+#ifndef NDEBUG
     /// Setup a threshold; if we try to make a vector bigger than MAX_SIZE, throw a warning.
     constexpr static const size_t MAX_SIZE = 2'000'000'001;  // 2x10^9 + 1
 
     /// Setup a revision number - iterators must match the revision of their vector.
     int revision = 0;
-#endif  // #ifndef EMP_NDEBUG
+#endif  // #ifndef NDEBUG
 
   public:
-#ifdef EMP_NDEBUG
+#ifdef NDEBUG
     // Outside of debug mode, we just need to make constructors available.
     vector() : stdv_t() {}
 
@@ -68,7 +68,7 @@ namespace emp {
     this_t & operator=(const this_t &) & = default;
     this_t & operator=(this_t &&) &      = default;
 
-#else   // #ifdef EMP_NDEBUG
+#else   // #ifdef NDEBUG
 
     /// Setup an iterator wrapper to make sure that they're not used again after a vector changes.
     template <typename ITERATOR_T>
@@ -395,7 +395,7 @@ namespace emp {
       stdv_t::emplace_back(std::forward<ARGS>(args)...);
       revision++;
     }
-#endif  // #ifdef EMP_NDEBUG : #else
+#endif  // #ifdef NDEBUG : #else
 
   };  // class vector
 
@@ -413,10 +413,10 @@ namespace emp {
     using this_t = emp::vector<bool, Ts...>;
     using stdv_t = std::vector<bool, Ts...>;
 
-#ifndef EMP_NDEBUG
+#ifndef NDEBUG
     /// Setup a threshold; if we try to make a vector bigger than MAX_SIZE, throw a warning.
     constexpr static const size_t MAX_SIZE = 2'000'000'001;
-#endif  // #ifndef EMP_NDEBUG
+#endif  // #ifndef NDEBUG
 
   public:
     using iterator        = typename stdv_t::iterator;
@@ -443,7 +443,7 @@ namespace emp {
       ;
     }
 
-#ifndef EMP_NDEBUG
+#ifndef NDEBUG
     // In debug mode, wrap functions important to test.
 
     // operator stdv_t &() { return v; }
@@ -496,7 +496,7 @@ namespace emp {
       emp_assert(stdv_t::size() > 0, stdv_t::size());
       stdv_t::pop_back();
     }
-#endif  // #ifndef EMP_NDEBUG
+#endif  // #ifndef NDEBUG
   };
 
   // A crude, generic printing function for vectors.

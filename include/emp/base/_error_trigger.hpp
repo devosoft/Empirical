@@ -17,11 +17,6 @@
 #include <stddef.h>
 #include <string>
 
-/// TDEBUG should trigger its EMP equivalent.
-#ifdef TDEBUG
-#define EMP_TDEBUG 1
-#endif  // #ifdef TDEBUG
-
 namespace emp {
 
   // Choose the correct version of trigger_emp_error in the pre-processor.  Options are:
@@ -39,7 +34,7 @@ namespace emp {
     abort();
   }
 
-#elif defined(EMP_TDEBUG)  // #if defined(__EMSCRIPTEN__)
+#elif defined(TDEBUG)  // #if defined(__EMSCRIPTEN__)
 
   struct ErrorInfo {
     std::string filename;
@@ -66,7 +61,7 @@ namespace emp {
   }
 
 
-#else  // #if defined(__EMSCRIPTEN__) : #elif defined(EMP_TDEBUG)
+#else  // #if defined(__EMSCRIPTEN__) : #elif defined(TDEBUG)
 
   template <typename... Ts>
   void trigger_emp_error(const std::string & filename, const size_t line, Ts &&... args) {
@@ -76,7 +71,7 @@ namespace emp {
     abort();
   }
 
-#endif  // #if defined(__EMSCRIPTEN__) : #elif defined(EMP_TDEBUG) : #else
+#endif  // #if defined(__EMSCRIPTEN__) : #elif defined(TDEBUG) : #else
 
 }  // namespace emp
 

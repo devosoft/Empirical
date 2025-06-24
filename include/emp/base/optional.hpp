@@ -23,7 +23,7 @@
 
 #include "assert.hpp"
 
-#ifdef EMP_NDEBUG
+#ifdef NDEBUG
 
 namespace emp {
   template <typename T>
@@ -41,7 +41,7 @@ namespace emp {
 
 }  // namespace emp
 
-#else  // #ifdef EMP_NDEBUG
+#else  // #ifdef NDEBUG
 
 namespace emp {
 
@@ -96,7 +96,7 @@ namespace std {
 
 }  // namespace std
 #endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
-#endif  // #ifdef EMP_NDEBUG : #else
+#endif  // #ifdef NDEBUG : #else
 
 #endif  // #ifndef INCLUDE_EMP_BASE_OPTIONAL_HPP_GUARD
 

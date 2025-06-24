@@ -13,7 +13,7 @@
  *  - emp_assert can take additional arguments.  If the assert is triggered,
  *    those extra arguments will be evaluated and printed.
  *  - If a literal string is provided as an argument, it will be printed as an error message.
- *  - if EMP_TDEBUG is defined, emp_assert() goes into test mode and records
+ *  - if TDEBUG is defined, emp_assert() goes into test mode and records
  *    failures, but does not abort.  (useful for unit tests of asserts)
  *
  * Example:

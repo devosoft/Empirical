@@ -7,7 +7,7 @@
  * @brief A drop-in wrapper for std::array; adds on bounds checking in debug mode.
  * Status: RELEASE
  *
- * If EMP_NDEBUG is set, emp::array is just an alias for std::array.
+ * If NDEBUG is set, emp::array is just an alias for std::array.
  * Otherwise, every time an array is accessed, tests are done to make sure that the
  * access is legal.
  *
@@ -30,7 +30,7 @@
 
 #include "assert.hpp"
 
-#ifdef EMP_NDEBUG
+#ifdef NDEBUG
 
 namespace emp {
   /// In release mode, emp::array is simply an alias for std::array.
@@ -38,7 +38,7 @@ namespace emp {
   using array = std::array<T, N>;
 }  // namespace emp
 
-#else  // #ifdef EMP_NDEBUG
+#else  // #ifdef NDEBUG
 
 namespace emp {
 
@@ -306,7 +306,7 @@ namespace emp {
 template <class T, size_t N>
 struct std::tuple_size<emp::array<T, N> > : public integral_constant<size_t, N> {};
 
-#endif  // #ifdef EMP_NDEBUG : #else
+#endif  // #ifdef NDEBUG : #else
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 namespace std {

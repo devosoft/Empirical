@@ -11,7 +11,7 @@
  *  - If compiled with Emscripten, will provide pop-up alerts in a web browser.
  *  - emp_assert_warning can take additional arguments.  If the assert is
  *    triggered, those extra arguments will be evaluated and printed.
- *  - if NDEBUG -or- EMP_NDEBUG is defined, the expression in
+ *  - if NDEBUG is defined, the expression in
  *    emp_assert_warning() is not evaluated.
  *  - emp_assert_warning() records failures, but does not abort.
  *
@@ -31,12 +31,7 @@
 
 #include "always_assert_warning.hpp"
 
-/// NDEBUG should trigger its EMP equivalent.
 #ifdef NDEBUG
-#define EMP_NDEBUG
-#endif  // #ifdef NDEBUG
-
-#if defined(EMP_NDEBUG)
 /// Ideally, this assert should use the expression (to prevent compiler
 /// error), but should not generate any assembly code.
 /// For now, just make it blank (other options commented out).
@@ -44,14 +39,14 @@
 // #define emp_assert_warning(EXPR) ((void) sizeof(EXPR) )
 // #define emp_assert_warning(EXPR, ...) { constexpr bool __emp_assert_warning_tmp = false && (EXPR); (void) __emp_assert_warning_tmp; }
 
-#else  // #if defined(EMP_NDEBUG)
+#else  // #ifdef NDEBUG
 /// Require a specified condition to be true. If it is false, print extra
 /// information on any variables or expressions provided as variadic args.
 /// Note: If NDEBUG is defined, emp_assert_warning() will not do anything.
 /// Due to macro parsing limitations, extra information will not be printed when compiling with MSVC.
 #define emp_assert_warning(...) emp_always_assert_warning(__VA_ARGS__)
 
-#endif  // #if defined(EMP_NDEBUG) : #else
+#endif  // #ifdef NDEBUG : #else
 
 
 #endif  // #ifndef INCLUDE_EMP_BASE_ASSERT_WARNING_HPP_GUARD

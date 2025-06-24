@@ -12,7 +12,7 @@
  *  - If compiled with Emscripten, will provide pop-up alerts in a web browser.
  *  - emp_assert can take additional arguments.  If the assert is triggered,
  *    those extra arguments will be evaluated and printed.
- *  - if EMP_TDEBUG is defined, emp_assert() goes into test mode and records
+ *  - if TDEBUG is defined, emp_assert() goes into test mode and records
  *    failures, but does not abort.  (useful for unit tests of asserts)
  *
  * Example:

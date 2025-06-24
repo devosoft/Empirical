@@ -12,8 +12,8 @@
  *  - If compiled with Emscripten, will provide pop-up alerts in a web browser.
  *  - emp_assert can take additional arguments.  If the assert is triggered, those extra
  *    arguments will be evaluated and printed.
- *  - if NDEBUG -or- EMP_NDEBUG is defined, the expression in emp_assert() is not evaluated.
- *  - if EMP_TDEBUG is defined, emp_assert() goes into test mode and records failures, but
+ *  - if NDEBUG is defined, the expression in emp_assert() is not evaluated.
+ *  - if TDEBUG is defined, emp_assert() goes into test mode and records failures, but
  *    does not abort.  (useful for unit tests of asserts)
  *
  * Example:
@@ -32,12 +32,7 @@
 
 #include "always_assert.hpp"
 
-/// NDEBUG should trigger its EMP equivalent.
 #ifdef NDEBUG
-#define EMP_NDEBUG
-#endif  // #ifdef NDEBUG
-
-#if defined(EMP_NDEBUG)
 /// Ideally, this assert should use the expression (to prevent compiler
 /// error), but should not generate any assembly code.
 /// For now, just make it blank (other options commented out).
@@ -45,7 +40,7 @@
 
 namespace emp { static constexpr bool is_debug_mode = false; }
 
-#else  // #if defined(EMP_NDEBUG)
+#else  // #ifdef NDEBUG
 /// Require a specified condition to be true. If it is false, immediately
 /// halt execution. Print also extra information on any variables or
 /// expressions provided as variadic args. Note: If NDEBUG is defined,
@@ -55,7 +50,7 @@ namespace emp { static constexpr bool is_debug_mode = false; }
 
 namespace emp { static constexpr bool is_debug_mode = true; }
 
-#endif  // #if defined(EMP_NDEBUG) : #else
+#endif  // #ifdef NDEBUG : #else
 
 
 #endif  // #ifndef INCLUDE_EMP_BASE_ASSERT_HPP_GUARD
