@@ -55,39 +55,37 @@ namespace emp { namespace web {
         // @CAO We can include fallback content here for browsers that don't support canvas.
         HTML << "</canvas>";
 
-// create an offscreen canvas
-#ifdef __EMSCRIPTEN_PTHREADS__
-        EM_ASM(
-          {
-            var cname                       = UTF8ToString($0);
+        // create an offscreen canvas
+        if constexpr (emp::compile::EMSCRIPTEN_PTHREADS) {
+          // clang-format off
+          EM_ASM({
+            var cname = UTF8ToString($0);
             emp_i.offscreen_canvases[cname] = new OffscreenCanvas($1, $2);
-          },
-          id.c_str(),
-          width,
-          height);
-#endif  // #ifdef __EMSCRIPTEN_PTHREADS__
+          }, id.c_str(), width, height);
+          // clang-format on
+        }
       }
 
       // Setup a canvas to be drawn on.
       void TargetCanvas() {
-#ifdef __EMSCRIPTEN_PTHREADS__
-        EM_ASM(
-          {
+        if constexpr (emp::compile::EMSCRIPTEN_PTHREADS) {
+          // clang-format off
+          EM_ASM({
             var cname  = UTF8ToString($0);
             var canvas = emp_i.offscreen_canvases[cname];
             emp_i.pending_offscreen_canvas_ids.add(cname);
             emp_i.ctx = canvas.getContext('2d');
-          },
-          id.c_str());
-#else   // #ifdef __EMSCRIPTEN_PTHREADS__
-        EM_ASM(
-          {
+          }, id.c_str());
+          // clang-format on
+        } else {
+          // clang-format off
+          EM_ASM({
             var cname  = UTF8ToString($0);
             var canvas = document.getElementById(cname);
             if (canvas) { emp_i.ctx = canvas.getContext('2d'); }
-          },
-          id.c_str());
-#endif  // #ifdef __EMSCRIPTEN_PTHREADS__ : #else
+          }, id.c_str());
+          // clang-format on
+        }
       }
 
       // Trigger any JS code needed on re-draw.
@@ -305,12 +303,9 @@ namespace emp { namespace web {
 
     /// Download a PNG image of a canvas.
     void DownloadPNG(const std::string & fname) const {
-      const std::string ext = ".png";
-      emscripten_run_script((std::string() + "emp.download(document.getElementById('" + Info()->id +
-                             "').toDataURL('img/png'), '" + fname +
-                             (fname.rfind(ext, fname.length()) == std::string::npos ? ext : "") +
-                             "', 'img/png');")
-                              .c_str());
+      const auto ext = fname.rfind(".png", fname.length()) == std::string::npos ? ".png" : "";
+      emscripten_run_script(MakeString("emp.download(document.getElementById('", Info()->id,
+                             "').toDataURL('img/png'), '", fname, ext, "', 'img/png');").c_str());
     }
 
     /// Save a PNG image of a canvas with node.js.
