@@ -200,6 +200,12 @@ namespace emp {
     }
   }
 
+  template <typename VEC_T, typename IT_T>
+  size_t IteratorIndex(const VEC_T & v, IT_T it) {
+    emp_assert(std::distance(v.begin(), it) > 0);
+    return static_cast<size_t>(std::distance(v.begin(), it));
+  }
+
   /// Find the first index where the provided function returns true; return -1 otherwise.
   template <typename T, typename FUN>
   int FindEval(const emp::vector<T> & v, const FUN & fun, size_t start_pos = 0) {
