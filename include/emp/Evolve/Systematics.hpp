@@ -42,6 +42,7 @@
 #include "../data/DataNode.hpp"
 #include "../datastructs/map_utils.hpp"
 #include "../datastructs/set_utils.hpp"
+#include "../datastructs/vector_utils.hpp"
 #include "../io/File.hpp"
 #include "../math/info_theory.hpp"
 #include "../math/stats.hpp"
@@ -2289,11 +2290,9 @@ namespace emp {
 
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   int Systematics<ORG, ORG_INFO, DATA_STRUCT>::GetPhylogeneticDiversityNormalize(
-    int generation,
-    std::string filename) const {
-    int gen_value =
-      ((generation / 10) -
-       1);  // indexes from 0, 100 generations would correspond to the 10th line in the csv
+    int generation, std::string filename) const {
+    // indexes from 0, 100 generations would correspond to the 10th line in the csv
+    const size_t gen_value = static_cast<size_t>(generation) / 10 - 1;  
     // bool percent_found = false;
     int phylogenetic_diversity = ancestor_taxa.size() + active_taxa.size() - 1;
 
@@ -2305,9 +2304,8 @@ namespace emp {
       emp::vector<emp::vector < double> > percentile_data =
         generation_percentiles.ToData<double>(",");  // turns file contents into vector
 
-      for (int j = 0; j <= percentile_data[gen_value].size() - 2;
-           j++) {  // searches through vector for slot where phylo diversity fits
-
+      // Search through vector for slot where phylo diversity fits
+      for (size_t j = 0; j + 2 <= percentile_data[gen_value].size(); j++) { 
         if ((percentile_data[gen_value][j] <= phylogenetic_diversity) &&
             (percentile_data[gen_value][j + 1] > phylogenetic_diversity)) {
           // std::cout << "phylogenetic diversity is in between: " << percentile_data[gen_value][j] << "and " << percentile_data[gen_value][j+1] << std::endl;
@@ -2365,43 +2363,43 @@ namespace emp {
     emp_optional_throw(
       id_pos_it != header.end(),
       "Input phylogeny file must be in ALife Phylogeny Data Standards format id column is missing");
-    size_t id_pos = std::distance(header.begin(), id_pos_it);
+    size_t id_pos = IteratorIndex(header, id_pos_it);
 
     auto anc_pos_it = std::find(header.begin(), header.end(), "ancestor_list");
     emp_optional_throw(
       anc_pos_it != header.end(),
       "Input phylogeny file must be in ALife Phylogeny Data Standards format ancestor_list column is missing");
-    size_t anc_pos = std::distance(header.begin(), anc_pos_it);
+    size_t anc_pos = IteratorIndex(header, anc_pos_it);
 
     auto origin_pos_it = std::find(header.begin(), header.end(), "origin_time");
     int origin_pos     = -1;
     if (origin_pos_it != header.end()) {
-      origin_pos = std::distance(header.begin(), origin_pos_it);
+      origin_pos = IteratorIndex(header, origin_pos_it);
     }
 
     auto destruction_pos_it = std::find(header.begin(), header.end(), "destruction_time");
     int destruction_pos     = -1;
     if (destruction_pos_it != header.end()) {
-      destruction_pos = std::distance(header.begin(), destruction_pos_it);
+      destruction_pos = IteratorIndex(header, destruction_pos_it);
     }
 
     auto num_orgs_pos_it = std::find(header.begin(), header.end(), "num_orgs");
     int num_orgs_pos     = -1;
     if (num_orgs_pos_it != header.end()) {
-      num_orgs_pos = std::distance(header.begin(), num_orgs_pos_it);
+      num_orgs_pos = IteratorIndex(header, num_orgs_pos_it);
     }
 
     auto tot_orgs_pos_it = std::find(header.begin(), header.end(), "tot_orgs");
     int tot_orgs_pos     = -1;
     if (tot_orgs_pos_it != header.end()) {
-      tot_orgs_pos = std::distance(header.begin(), tot_orgs_pos_it);
+      tot_orgs_pos = IteratorIndex(header, tot_orgs_pos_it);
     }
 
     auto info_pos_it = std::find(header.begin(), header.end(), info_col);
     emp_optional_throw(
       info_pos_it != header.end(),
       "Input phylogeny file must be in ALife Phylogeny Data Standards format info column name supplied is not in file.");
-    size_t info_pos = std::distance(header.begin(), info_pos_it);
+    size_t info_pos = IteratorIndex(header, info_pos_it);
 
     // Keep track taxon objects
     std::unordered_map<int, emp::Ptr<taxon_t>> taxa;
@@ -2421,7 +2419,7 @@ namespace emp {
       // or we don't know which taxa are alive
       std::string destruction_time = "inf";
       if (destruction_pos != -1) {
-        destruction_time = row[destruction_pos];
+        destruction_time = row[static_cast<size_t>(destruction_pos)];
       } else {
         destruction_time = "missing";
       }
@@ -2449,7 +2447,7 @@ namespace emp {
       // Fill in destruction and origin time if
       // provided
       if (origin_pos != -1) {
-        double origin_time = emp::from_string<double>(row[origin_pos]);
+        double origin_time = emp::from_string<double>(row[static_cast<size_t>(origin_pos)]);
         tax->SetOriginationTime(origin_time);
       }
       if (destruction_time != "inf" && destruction_time != "missing") {
@@ -2458,7 +2456,7 @@ namespace emp {
 
       // Fill in number of current and total orgs if provided
       if (num_orgs_pos != -1) {
-        size_t num_orgs = emp::from_string<size_t>(row[num_orgs_pos]);
+        size_t num_orgs = emp::from_string<size_t>(row[static_cast<size_t>(num_orgs_pos)]);
         tax->SetNumOrgs(num_orgs);
         if (num_orgs > 0 && emp::Has(ancestor_taxa, tax)) {
           active_taxa.insert(tax);
@@ -2466,7 +2464,7 @@ namespace emp {
         }
       }
       if (tot_orgs_pos != -1) {
-        size_t tot_orgs = emp::from_string<size_t>(row[tot_orgs_pos]);
+        size_t tot_orgs = emp::from_string<size_t>(row[static_cast<size_t>(tot_orgs_pos)]);
         tax->SetTotOrgs(tot_orgs);
       }
 
