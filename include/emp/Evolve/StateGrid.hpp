@@ -153,7 +153,11 @@ namespace emp {
 
     [[nodiscard]] key_t GetWidth() const { return width; }
 
+    [[nodiscard]] key_t NumCols() const { return width; }
+
     [[nodiscard]] key_t GetHeight() const { return height; }
+
+    [[nodiscard]] key_t NumRows() const { return height; }
 
     [[nodiscard]] size_t GetSize() const { return states.size(); }
 
