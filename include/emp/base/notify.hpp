@@ -538,7 +538,7 @@ namespace emp::notify {
 namespace emp {
   template <typename... Ts>
   static bool Alert(Ts... args) {
-    return notify::Warning(std::forward<Ts>(args)...);
+    return notify::Message(std::forward<Ts>(args)...);
   }
 
   /// A version of Alert that will cap how many times it can go off
