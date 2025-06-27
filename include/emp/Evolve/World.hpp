@@ -921,7 +921,7 @@ namespace emp {
     void SetRandom(Random & r);
 
     /// Create a new random number generator (that World will manage)
-    void NewRandom(int seed = -1);
+    void NewRandom(uint64_t seed = 0);
 
     /// Get the position a cell, at random.
     size_t GetRandomCellID() { return GetRandom().GetUInt(pop.size()); }
@@ -1327,9 +1327,9 @@ namespace emp {
 
       emp_assert(z_pos < size_z);
 
-      int self_pos  = 13;
-      int n_options = 26;
-      int rand_pos  = 0;
+      size_t self_pos  = 13;
+      size_t n_options = 26;
+      size_t rand_pos  = 0;
 
       if (z_pos > 0 && z_pos < size_z - 1 && y_pos > 0 && y_pos < size_y - 1 && x_pos > 0 &&
           x_pos < size_x - 1) {
@@ -1344,9 +1344,9 @@ namespace emp {
         options.SetAll();
         options.Set(self_pos, false);
         if (z_pos == 0) {
-          for (int i = 0; i < 9; i++) { options.Set(i, false); }
+          for (size_t i = 0; i < 9; i++) { options.Set(i, false); }
         } else if (z_pos == size_z - 1) {
-          for (int i = 18; i < 27; i++) { options.Set(i, false); }
+          for (size_t i = 18; i < 27; i++) { options.Set(i, false); }
         }
         if (y_pos == 0) {
           options.Set(0, false);
@@ -1712,7 +1712,7 @@ namespace emp {
   }
 
   template <typename ORG>
-  void World<ORG>::NewRandom(int seed) {
+  void World<ORG>::NewRandom(uint64_t seed) {
     if (random_owner) { random_ptr.Delete(); }
     random_ptr.New(seed);
     random_owner = true;
