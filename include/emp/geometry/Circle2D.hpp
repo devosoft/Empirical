@@ -1,6 +1,6 @@
 /**
  * This file is part of Empirical, https://github.com/devosoft/Empirical
- * Copyright (C) 2021 Michigan State University
+ * Copyright (C) 2021-2025 Michigan State University
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/geometry/Circle2D.hpp
@@ -18,99 +18,82 @@
 
 namespace emp {
 
-  template <typename TYPE = double>
   class Circle2D {
   private:
-    TYPE radius;
-    Point2D<TYPE> center{0.0, 0.0};
+    double radius;
+    Point2D center{0.0, 0.0};
 
   public:
-    constexpr Circle2D(const Point2D<TYPE> & _c, TYPE _r = 0) : radius(_r), center(_c) { ; }
+    constexpr Circle2D(const Point2D & _c, double _r = 0) : radius(_r), center(_c) {}
 
-    constexpr Circle2D(TYPE _x, TYPE _y, TYPE _r = 0) : radius(_r), center(_x, _y) { ; }
-
-    constexpr Circle2D(TYPE _r = 0) : radius(_r) { ; }
+    constexpr Circle2D(double _r = 0.0) : radius(_r) {}
 
     constexpr Circle2D(const Circle2D &) = default;
 
     Circle2D & operator=(const Circle2D & _in)        = default;
+
     constexpr int operator<=>(const Circle2D &) const = default;
 
-    constexpr const Point2D<TYPE> & GetCenter() const { return center; }
+    constexpr const Point2D & GetCenter() const { return center; }
 
-    constexpr TYPE GetCenterX() const { return center.GetX(); }
+    constexpr double GetCenterX() const { return center.GetX(); }
 
-    constexpr TYPE GetCenterY() const { return center.GetY(); }
+    constexpr double GetCenterY() const { return center.GetY(); }
 
-    constexpr TYPE GetRadius() const { return radius; }
+    constexpr double GetRadius() const { return radius; }
 
-    constexpr TYPE GetSquareRadius() const { return radius * radius; }
+    constexpr double GetSquareRadius() const { return radius * radius; }
 
-    constexpr TYPE GetArea() const { return PI * radius * radius; }
+    constexpr double GetArea() const { return PI * radius * radius; }
 
-    constexpr TYPE GetCircumference() const { return PI * 2.0 * radius; }
+    constexpr double GetCircumference() const { return PI * 2.0 * radius; }
 
-    Circle2D<TYPE> & SetCenter(const Point2D<TYPE> & c) {
+    Circle2D & SetCenter(const Point2D & c) {
       center = c;
       return *this;
     }
 
-    Circle2D<TYPE> & SetCenter(TYPE x, TYPE y) {
-      center.Set(x, y);
-      return *this;
-    }
-
-    Circle2D<TYPE> & SetCenterX(TYPE x) {
+    Circle2D & SetCenterX(double x) {
       center.SetX(x);
       return *this;
     }
 
-    Circle2D<TYPE> & SetCenterY(TYPE y) {
+    Circle2D & SetCenterY(double y) {
       center.SetY(y);
       return *this;
     }
 
-    Circle2D<TYPE> & SetRadius(TYPE new_radius) {
+    Circle2D & SetRadius(double new_radius) {
       radius = new_radius;
       return *this;
     }
 
-    Circle2D<TYPE> & Set(const Point2D<TYPE> & c, TYPE r) {
+    Circle2D & Set(const Point2D & c, double r) {
       center = c;
       radius = r;
       return *this;
     }
 
-    Circle2D<TYPE> & Set(TYPE x, TYPE y, TYPE r) {
-      center.Set(x, y);
-      radius = r;
-      return *this;
-    }
-
-    Circle2D<TYPE> & Translate(Point2D<TYPE> shift) {
+    Circle2D & Translate(Point2D shift) {
       center += shift;
       return *this;
     }
 
-    constexpr bool Contains(const Point2D<TYPE> & point) const {
+    constexpr bool Contains(const Point2D & point) const {
       return center.SquareDistance(point) < GetSquareRadius();
     }
 
-    constexpr bool Contains(TYPE x, TYPE y) const {
-      return center.SquareDistance(Point2D<TYPE>(x, y)) < GetSquareRadius();
-    }
-
-    constexpr bool Contains(const Circle2D<TYPE> & other) const {
+    constexpr bool Contains(const Circle2D & other) const {
       return (other.center.Distance(center) + other.GetRadius()) < GetRadius();
     }
 
-    bool HasOverlap(const Circle2D<TYPE> & other) const {
-      const TYPE min_dist = radius + other.radius;
+    bool HasOverlap(const Circle2D & other) const {
+      const double min_dist = radius + other.radius;
       return center.SquareDistance(other.center) < (min_dist * min_dist);
     }
   };
 
-  using Circle = Circle2D<double>;
+  using Circle = Circle2D;
 }  // namespace emp
 
 #endif  // #ifndef INCLUDE_EMP_GEOMETRY_CIRCLE2D_HPP_GUARD
