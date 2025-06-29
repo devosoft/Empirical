@@ -1,6 +1,6 @@
 /**
  * This file is part of Empirical, https://github.com/devosoft/Empirical
- * Copyright (C) 2021-2025 Michigan State University
+ * Copyright (C) 2025 Michigan State University
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/geometry/Polygon.hpp
@@ -36,6 +36,8 @@ namespace emp {
     int operator<=>(const Polygon &) const = default;
 
     const Point2D & GetAnchor() const { return anchor; }
+
+    const emp::vector<Point2D> & GetOther() const { return other_points; }
 
     Polygon & SetAnchor(const Point2D & in) {
       anchor = in;
