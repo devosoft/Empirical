@@ -24,10 +24,10 @@ namespace emp {
     Size2D size;
 
   public:
-    constexpr Box2D(const Point2D & ul_corner, const Size2D & size)
+    constexpr Box2D(const Point2D & ul_corner=Point2D{}, const Size2D & size=Size2D{1.0, 1.0})
       : ul_corner(ul_corner), size(size) {}
     constexpr Box2D(const Size2D & size)
-      : ul_corner({0.0, 0.0}), size(size) {}
+      : ul_corner(0.0, 0.0), size(size) {}
 
     constexpr Box2D(const Box2D &)       = default;
     constexpr Box2D(Box2D &&)            = default;
@@ -56,20 +56,36 @@ namespace emp {
 
     constexpr void SetSize(const Size2D & in) { size = in; }
 
-    Box2D & Translate(Point2D shift) {
+    constexpr Box2D operator+(Point2D shift) {
+      return {ul_corner + shift, size};
+    }
+
+    constexpr Box2D operator-(Point2D shift) {
+      return {ul_corner - shift, size};
+    }
+
+    constexpr Box2D operator*(Point2D dilate) {
+      return {ul_corner, size * dilate};
+    }
+
+    constexpr Box2D operator/(Point2D dilate) {
+      return {ul_corner, size / dilate};
+    }
+
+    constexpr Box2D & Translate(Point2D shift) {
       ul_corner += shift;
       return *this;
     }
 
     constexpr bool Contains(const Point2D & point) const {
-      return point.GetX() > GetLeft() && point.GetX() < GetRight() && point.GetY() > GetTop() &&
-             point.GetY() < GetBottom();
+      return point.GetX() >= GetLeft() && point.GetX() <= GetRight() && point.GetY() >= GetTop() &&
+             point.GetY() <= GetBottom();
     }
 
     // Is "other" fully contained inside of this box?
     constexpr bool Contains(const Box2D & other) const {
-      return other.GetLeft() > GetLeft() && other.GetRight() < GetRight() &&
-             other.GetTop() > GetTop() && other.GetBottom() < GetBottom();
+      return other.GetLeft() >= GetLeft() && other.GetRight() <= GetRight() &&
+             other.GetTop() >= GetTop() && other.GetBottom() <= GetBottom();
     }
 
     constexpr bool HasOverlap(const Box2D & other) const {
