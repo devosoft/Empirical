@@ -52,6 +52,8 @@ namespace emp {
 
     double GetHeight() const { return max_pos.GetY(); }
 
+    Size2D GetSize() const { return Size2D{max_pos}; }
+
     const Point & GetMaxPosition() const { return max_pos; }
 
     emp::vector < Ptr < BODY_TYPE >> &GetBodySet() { return body_set; }
