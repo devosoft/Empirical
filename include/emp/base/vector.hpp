@@ -50,20 +50,20 @@ namespace emp {
   public:
 #ifdef NDEBUG
     // Outside of debug mode, we just need to make constructors available.
-    vector() : stdv_t() {}
+    constexpr vector() : stdv_t() {}
 
-    vector(const this_t & _in) : stdv_t(_in) {}
+    constexpr vector(const this_t & _in) : stdv_t(_in) {}
 
-    vector(size_t size) : stdv_t(size) {}
+    constexpr vector(size_t size) : stdv_t(size) {}
 
-    vector(size_t size, const T & val) : stdv_t(size, val) {}
+    constexpr vector(size_t size, const T & val) : stdv_t(size, val) {}
 
-    vector(std::initializer_list<T> in_list) : stdv_t(in_list) {}
+    constexpr vector(std::initializer_list<T> in_list) : stdv_t(in_list) {}
 
-    vector(const stdv_t & in) : stdv_t(in) {}  // Emergency fallback conversion.
+    constexpr vector(const stdv_t & in) : stdv_t(in) {}  // Emergency fallback conversion.
 
     template <typename InputIt>
-    vector(InputIt first, InputIt last) : stdv_t(first, last) {}
+    constexpr vector(InputIt first, InputIt last) : stdv_t(first, last) {}
 
     this_t & operator=(const this_t &) & = default;
     this_t & operator=(this_t &&) &      = default;
@@ -84,19 +84,19 @@ namespace emp {
       // @CAO: For the moment cannot create an emp iterator from a base since we don't know vector to use.
       // iterator_wrapper(const ITERATOR_T & _in)
       //   : ITERATOR_T(_in), v_ptr(nullptr), revision(0) { ; }
-      iterator_wrapper(const ITERATOR_T & _in, const vec_t * _v)
+      constexpr iterator_wrapper(const ITERATOR_T & _in, const vec_t * _v)
         : ITERATOR_T(_in), v_ptr(_v), revision(_v->revision) {
         ;
       }
 
-      iterator_wrapper(const this_it_t &) = default;
-      iterator_wrapper(this_it_t &&)      = default;
-      iterator_wrapper()                  = default;
+      constexpr iterator_wrapper(const this_it_t &) = default;
+      constexpr iterator_wrapper(this_it_t &&)      = default;
+      constexpr iterator_wrapper()                  = default;
 
-      ~iterator_wrapper() { ; }
+      constexpr ~iterator_wrapper() { ; }
 
       // Debug tools to make sure this iterator is okay.
-      static std::string & ErrorCode() {
+      [[nodiscard]] static std::string & ErrorCode() {
         static std::string code = "No Errors Found.";
         return code;
       }
@@ -161,24 +161,24 @@ namespace emp {
         return true;
       }
 
-      this_it_t & operator=(const this_it_t &) & = default;
-      this_it_t & operator=(this_it_t &&) &      = default;
+      constexpr this_it_t & operator=(const this_it_t &) & = default;
+      constexpr this_it_t & operator=(this_it_t &&) &      = default;
 
-      operator ITERATOR_T() { return *this; }
+      constexpr operator ITERATOR_T() { return *this; }
 
-      operator const ITERATOR_T() const { return *this; }
+      constexpr operator const ITERATOR_T() const { return *this; }
 
-      auto & operator*() {
+      [[nodiscard]] constexpr auto & operator*() {
         emp_assert(OK(true, false, "dereference"), ErrorCode());
         return wrapped_t::operator*();
       }
 
-      const auto & operator*() const {
+      [[nodiscard]] constexpr const auto & operator*() const {
         emp_assert(OK(true, false, "const dereference"), ErrorCode());
         return wrapped_t::operator*();
       }
 
-      auto operator->() {
+      [[nodiscard]] constexpr auto operator->() {
         //        emp_assert(OK(true, false, "->"), ErrorCode());
         emp_assert(
           OK(true, true, "->"),
@@ -186,7 +186,7 @@ namespace emp {
         return wrapped_t::operator->();
       }
 
-      auto operator->() const {
+      [[nodiscard]] constexpr auto operator->() const {
         //        emp_assert(OK(true, false, "const ->"), ErrorCode());
         emp_assert(
           OK(true, true, "const ->"),
@@ -194,56 +194,56 @@ namespace emp {
         return wrapped_t::operator->();
       }
 
-      this_it_t & operator++() {
+      constexpr this_it_t & operator++() {
         emp_assert(OK(true, false, "++ (post)"), ErrorCode());
         wrapped_t::operator++();
         return *this;
       }
 
-      this_it_t operator++(int x) {
+      constexpr this_it_t operator++(int x) {
         emp_assert(OK(true, false, "++ (pre)"), ErrorCode());
         return this_it_t(wrapped_t::operator++(x), v_ptr);
       }
 
-      this_it_t & operator--() {
+      constexpr this_it_t & operator--() {
         emp_assert(OK(false, true, "-- (post)"), ErrorCode());
         wrapped_t::operator--();
         return *this;
       }
 
-      this_it_t operator--(int x) {
+      constexpr this_it_t operator--(int x) {
         emp_assert(OK(false, true, "-- (pre)"), ErrorCode());
         return this_it_t(wrapped_t::operator--(x), v_ptr);
       }
 
-      auto operator+(int in) {
+      [[nodiscard]] constexpr auto operator+(int in) {
         emp_assert(OK(), ErrorCode());
         return this_it_t(wrapped_t::operator+(in), v_ptr);
       }
 
-      auto operator-(int in) {
+      [[nodiscard]] constexpr auto operator-(int in) {
         emp_assert(OK(), ErrorCode());
         return this_it_t(wrapped_t::operator-(in), v_ptr);
       }
 
-      auto operator-(const this_it_t & in) {
+      [[nodiscard]] constexpr auto operator-(const this_it_t & in) {
         emp_assert(OK(), ErrorCode());
         return ((wrapped_t) * this) - (wrapped_t) in;
       }
 
-      this_it_t & operator+=(int in) {
+      constexpr this_it_t & operator+=(int in) {
         emp_assert(OK(), ErrorCode());
         wrapped_t::operator+=(in);
         return *this;
       }
 
-      this_it_t & operator-=(int in) {
+      constexpr this_it_t & operator-=(int in) {
         emp_assert(OK(), ErrorCode());
         wrapped_t::operator-=(in);
         return *this;
       }
 
-      auto & operator[](int offset) {
+      [[nodiscard]] constexpr auto & operator[](int offset) {
         emp_assert(OK(), ErrorCode());
         return wrapped_t::operator[](offset);
       }
@@ -258,140 +258,140 @@ namespace emp {
     using reference              = typename stdv_t::reference;
     using const_reference        = typename stdv_t::const_reference;
 
-    vector() : stdv_t(), revision(1){};
-    vector(const this_t & _in) : stdv_t(_in), revision(1){};
+    constexpr vector() : stdv_t(), revision(1){};
+    constexpr vector(const this_t & _in) : stdv_t(_in), revision(1){};
 
-    vector(size_t size) : stdv_t(size), revision(1) { emp_assert(size < MAX_SIZE, size); }
+    constexpr vector(size_t size) : stdv_t(size), revision(1) { emp_assert(size < MAX_SIZE, size); }
 
-    vector(size_t size, const T & val) : stdv_t(size, val), revision(1) {
+    constexpr vector(size_t size, const T & val) : stdv_t(size, val), revision(1) {
       emp_assert(size < MAX_SIZE, size);
     }
 
-    vector(std::initializer_list<T> in_list) : stdv_t(in_list), revision(1) { ; }
+    constexpr vector(std::initializer_list<T> in_list) : stdv_t(in_list), revision(1) { ; }
 
-    vector(const stdv_t & in) : stdv_t(in), revision(1) { ; }  // Emergency fallback conversion.
+    constexpr vector(const stdv_t & in) : stdv_t(in), revision(1) { ; }  // Emergency fallback conversion.
 
     template <typename InputIt>
-    vector(InputIt first, InputIt last) : stdv_t(first, last), revision(1) {
+    constexpr vector(InputIt first, InputIt last) : stdv_t(first, last), revision(1) {
       ;
     }
 
-    ~vector() { revision = 0; }  // Clear out revision when vector is deleted.
+    constexpr ~vector() { revision = 0; }  // Clear out revision when vector is deleted.
 
-    size_t size() const { return stdv_t::size(); }
+    [[nodiscard]] constexpr size_t size() const { return stdv_t::size(); }
 
-    iterator begin() noexcept { return iterator(stdv_t::begin(), this); }
+    [[nodiscard]] constexpr iterator begin() noexcept { return iterator(stdv_t::begin(), this); }
 
-    const_iterator begin() const noexcept { return const_iterator(stdv_t::begin(), this); }
+    [[nodiscard]] constexpr const_iterator begin() const noexcept { return const_iterator(stdv_t::begin(), this); }
 
-    iterator end() noexcept { return iterator(stdv_t::end(), this); }
+    [[nodiscard]] constexpr iterator end() noexcept { return iterator(stdv_t::end(), this); }
 
-    const_iterator end() const noexcept { return const_iterator(stdv_t::end(), this); }
+    [[nodiscard]] constexpr const_iterator end() const noexcept { return const_iterator(stdv_t::end(), this); }
 
-    const_iterator cbegin() const noexcept { return const_iterator(stdv_t::cbegin(), this); }
+    [[nodiscard]] constexpr const_iterator cbegin() const noexcept { return const_iterator(stdv_t::cbegin(), this); }
 
-    const_iterator cend() const noexcept { return const_iterator(stdv_t::cend(), this); }
+    [[nodiscard]] constexpr const_iterator cend() const noexcept { return const_iterator(stdv_t::cend(), this); }
 
-    reverse_iterator rbegin() noexcept { return reverse_iterator(stdv_t::rbegin(), this); }
+    [[nodiscard]] constexpr reverse_iterator rbegin() noexcept { return reverse_iterator(stdv_t::rbegin(), this); }
 
-    const_reverse_iterator rbegin() const noexcept {
+    [[nodiscard]] constexpr const_reverse_iterator rbegin() const noexcept {
       return const_reverse_iterator(stdv_t::rbegin(), this);
     }
 
-    reverse_iterator rend() noexcept { return reverse_iterator(stdv_t::rend(), this); }
+    [[nodiscard]] constexpr reverse_iterator rend() noexcept { return reverse_iterator(stdv_t::rend(), this); }
 
-    const_reverse_iterator rend() const noexcept {
+    [[nodiscard]] constexpr const_reverse_iterator rend() const noexcept {
       return const_reverse_iterator(stdv_t::rend(), this);
     }
 
-    const_reverse_iterator crbegin() const noexcept {
+    [[nodiscard]] constexpr const_reverse_iterator crbegin() const noexcept {
       return const_reverse_iterator(stdv_t::crbegin(), this);
     }
 
-    const_reverse_iterator crend() const noexcept {
+    [[nodiscard]] constexpr const_reverse_iterator crend() const noexcept {
       return const_reverse_iterator(stdv_t::crend(), this);
     }
 
     // operator stdv_t &() { return v; }
     // operator const stdv_t &() const { return v; }
 
-    void resize(size_t new_size) {
+    constexpr void resize(size_t new_size) {
       emp_assert(new_size < MAX_SIZE, new_size);
       stdv_t::resize(new_size);
       revision++;
     }
 
-    void resize(size_t new_size, const T & val) {
+    constexpr void resize(size_t new_size, const T & val) {
       emp_assert(new_size < MAX_SIZE, new_size);
       stdv_t::resize(new_size, val);
       revision++;
     }
 
-    this_t & operator=(const this_t &) & = default;
-    this_t & operator=(this_t &&) &      = default;
+    constexpr this_t & operator=(const this_t &) & = default;
+    constexpr this_t & operator=(this_t &&) &      = default;
 
-    T & operator[](size_t pos) {
+    [[nodiscard]] constexpr T & operator[](size_t pos) {
       emp_assert(pos < stdv_t::size(), pos, stdv_t::size());
       return stdv_t::operator[](pos);
     }
 
-    const T & operator[](size_t pos) const {
+    [[nodiscard]] constexpr const T & operator[](size_t pos) const {
       emp_assert(pos < stdv_t::size(), pos, stdv_t::size());
       return stdv_t::operator[](pos);
     }
 
-    T & back() {
+    [[nodiscard]] constexpr T & back() {
       emp_assert(stdv_t::size() > 0);
       return stdv_t::back();
     }
 
-    const T & back() const {
+    [[nodiscard]] constexpr const T & back() const {
       emp_assert(stdv_t::size() > 0);
       return stdv_t::back();
     }
 
-    T & front() {
+    [[nodiscard]] constexpr T & front() {
       emp_assert(stdv_t::size() > 0);
       return stdv_t::front();
     }
 
-    const T & front() const {
+    [[nodiscard]] constexpr const T & front() const {
       emp_assert(stdv_t::size() > 0);
       return stdv_t::front();
     }
 
     template <typename... PB_Ts>
-    void push_back(PB_Ts &&... args) {
+    constexpr void push_back(PB_Ts &&... args) {
       stdv_t::push_back(std::forward<PB_Ts>(args)...);
       revision++;
     }
 
-    void pop_back() {
+    constexpr void pop_back() {
       emp_assert(stdv_t::size() > 0, stdv_t::size());
       stdv_t::pop_back();
       revision++;  // Technically reducing size can cause memory reallocation, but less likely.
     }
 
     template <typename... ARGS>
-    iterator insert(ARGS &&... args) {
+    constexpr iterator insert(ARGS &&... args) {
       ++revision;
       return iterator(stdv_t::insert(std::forward<ARGS>(args)...), this);
     }
 
     template <typename... ARGS>
-    iterator erase(ARGS &&... args) {
+    constexpr iterator erase(ARGS &&... args) {
       ++revision;
       return iterator(stdv_t::erase(std::forward<ARGS>(args)...), this);
     }
 
     template <typename... ARGS>
-    iterator emplace(ARGS &&... args) {
+    constexpr iterator emplace(ARGS &&... args) {
       ++revision;
       return iterator(stdv_t::emplace(std::forward<ARGS>(args)...), this);
     }
 
     template <typename... ARGS>
-    void emplace_back(ARGS &&... args) {
+    constexpr void emplace_back(ARGS &&... args) {
       stdv_t::emplace_back(std::forward<ARGS>(args)...);
       revision++;
     }
