@@ -208,7 +208,7 @@ namespace emp {
     bool Test(RAND_T & random) {
       if (!next) {
         const double U = random.GetDouble();
-        next           = (U == 0.0) ? 1 : (static_cast<size_t>(std::log(U) * scale) + 1);
+        next           = (U == 0.0) ? 1 : (static_cast<uint32_t>(std::log(U) * scale) + 1);
       }
       return !(--next);
     }

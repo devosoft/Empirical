@@ -43,7 +43,6 @@
 
 #include <array>
 #include <cstdint>
-#include <emscripten/threading.h>
 #include <functional>
 #include <stddef.h>
 #include <tuple>
