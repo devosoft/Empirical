@@ -53,13 +53,12 @@ namespace emp {
   template <typename TYPE>
   class Ptr;
 
-
   template <typename T>
-  inline void FillMemory(emp::Ptr<unsigned char> mem_ptr, size_t num_bytes, T fill_value);
+  constexpr inline void FillMemory(emp::Ptr<unsigned char> mem_ptr, size_t num_bytes, T fill_value);
 
   /// Fill an array by repeatedly calling the provided fill functions.
   template <typename T>
-  inline void FillMemoryFunction(emp::Ptr<unsigned char> mem_ptr, size_t num_bytes, T fill_fun);
+  constexpr inline void FillMemoryFunction(emp::Ptr<unsigned char> mem_ptr, size_t num_bytes, T fill_fun);
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
@@ -68,12 +67,12 @@ namespace emp {
   }  // namespace internal
 #endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-  [[nodiscard]] static inline bool & GetPtrDebug() {
+  [[nodiscard]] constexpr static inline bool & GetPtrDebug() {
     static bool ptr_debug = false;
     return ptr_debug;
   }
 
-  inline void SetPtrDebug(bool _d = true) { GetPtrDebug() = _d; }
+  constexpr inline void SetPtrDebug(bool _d = true) { GetPtrDebug() = _d; }
 
   enum class PtrStatus : std::uint8_t { DELETED = 0, ACTIVE, ARRAY };
 
@@ -85,11 +84,11 @@ namespace emp {
     size_t array_bytes;  ///< How big is the array pointed to (in bytes)?
 
   public:
-    PtrInfo(const void * _ptr) : ptr(_ptr), count(1), status(PtrStatus::ACTIVE), array_bytes(0) {
+    constexpr PtrInfo(const void * _ptr) : ptr(_ptr), count(1), status(PtrStatus::ACTIVE), array_bytes(0) {
       if (GetPtrDebug()) { std::cout << "Created info for pointer: " << ptr << std::endl; }
     }
 
-    PtrInfo(const void * _ptr, size_t _array_bytes)
+    constexpr PtrInfo(const void * _ptr, size_t _array_bytes)
       : ptr(_ptr), count(1), status(PtrStatus::ARRAY), array_bytes(_array_bytes) {
       emp_assert(_array_bytes >= 1);
       if (GetPtrDebug()) {
@@ -98,45 +97,45 @@ namespace emp {
       }
     }
 
-    PtrInfo(const PtrInfo &)               = default;
-    PtrInfo(PtrInfo &&)                    = default;
-    PtrInfo & operator=(const PtrInfo &) & = default;
-    PtrInfo & operator=(PtrInfo &&) &      = default;
+    constexpr PtrInfo(const PtrInfo &)               = default;
+    constexpr PtrInfo(PtrInfo &&)                    = default;
+    constexpr PtrInfo & operator=(const PtrInfo &) & = default;
+    constexpr PtrInfo & operator=(PtrInfo &&) &      = default;
 
-    ~PtrInfo() {
+    constexpr ~PtrInfo() {
       if (GetPtrDebug()) { std::cout << "Deleted info for pointer " << ptr << std::endl; }
     }
 
     /// What pointer does this one hold information about?
-    [[nodiscard]] const void * GetPtr() const noexcept { return ptr; }
+    [[nodiscard]] constexpr const void * GetPtr() const noexcept { return ptr; }
 
     /// How many Ptr objects point to the associated position?
-    [[nodiscard]] int GetCount() const noexcept { return count; }
+    [[nodiscard]] constexpr int GetCount() const noexcept { return count; }
 
     /// If this ptr is to an array, how many bytes large is the array (may be different from size!)
-    [[nodiscard]] size_t GetArrayBytes() const noexcept { return array_bytes; }
+    [[nodiscard]] constexpr size_t GetArrayBytes() const noexcept { return array_bytes; }
 
     /// Is this pointer currently valid to access?
-    [[nodiscard]] bool IsActive() const noexcept { return (bool) status; }
+    [[nodiscard]] constexpr bool IsActive() const noexcept { return (bool) status; }
 
     /// Is this pointer pointing to an array?
-    [[nodiscard]] bool IsArray() const noexcept { return status == PtrStatus::ARRAY; }
+    [[nodiscard]] constexpr bool IsArray() const noexcept { return status == PtrStatus::ARRAY; }
 
     /// Denote that this pointer is an array.
-    void SetArray(size_t bytes) noexcept {
+    constexpr void SetArray(size_t bytes) noexcept {
       array_bytes = bytes;
       status      = PtrStatus::ARRAY;
     }
 
     /// Add one more pointer.
-    void Inc([[maybe_unused]] const size_t id) {
+    constexpr void Inc([[maybe_unused]] const size_t id) {
       if (GetPtrDebug()) { std::cout << "Inc info for pointer " << ptr << std::endl; }
       emp_assert(status != PtrStatus::DELETED, "Incrementing deleted pointer!", id);
       count++;
     }
 
     /// Remove a pointer.
-    void Dec([[maybe_unused]] const size_t id) {
+    constexpr void Dec([[maybe_unused]] const size_t id) {
       if (GetPtrDebug()) { std::cout << "Dec info for pointer " << ptr << std::endl; }
 
       // Make sure that we have more than one copy, -or- we've already deleted this pointer
@@ -147,13 +146,13 @@ namespace emp {
     }
 
     /// Indicate that the associated position has been deleted.
-    void MarkDeleted() {
+    constexpr void MarkDeleted() {
       if (GetPtrDebug()) { std::cout << "Marked deleted for pointer " << ptr << std::endl; }
       status = PtrStatus::DELETED;
     }
 
     /// Debug utility to determine if everything looks okay with this pointer's information.
-    [[nodiscard]] bool OK() const noexcept {
+    [[nodiscard]] constexpr bool OK() const noexcept {
       if (ptr == nullptr) {
         return false;  // Should not have info for a null pointer.
       }
@@ -180,12 +179,12 @@ namespace emp {
     PtrTracker() { std::cout << "EMP_TRACK_MEM: Pointer tracking is active!\n"; }
 
   public:
-    PtrTracker(const PtrTracker &)             = delete;
-    PtrTracker(PtrTracker &&)                  = delete;
-    PtrTracker & operator=(const PtrTracker &) = delete;
-    PtrTracker & operator=(PtrTracker &&)      = delete;
+    constexpr PtrTracker(const PtrTracker &)             = delete;
+    constexpr PtrTracker(PtrTracker &&)                  = delete;
+    constexpr PtrTracker & operator=(const PtrTracker &) = delete;
+    constexpr PtrTracker & operator=(PtrTracker &&)      = delete;
 
-    ~PtrTracker() {
+    constexpr ~PtrTracker() {
       constexpr size_t MAX_ERRORS = 10;  // Max errors to output (to not overwhelm user.)
 
       // Track stats about pointer record.
@@ -224,48 +223,48 @@ namespace emp {
     }
 
     /// Treat this class as a singleton with a single Get() method to retrieve it.
-    static PtrTracker & Get() {
+    static constexpr PtrTracker & Get() {
       static PtrTracker tracker;
       return tracker;
     }
 
     /// Retrieve the ID associated with a pointer.
-    [[nodiscard]] size_t GetCurID(const void * ptr) const {
+    [[nodiscard]] constexpr size_t GetCurID(const void * ptr) const {
       auto it = ptr_id.find(ptr);
       emp_assert(it != ptr_id.end(), "Ptr is not tracked!");
       return it->second;
     }
 
     /// Get the info associated with an existing pointer.
-    [[nodiscard]] const PtrInfo & GetInfo(const void * ptr) const { return id_info[GetCurID(ptr)]; }
+    [[nodiscard]] constexpr const PtrInfo & GetInfo(const void * ptr) const { return id_info[GetCurID(ptr)]; }
 
-    [[nodiscard]] const PtrInfo & GetInfo(size_t id) const { return id_info[id]; }
+    [[nodiscard]] constexpr const PtrInfo & GetInfo(size_t id) const { return id_info[id]; }
 
     /// Determine if a pointer is being tracked.
-    [[nodiscard]] bool HasPtr(const void * ptr) const {
+    [[nodiscard]] constexpr bool HasPtr(const void * ptr) const {
       if (GetPtrDebug()) { std::cout << "HasPtr: " << ptr << std::endl; }
       return ptr_id.contains(ptr);
     }
 
     /// Lookup how many pointers are being tracked.
-    [[nodiscard]] size_t GetNumIDs() const { return id_info.size(); }
+    [[nodiscard]] constexpr size_t GetNumIDs() const { return id_info.size(); }
 
     /// How big is an array associated with an ID?
-    [[nodiscard]] size_t GetArrayBytes(size_t id) const { return id_info[id].GetArrayBytes(); }
+    [[nodiscard]] constexpr size_t GetArrayBytes(size_t id) const { return id_info[id].GetArrayBytes(); }
 
-    [[nodiscard]] bool OK(size_t id) const {
+    [[nodiscard]] constexpr bool OK(size_t id) const {
       if (id == UNTRACKED_ID) { return true; }
       if (id >= id_info.size()) { return false; }
       return id_info[id].OK();
     }
 
-    [[nodiscard]] bool IsTracked(size_t id) const {
+    [[nodiscard]] constexpr bool IsTracked(size_t id) const {
       emp_assert(OK(id));
       return id != UNTRACKED_ID;
     }
 
     /// Check if an ID is for a pointer that has been deleted.
-    [[nodiscard]] bool IsDeleted(size_t id) const {
+    [[nodiscard]] constexpr bool IsDeleted(size_t id) const {
       emp_assert(OK(id));
       if (!IsTracked(id)) { return false; }  // Not tracked, so not deleted.
       if (GetPtrDebug()) { std::cout << "IsDeleted: " << id << std::endl; }
@@ -273,21 +272,21 @@ namespace emp {
     }
 
     /// Is a pointer active and ready to be used?
-    [[nodiscard]] bool IsActive(const void * ptr) const {
+    [[nodiscard]] constexpr bool IsActive(const void * ptr) const {
       if (GetPtrDebug()) { std::cout << "IsActive: " << ptr << std::endl; }
       if (!ptr_id.contains(ptr)) { return false; }  // Not in database.
       return GetInfo(ptr).IsActive();
     }
 
     /// Is a pointer id associated with a pointer that's active and ready to be used?
-    [[nodiscard]] bool IsActiveID(size_t id) const {
+    [[nodiscard]] constexpr bool IsActiveID(size_t id) const {
       emp_assert(OK(id));
       if (id >= id_info.size()) { return false; }  // Includes untracked.
       return id_info[id].IsActive();
     }
 
     /// Is an ID associated with an array?
-    [[nodiscard]] bool IsArrayID(size_t id) const {
+    [[nodiscard]] constexpr bool IsArrayID(size_t id) const {
       emp_assert(OK(id));
       if (GetPtrDebug()) { std::cout << "IsArrayID: " << id << std::endl; }
       if (id >= id_info.size()) { return false; }  // Includes untracked.
@@ -295,20 +294,20 @@ namespace emp {
     }
 
     /// Check if an ID is for a pointer that can be followed.
-    [[nodiscard]] bool IsUsable(size_t id) const {
+    [[nodiscard]] constexpr bool IsUsable(size_t id) const {
       emp_assert(OK(id));
       return !IsTracked(id) || IsActiveID(id);
     }
 
     /// How many Ptr objects are associated with an ID?
-    [[nodiscard]] int GetIDCount(size_t id) const {
+    [[nodiscard]] constexpr int GetIDCount(size_t id) const {
       emp_assert(OK(id));
       if (GetPtrDebug()) { std::cout << "Count:  " << id << std::endl; }
       return id_info[id].GetCount();
     }
 
     /// This pointer was just created as a Ptr!
-    size_t New(const void * ptr) {
+    constexpr size_t New(const void * ptr) {
       emp_assert(ptr);  // Cannot track a null pointer.
       const size_t id = id_info.size();
 #ifdef EMP_ABORT_PTR_NEW
@@ -325,7 +324,7 @@ namespace emp {
     }
 
     /// This pointer was just created as a Ptr ARRAY!
-    size_t NewArray(const void * ptr, size_t array_bytes) {
+    constexpr size_t NewArray(const void * ptr, size_t array_bytes) {
       const size_t id = New(ptr);  // Build the new pointer.
       if (GetPtrDebug()) { std::cout << "  ...Array of size " << array_bytes << std::endl; }
       id_info[id].SetArray(array_bytes);
@@ -333,7 +332,7 @@ namespace emp {
     }
 
     /// Increment the number of Pointers associated with an ID
-    void IncID(size_t id) {
+    constexpr void IncID(size_t id) {
       emp_assert(OK(id));
       if (id == UNTRACKED_ID) { return; }  // Not tracked!
       if (GetPtrDebug()) { std::cout << "Inc:    " << id << std::endl; }
@@ -341,7 +340,7 @@ namespace emp {
     }
 
     /// Decrement the number of Pointers associated with an ID
-    void DecID(size_t id) {
+    constexpr void DecID(size_t id) {
       emp_assert(OK(id));
       if (id == UNTRACKED_ID) { return; }  // Not tracked!
       auto & info = id_info[id];
@@ -357,7 +356,7 @@ namespace emp {
     }
 
     /// Mark the pointers associated with this ID as deleted.
-    void MarkDeleted(size_t id) {
+    constexpr void MarkDeleted(size_t id) {
       emp_assert(OK(id));
 #ifdef EMP_ABORT_PTR_DELETE
       if (id == EMP_ABORT_PTR_DELETE) {
@@ -382,7 +381,7 @@ namespace emp {
   namespace {
     // @CAO: Build this for real!
     template <typename FROM, typename TO>
-    bool PtrIsConvertible(FROM * ptr) {
+    constexpr bool PtrIsConvertible(FROM * ptr) {
       (void) ptr;
       return true;
     }
@@ -392,12 +391,12 @@ namespace emp {
       size_t current{0};
       size_t total{0};
 
-      void AddPtr() {
+      constexpr void AddPtr() {
         current++;
         total++;
       }
 
-      void RemovePtr() { current--; }
+      constexpr void RemovePtr() { current--; }
     };
   }  // namespace
 
@@ -405,9 +404,9 @@ namespace emp {
   template <typename TYPE>
   class BasePtr {
   private:
-    [[nodiscard]] bool IsUsable() const { return Tracker().IsUsable(id) && (ptr != nullptr); }
+    [[nodiscard]] constexpr bool IsUsable() const { return Tracker().IsUsable(id) && (ptr != nullptr); }
 
-    [[nodiscard]] std::string Diagnose() const {
+    [[nodiscard]] constexpr std::string Diagnose() const {
       std::stringstream ss;
       ss << "IsNull:" << (ptr == nullptr) << " id:";
       if (id == UNTRACKED_ID) {
@@ -427,7 +426,7 @@ namespace emp {
 
     static constexpr size_t UNTRACKED_ID = (size_t) -1;
 
-    BasePtr(TYPE * in_ptr, size_t in_id) : ptr(in_ptr), id(in_id) {
+    constexpr BasePtr(TYPE * in_ptr, size_t in_id) : ptr(in_ptr), id(in_id) {
 #ifdef EMP_NO_PTR_TO_PTR
       emp_assert(!std::is_pointer_v<TYPE>, "Pointers to pointers are disallowed!");
 #endif  // #ifdef EMP_NO_PTR_TO_PTR
@@ -435,24 +434,24 @@ namespace emp {
 
     static PtrTracker & Tracker() { return PtrTracker::Get(); }  // Single tracker for al Ptr types
 
-    [[nodiscard]] bool OK() const { return Tracker().OK(id); }
+    [[nodiscard]] constexpr bool OK() const { return Tracker().OK(id); }
 
     /// Dereference a pointer.
-    [[nodiscard]] TYPE & operator*() const {
+    [[nodiscard]] constexpr TYPE & operator*() const {
       emp_assert(OK(), Diagnose());
       emp_assert(IsUsable(), Diagnose());
       return *ptr;
     }
 
     /// Follow a pointer.
-    TYPE * operator->() const {
+    constexpr TYPE * operator->() const {
       emp_assert(OK(), Diagnose());
       emp_assert(IsUsable(), "Trying to follow and invalid pointer.", Diagnose());
       return ptr;
     }
 
     /// Indexing into array
-    [[nodiscard]] TYPE & operator[](size_t pos) const {
+    [[nodiscard]] constexpr TYPE & operator[](size_t pos) const {
       emp_assert(OK(), Diagnose());
       emp_assert(IsUsable(), Diagnose());
       emp_assert(id == UNTRACKED_ID || Tracker().IsArrayID(id),
@@ -476,9 +475,9 @@ namespace emp {
     void * ptr;  ///< The raw pointer associated with this Ptr object.
     size_t id;   ///< A unique ID for this pointer type.
 
-    BasePtr(void * in_ptr, size_t in_id) : ptr(in_ptr), id(in_id) {}
+    constexpr BasePtr(void * in_ptr, size_t in_id) : ptr(in_ptr), id(in_id) {}
 
-    static PtrTracker & Tracker() { return PtrTracker::Get(); }  // Single tracker for al Ptr types
+    static constexpr PtrTracker & Tracker() { return PtrTracker::Get(); }  // Single tracker for al Ptr types
   };
 
   /// Base class with functionality only needed in void pointers.
@@ -488,9 +487,9 @@ namespace emp {
     const void * ptr;  ///< The raw pointer associated with this Ptr object.
     size_t id;         ///< A unique ID for this pointer type.
 
-    BasePtr(const void * in_ptr, size_t in_id) : ptr(in_ptr), id(in_id) {}
+    constexpr BasePtr(const void * in_ptr, size_t in_id) : ptr(in_ptr), id(in_id) {}
 
-    static PtrTracker & Tracker() { return PtrTracker::Get(); }  // Single tracker for al Ptr types
+    constexpr static PtrTracker & Tracker() { return PtrTracker::Get(); }  // Single tracker for al Ptr types
   };
 
   /// Main Ptr class DEBUG definition.
@@ -505,25 +504,25 @@ namespace emp {
 
     static constexpr size_t UNTRACKED_ID = (size_t) -1;
 
-    static PtrDebug & DebugInfo() {
+    static constexpr PtrDebug & DebugInfo() {
       static PtrDebug info;
       return info;
     }  // Debug info for each type
 
     /// Construct a null Ptr by default.
-    Ptr() : BasePtr<TYPE>(nullptr, UNTRACKED_ID) {
+    constexpr Ptr() : BasePtr<TYPE>(nullptr, UNTRACKED_ID) {
       if (GetPtrDebug()) { std::cout << "null construct." << std::endl; }
     }
 
     /// Construct using copy constructor
-    Ptr(const Ptr<TYPE> & _in) : BasePtr<TYPE>(_in.ptr, _in.id) {
+    constexpr Ptr(const Ptr<TYPE> & _in) : BasePtr<TYPE>(_in.ptr, _in.id) {
       if (GetPtrDebug()) { std::cout << "copy construct: " << ptr << std::endl; }
       Tracker().IncID(id);
     }
 
     /// Construct from a raw pointer of compatible type.
     template <typename T2>
-    Ptr(T2 * in_ptr, bool track = false) : BasePtr<TYPE>(in_ptr, UNTRACKED_ID) {
+    constexpr Ptr(T2 * in_ptr, bool track = false) : BasePtr<TYPE>(in_ptr, UNTRACKED_ID) {
       if (GetPtrDebug()) {
         std::cout << "raw construct: " << ((void *) ptr) << ". track=" << track << std::endl;
       }
@@ -543,7 +542,7 @@ namespace emp {
 
     /// Construct from a raw pointer of compatible ARRAY type.
     template <typename T2>
-    Ptr(T2 * _ptr, size_t array_size, bool track) : BasePtr<TYPE>(_ptr, UNTRACKED_ID) {
+    constexpr Ptr(T2 * _ptr, size_t array_size, bool track) : BasePtr<TYPE>(_ptr, UNTRACKED_ID) {
       const size_t array_bytes = array_size * sizeof(T2);
       if (GetPtrDebug()) {
         std::cout << "raw ARRAY construct: " << ptr << ". size=" << array_size << "(" << array_bytes
@@ -566,19 +565,19 @@ namespace emp {
 
     /// Construct from another Ptr<> object of compatible type.
     template <typename T2>
-    Ptr(Ptr<T2> _in) : BasePtr<TYPE>(_in.Raw(), _in.GetID()) {
+    constexpr Ptr(Ptr<T2> _in) : BasePtr<TYPE>(_in.Raw(), _in.GetID()) {
       if (GetPtrDebug()) { std::cout << "inexact copy construct: " << ptr << std::endl; }
       emp_assert((PtrIsConvertible<T2, TYPE>(_in.Raw())), id);
       Tracker().IncID(id);
     }
 
     /// Construct from nullptr.
-    Ptr(std::nullptr_t) : Ptr() {
+    constexpr Ptr(std::nullptr_t) : Ptr() {
       if (GetPtrDebug()) { std::cout << "null construct 2." << std::endl; }
     }
 
     /// Destructor.
-    ~Ptr() {
+    constexpr ~Ptr() {
       if (GetPtrDebug()) {
         std::cout << "destructing Ptr instance ";
         if (ptr) {
@@ -591,30 +590,30 @@ namespace emp {
     }
 
     /// Is this Ptr currently nullptr?
-    [[nodiscard]] bool IsNull() const { return ptr == nullptr; }
+    [[nodiscard]] constexpr bool IsNull() const { return ptr == nullptr; }
 
     /// Convert this Ptr to a raw pointer that isn't going to be tracked.
-    [[nodiscard]] TYPE * Raw() const {
+    [[nodiscard]] constexpr TYPE * Raw() const {
       emp_assert(Tracker().IsDeleted(id) == false, "Do not convert deleted Ptr to raw.", id);
       return ptr;
     }
 
     /// Convert this Ptr to a raw pointer of a position in an array.
-    [[nodiscard]] TYPE * Raw(size_t pos) const {
+    [[nodiscard]] constexpr TYPE * Raw(size_t pos) const {
       emp_assert(Tracker().IsDeleted(id) == false, "Do not convert deleted Ptr to array raw.", id);
       return &(ptr[pos]);
     }
 
     /// Cast this Ptr to a different type.
     template <typename T2>
-    [[nodiscard]] Ptr<T2> Cast() const {
+    [[nodiscard]]constexpr  Ptr<T2> Cast() const {
       emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.", id);
       return (T2 *) ptr;
     }
 
     /// Change constness of this Ptr's target; throw an assert of the cast fails.
     template <typename T2>
-    [[nodiscard]] Ptr<T2> ConstCast() const {
+    [[nodiscard]] constexpr Ptr<T2> ConstCast() const {
       emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.", id);
       emp_assert((std::same_as<std::remove_const_t<TYPE>, std::remove_const_t<T2>>) );
       return const_cast<T2 *>(ptr);
@@ -622,14 +621,14 @@ namespace emp {
 
     /// Dynamically cast this Ptr to another type; throw an assert of the cast fails.
     template <typename T2>
-    [[nodiscard]] Ptr<T2> DynamicCast() const {
+    [[nodiscard]] constexpr Ptr<T2> DynamicCast() const {
       emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.", id);
       return dynamic_cast<T2 *>(ptr);
     }
 
     /// Reinterpret this Ptr to another type; throw an assert of the cast fails.
     template <typename T2>
-    [[nodiscard]] Ptr<T2> ReinterpretCast() const {
+    [[nodiscard]] constexpr Ptr<T2> ReinterpretCast() const {
       emp_assert(Tracker().IsDeleted(id) == false, "Do not cast deleted pointers.", id);
 #ifdef EMP_NO_PTR_TO_PTR
       emp_assert(!std::is_pointer_v<TYPE>, "Reinterpreting as pointers to pointers is disallowed!");
@@ -638,11 +637,11 @@ namespace emp {
     }
 
     /// Get the unique ID associated with this pointer.
-    [[nodiscard]] size_t GetID() const { return id; }
+    [[nodiscard]] constexpr size_t GetID() const { return id; }
 
     /// Reallocate this Ptr to a newly allocated value using arguments passed in.
     template <typename... T>
-    void New(T &&... args) {
+    constexpr void New(T &&... args) {
       Tracker().DecID(id);  // Remove a pointer to any old memory...
 
       ptr = new TYPE(std::forward<T>(args)...);  // Special new that uses allocated space.
@@ -655,7 +654,7 @@ namespace emp {
     /// Reallocate this Ptr to a newly allocated array using the size passed in.
     // template <typename... Ts>
     // void NewArray(size_t array_size, Ts &&... args) {
-    void NewArray(size_t array_size) {
+    constexpr void NewArray(size_t array_size) {
       Tracker().DecID(id);  // Remove a pointer to any old memory...
 
       // @CAO: This next portion of code is allocating an array of the appropriate type.
@@ -670,7 +669,7 @@ namespace emp {
     }
 
     /// Delete this pointer (must NOT be an array).
-    void Delete() {
+    constexpr void Delete() {
       emp_assert(ptr, "Trying to delete null Ptr.");
       emp_assert(id < Tracker().GetNumIDs(),
                  id,
@@ -688,7 +687,7 @@ namespace emp {
     }
 
     /// Delete this pointer to an array (must be an array).
-    void DeleteArray() {
+    constexpr void DeleteArray() {
       emp_assert(ptr, "Trying to delete null Ptr.");
       emp_assert(id < Tracker().GetNumIDs(),
                  id,
@@ -704,18 +703,18 @@ namespace emp {
     }
 
     /// Convert this pointer to a hash value.
-    [[nodiscard]] size_t Hash() const noexcept {
+    [[nodiscard]] constexpr size_t Hash() const noexcept {
       // Chop off useless bits of pointer...
       static constexpr size_t shift = internal::Log2(1 + sizeof(TYPE));
       return (size_t) (ptr) >> shift;
     }
 
     struct hash_t {
-      size_t operator()(const Ptr<TYPE> & t) const noexcept { return t.Hash(); }
+      constexpr size_t operator()(const Ptr<TYPE> & t) const noexcept { return t.Hash(); }
     };
 
     /// Copy assignment
-    Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) & {
+    constexpr Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) & {
       if (GetPtrDebug()) {
         std::cout << "copy assignment from id " << _in.id << " to id " << id << std::endl;
       }
@@ -736,7 +735,7 @@ namespace emp {
     /// Assign to a raw pointer of the correct type; if this is already tracked, hooked in
     /// correctly, otherwise don't track.
     template <typename T2>
-    Ptr<TYPE> & operator=(T2 * _in) & {
+    constexpr Ptr<TYPE> & operator=(T2 * _in) & {
       if (GetPtrDebug()) { std::cout << "raw assignment" << std::endl; }
       emp_assert((PtrIsConvertible<T2, TYPE>(_in)));
 
@@ -758,7 +757,7 @@ namespace emp {
 
     /// Assign to a convertible Ptr
     template <typename T2>
-    Ptr<TYPE> & operator=(Ptr<T2> _in) & {
+    constexpr Ptr<TYPE> & operator=(Ptr<T2> _in) & {
       if (GetPtrDebug()) { std::cout << "convert-copy assignment" << std::endl; }
       emp_assert((PtrIsConvertible<T2, TYPE>(_in.Raw())), _in.id);
       emp_assert(Tracker().IsDeleted(_in.id) == false, _in.id, "Do not copy deleted pointers.");
@@ -770,7 +769,7 @@ namespace emp {
     }
 
     /// Auto-cast to raw pointer type.
-    operator TYPE *() {
+    constexpr operator TYPE *() {
       // Make sure a pointer is active before we convert it.
       emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
 
@@ -782,13 +781,13 @@ namespace emp {
     }
 
     /// Does this pointer exist?
-    operator bool() { return ptr != nullptr; }
+    constexpr operator bool() { return ptr != nullptr; }
 
     /// Does this const pointer exist?
-    operator bool() const { return ptr != nullptr; }
+    constexpr operator bool() const { return ptr != nullptr; }
 
     template <typename T>
-    [[nodiscard]] bool operator==(const T & in_ptr) const {
+    [[nodiscard]] constexpr bool operator==(const T & in_ptr) const {
       if constexpr (std::same_as<T, Ptr<TYPE>>) {
         return ptr == in_ptr.ptr;
       } else {
@@ -797,12 +796,12 @@ namespace emp {
     }
 
     template <typename T>
-    [[nodiscard]] bool operator!=(const T & in_ptr) const {
+    [[nodiscard]] constexpr bool operator!=(const T & in_ptr) const {
       return !operator==(in_ptr);
     }
 
     template <typename T>
-    [[nodiscard]] bool operator<(const T & in_ptr) const {
+    [[nodiscard]] constexpr bool operator<(const T & in_ptr) const {
       if constexpr (std::same_as<T, Ptr<TYPE>>) {
         return ptr < in_ptr.ptr;
       } else {
@@ -811,7 +810,7 @@ namespace emp {
     }
 
     template <typename T>
-    [[nodiscard]] bool operator>(const T & in_ptr) const {
+    [[nodiscard]] constexpr bool operator>(const T & in_ptr) const {
       if constexpr (std::same_as<T, Ptr<TYPE>>) {
         return ptr > in_ptr.ptr;
       } else {
@@ -820,7 +819,7 @@ namespace emp {
     }
 
     template <typename T>
-    [[nodiscard]] bool operator<=(const T & in_ptr) const {
+    [[nodiscard]] constexpr bool operator<=(const T & in_ptr) const {
       if constexpr (std::same_as<T, Ptr<TYPE>>) {
         return ptr <= in_ptr.ptr;
       } else {
@@ -829,7 +828,7 @@ namespace emp {
     }
 
     template <typename T>
-    [[nodiscard]] bool operator>=(const T & in_ptr) const {
+    [[nodiscard]] constexpr bool operator>=(const T & in_ptr) const {
       if constexpr (std::same_as<T, Ptr<TYPE>>) {
         return ptr >= in_ptr.ptr;
       } else {
@@ -837,18 +836,18 @@ namespace emp {
       }
     }
 
-    [[nodiscard]] Ptr<TYPE> operator+(int value) const { return ptr + value; }
+    [[nodiscard]] constexpr Ptr<TYPE> operator+(int value) const { return ptr + value; }
 
-    [[nodiscard]] Ptr<TYPE> operator-(int value) const { return ptr - value; }
+    [[nodiscard]] constexpr Ptr<TYPE> operator-(int value) const { return ptr - value; }
 
-    [[nodiscard]] Ptr<TYPE> operator+(size_t value) const { return ptr + value; }
+    [[nodiscard]] constexpr Ptr<TYPE> operator+(size_t value) const { return ptr + value; }
 
-    [[nodiscard]] Ptr<TYPE> operator-(size_t value) const { return ptr - value; }
+    [[nodiscard]] constexpr Ptr<TYPE> operator-(size_t value) const { return ptr - value; }
 
     /// Fill an array with the provided fill_value.
     /// If fill_value is a function, repeatedly call function.
     template <typename T>
-    void FillMemoryFunction(const size_t num_bytes, T fill_fun) {
+    constexpr void FillMemoryFunction(const size_t num_bytes, T fill_fun) {
       // Make sure a pointer is active before we write to it.
       emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
       emp_assert(id == UNTRACKED_ID || Tracker().IsArrayID(id), "Only arrays can fill memory.", id);
@@ -866,7 +865,7 @@ namespace emp {
     /// Fill an array with the provided fill_value.
     /// If fill_value is a function, repeatedly call function.
     template <typename T>
-    void FillMemory(const size_t num_bytes, T fill_value) {
+    constexpr void FillMemory(const size_t num_bytes, T fill_value) {
       // Make sure a pointer is active before we write to it.
       emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
       emp_assert(Tracker().IsArrayID(id) || id == UNTRACKED_ID, "Only arrays can fill memory.", id);
@@ -882,15 +881,15 @@ namespace emp {
     }
 
     /// Some debug testing functions
-    [[nodiscard]] int DebugGetCount() const { return Tracker().GetIDCount(id); }
+    [[nodiscard]] constexpr int DebugGetCount() const { return Tracker().GetIDCount(id); }
 
-    [[nodiscard]] bool DebugIsArray() const { return Tracker().IsArrayID(id); }
+    [[nodiscard]] constexpr bool DebugIsArray() const { return Tracker().IsArrayID(id); }
 
-    [[nodiscard]] size_t DebugGetArrayBytes() const { return Tracker().GetArrayBytes(id); }
+    [[nodiscard]] constexpr size_t DebugGetArrayBytes() const { return Tracker().GetArrayBytes(id); }
 
-    [[nodiscard]] bool DebugIsActive() const { return Tracker().IsActiveID(id); }
+    [[nodiscard]] constexpr bool DebugIsActive() const { return Tracker().IsActiveID(id); }
 
-    [[nodiscard]] bool OK() const {
+    [[nodiscard]] constexpr bool OK() const {
       // Untracked ID's should not have pointers in the Tracker.
       if (id == UNTRACKED_ID) { return !Tracker().HasPtr(ptr); }
 
@@ -934,17 +933,17 @@ namespace emp {
     BasePtr(TYPE * in_ptr = nullptr) : ptr(in_ptr) {}
 
     // Dereference a pointer.
-    [[nodiscard]] TYPE & operator*() const { return *ptr; }
+    [[nodiscard]] constexpr TYPE & operator*() const { return *ptr; }
 
     // Follow a pointer.
-    TYPE * operator->() const { return ptr; }
+    constexpr TYPE * operator->() const { return ptr; }
 
     // Should implement operator->* to follow a pointer to a member function.
     // For an example, see:
     //  https://stackoverflow.com/questions/27634036/overloading-operator-in-c
 
     // Indexing into array
-    [[nodiscard]] TYPE & operator[](size_t pos) const { return ptr[pos]; }
+    [[nodiscard]] constexpr TYPE & operator[](size_t pos) const { return ptr[pos]; }
   };
 
   /// Base class with functionality only needed in void pointers.
@@ -953,7 +952,7 @@ namespace emp {
   protected:
     void * ptr;  ///< The raw pointer associated with this Ptr object.
   public:
-    BasePtr(void * in_ptr = nullptr) : ptr(in_ptr) {}
+    constexpr BasePtr(void * in_ptr = nullptr) : ptr(in_ptr) {}
   };
 
   template <>
@@ -961,7 +960,7 @@ namespace emp {
   protected:
     const void * ptr;  ///< The raw pointer associated with this Ptr object.
   public:
-    BasePtr(const void * in_ptr = nullptr) : ptr(in_ptr) {}
+    constexpr BasePtr(const void * in_ptr = nullptr) : ptr(in_ptr) {}
   };
 
   template <typename TYPE>
@@ -973,103 +972,103 @@ namespace emp {
     using element_type = TYPE;
 
     /// Default constructor
-    Ptr() = default;
+    constexpr Ptr() = default;
 
     /// Copy constructor
-    Ptr(const Ptr<TYPE> & _in) : BasePtr<TYPE>(_in.ptr) {}
+    constexpr Ptr(const Ptr<TYPE> & _in) : BasePtr<TYPE>(_in.ptr) {}
 
     /// Construct from raw ptr
     template <typename T2>
-    Ptr(T2 * _ptr, bool = false) : BasePtr<TYPE>(_ptr) {}
+    constexpr Ptr(T2 * _ptr, bool = false) : BasePtr<TYPE>(_ptr) {}
 
     /// Construct from array
     template <typename T2>
-    Ptr(T2 * _ptr, size_t, bool) : BasePtr<TYPE>(_ptr) {}
+    constexpr Ptr(T2 * _ptr, size_t, bool) : BasePtr<TYPE>(_ptr) {}
 
     /// From compatible Ptr
     template <typename T2>
-    Ptr(Ptr<T2> _in) : BasePtr<TYPE>(_in.Raw()) {}
+    constexpr Ptr(Ptr<T2> _in) : BasePtr<TYPE>(_in.Raw()) {}
 
     /// From nullptr
-    Ptr(std::nullptr_t) : Ptr() {}
+    constexpr Ptr(std::nullptr_t) : Ptr() {}
 
     /// Destructor
-    ~Ptr() = default;
+    constexpr ~Ptr() = default;
 
-    [[nodiscard]] bool IsNull() const { return ptr == nullptr; }
+    [[nodiscard]] constexpr bool IsNull() const { return ptr == nullptr; }
 
-    [[nodiscard]] TYPE * Raw() const { return ptr; }
+    [[nodiscard]] constexpr TYPE * Raw() const { return ptr; }
 
-    [[nodiscard]] TYPE * Raw(size_t pos) const { return &(ptr[pos]); }
+    [[nodiscard]] constexpr TYPE * Raw(size_t pos) const { return &(ptr[pos]); }
 
     template <typename T2>
-    [[nodiscard]] Ptr<T2> Cast() const {
+    [[nodiscard]] constexpr Ptr<T2> Cast() const {
       return (T2 *) ptr;
     }
 
     template <typename T2>
-    [[nodiscard]] Ptr<T2> ConstCast() const {
+    [[nodiscard]] constexpr Ptr<T2> ConstCast() const {
       return const_cast<T2 *>(ptr);
     }
 
     template <typename T2>
-    [[nodiscard]] Ptr<T2> DynamicCast() const {
+    [[nodiscard]] constexpr Ptr<T2> DynamicCast() const {
       return dynamic_cast<T2 *>(ptr);
     }
 
     template <typename T2>
-    [[nodiscard]] Ptr<T2> ReinterpretCast() const {
+    [[nodiscard]] constexpr Ptr<T2> ReinterpretCast() const {
       return reinterpret_cast<T2 *>(ptr);
     }
 
     template <typename... T>
-    void New(T &&... args) {
+    constexpr void New(T &&... args) {
       ptr = new TYPE(std::forward<T>(args)...);
     }  // New raw pointer.
 
-    void NewArray(size_t array_size) { ptr = new TYPE[array_size]; }
+    constexpr void NewArray(size_t array_size) { ptr = new TYPE[array_size]; }
 
-    void Delete() { delete ptr; }
+    constexpr void Delete() { delete ptr; }
 
-    void DeleteArray() { delete[] ptr; }
+    constexpr void DeleteArray() { delete[] ptr; }
 
-    size_t Hash() const noexcept {
+    constexpr size_t Hash() const noexcept {
       static constexpr size_t shift = internal::Log2(1 + sizeof(TYPE));  // Chop off useless bits...
       return (size_t) (ptr) >> shift;
     }
 
     struct hash_t {
-      size_t operator()(const Ptr<TYPE> & t) const noexcept { return t.Hash(); }
+      constexpr size_t operator()(const Ptr<TYPE> & t) const noexcept { return t.Hash(); }
     };
 
     // Copy assignments
-    Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) & {
+    constexpr Ptr<TYPE> & operator=(const Ptr<TYPE> & _in) & {
       ptr = _in.ptr;
       return *this;
     }
 
     // Assign to compatible Ptr or raw (non-managed) pointer.
     template <typename T2>
-    Ptr<TYPE> & operator=(T2 * _in) & {
+    constexpr Ptr<TYPE> & operator=(T2 * _in) & {
       ptr = _in;
       return *this;
     }
 
     template <typename T2>
-    Ptr<TYPE> & operator=(Ptr<T2> _in) & {
+    constexpr Ptr<TYPE> & operator=(Ptr<T2> _in) & {
       ptr = _in.Raw();
       return *this;
     }
 
     // Auto-cast to raw pointer type.
-    operator TYPE *() { return ptr; }
+    constexpr operator TYPE *() { return ptr; }
 
-    operator bool() { return ptr != nullptr; }
+    constexpr operator bool() { return ptr != nullptr; }
 
-    operator bool() const { return ptr != nullptr; }
+    constexpr operator bool() const { return ptr != nullptr; }
 
     template <typename T>
-    [[nodiscard]] bool operator==(const T & in_ptr) const {
+    [[nodiscard]] constexpr bool operator==(const T & in_ptr) const {
       if constexpr (std::same_as<T, Ptr<TYPE>>) {
         return ptr == in_ptr.ptr;
       } else {
@@ -1078,12 +1077,12 @@ namespace emp {
     }
 
     template <typename T>
-    [[nodiscard]] bool operator!=(const T & in_ptr) const {
+    [[nodiscard]] constexpr bool operator!=(const T & in_ptr) const {
       return !operator==(in_ptr);
     }
 
     template <typename T>
-    [[nodiscard]] bool operator<(const T & in_ptr) const {
+    [[nodiscard]] constexpr bool operator<(const T & in_ptr) const {
       if constexpr (std::same_as<T, Ptr<TYPE>>) {
         return ptr < in_ptr.ptr;
       } else {
@@ -1092,7 +1091,7 @@ namespace emp {
     }
 
     template <typename T>
-    [[nodiscard]] bool operator>(const T & in_ptr) const {
+    [[nodiscard]] constexpr bool operator>(const T & in_ptr) const {
       if constexpr (std::same_as<T, Ptr<TYPE>>) {
         return ptr > in_ptr.ptr;
       } else {
@@ -1101,7 +1100,7 @@ namespace emp {
     }
 
     template <typename T>
-    [[nodiscard]] bool operator<=(const T & in_ptr) const {
+    [[nodiscard]] constexpr bool operator<=(const T & in_ptr) const {
       if constexpr (std::same_as<T, Ptr<TYPE>>) {
         return ptr <= in_ptr.ptr;
       } else {
@@ -1110,7 +1109,7 @@ namespace emp {
     }
 
     template <typename T>
-    [[nodiscard]] bool operator>=(const T & in_ptr) const {
+    [[nodiscard]] constexpr bool operator>=(const T & in_ptr) const {
       if constexpr (std::same_as<T, Ptr<TYPE>>) {
         return ptr >= in_ptr.ptr;
       } else {
@@ -1118,43 +1117,43 @@ namespace emp {
       }
     }
 
-    [[nodiscard]] Ptr<TYPE> operator+(int value) const { return ptr + value; }
+    [[nodiscard]] constexpr Ptr<TYPE> operator+(int value) const { return ptr + value; }
 
-    [[nodiscard]] Ptr<TYPE> operator-(int value) const { return ptr - value; }
+    [[nodiscard]] constexpr Ptr<TYPE> operator-(int value) const { return ptr - value; }
 
-    [[nodiscard]] Ptr<TYPE> operator+(size_t value) const { return ptr + value; }
+    [[nodiscard]] constexpr Ptr<TYPE> operator+(size_t value) const { return ptr + value; }
 
-    [[nodiscard]] Ptr<TYPE> operator-(size_t value) const { return ptr - value; }
+    [[nodiscard]] constexpr Ptr<TYPE> operator-(size_t value) const { return ptr - value; }
 
     // Extra functionality (not in raw pointers)
 
     /// Fill an array with the provided fill_value.
     /// If fill_value is a function, repeatedly call function.
     template <typename T>
-    void FillMemoryFunction(const size_t num_bytes, T fill_fun) {
+    constexpr void FillMemoryFunction(const size_t num_bytes, T fill_fun) {
       emp::FillMemoryFunction(*this, num_bytes, fill_fun);
     }
 
     /// Fill an array with the provided fill_value.
     /// If fill_value is a function, repeatedly call function.
     template <typename T>
-    void FillMemory(const size_t num_bytes, T fill_value) {
+    constexpr void FillMemory(const size_t num_bytes, T fill_value) {
       emp::FillMemory(*this, num_bytes, fill_value);
     }
 
     // Stubs for debug-related functions when outside debug mode.
-    [[nodiscard]] int DebugGetCount() const { return -1; }
+    [[nodiscard]] constexpr int DebugGetCount() const { return -1; }
 
-    [[nodiscard]] bool DebugIsArray() const {
+    [[nodiscard]] constexpr bool DebugIsArray() const {
       emp_assert(false);
       return false;
     }
 
-    [[nodiscard]] size_t DebugGetArrayBytes() const { return 0; }
+    [[nodiscard]] constexpr size_t DebugGetArrayBytes() const { return 0; }
 
-    [[nodiscard]] bool DebugIsActive() const { return true; }
+    [[nodiscard]] constexpr bool DebugIsActive() const { return true; }
 
-    [[nodiscard]] bool OK() const { return true; }
+    [[nodiscard]] constexpr bool OK() const { return true; }
   };
 
 #endif  // #ifdef EMP_TRACK_MEM : #else
@@ -1178,19 +1177,19 @@ namespace emp {
 
   /// Convert a T* to a Ptr<T>.  By default, don't track.
   template <typename T>
-  [[nodiscard]] Ptr<T> ToPtr(T * _in, bool own = false) {
+  [[nodiscard]] constexpr Ptr<T> ToPtr(T * _in, bool own = false) {
     return Ptr<T>(_in, own);
   }
 
   /// Convert a T* to a Ptr<T> that we DO track.
   template <typename T>
-  [[nodiscard]] Ptr<T> TrackPtr(T * _in, bool own = true) {
+  [[nodiscard]] constexpr Ptr<T> TrackPtr(T * _in, bool own = true) {
     return Ptr<T>(_in, own);
   }
 
   /// Create a new Ptr of the target type; use the args in the constructor.
   template <typename T, typename... ARGS>
-  [[nodiscard]] Ptr<T> NewPtr(ARGS &&... args) {
+  [[nodiscard]] constexpr Ptr<T> NewPtr(ARGS &&... args) {
     auto ptr = new T(std::forward<ARGS>(args)...);
     // auto ptr = (T*) malloc (sizeof(T));         // Build a new raw pointer.
     // emp_assert(ptr);                            // No exceptions in emscripten; assert alloc!
@@ -1207,13 +1206,13 @@ namespace emp {
 
   /// Copy an object pointed to and return a Ptr to the copy.
   template <typename T>
-  [[nodiscard]] Ptr<T> CopyPtr(Ptr<T> in) {
+  [[nodiscard]] constexpr Ptr<T> CopyPtr(Ptr<T> in) {
     return NewPtr<T>(*in);
   }
 
   /// Copy a vector of objects pointed to; return a vector of Ptrs to the new copies.
   template <typename T>
-    [[nodiscard]] emp::vector < Ptr < T >> CopyPtrs(const emp::vector < Ptr < T >> &in) {
+  [[nodiscard]] constexpr emp::vector < Ptr < T >> CopyPtrs(const emp::vector < Ptr < T >> &in) {
     emp::vector < Ptr < T >> out_ptrs(in.size());
     for (size_t i = 0; i < in.size(); i++) { out_ptrs[i] = CopyPtr(in[i]); }
     return out_ptrs;
@@ -1221,7 +1220,7 @@ namespace emp {
 
   /// Copy a vector of objects pointed to by using their Clone() member function; return vector.
   template <typename T>
-    [[nodiscard]] emp::vector < Ptr < T >> ClonePtrs(const emp::vector < Ptr < T >> &in) {
+  [[nodiscard]] constexpr emp::vector < Ptr < T >> ClonePtrs(const emp::vector < Ptr < T >> &in) {
     emp::vector < Ptr < T >> out_ptrs(in.size());
     for (size_t i = 0; i < in.size(); i++) { out_ptrs[i] = in[i]->Clone(); }
     return out_ptrs;
@@ -1229,7 +1228,7 @@ namespace emp {
 
   /// Create a pointer to an array of objects.
   template <typename T>
-  [[nodiscard]] Ptr<T> NewArrayPtr(size_t array_size) {
+  [[nodiscard]] constexpr Ptr<T> NewArrayPtr(size_t array_size) {
     auto ptr = new T[array_size];  // Build a new raw pointer.
     emp_assert(ptr, array_size);   // No exceptions in emscripten; assert alloc!
     return Ptr<T>(ptr, array_size, true);
@@ -1238,7 +1237,7 @@ namespace emp {
   /// Fill an array with the provided fill_value.
   /// If fill_value is a function, repeatedly call function.
   template <typename T>
-  void FillMemory(emp::Ptr<unsigned char> mem_ptr, const size_t num_bytes, T fill_value) {
+  constexpr void FillMemory(emp::Ptr<unsigned char> mem_ptr, const size_t num_bytes, T fill_value) {
     // If the fill value is a function, call that function for each memory position.
     if constexpr (std::is_invocable_v<T>) {
       FillMemoryFunction(mem_ptr, num_bytes, std::forward<T>(fill_value));
@@ -1261,7 +1260,7 @@ namespace emp {
 
   /// Fill an array by repeatedly calling the provided fill functions.
   template <typename T>
-  void FillMemoryFunction(emp::Ptr<unsigned char> mem_ptr, const size_t num_bytes, T fill_fun) {
+  constexpr void FillMemoryFunction(emp::Ptr<unsigned char> mem_ptr, const size_t num_bytes, T fill_fun) {
     static_assert(std::is_invocable_v<T>, "FillMemoryFunction requires an invocable fill_fun.");
     using return_t             = decltype(fill_fun());
     constexpr size_t FILL_SIZE = sizeof(return_t);
@@ -1286,7 +1285,7 @@ namespace emp {
 
   /// Copy an array from the provided memory.
   template <typename T>
-  void CopyMemory(emp::Ptr<T> from_ptr, emp::Ptr<T> to_ptr, const size_t num_items) {
+  constexpr void CopyMemory(emp::Ptr<T> from_ptr, emp::Ptr<T> to_ptr, const size_t num_items) {
     constexpr size_t FILL_CHUNK = sizeof(T);
     const size_t num_bytes      = num_items * FILL_CHUNK;
 
