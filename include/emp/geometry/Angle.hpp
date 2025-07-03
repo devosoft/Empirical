@@ -6,9 +6,8 @@
  * @file include/emp/geometry/Angle.hpp
  * @brief emp::Angle maintains a geometric angle.
  *
- * The internal representation uses an int to represent angles.
- * First two bytes are number of full circles.
- * Last two bytes represent actual angle.
+ * The internal representation uses an uint16_t to represent angles in a 2 byte system.
+ * I.e., internally, all angles go from 0 to 65,535
  */
 
 #pragma once
@@ -26,6 +25,7 @@
 
 namespace emp {
 
+  // 256 sine values over one period, from -1023 to +1024
   constexpr const int32_t sin_chart_1K[] =
     {0,     25,    50,    75,    100,   125,   150,   175,   200,   224,   249,   273,   297,
      321,   345,   369,   392,   415,   438,   460,   483,   505,   526,   548,   569,   590,
@@ -47,6 +47,8 @@ namespace emp {
      -774,  -758,  -741,  -723,  -705,  -687,  -668,  -649,  -629,  -609,  -589,  -568,  -547,
      -525,  -504,  -482,  -459,  -437,  -414,  -391,  -368,  -344,  -320,  -296,  -272,  -248,
      -223,  -199,  -174,  -149,  -124,  -99,   -74,   -49,   -24};
+
+  // 256 cosine values over one period, from -1023 to +1024
   constexpr const int32_t cos_chart_1K[] =
     {1024,  1024,  1023,  1021,  1019,  1016,  1013,  1009,  1004,  999,   993,   987,   980,
      972,   964,   955,   946,   936,   926,   915,   903,   891,   878,   865,   851,   837,
@@ -68,6 +70,8 @@ namespace emp {
      669,   688,   706,   724,   742,   759,   775,   792,   807,   822,   837,   851,   865,
      878,   891,   903,   915,   926,   936,   946,   955,   964,   972,   980,   987,   993,
      999,   1004,  1009,  1013,  1016,  1019,  1021,  1023,  1024};
+
+  // 256 tangent values over one period, scaled based on charts above.
   constexpr const int32_t tan_chart_1K[] = {
     0,       25,     50,     76,     101,     126,    152,    178,    204,    230,   256,   283,
     311,     338,    366,    395,    424,     454,    484,    515,    547,    580,   614,   648,
@@ -95,131 +99,142 @@ namespace emp {
 
   class Angle {
   private:
-    uint32_t angle = 0;  // Int representation of an angle
+    uint16_t angle = 0;       // Int representation of an angle using 2byte system.
 
-    static constexpr double ANGLE_CAP = 65536.0;
-    static constexpr uint32_t UP      = 0;
-    static constexpr uint32_t RIGHT   = 16384;
-    static constexpr uint32_t DOWN    = 32768;
-    static constexpr uint32_t LEFT    = 49152;
+    static constexpr double ANGLE_CAP     = 65536.0;
+    static constexpr uint16_t ANGLE_UP    = 0;
+    static constexpr uint16_t ANGLE_RIGHT = 16384;
+    static constexpr uint16_t ANGLE_DOWN  = 32768;
+    static constexpr uint16_t ANGLE_LEFT  = 49152;
+
+    static constexpr double MAX_RADIANS = 2.0 * PI;
+    static constexpr double MAX_DEGREES = 360.0;
+
+    static constexpr double BYTE2_TO_DEGREE  = MAX_DEGREES / ANGLE_CAP;
+    static constexpr double BYTE2_TO_PORTION = 1.0 / ANGLE_CAP;
+    static constexpr double BYTE2_TO_RADIANS = MAX_RADIANS / ANGLE_CAP;
+
+    static constexpr double DEGREES_TO_BYTE2 = ANGLE_CAP / MAX_DEGREES;
+    static constexpr double DEGREES_TO_PORTION = 1.0 / MAX_DEGREES;
+    static constexpr double DEGREES_TO_RADIANS = MAX_RADIANS / MAX_DEGREES;
+
+    static constexpr double RADIANS_TO_BYTE2 = ANGLE_CAP / MAX_RADIANS;
+    static constexpr double RADIANS_TO_DEGREE = MAX_DEGREES / MAX_RADIANS;
+    static constexpr double RADIANS_TO_PORTION = 1.0 / MAX_RADIANS;
+
+    static constexpr uint16_t FromRadians(double rads) {
+      return static_cast<uint16_t>(rads * RADIANS_TO_BYTE2);
+    }
+
+    constexpr Angle(uint16_t in_angle, bool) : angle(in_angle) {}  // directly set internal value
 
   public:
     constexpr Angle()              = default;
     constexpr Angle(const Angle &) = default;
 
-    constexpr Angle(double radians) : angle((uint32_t) (radians * ANGLE_CAP / (2.0 * PI))) { ; }
-
-    constexpr Angle(uint32_t in_angle, bool) : angle(in_angle) { ; }  // directly set internal value
+    constexpr Angle(double radians) : angle(FromRadians(radians)) {}
 
     constexpr Angle & operator=(const Angle &) = default;
 
     [[nodiscard]] constexpr auto operator<=>(const Angle &) const = default;
 
-    [[nodiscard]] constexpr double AsPortion() const { return ((double) (angle % 0xFFFF)) / ANGLE_CAP; }
+    // A series of conversion helpers for different methods of tracking angles.
+    static constexpr double Byte2ToDegree(uint16_t byte2) { return byte2 * BYTE2_TO_DEGREE; }
+    static constexpr double Byte2ToPortion(uint16_t byte2) { return byte2 * BYTE2_TO_PORTION; }
+    static constexpr double Byte2ToRadians(uint16_t byte2) { return byte2 * BYTE2_TO_RADIANS; }
 
-    [[nodiscard]] constexpr double AsRadians() const { return ((double) angle) * 2.0 * PI / ANGLE_CAP; }
+    static constexpr uint16_t DegreesToByte2(double degrees) {
+      return static_cast<uint16_t>(degrees * DEGREES_TO_BYTE2);
+    }
+    static constexpr double DegreesToPortion(double degrees) {
+      return degrees * DEGREES_TO_PORTION;
+    }
+    static constexpr double DegreesToRadians(double degrees) {
+      return degrees * DEGREES_TO_RADIANS;
+    }
 
-    [[nodiscard]] constexpr double AsDegrees() const { return ((double) angle) * 360.0 / ANGLE_CAP; }
+    static constexpr uint16_t PortionToByte2(double portion) {
+      return static_cast<uint16_t>(portion * ANGLE_CAP);
+    }
+    static constexpr double PortionToDegree(double portion) { return portion * MAX_DEGREES; }
+    static constexpr double PortionToRadians(double portion) { return portion * MAX_RADIANS; }
+
+    static constexpr uint16_t RadiansToByte2(double rads) {
+      return static_cast<uint16_t>(rads * RADIANS_TO_BYTE2);
+    }
+    static constexpr double RadiansToDegree(double rads) { return rads * RADIANS_TO_DEGREE; }
+    static constexpr double RadiansToPortion(double rads) { return rads * RADIANS_TO_PORTION; }
+
+    [[nodiscard]] constexpr double AsPortion() const { return Byte2ToPortion(angle); }
+    [[nodiscard]] constexpr double AsRadians() const { return Byte2ToRadians(angle); }
+    [[nodiscard]] constexpr double AsDegrees() const { return Byte2ToDegree(angle); }
 
     constexpr Angle & SetPortion(double portion) {
-      angle = static_cast<uint32_t>(portion * ANGLE_CAP);
+      angle = PortionToByte2(portion);
       return *this;
     }
 
     constexpr Angle & SetRadians(double radians) {
-      angle = static_cast<uint32_t>(radians * ANGLE_CAP / (2.0 * PI));
+      angle = RadiansToByte2(radians);
       return *this;
     }
 
     constexpr Angle & SetDegrees(double degrees) {
-      angle = static_cast<uint32_t>(degrees * ANGLE_CAP / 360.0);
+      angle = DegreesToByte2(degrees);
       return *this;
     }
 
-    constexpr Angle & PointUp() {
-      angle = UP;
-      return *this;
-    }
-
-    constexpr Angle & PointRight() {
-      angle = RIGHT;
-      return *this;
-    }
-
-    constexpr Angle & PointDown() {
-      angle = DOWN;
-      return *this;
-    }
-
-    constexpr Angle & PointLeft() {
-      angle = LEFT;
-      return *this;
-    }
-
-    // Chop off full circles
-    constexpr Angle & Truncate() {
-      angle &= 0xFFFF;
-      return *this;
-    }
-
-    // Count full circles
-    [[nodiscard]] constexpr uint32_t CountFullCircles() const { return angle >> 16; }
+    static constexpr Angle UP() { return { ANGLE_UP, true}; }
+    static constexpr Angle RIGHT() { return { ANGLE_RIGHT, true}; }
+    static constexpr Angle DOWN() { return { ANGLE_DOWN, true}; }
+    static constexpr Angle LEFT() { return { ANGLE_LEFT, true}; }
 
     // Some basic rotations...
     constexpr Angle & RotateRight() {
-      angle += RIGHT;
+      angle += ANGLE_RIGHT;
       return *this;
     }
 
     constexpr Angle & RotateLeft() {
-      angle -= RIGHT;
+      angle += ANGLE_LEFT;
       return *this;
     }
 
     constexpr Angle & RotateUTurn() {
-      angle += DOWN;
-      return *this;
-    }
-
-    constexpr Angle & RotateFull(uint32_t turns = 1) {
-      angle += turns << 16;
-      return *this;
-    }
-
-    constexpr Angle & RotateRadians(double radians) {
-      angle += (uint32_t) (radians * ANGLE_CAP / (2.0 * PI));
+      angle += ANGLE_DOWN;
       return *this;
     }
 
     constexpr Angle & RotateDegrees(double degrees) {
-      if (degrees < 0.0) { degrees += 360.0; }
-      emp_assert(degrees >= 0.0);  // Don't modify by less than -360 (@CAO Fix?)
-      angle += (uint32_t) (degrees * ANGLE_CAP / 360.0);
+      angle += RadiansToByte2(degrees);
       return *this;
     }
 
-    [[nodiscard]] constexpr bool operator==(const Angle & _in) const { return angle == _in.angle; }
+    constexpr Angle & RotatePortion(double portion) {
+      angle += PortionToByte2(portion);
+      return *this;
+    }
 
-    [[nodiscard]] constexpr bool operator!=(const Angle & _in) const { return angle != _in.angle; }
+    constexpr Angle & RotateRadians(double radians) {
+      angle += RadiansToByte2(radians);
+      return *this;
+    }
 
-    [[nodiscard]] constexpr bool operator<(const Angle & _in) const { return angle < _in.angle; }
+    [[nodiscard]] constexpr Angle operator+(const Angle & in) const {
+      return {static_cast<uint16_t>(angle + in.angle), true };
+    }
 
-    [[nodiscard]] constexpr bool operator<=(const Angle & _in) const { return angle <= _in.angle; }
+    [[nodiscard]] constexpr Angle operator-(const Angle & in) const {
+      return {static_cast<uint16_t>(angle - in.angle), true };
+    }
 
-    [[nodiscard]] constexpr bool operator>(const Angle & _in) const { return angle > _in.angle; }
+    [[nodiscard]] constexpr Angle operator*(double in) const {
+      return {static_cast<uint16_t>(angle * in), true};
+    }
 
-    [[nodiscard]] constexpr bool operator>=(const Angle & _in) const { return angle >= _in.angle; }
-
-    [[nodiscard]] constexpr Angle operator+(const Angle & _in) const { return Angle(angle + _in.angle, true); }
-
-    [[nodiscard]] constexpr Angle operator-(const Angle & _in) const { return Angle(angle - _in.angle, true); }
-
-    [[nodiscard]] constexpr Angle operator*(double _in) const { return Angle((uint32_t) (angle * _in), true); }
-
-    [[nodiscard]] constexpr Angle operator/(double _in) const { return Angle((uint32_t) (angle / _in), true); }
-
-    // constexpr Angle operator*(int _in)     const { return Angle(angle * _in, true); }
-    // constexpr Angle operator/(int _in)     const { return Angle(angle / _in, true); }
+    [[nodiscard]] constexpr Angle operator/(double in) const {
+      return {static_cast<uint16_t>(angle / in), true};
+    }
 
     constexpr Angle & operator+=(const Angle & _in) {
       angle += _in.angle;
@@ -232,34 +247,32 @@ namespace emp {
     }
 
     constexpr Angle & operator*=(double _in) {
-      angle = (uint32_t) (angle * _in);
+      angle = static_cast<uint16_t>(angle * _in);
       return *this;
     }
 
     constexpr Angle & operator/=(double _in) {
-      angle = (uint32_t) (angle / _in);
+      angle = static_cast<uint16_t>(angle / _in);
       return *this;
     }
 
     [[nodiscard]] double Sin() const { return sin(AsRadians()); }
-
     [[nodiscard]] double Cos() const { return cos(AsRadians()); }
-
     [[nodiscard]] double Tan() const { return tan(AsRadians()); }
 
     // Quicker version of sin/cos/tan -- these are low precision and return an int: result * 1024
-    [[nodiscard]] constexpr int Sin_Quick1K() const { return emp::sin_chart_1K[(angle >> 8) & 255]; }
-
-    [[nodiscard]] constexpr int Cos_Quick1K() const { return emp::cos_chart_1K[(angle >> 8) & 255]; }
-
-    [[nodiscard]] constexpr int Tan_Quick1K() const { return emp::tan_chart_1K[(angle >> 8) & 255]; }
+    [[nodiscard]] constexpr int QuickSin() const { return emp::sin_chart_1K[angle >> 8]; }
+    [[nodiscard]] constexpr int QuickCos() const { return emp::cos_chart_1K[angle >> 8]; }
+    [[nodiscard]] constexpr int QuickTan() const { return emp::tan_chart_1K[angle >> 8]; }
 
     [[nodiscard]] constexpr Point GetPoint(double distance = 1.0) const {
       return Point{Sin() * distance, Cos() * distance};
     }
 
-    [[nodiscard]] constexpr Point GetPoint(const Point & start_point, double distance = 1.0) const {
-      return start_point + GetPoint(distance);
+    /// @brief Overload ostream operator to return Print.
+    friend std::ostream & operator<<(std::ostream & out, Angle angle) {
+      out << angle.angle;
+      return out;
     }
   };
 
