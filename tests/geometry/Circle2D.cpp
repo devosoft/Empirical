@@ -1,7 +1,7 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2021
+ *  date: 2021-2025
 */
 /**
  *  @file
@@ -31,11 +31,11 @@ TEST_CASE("Test Circle2D", "[geometry]")
   REQUIRE(circle_small.Contains(test_point2) == false);
   REQUIRE(circle_big.Contains(test_point2) == true);
 
-  emp::Circle circle_xyr(7.0, 10.0, 3.0);
+  emp::Circle circle_xyr({7.0, 10.0}, 3.0);
   REQUIRE(circle_xyr.GetCenterX() == 7.0);
   REQUIRE(circle_xyr.GetCenterY() == 10.0);
 
-  circle_xyr.SetCenter(4.0,9.0);
+  circle_xyr.SetCenter({4.0, 9.0});
   REQUIRE(circle_xyr.GetCenterX() == 4.0);
   REQUIRE(circle_xyr.GetCenterY() == 9.0);
 
@@ -48,14 +48,12 @@ TEST_CASE("Test Circle2D", "[geometry]")
   circle_xyr.SetRadius(7.0);
   REQUIRE(circle_xyr.GetRadius()== 7.0);
 
-  circle_xyr.Set(1.0,9.0,2.5);
+  circle_xyr.Set({1.0, 9.0}, 2.5);
   REQUIRE(circle_xyr.GetCenterX() == 1.0);
   REQUIRE(circle_xyr.GetCenterY() == 9.0);
   REQUIRE(circle_xyr.GetRadius() == 2.5);
 
-  REQUIRE(circle_xyr.Contains(1.5,9.5) == true);
-
-
+  REQUIRE(circle_xyr.Contains({1.5,9.5}) == true);
 
 }
 

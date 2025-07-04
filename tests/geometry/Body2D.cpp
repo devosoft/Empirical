@@ -17,7 +17,7 @@
 TEST_CASE("Test Body2d", "[geometry]")
 {
   emp::Circle body_outline(10.0);
-  emp::CircleBody2D body1(body_outline);
+  emp::Body2D body1(body_outline);
 
 
   // Test to make sure shifts and pressure are being calculated correctly.
@@ -32,11 +32,10 @@ TEST_CASE("Test Body2d", "[geometry]")
   body1.AddShift(shift2);
 
   REQUIRE(body1.GetShift() == shift1 + shift2);
-  //BAD TEST: REQUIRE(body1.CalcPressure() == 32);
 
   // Start a round of replication for tests
 
-  emp::Ptr<emp::CircleBody2D> body2 = body1.BuildOffspring({3.0, -4.0});
+  emp::Ptr<emp::Body2D> body2 = body1.BuildOffspring({3.0, -4.0});
 
   // Make sure original organism is linked to offspring.
   REQUIRE(body1.IsLinked(*body2));
@@ -51,9 +50,9 @@ TEST_CASE("Test Body2d", "[geometry]")
   body2.Delete();
 
 
-  //Simple test creating and getting birth time
+  // Simple test creating and getting birth time
 
-  emp::CircleBody2D body3(body_outline);
+  emp::Body2D body3(body_outline);
   body3.SetBirthTime(1.1);
   REQUIRE(body3.GetBirthTime() == 1.1);
 
