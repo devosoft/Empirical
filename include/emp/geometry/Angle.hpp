@@ -261,9 +261,13 @@ namespace emp {
     [[nodiscard]] double Tan() const { return tan(AsRadians()); }
 
     // Quicker version of sin/cos/tan -- these are low precision and return an int: result * 1024
-    [[nodiscard]] constexpr int QuickSin() const { return emp::sin_chart_1K[angle >> 8]; }
-    [[nodiscard]] constexpr int QuickCos() const { return emp::cos_chart_1K[angle >> 8]; }
-    [[nodiscard]] constexpr int QuickTan() const { return emp::tan_chart_1K[angle >> 8]; }
+    [[nodiscard]] constexpr int QuickSin1K() const { return emp::sin_chart_1K[angle >> 8]; }
+    [[nodiscard]] constexpr int QuickCos1K() const { return emp::cos_chart_1K[angle >> 8]; }
+    [[nodiscard]] constexpr int QuickTan1K() const { return emp::tan_chart_1K[angle >> 8]; }
+
+    [[nodiscard]] constexpr double QuickSin() const { return QuickSin1K() / 1024.0; }
+    [[nodiscard]] constexpr double QuickCos() const { return QuickCos1K() / 1024.0; }
+    [[nodiscard]] constexpr double QuickTan() const { return QuickTan1K() / 1024.0; }
 
     [[nodiscard]] constexpr Point GetPoint(double distance = 1.0) const {
       return Point{Sin() * distance, Cos() * distance};
