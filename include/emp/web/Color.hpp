@@ -5,6 +5,12 @@
  *
  * @file include/emp/web/Color.hpp
  * @brief Color objects
+ * 
+ * DEVELOPER NOTES:
+ * - Change to storing RGB (and maybe alpha?)
+ * - Build a chart for converting color names.
+ * - Add a ToANSI option on colors (where it aims for the nearest match?)
+ * - Some kind of measure of color distance?
  */
 
 #pragma once
