@@ -1,11 +1,10 @@
 /**
  * This file is part of Empirical, https://github.com/devosoft/Empirical
- * Copyright (C) 2015-2018 Michigan State University
+ * Copyright (C) 2015-2025 Michigan State University
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/web/Canvas.hpp
  * @brief Manage an HTML canvas object.
- *
  */
 
 #pragma once
@@ -13,23 +12,53 @@
 #ifndef INCLUDE_EMP_WEB_CANVAS_HPP_GUARD
 #define INCLUDE_EMP_WEB_CANVAS_HPP_GUARD
 
-
+#include <functional>
 #include <string>
 
 #include "../base/vector.hpp"
 #include "../geometry/Circle2D.hpp"
+#include "../geometry/Box2D.hpp"
+#include "../geometry/Polygon.hpp"
 #include "../tools/string_utils.hpp"
 
-#include "CanvasAction.hpp"
-#include "CanvasShape.hpp"
+#include "Color.hpp"
+#include "init.hpp"
+#include "RawImage.hpp"
+#include "Widget.hpp"
 
-namespace emp { namespace web {
+namespace emp::web {
+
+  namespace internal {
+    EM_JS(void, DownloadPNG_impl, (const char* id, const char* fname), {
+      let canvas = document.getElementById(UTF8ToString(id));
+      let url = canvas.toDataURL("image/png");
+      emp.download(url, UTF8ToString(fname), "image/png");
+    });
+
+    EM_JS(void, SavePNG_impl, (const char* id, const char* fname), {
+      const canvas = document.getElementById(UTF8ToString(id));
+      if (!canvas) {
+        console.error("SavePNG failed: canvas not found");
+        return;
+      }
+
+      canvas.toBlob(function(blob) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = UTF8ToString(fname);
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, "image/png");
+    });
+  }
 
   /// Manage an HTML Canvas object.
   class Canvas : public internal::WidgetFacet<Canvas> {
     friend class CanvasInfo;
   protected:
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
     class CanvasInfo : public internal::WidgetInfo {
       friend Canvas;
 
@@ -37,9 +66,10 @@ namespace emp { namespace web {
       double width;   ///< pixel width of the canvas.
       double height;  ///< pixel height of the canvas.
 
-      emp::vector<CanvasAction *> actions;
+      using fun_t = std::function<void()>;
+      emp::vector<fun_t> draw_funs;
 
-      CanvasInfo(const std::string & in_id = "") : internal::WidgetInfo(in_id) { ; }
+      CanvasInfo(const std::string & in_id = "") : internal::WidgetInfo(in_id) {}
 
       CanvasInfo(const CanvasInfo &)             = delete;  // No copies of INFO allowed
       CanvasInfo & operator=(const CanvasInfo &) = delete;  // No copies of INFO allowed
@@ -49,10 +79,9 @@ namespace emp { namespace web {
       std::string GetTypeName() const override { return "CanvasInfo"; }
 
       virtual void GetHTML(std::stringstream & HTML) override {
-        HTML.str("");  // Clear the current text.
+        HTML.str("");  // Clear any current text.
         HTML << "<canvas id=\"" << id << "\" width=\"" << width << "\" height=\"" << height
              << "\">";
-        // @CAO We can include fallback content here for browsers that don't support canvas.
         HTML << "</canvas>";
 
         // create an offscreen canvas
@@ -66,7 +95,7 @@ namespace emp { namespace web {
         }
       }
 
-      // Setup a canvas to be drawn on.
+      // Set up THIS canvas as active context.
       void TargetCanvas() {
         if constexpr (emp::compile::EMSCRIPTEN_PTHREADS) {
           // clang-format off
@@ -90,40 +119,209 @@ namespace emp { namespace web {
 
       // Trigger any JS code needed on re-draw.
       void TriggerJS() override {
-        if (state == Widget::ACTIVE) {  // Only draw on active canvases
-          TargetCanvas();               // Prepare the canvas for drawing
-          for (auto & a : actions) {
-            a->Apply();  // Run all of the actions
-          }
+        if (state == Widget::ACTIVE) {                   // Only draw on active canvases
+          TargetCanvas();                                // Prepare the canvas for drawing
+          for (const auto & fun : draw_funs) { fun(); }  // Apply all draw actions.
         }
       }
 
-      void AddAction(CanvasAction * new_action) {
+      template <typename FUN_T>
+      void AddDrawFun(FUN_T && fun) {
         if (state == Widget::ACTIVE) {  // Only draw on active canvases
           TargetCanvas();               // Prepare the canvas for drawing
-          new_action->Apply();          // Draw the current action
+          fun();                        // Apply draw function.
         }
-        actions.push_back(new_action);  // Store the current action.
+        draw_funs.push_back(std::forward<FUN_T>(fun));  // Store the current draw function.
       }
 
-      void ClearActions() {
-        for (auto * a : actions) { delete a; }
-        actions.resize(0);
-      }
-
+      void ClearActions() { draw_funs.resize(0); }
 
     public:
       virtual std::string GetType() override { return "web::CanvasInfo"; }
 
     };  // End of ButtonInfo definition.
-#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
     // Get a properly cast version of info.
     CanvasInfo * Info() { return (CanvasInfo *) info; }
 
     const CanvasInfo * Info() const { return (CanvasInfo *) info; }
 
-    Canvas(CanvasInfo * in_info) : WidgetFacet(in_info) { ; }
+    Canvas(CanvasInfo * in_info) : WidgetFacet(in_info) {}
+
+    // === Helper functions to encapsulate JS code ===
+
+    static void JS_BeginPath() { EM_ASM({ emp_i.ctx.beginPath(); }); }
+
+    static void JS_ClosePath() { EM_ASM({ emp_i.ctx.closePath(); }); }
+
+    static void JS_Translate(const Point & offset) {
+      EM_ASM({ emp_i.ctx.translate($0, $1); }, offset.GetX(), offset.GetY());
+    }
+
+    static void JS_Rotate(double angle) { EM_ASM({ emp_i.ctx.rotate($0); }, angle); }
+
+    static void JS_MoveTo(const Point & p) {
+      EM_ASM({ emp_i.ctx.moveTo($0, $1); }, p.GetX(), p.GetY());
+    }
+
+    static void JS_LineTo(const Point & p) {
+      EM_ASM({ emp_i.ctx.lineTo($0, $1); }, p.GetX(), p.GetY());
+    }
+
+    static void JS_Fill() { EM_ASM({ emp_i.ctx.fill(); }); }
+
+    static void JS_Stroke() { EM_ASM({ emp_i.ctx.stroke(); }); }
+
+    static void JS_SetStrokeColor(const Color & color) {
+      EM_ASM({ emp_i.ctx.strokeStyle = UTF8ToString($0); }, color.c_str());
+    }
+
+    static void JS_SetFillColor(const Color & color) {
+      EM_ASM({ emp_i.ctx.fillStyle = UTF8ToString($0); }, color.c_str());
+    }
+
+    static void JS_LineWidth(double line_width = 1.0) {
+      EM_ASM({ emp_i.ctx.lineWidth = $0; }, line_width);
+    }
+ 
+    static void JS_Circle(const Point & center, double radius) {
+      EM_ASM({ emp_i.ctx.arc($0, $1, $2, 0, Math.PI * 2); }, center.X(), center.Y(), radius);
+    }
+
+    static void JS_Rect(const Point & p, const Size2D size) {
+      EM_ASM({ emp_i.ctx.rect($0, $1, $2, $3); }, p.X(), p.Y(), size.Width(), size.Height());
+    }
+
+    static void JS_ClearRect(const Point & p, const Size2D size) {
+      EM_ASM({ emp_i.ctx.clearRect($0, $1, $2, $3); }, p.X(), p.Y(), size.Width(), size.Height());
+    }
+
+    static void JS_SetFont(const emp::String & font) {
+      EM_ASM({ emp_i.ctx.font = UTF8ToString($0); }, font.c_str());
+    }
+
+    static void JS_TextAlign_Center() { EM_ASM({ emp_i.ctx.textAlign = "center"; }); }
+
+    static void JS_TextBaseline_Middle() { EM_ASM({ emp_i.ctx.textBaseline = "middle"; }); }
+
+    static void JS_FillText(const Point & p, const emp::String & text) {
+      EM_ASM({ emp_i.ctx.fillText(UTF8ToString($0), $1, $2); }, text.c_str(), p.X(), p.Y());
+    }
+
+    static void JS_DrawImage(const Point & p, const RawImage & image) {
+      EM_ASM({ emp_i.ctx.drawImage(emp_i.images[$0], $1, $2); }, image.GetID(), p.X(), p.Y());      
+    }
+
+    static void JS_DrawImage(const Point & p, const RawImage & image, const Size2D & size) {
+      EM_ASM({ emp_i.ctx.drawImage(emp_i.images[$0], $1, $2, $3, $4); },
+        image.GetID(), p.X(), p.Y(), size.X(), size.Y());
+    }
+
+    template <typename T>
+    Canvas & AddDrawFun(T && fun) {
+      Info()->AddDrawFun(std::forward<T>(fun));
+      return *this;
+    }
+
+    /// Add a Circle to this canvas.
+    Canvas & AddCircle(Circle circle) {
+      auto fun = [circle]() {
+        JS_BeginPath();
+        JS_Circle(circle.GetCenter(), circle.GetRadius());
+      };      
+      return AddDrawFun(fun);
+    }
+
+    /// Add a Rectangle to this canvas.
+    Canvas & AddBox(Box2D box) {
+      auto fun = [box]() {
+        JS_BeginPath();
+        JS_Rect(box.GetUL(), box.GetSize());
+      };      
+      return AddDrawFun(fun);
+    }
+
+    /// Draw a line between two points.
+    Canvas & AddLine(Point start, Point end) {
+      auto fun = [start, end]() {
+        JS_BeginPath();
+        JS_MoveTo(start);
+        JS_LineTo(end);
+      };      
+      return AddDrawFun(fun);
+    }
+
+    /// Add a series of lines.
+    Canvas & AddLines(Point start, const emp::vector<Point> & points, bool close=false) {
+      emp_assert(points.size() >= 3, points.size());
+      auto fun = [start, points, close]() {
+        JS_BeginPath();
+        JS_MoveTo(start);
+        for (const Point & point : points) {
+          JS_LineTo(point);
+        }
+        if (close) JS_ClosePath();
+      };
+      return AddDrawFun(fun);
+    }
+
+    /// Add a Rectangle to this canvas.
+    Canvas & AddRect(Point ul_corner, Size2D size) {
+      auto fun = [ul_corner, size]() {
+        JS_BeginPath();
+        JS_Rect(ul_corner, size);
+      };      
+      return AddDrawFun(fun);
+    }
+
+    /// Clear the area of a Rectangle from this canvas.
+    Canvas & AddClearRect(Point ul_corner, Size2D size) {
+      auto fun = [ul_corner, size]() {
+        JS_BeginPath(); // @CAO Is this BeginPath needed?
+        JS_ClearRect(ul_corner, size);
+      };      
+      return AddDrawFun(fun);
+    }
+
+    /// Draw text directly on the canvas.
+    Canvas & AddText(Point p, emp::String text, bool center=false) {
+      auto fun = [p, text, center]() {
+        if (center) {
+          JS_TextAlign_Center();
+          JS_TextBaseline_Middle();
+        }
+        JS_FillText(p, text);
+      };      
+      return AddDrawFun(fun);
+    }
+
+    Canvas & AddImage(Point p, const RawImage & image) {
+      auto fun = [p, image]() {
+        if (image.HasLoaded()) JS_DrawImage(p, image);
+      };
+      return AddDrawFun(fun);
+    }
+
+    Canvas & AddImage(Point p, const RawImage & image, Size2D size) {
+      auto fun = [p, image, size]() {
+        if (image.HasLoaded()) JS_DrawImage(p, image, size);
+      };
+      return AddDrawFun(fun);
+    }
+
+    Canvas & AddImageWhenReady(Point p, RawImage & image) {
+      auto fun = [p, &image]() {
+        image.OnLoad([p, image](){ JS_DrawImage(p, image); });
+      };
+      return AddDrawFun(fun);
+    }
+
+    Canvas & AddImageWhenReady(Point p, RawImage & image, Size2D size) {
+      auto fun = [p, &image, size]() {
+        image.OnLoad([p, image, size](){ JS_DrawImage(p, image, size); });
+      };
+      return AddDrawFun(fun);
+    }
 
   public:
     /// Create a new canvas with the specified size and optional HTML identifier.
@@ -134,19 +332,21 @@ namespace emp { namespace web {
     }
 
     /// Link to an existing canvas.
-    Canvas(const Canvas & in) : WidgetFacet(in) { ; }
+    Canvas(const Canvas & in) : WidgetFacet(in) {}
 
     Canvas(const Widget & in) : WidgetFacet(in) { emp_assert(in.IsCanvas()); }
 
-    Canvas() { ; }
+    // Canvas() {}
 
-    virtual ~Canvas() { ; }
+    virtual ~Canvas() {}
 
     using INFO_TYPE = CanvasInfo;
 
     double GetWidth() const { return Info()->width; }  ///< Get the pixel width of this Canvas.
 
     double GetHeight() const { return Info()->height; }  ///< Get the pixel height of this Canvas.
+
+    Size2D GetSize() const { return Size2D{GetWidth(), GetHeight()}; }
 
     void SetWidth(double w) { Info()->width = w; }  ///< Set a new width for this Canvas.
 
@@ -158,187 +358,149 @@ namespace emp { namespace web {
       Info()->height = h;
     }
 
-    /// Add a Circle to this canvas; provide constructor for the CanvasCircle with a position and radius
-    /// as well as optional face color, line color, and line width.
-    template <typename... Ts>
-    Canvas & Circle(Point center, double _r, Ts &&... vals) {
-      Info()->AddAction(new CanvasCircle(emp::Circle(center, _r), std::forward<Ts>(vals)...));
+    Canvas & LineWidth(double line_width = 1.0) {
+      auto fun = [line_width]() { JS_LineWidth(line_width); };
+      return AddDrawFun(fun);
+    }
+
+    struct ShapeFormat {
+      Color fg_color{};
+      Color bg_color{};
+      double line_width=1.0;
+    };
+
+    Canvas & SetLineColor(const Color & color) {
+      auto fun = [color]() { JS_SetStrokeColor(color); };
+      return AddDrawFun(fun);
+    }
+
+    Canvas & SetFillColor(const Color & color) {
+      auto fun = [color]() { JS_SetFillColor(color); };
+      return AddDrawFun(fun);
+    }
+
+    Canvas & SetLineWidth(double line_width) {
+      auto fun = [line_width]() { JS_LineWidth(line_width); };
+      return AddDrawFun(fun);
+    }
+
+    Canvas & SetFormat(const ShapeFormat & format) {
+      auto fun = [format]() {
+        JS_SetStrokeColor(format.fg_color);
+        JS_SetFillColor(format.bg_color);
+        JS_LineWidth(format.line_width);
+      };
+      return AddDrawFun(fun);
+    }
+
+    Canvas & SetFont(const emp::String & font) {
+      auto fun = [font]() { JS_SetFont(font); };
+      return AddDrawFun(fun);
+    }
+
+    Canvas & SetTranslate(Point offset) {
+      auto fun = [offset] { JS_Translate(offset); };
+      return AddDrawFun(fun);
+    }
+
+    Canvas & SetRotate(double angle) {
+      auto fun = [angle] { JS_Rotate(angle); };
+      return AddDrawFun(fun);
+    }
+
+    // === Some Draw() shortcuts ===
+
+    // DRAW LINE: Two points indicates a line should be drawn between them.
+    Canvas & Draw(Point start, Point end, const Color & line_color=Color{},
+                  double line_width=0.0) {
+      AddLine(start, end);
+      if (line_color) SetLineColor(line_color);
+      if (line_width > 0) SetLineWidth(line_width);
+      JS_Stroke();
       return *this;
     }
 
-    template <typename... Ts>
-    Canvas & Circle(double _x, double _y, double _r, Ts &&... vals) {
-      Info()->AddAction(new CanvasCircle(emp::Circle(_x, _y, _r), std::forward<Ts>(vals)...));
+    // DRAW MULTIPLE LINES: A series of points indicates lines should be drawn connecting them.
+    Canvas & Draw(Point start, const emp::vector<Point> & other,
+                  const Color & line_color=Color{}, double line_width=0.0) {
+      AddLines(start, other);
+      if (line_color) SetLineColor(line_color);
+      if (line_width > 0) SetLineWidth(line_width);
+      JS_Stroke();
       return *this;
     }
 
-    /// Add a Rectangle to this canvas at x,y with width w and height h.  Optional face color and
-    /// line color.
-    template <typename... Ts>
-    Canvas & Rect(Point corner, double w, double h, Ts &&... vals) {
-      Info()->AddAction(new CanvasRect(corner, w, h, std::forward<Ts>(vals)...));
+    // DRAW A CIRCLE
+    Canvas & Draw(const Circle2D & circle, const Color & fill_color=Color{},
+                  const Color & line_color=Color{}, double line_width=0.0) {
+      // emp::Alert("Circle! Fill=", fill_color.ToString(), "; Line=", line_color.ToString(),
+      //            "; Width=", line_width);
+
+      AddCircle(circle);
+      if (line_color) SetLineColor(line_color);
+      if (line_width > 0) SetLineWidth(line_width);
+      JS_Stroke();
+      if (fill_color) {
+        SetFillColor(fill_color);
+        JS_Fill();
+      }
       return *this;
     }
 
-    template <typename... Ts>
-    Canvas & Rect(double x, double y, double w, double h, Ts &&... vals) {
-      Info()->AddAction(new CanvasRect(x, y, w, h, std::forward<Ts>(vals)...));
+    // DRAW A RECTANGLE
+    Canvas & Draw(const Box2D & box, const Color & fill_color=Color{},
+                  const Color & line_color=Color{}, double line_width=0.0) {
+      AddBox(box);
+      if (line_color) SetLineColor(line_color);
+      if (line_width > 0) SetLineWidth(line_width);
+      JS_Stroke();
+      if (fill_color) {
+        SetFillColor(fill_color);
+        JS_Fill();
+      }
       return *this;
     }
 
-    /// Add an Image to this canvas at x,y with width w and height h.
-    template <typename... Ts>
-    Canvas & Image(const emp::RawImage & image, Point corner, Ts &&... vals) {
-      Info()->AddAction(new CanvasImage(image, corner, std::forward<Ts>(vals)...));
-      return *this;
-    }
-
-    template <typename... Ts>
-    Canvas & Image(const emp::RawImage & image, double x, double y, Ts &&... vals) {
-      Info()->AddAction(new CanvasImage(image, x, y, std::forward<Ts>(vals)...));
-      return *this;
-    }
-
-    /// Add a Line from x1,y1 to x2,y2.  Optional face color and line color.
-    template <typename... Ts>
-    Canvas & Line(double x1, double y1, double x2, double y2, Ts &&... vals) {
-      Info()->AddAction(new CanvasLine(x1, y1, x2, y2, std::forward<Ts>(vals)...));
-      return *this;
-    }
-
-    template <typename... Ts>
-    Canvas & Line(emp::Point p1, emp::Point p2, Ts &&... vals) {
-      Info()->AddAction(new CanvasLine(p1, p2, std::forward<Ts>(vals)...));
-      return *this;
-    }
-
-    /// Add a Line from x1,y1 to x2,y2.  Optional face color and line color.
-    template <typename... Ts>
-    Canvas & MultiLine(emp::Point p1, const emp::vector<emp::Point> & points, Ts &&... vals) {
-      Info()->AddAction(new CanvasMultiLine(p1, points, std::forward<Ts>(vals)...));
-      return *this;
-    }
-
-    /// Add a string to this canvas at x,y with specified text.  Optional face color and
-    /// line color.
-    template <typename... Ts>
-    Canvas & Text(emp::Point p, Ts &&... vals) {
-      Info()->AddAction(new CanvasText(p, std::forward<Ts>(vals)...));
-      return *this;
-    }
-
-    template <typename... Ts>
-    Canvas & Text(double x, double y, Ts &&... vals) {
-      Info()->AddAction(new CanvasText(x, y, std::forward<Ts>(vals)...));
-      return *this;
-    }
-
-    /// Add a string to this canvas centered at x,y with specified text.  Optional face color and
-    /// line color.
-    template <typename... Ts>
-    Canvas & CenterText(emp::Point p, Ts &&... vals) {
-      auto * ctext = new CanvasText(p, std::forward<Ts>(vals)...);
-      ctext->Center();
-      Info()->AddAction(ctext);
-      return *this;
-    }
-
-    template <typename... Ts>
-    Canvas & CenterText(double x, double y, Ts &&... vals) {
-      auto * ctext = new CanvasText({x, y}, std::forward<Ts>(vals)...);
-      ctext->Center();
-      Info()->AddAction(ctext);
-      return *this;
-    }
-
-    /// Update the default font for text.
-    Canvas & Font(const std::string font) {
-      Info()->AddAction(new CanvasFont(font));
-      return *this;
-    }
-
-    /// Draw a circle onto this canvas.
-    Canvas & Draw(const emp::Circle & circle,
-                  const std::string & fc = "",
-                  const std::string & lc = "") {
-      Info()->AddAction(new CanvasCircle(circle, fc, lc));
-      return *this;
-    }
-
-    /// Draw an arbitrary shape onto this canvas.
-    Canvas & Draw(const CanvasShape & shape) {
-      Info()->AddAction(shape.Clone());
-      return *this;
-    }
-
-    /// Change the default stroke color.
-    Canvas & StrokeColor(std::string c) {
-      Info()->AddAction(new CanvasStrokeColor(c));
-      return *this;
-    }
-
-    /// Rotate the entire canvas.
-    Canvas & Rotate(double angle) {
-      Info()->AddAction(new CanvasRotate(angle));
+    // DRAW A GENERIC POLYGON
+    Canvas & Draw(const Polygon & polygon, const Color & fill_color=Color{},
+                  const Color & line_color=Color{}, double line_width=0.0) {
+      SetTranslate(polygon.GetAnchor());
+      AddLines(Point{0.0, 0.0}, polygon.GetOther(), true);
+      SetTranslate(-polygon.GetAnchor());
+      if (line_color) SetLineColor(line_color);
+      if (line_width > 0) SetLineWidth(line_width);
+      JS_Stroke();
+      if (fill_color) {
+        SetFillColor(fill_color);
+        JS_Fill();
+      }
       return *this;
     }
 
     /// Clear everything off of this canvas.
-    Canvas & Clear() {
-      Info()->ClearActions();
-      Info()->AddAction(new CanvasClearRect({0, 0}, GetWidth(), GetHeight()));
-      return *this;
-    }
-
-    /// Clear to a specific background color.
-    Canvas & Clear(const std::string & bg_color) {
-      Info()->ClearActions();
-      Info()->AddAction(new CanvasClearRect({0, 0}, GetWidth(), GetHeight()));
-      Info()->AddAction(new CanvasRect({0, 0}, GetWidth(), GetHeight(), bg_color, ""));
-      return *this;
+    Canvas & Clear(Color bg_color = Color{}) {
+      Info()->ClearActions();                           // Remove canvas history.
+      if (!bg_color) bg_color = Palette::WHITE;         // Default background is white.
+      return Draw(Box2D{{0, 0}, GetSize()}, bg_color);  // Draw a rectangle coverring the screen.
     }
 
     /// Download a PNG image of a canvas.
+    void DownloadPNG(emp::String fname) const {
+      if (!fname.ends_with(".png")) fname += ".png";
+      internal::DownloadPNG_impl(Info()->id.c_str(), fname.c_str());
+    }
+
+    /// Download a PNG image of a canvas using the default filename.
     void DownloadPNG() const { DownloadPNG(Info()->id + ".png"); }
 
-    /// Download a PNG image of a canvas.
-    void DownloadPNG(const std::string & fname) const {
-      const auto ext = fname.rfind(".png", fname.length()) == std::string::npos ? ".png" : "";
-      emscripten_run_script(MakeString("emp.download(document.getElementById('", Info()->id,
-                             "').toDataURL('img/png'), '", fname, ext, "', 'img/png');").c_str());
-    }
-
     /// Save a PNG image of a canvas with node.js.
-    void SavePNG(const std::string & fname) const {
-      // adapted from https://stackoverflow.com/a/11335500
-      const std::string command_template = R"(
-        setTimeout(function(){
-
-          fs = require('fs');
-
-          canvas = document.getElementById('%s');
-
-          var url = canvas.toDataURL('image/png');
-          var regex = `^data:.+\/(.+);base64,(.*)$`;
-
-          var matches = url.match(regex);
-          var data = matches[2];
-          var buffer = Buffer.from(data, 'base64');
-
-          fs.writeFileSync('%s' , buffer);
-
-        }, 10);
-      )";
-
-
-      const std::string id{Info()->id};
-      const std::string command{emp::format_string(command_template, id.c_str(), fname.c_str())};
-
-      emscripten_run_script(command.c_str());
+    void SavePNG(emp::String fname) const {
+      if (!fname.ends_with(".png")) fname += ".png";
+      internal::SavePNG_impl(Info()->id.c_str(), fname.c_str());
     }
   };
 
-}}  // namespace emp::web
+}  // namespace emp::web
 
 #endif  // #ifndef INCLUDE_EMP_WEB_CANVAS_HPP_GUARD
 
