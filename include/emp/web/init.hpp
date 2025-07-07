@@ -29,6 +29,7 @@
 #ifdef __EMSCRIPTEN__
 
 #include <emscripten.h>
+#include <emscripten/threading.h>
 
 #ifdef __EMSCRIPTEN_PTHREADS__
 #include <pthread.h>
@@ -129,6 +130,20 @@ namespace emp {
       }
     }
   }
+}  // namespace emp
+
+#else  // #ifdef __EMSCRIPTEN__
+
+// Add some fake defines to help IDEs function in non-emscripten mode.
+#define EM_ASM(...)
+#define EM_JS(...)
+#define MAIN_THREAD_EM_ASM(...)
+#define MAIN_THREAD_EM_ASM_DOUBLE(...)
+#define emscripten_run_script(...)
+
+#endif  // #ifdef __EMSCRIPTEN__ : else
+
+namespace emp {
 
   namespace web {
     /// Take a function or variable and set it up so that it can update each time a text box is redrawn.
@@ -147,7 +162,6 @@ namespace emp {
   }
 }
 
-#endif  // #ifdef __EMSCRIPTEN__
 
 #endif  // This file is just going to confuse doxygen : #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
