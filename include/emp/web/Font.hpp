@@ -16,7 +16,7 @@
 #include <sstream>
 #include <string>
 
-#include "color_map.hpp"
+#include "Color.hpp"
 #include "Style.hpp"
 
 namespace emp::web {
@@ -24,10 +24,10 @@ namespace emp::web {
   /// Maintain information about an HTML font.
   class Font {
   protected:
-    std::string family;      ///< Font family to use.
-    int size;                ///< Font size (in px) to use.
-    std::string color;       ///< Font color.
-    std::string line_color;  ///< Color of lines through the text (underline, linethrough, etc.)
+    std::string family;     ///< Font family to use.
+    int size;               ///< Font size (in px) to use.
+    emp::Color text_color;  ///< Font color.
+    emp::Color line_color;  ///< Color of lines through the text (underline, linethrough, etc.)
 
     bool is_bold;         ///< Is this font bold?
     bool is_italic;       ///< Is this font italic?
@@ -43,12 +43,12 @@ namespace emp::web {
 
     Font(const std::string & _family = "Helvetica",
          int _size                   = 15,
-         const std::string & _color  = "black",
+         const emp::Color & _color   = Palette::BLACK,
          bool _bold                  = false,
          bool _italic                = false)
       : family(_family)
       , size(_size)
-      , color(_color)
+      , text_color(_color)
       , is_bold(_bold)
       , is_italic(_italic)
       , is_smallcaps(false)
@@ -76,10 +76,10 @@ namespace emp::web {
     int GetSize() const { return size; }
 
     /// @returns font color
-    const std::string & GetColor() const { return color; }
+    const emp::Color & GetColor() const { return text_color; }
 
     /// @returns color of lines through text (underline or strikethrough)
-    const std::string & GetLineColor() const { return line_color; }
+    const emp::Color & GetLineColor() const { return line_color; }
 
     /// @returns Boolean indicating whether font is bold
     bool IsBold() const { return is_bold; }
@@ -121,14 +121,14 @@ namespace emp::web {
 
     /// Sets font color to specified value
     /// @returns reference to this font for easy chaining
-    Font & SetColor(const std::string & _color) {
-      color = _color;
+    Font & SetColor(const emp::Color & _color) {
+      text_color = _color;
       return *this;
     }
 
     /// Sets color of any lines through, under, or over this font
     /// @returns reference to this font for easy chaining
-    Font & SetLineColor(const std::string & _color) {
+    Font & SetLineColor(const emp::Color & _color) {
       line_color = _color;
       return *this;
     }
@@ -184,7 +184,7 @@ namespace emp::web {
 
     /// Take a Style object an fill it out based on this font information.
     void ConfigStyle(Style & style) const {
-      style.Set("color", color);
+      style.Set("color", text_color);
       style.Set("font-family", family);
       style.Set("font-size", to_string(size, "px"));
       if (is_bold) { style.Set("font-weight", "bold"); }
@@ -195,7 +195,7 @@ namespace emp::web {
         if (is_underlined) { decoration += " underline"; }
         if (is_overlined) { decoration += " overline"; }
         if (is_linethrough) { decoration += " line-through"; }
-        if (line_color != "") {
+        if (line_color != Palette::NONE) {
           decoration += " ";
           decoration += line_color;
         }
@@ -215,7 +215,7 @@ namespace emp::web {
     /// element using this font.
     std::string GetHTMLStart() {
       std::stringstream ss;
-      ss << "<span style=\"color:" << color << "; font-family:" << family << "; font-size:" << size;
+      ss << "<span style=\"color:" << text_color << "; font-family:" << family << "; font-size:" << size;
       if (is_bold) { ss << "; font-weight:bold"; }
       if (is_italic) { ss << "; font-style:italic"; }
       if (is_smallcaps) { ss << "; font-variant:small-caps"; }
@@ -224,7 +224,7 @@ namespace emp::web {
         if (is_underlined) { ss << " underline"; }
         if (is_overlined) { ss << " overline"; }
         if (is_linethrough) { ss << " line-through"; }
-        if (line_color != "") { ss << " " << line_color; }
+        if (line_color != Palette::NONE) { ss << " " << line_color; }
         if (is_wavy_line) { ss << " wavy"; }
       }
       ss << "\">";
@@ -237,7 +237,7 @@ namespace emp::web {
 
     /// Fonts will evaluate to equal if all of their properties are the same
     bool operator==(const Font & _in) const {
-      return (family == _in.family) && (size == _in.size) && (color == _in.color) &&
+      return (family == _in.family) && (size == _in.size) && (text_color == _in.text_color) &&
              (line_color == _in.line_color) && (is_bold == _in.is_bold) &&
              (is_italic == _in.is_italic) && (is_smallcaps == _in.is_smallcaps) &&
              (is_underlined == _in.is_underlined) && (is_overlined == _in.is_overlined) &&
