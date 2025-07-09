@@ -72,8 +72,33 @@ namespace emp {
       return {ul_corner, size / dilate};
     }
 
-    constexpr Box2D & Translate(Point2D shift) {
+    constexpr Box2D & operator+=(Point2D shift) {
       ul_corner += shift;
+      return *this;
+    }
+
+    constexpr Box2D & operator-=(Point2D shift) {
+      ul_corner -= shift;
+      return *this;
+    }
+
+    constexpr Box2D & operator*=(double dilate) {
+      size *= dilate;
+      return *this;
+    }
+
+    constexpr Box2D & operator/=(double dilate) {
+      size /= dilate;
+      return *this;
+    }
+
+    constexpr Box2D & operator*=(Point2D dilate) {
+      size *= dilate;
+      return *this;
+    }
+
+    constexpr Box2D & operator/=(Point2D dilate) {
+      size /= dilate;
       return *this;
     }
 
