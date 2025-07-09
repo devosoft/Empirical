@@ -108,8 +108,15 @@ namespace emp {
     }
 
     constexpr bool HasOverlap(const Circle2D & other) const {
-      const double min_dist = radius + other.radius;
-      return center.SquareDistance(other.center) < (min_dist * min_dist);
+      const double threshold = radius + other.radius;
+      return center.SquareDistance(other.center) < (threshold * threshold);
+    }
+
+    // Distance between the nearest EDGES of two circles.
+    // Note: negative if circles overlap.
+    constexpr double CalcDistance(const Circle2D other) const {
+      const double center_dist = center.Distance(other.center);
+      return radius + other.radius - center_dist;
     }
   };
 
