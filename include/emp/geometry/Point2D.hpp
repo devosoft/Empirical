@@ -32,30 +32,31 @@ namespace emp {
 
   public:
     constexpr Point2D()                    = default;  // Default = 0,0
-    constexpr Point2D(const Point2D & _in) = default;  // Copy constructor
+    constexpr Point2D(const Point2D & in) = default;  // Copy constructor
 
     constexpr Point2D(double x, double y) : x(x), y(y) {}
 
-    constexpr Point2D(const GridPos & pos) : x(pos.Col()), y(pos.Row()) {}
+    constexpr explicit Point2D(const GridPos & pos) : x(pos.Col()), y(pos.Row()) {}
 
-    constexpr Point2D(const Point2D & _in, double new_magnitude)
-      : x(_in.x * new_magnitude / _in.Magnitude())
-      , y(_in.y * new_magnitude / _in.Magnitude()) {}
+    constexpr Point2D(const Point2D & in, double new_magnitude)
+      : x(in.x * new_magnitude / in.Magnitude())
+      , y(in.y * new_magnitude / in.Magnitude()) {}
 
-    Point2D & operator=(const Point2D & _in)          = default;
+    constexpr Point2D & operator=(const Point2D & in) = default;
+
     constexpr auto operator<=>(const Point2D &) const = default;
 
-    constexpr double GetX() const { return x;
-    }
+    [[nodiscard]] constexpr double GetX() const { return x; }
 
-    constexpr double GetY() const { return y;
-    }
+    [[nodiscard]] constexpr double GetY() const { return y; }
 
-    constexpr double X() const { return x;
-    }
+    [[nodiscard]] constexpr double X() const { return x; }
 
-    constexpr double Y() const { return y;
-    }
+    [[nodiscard]] constexpr double Y() const { return y; }
+
+    [[nodiscard]] constexpr double & X() { return x; }
+
+    [[nodiscard]] constexpr double & Y() { return y; }
 
     template <class Self>
     constexpr Self & SetX(this Self & self, double in_x) {
@@ -76,223 +77,215 @@ namespace emp {
       return self;
     }
 
-    constexpr double SquareMagnitude() const { return x * x + y * y;
-    }
+    [[nodiscard]] constexpr double SquareMagnitude() const { return x * x + y * y; }
 
-    constexpr double Magnitude() const { return sqrt(x * x + y * y);
-    }
+    [[nodiscard]] constexpr double Magnitude() const { return sqrt(x * x + y * y); }
 
-    constexpr bool AtOrigin() const { return x == 0.0 && y == 0.0;
-    }
+    [[nodiscard]] constexpr bool AtOrigin() const { return x == 0.0 && y == 0.0; }
 
-    constexpr bool NonZero() const { return x != 0.0 || y != 0.0;
-    }
+    [[nodiscard]] constexpr bool IsNonZero() const { return x != 0.0 || y != 0.0; }
 
-    constexpr bool NonNegative() const { return x >= 0.0 || y >= 0.0;
-    }
+    [[nodiscard]] constexpr bool IsNonNegative() const { return x >= 0.0 || y >= 0.0; }
 
     // Determine a new point, but don't change this one
     template <class Self>
-    constexpr Self GetMidpoint(this const Self & self, const Point2D & p2) {
+    [[nodiscard]] constexpr Self Midpoint(this const Self & self, const Point2D & p2) {
       return (self + p2) / 2.0;
     }
 
     template <class Self>
-    constexpr Self GetRot90(this const Self & self) { return {self.y, -self.x};
-  }
+    [[nodiscard]] constexpr Self Rot90(this const Self & self) { return {self.y, -self.x}; }
 
     template <class Self>
-    constexpr Self GetRot180(this const Self & self) { return {-self.x, -self.y};
-  }
+    [[nodiscard]] constexpr Self Rot180(this const Self & self) { return {-self.x, -self.y}; }
 
     template <class Self>
-    constexpr Self GetRot270(this const Self & self) { return {-self.y, self.x};
-  }
+    [[nodiscard]] constexpr Self Rot270(this const Self & self) { return {-self.y, self.x}; }
 
     template <class Self>
-    constexpr Self GetOffsetX(this const Self & self, double in_x) { return {self.x + in_x, self.y};
-  }
+    [[nodiscard]] constexpr Self OffsetX(this const Self & self, double in_x) { return {self.x + in_x, self.y}; }
 
     template <class Self>
-    constexpr Self GetOffsetY(this const Self & self, double in_y) { return {self.x, self.y + in_y};
-  }
+    [[nodiscard]] constexpr Self OffsetY(this const Self & self, double in_y) { return {self.x, self.y + in_y}; }
 
     template <class Self>
-    constexpr Self GetScaled(this const Self & self, double scale) {
+    [[nodiscard]] constexpr Self Scale(this const Self & self, double scale) {
       return {self.x * scale, self.y * scale};
     }
 
     template <class Self>
-    constexpr Self GetScaled(this const Self & self, double scale_x, double scale_y) {
-      return { self.x * scale_x, self.y * scale_y };
+    [[nodiscard]] constexpr Self Scale(this const Self & self, double scale_x, double scale_y) {
+      return {self.x * scale_x, self.y * scale_y};
+    }
+
+    // === Operations with other Point2D's ===
+
+    template <class Self>
+    [[nodiscard]] constexpr Self operator+(this const Self & self, const Point2D & in) {
+      return {self.x + in.x, self.y + in.y};
     }
 
     template <class Self>
-    constexpr Self operator+(this const Self & self, const Point2D & _in) {
-      return {self.x + _in.x, self.y + _in.y};
+    [[nodiscard]] constexpr Self operator-(this const Self & self, const Point2D & in) {
+      return {self.x - in.x, self.y - in.y};
     }
 
     template <class Self>
-    constexpr Self operator-(this const Self & self, const Point2D & _in) {
-      return {self.x - _in.x, self.y - _in.y};
+    [[nodiscard]] constexpr Self operator*(this const Self & self, const Point2D & in) {
+      return {self.x * in.x, self.y * in.y};
     }
 
     template <class Self>
-    constexpr Self operator*(this const Self & self, const Point2D & _in) {
-      return {self.x * _in.x, self.y * _in.y};
+    [[nodiscard]] constexpr Self operator/(this const Self & self, const Point2D & in) {
+      return {self.x / in.x, self.y / in.y};
+    }
+
+    // === Operations with GridPosition ===
+
+    template <class Self>
+    [[nodiscard]] constexpr Self operator*(this const Self & self, const GridPos & in) {
+      return {self.x * in.Col(), self.y * in.Row()};
     }
 
     template <class Self>
-    constexpr Self operator/(this const Self & self, const Point2D & _in) {
-      return {self.x / _in.x, self.y / _in.y};
-    }
-
-    template <class Self>
-    constexpr Self operator/(this const Self & self, const GridPos & _in) {
-      return {self.x / _in.Col(), self.y / _in.Row()};
+    [[nodiscard]] constexpr Self operator/(this const Self & self, const GridPos & in) {
+      return {self.x / in.Col(), self.y / in.Row()};
     }
 
 
+    // === Operations with double or int ===
+
     template <class Self>
-    constexpr Self operator*(this const Self & self, double mult) {
+    [[nodiscard]] constexpr Self operator*(this const Self & self, double mult) {
       return {self.x * mult, self.y * mult};
     }
 
     template <class Self>
-    constexpr Self operator/(this const Self & self, double div) {
+    [[nodiscard]] constexpr Self operator/(this const Self & self, double div) {
       return {self.x / div, self.y / div};
     }
 
     template <class Self>
-    constexpr Self operator*(this const Self & self, int mult) {
+    [[nodiscard]] constexpr Self operator*(this const Self & self, int mult) {
       return { self.x * mult, self.y * mult};
     }
 
     template <class Self>
-    constexpr Self operator/(this const Self & self, int div) {
+    [[nodiscard]] constexpr Self operator/(this const Self & self, int div) {
       return { self.x / div, self.y / div};
     }
 
+    // === Unary operations ===
     template <class Self>
-    constexpr Self operator-(this const Self & self) {   // Unary minus
+    [[nodiscard]] constexpr Self operator-(this const Self & self) {   // Unary minus
       return { -self.x, -self.y};
     }
 
     template <class Self>
-    constexpr Self Abs(this const Self & self) {  // Absolute value
-      return { std::abs(self.x), std::abs(self.y)};
-    }
-
-    // Modify this point.
-    template <class Self>
-    constexpr Self & Scale(this Self & self, double scale_x, double scale_y) {
-      self.x *= scale_x;
-      self.y *= scale_y;
-      return *this;
+    [[nodiscard]] constexpr Self Abs(this const Self & self) {  // Absolute value
+      return {std::abs(self.x), std::abs(self.y)};
     }
 
     template <class Self>
-    constexpr Self & ToOrigin(this Self & self) {
-      self.x = 0.0;
-      self.y = 0.0;
-      return *this;
+    [[nodiscard]] constexpr Self NegateX(this const Self & self) {
+      return {-self.x, self.y};
     }
 
     template <class Self>
-    constexpr Self & NegateX(this Self & self) {
-      self.x = -self.x;
-      return *this;
+    [[nodiscard]] constexpr Self NegateY(this const Self & self) {
+      return {self.x, -self.y};
     }
 
     template <class Self>
-    constexpr Self & NegateY(this Self & self) {
-      self.y = -self.y;
-      return *this;
+    [[nodiscard]] constexpr Self Wrap(this const Self & self, const Point2D & limits) {
+      return {emp::Mod(self.x, limits.x), emp::Mod(self.y, limits.y)};
     }
 
     template <class Self>
-    constexpr Self & Wrap(this Self & self, const Point2D & limits) {
-      self.x = emp::Mod(self.x, limits.x);
-      self.y = emp::Mod(self.y, limits.y);
-      return *this;
+    [[nodiscard]] constexpr Self BoundLower(this const Self & self, const Point2D & bound) {
+      return {std::max(self.x, bound.x), std::max(self.y, bound.y)};
     }
 
     template <class Self>
-    constexpr Self & BoundLower(this Self & self, const Point2D & bound) {
-      self.x = std::max(self.x, bound.x);
-      self.y = std::max(self.y, bound.y);
-      return *this;
+    [[nodiscard]] constexpr Self BoundUpper(this const Self & self, const Point2D & bound) {
+      return {std::min(self.x, bound.x), std::min(self.y, bound.y)};
     }
 
     template <class Self>
-    constexpr Self & BoundUpper(this Self & self, const Point2D & bound) {
-      self.x = std::min(self.x, bound.x);
-      self.y = std::min(self.y, bound.y);
-      return *this;
+    [[nodiscard]] constexpr Self BoundPositive(this const Self & self) {
+      return self.BoundLower({0.0, 0.0});
     }
 
     template <class Self>
-    constexpr Self & BoundPositive(this Self & self) { return BoundLower({0.0, 0.0}); }
-
-    template <class Self>
-    constexpr Self & operator+=(this Self & self, const Point2D & _in) {
-      self.x += _in.x;
-      self.y += _in.y;
-      return *this;
+    constexpr Self & operator+=(this Self & self, const Point2D & in) {
+      self.x += in.x;
+      self.y += in.y;
+      return self;
     }
 
     template <class Self>
-    constexpr Self & operator-=(this Self & self, const Point2D & _in) {
-      self.x -= _in.x;
-      self.y -= _in.y;
-      return *this;
+    constexpr Self & operator-=(this Self & self, const Point2D & in) {
+      self.x -= in.x;
+      self.y -= in.y;
+      return self;
+    }
+
+    template <class Self>
+    constexpr Self & operator*=(this Self & self, const Point2D & in) {
+      self.x *= in.x;
+      self.y *= in.y;
+      return self;
+    }
+
+    template <class Self>
+    constexpr Self & operator/=(this Self & self, const Point2D & in) {
+      emp_assert(in.X() != 0.0 && in.Y() != 0.0);
+      self.x /= in.x;
+      self.y /= in.y;
+      return self;
     }
 
     template <class Self>
     constexpr Self & operator*=(this Self & self, double mult) {
       self.x *= mult;
       self.y *= mult;
-      return *this;
+      return self;
     }
 
     template <class Self>
     constexpr Self & operator/=(this Self & self, double val) {
-      if (val != 0.0) {
-        self.x /= val;
-        self.y /= val;
-      };
-      return *this;
+      emp_assert(val != 0.0);
+      self.x /= val;
+      self.y /= val;
+      return self;
     }
 
     template <class Self>
-    constexpr Self & Rot90(this Self & self) { return Set(self.y, -self.x); }
+    constexpr Self & Rot90(this Self & self) { return self.Set(self.y, -self.x); }
 
     template <class Self>
-    constexpr Self & Rot180(this Self & self) { return Set(-self.x, -self.y); }
+    constexpr Self & Rot180(this Self & self) { return self.Set(-self.x, -self.y); }
 
     template <class Self>
-    constexpr Self & Rot270(this Self & self) { return Set(-self.y, self.x); }
+    constexpr Self & Rot270(this Self & self) { return self.Set(-self.y, self.x); }
+
+    [[nodiscard]] constexpr double Dot(const Point2D & in) const {
+      return x * in.x + y * in.y;
+    }
 
     // Square-roots are slow to calculate; if we're just doing comparisons, square-distance
     // is usually going to be sufficient.
-    constexpr double SquareDistance(const Point2D & _in) const {
-      const double x_dist = x - _in.x;
-      const double y_dist = y - _in.y;
+    [[nodiscard]] constexpr double SquareDistance(const Point2D & in) const {
+      const double x_dist = x - in.x;
+      const double y_dist = y - in.y;
       return x_dist * x_dist + y_dist * y_dist;
     }
 
-    constexpr double Distance(const Point2D & _in) const { return sqrt(SquareDistance(_in));
-    }
+    [[nodiscard]] constexpr double Distance(const Point2D & in) const { return sqrt(SquareDistance(in)); }
 
     // Convert to a grid postion (typically done after dividing by a unit size)
-    constexpr GridPos ToGridPos() {
+    [[nodiscard]] constexpr GridPos ToGridPos() {
       return GridPos{static_cast<GridPos::pos_t>(x), static_cast<GridPos::pos_t>(y)};
-    }
-
-    // Convert to a grid size (typically done after dividing by a unit size)
-    // @CAO: Should be in Size2D, but need preserve Size2D with math first.
-    constexpr GridSize ToGridSize() {
-      return GridSize{static_cast<GridSize::pos_t>(x), static_cast<GridSize::pos_t>(y)};
     }
   };
 
@@ -307,20 +300,25 @@ namespace emp {
 
     constexpr Size2D(double x, double y) : Point2D(x,y) {}
 
-    constexpr Size2D(const Size2D & _in, double new_magnitude) : Point2D(_in, new_magnitude) {}
+    constexpr Size2D(const Size2D & in, double new_magnitude) : Point2D(in, new_magnitude) {}
 
-    constexpr Size2D & operator=(const Size2D & _in) = default;
+    constexpr Size2D & operator=(const Size2D & in) = default;
 
-    constexpr double Width() const { return x; }
-    constexpr double Height() const { return y; }
-    constexpr double Area() const { return Width() * Height(); }
+    [[nodiscard]] constexpr double Width() const { return x; }
+    [[nodiscard]] constexpr double Height() const { return y; }
+    [[nodiscard]] constexpr double Area() const { return Width() * Height(); }
 
-    constexpr bool Contains(const Point2D in) const {
+    [[nodiscard]] constexpr bool Contains(const Point2D in) const {
       return in.X() <= X() && in.Y() <= Y();
     }
 
-    constexpr Size2D ToCellSize(size_t num_rows, size_t num_cols) const {
+    [[nodiscard]] constexpr Size2D ToCellSize(size_t num_rows, size_t num_cols) const {
       return { x / num_cols, y / num_rows };      
+    }
+
+    // Convert to GridSize (typically done after dividing by a unit size)
+    [[nodiscard]] constexpr GridSize ToGridSize() {
+      return GridSize{static_cast<GridSize::pos_t>(x), static_cast<GridSize::pos_t>(y)};
     }
   };
 
