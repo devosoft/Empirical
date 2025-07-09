@@ -1,23 +1,14 @@
 /**
  * This file is part of Empirical, https://github.com/devosoft/Empirical
- * Copyright (C) 2016-2018 Michigan State University
+ * Copyright (C) 2016-2025 Michigan State University
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/geometry/Body2D.hpp
- * @brief This file defines classes to represent bodies that exist on a 2D surface.
- *
- * Each class should be able to:
- *  * Maintain a pointer to information about the full organism associated with this body.
- *  * provide a circular perimeter of the body (for phase1 of collision detection)
- *  * Provide body an anchor point and center point of the body (typically the same)
- *
- * Currently, the only type of body we have is:
- *
- *   CircleBody2D - One individual circular object in the 2D world.
- *
+ * @brief This file defines classes to represent circular bodies that exist on a 2D surface.
  *
  * Development notes:
- * * If we are going to have a lot of links, we may want a better data structure than vector.
+ * - Right now all bodies are circular, but additional internal detail should be allowed
+ * - consider alternative data structures for links (knowing that there will never be more than ~6)
  */
 
 #pragma once
@@ -34,184 +25,133 @@
 #include "../base/vector.hpp"
 #include "../debug/mem_track.hpp"
 
-#include "Angle2D.hpp"
+#include "Angle.hpp"
 #include "Circle2D.hpp"
 
 namespace emp {
 
-  class Body2D_Base {
+  class Body2D {
   protected:
     // Bodies can be linked in several ways.
-    // DEFAULT -> Joined together with no extra meaning
+    // MULTICELL -> Joined together with no extra meaning
     // REPRODUCTION -> "from" is gestating "to"
     // ATTACK -> "from" is trying to eat "to"
     // PARASITE -> "from" is stealing resources from "to"
-    enum class LINK_TYPE { DEFAULT, REPRODUCTION, ATTACK, PARASITE, MULTICELL };
+    enum class LinkType { MULTICELL, REPRODUCTION, ATTACK, PARASITE };
 
-    template <typename BODY_TYPE>
     struct BodyLink {
-      LINK_TYPE type      = LINK_TYPE::DEFAULT;  // DEFAULT, REPRODUCTION, ATTACK, PARASITE
-      Ptr<BODY_TYPE> from = nullptr;             // Initiator of link (e.g., parent, attacker)
-      Ptr<BODY_TYPE> to   = nullptr;             // Target of link (e.g., offspring, prey/host)
-      double cur_dist     = 0.0;                 // Current distance apart of bodies
-      double target_dist  = 0.0;  // Goal for distance apart of bodies (e.g., if growing)
+      LinkType type      = LinkType::MULTICELL;  // MULTICELL, REPRODUCTION, ATTACK, PARASITE
+      Ptr<Body2D> from   = nullptr;              // Initiator of link (e.g., parent, attacker)
+      Ptr<Body2D> to     = nullptr;              // Target of link (e.g., offspring, prey/host)
+      double cur_dist    = 0.0;                  // Current distance apart of bodies
+      double target_dist = 0.0;                  // Goal distance apart (e.g., if growing)
 
-      BodyLink() = default;
-
-      BodyLink(LINK_TYPE t,
-               Ptr<BODY_TYPE> _frm,
-               Ptr<BODY_TYPE> _to,
-               double cur    = 0,
-               double target = 0)
-        : type(t), from(_frm), to(_to), cur_dist(cur), target_dist(target) {
-        ;
-      }
-
-      BodyLink(const BodyLink &) = default;
-      ~BodyLink()                = default;
+      constexpr BodyLink(LinkType t, Ptr<Body2D> _frm, Ptr<Body2D> _to, double cur = 0, double target = 0)
+        : type(t), from(_frm), to(_to), cur_dist(cur), target_dist(target) {}
+      constexpr BodyLink(const BodyLink &) = default;
+      constexpr BodyLink(BodyLink &&) = default;
+      constexpr ~BodyLink() = default;
     };
 
+    // Body information
+    double target_radius;     // For growing/shrinking
     double birth_time = 0.0;  // When was this body created / born?
     Angle orientation;        // Which way is body facing?
     Point velocity;           // Speed and direction of movement
     double mass       = 1.0;  // "Weight" of this body (@CAO not used yet..)
-    uint32_t color_id = 0;    // Which color should this body appear?
+    size_t color_id = 0;      // Which color should this body appear?
     int repro_count   = 0;    // Number of offspring currently being produced.
 
+    // Ongoing calculations
     Point shift;            // How should this body be updated to minimize overlap.
-    Point cum_shift;        // Build up of shift not yet acted upon.
+    Point total_shift;      // Build up of shift not yet acted upon.
     Point total_abs_shift;  // Total absolute-value of shifts (to calculate pressure)
     double pressure = 0.0;  // Current pressure on this body.
 
+    // Information about other bodies that this one is linked to.
+    emp::vector<Ptr<BodyLink>> from_links;  // Active links initiated by body
+    emp::vector<Ptr<BodyLink>> to_links;    // Active links targeting body
+
     bool detach_on_divide = true;  // Should offspring detach (or stay linked to parent)
   public:
-    double GetBirthTime() const { return birth_time; }
+    Body2D() {}
+    Body2D(Body2D &&) = default;
 
-    const Angle & GetOrientation() const { return orientation; }
+    ~Body2D() {
+      // Remove any remaining links from this body.
+      while (from_links.size()) { RemoveLink(from_links[0]); }
+      while (to_links.size()) { RemoveLink(to_links[0]); }
+    }
 
-    const Point & GetVelocity() const { return velocity; }
+    [[nodiscard]] constexpr double GetBirthTime() const { return birth_time; }
+    [[nodiscard]] constexpr const Point & GetVelocity() const { return velocity; }
+    [[nodiscard]] constexpr const Angle & GetOrientation() const { return orientation; }
+    [[nodiscard]] constexpr double GetMass() const { return mass; }
 
-    double GetMass() const { return mass; }
+    [[nodiscard]] constexpr bool IsReproducing() const { return repro_count; }
+    [[nodiscard]] constexpr int GetReproCount() const { return repro_count; }
+    [[nodiscard]] constexpr Point GetShift() const { return shift; }
+    [[nodiscard]] constexpr double GetPressure() const { return pressure; }
+    [[nodiscard]] constexpr bool GetDetachOnDivide() const { return detach_on_divide; }
 
-    uint32_t GetColorID() const { return color_id; }
+    [[nodiscard]] constexpr double GetTargetRadius() const { return target_radius; }
 
-    bool IsReproducing() const { return repro_count; }
+    constexpr void SetTargetRadius(double t) { target_radius = t; }
 
-    int GetReproCount() const { return repro_count; }
-
-    Point GetShift() const { return shift; }
-
-    double GetPressure() const { return pressure; }
-
-    bool GetDetachOnDivide() const { return detach_on_divide; }
-
-    void SetBirthTime(double _in) { birth_time = _in; }
-
-    void SetOrientation(Angle _in) { orientation = _in; }
-
-    void SetVelocity(Point _in) { velocity = _in; }
-
-    void SetMass(double _in) { mass = _in; }
-
-    void SetColorID(uint32_t _in) { color_id = _in; }
+    constexpr void SetBirthTime(double in) { birth_time = in; }
+    constexpr void SetOrientation(Angle in) { orientation = in; }
+    constexpr void SetVelocity(Point in) { velocity = in; }
+    constexpr void SetMass(double in) { mass = in; }
+    constexpr void SetColorID(size_t in) { color_id = in; }
 
     // Other orientation controls...
-    void TurnLeft(int steps = 1) { orientation.RotateDegrees(steps * 45); }
-
-    void TurnRight(int steps = 1) { orientation.RotateDegrees(steps * -45); }
-
-    void RotateDegrees(double degrees) { orientation.RotateDegrees(degrees); }
+    constexpr void TurnLeft(int steps = 1) { orientation.RotateDegrees(steps * 45); }
+    constexpr void TurnRight(int steps = 1) { orientation.RotateDegrees(steps * -45); }
+    constexpr void RotateDegrees(double degrees) { orientation.RotateDegrees(degrees); }
 
     // Other velocity controls...
-    void IncSpeed(const Point & offset) { velocity += offset; }
-
-    void IncSpeed() { velocity += orientation.GetPoint(); }
-
-    void DecSpeed() { velocity -= orientation.GetPoint(); }
-
-    void SetVelocity(double x, double y) { velocity.Set(x, y); }
+    constexpr void IncSpeed(const Point & offset) { velocity += offset; }
+    constexpr void IncSpeed() { velocity += orientation.GetPoint(); }
+    constexpr void DecSpeed() { velocity -= orientation.GetPoint(); }
+    constexpr void SetVelocity(double x, double y) { velocity.Set(x, y); }
 
     // Shift to apply next update.
-    void AddShift(const Point & s) {
+    constexpr void AddShift(const Point & s) {
       shift += s;
       total_abs_shift += s.Abs();
     }
 
     // Controls about replication
-    void SetDetachOnDivide(bool in = true) { detach_on_divide = in; }
-  };
-
-  class CircleBody2D : public Body2D_Base {
-  protected:
-    Circle2D<double> perimeter;  // Includes position and size.
-    double target_radius;        // For growing/shrinking
-
-    // Information about other bodies that this one is linked to.
-    emp::vector<Ptr < BodyLink < CircleBody2D> >> from_links;  // Active links initiated by body
-    emp::vector<Ptr < BodyLink < CircleBody2D> >> to_links;    // Active links targeting body
-
-  public:
-    // delete to avoid a possibility of EMP_TRACK_CONSTRUCT and EMP_TRACK_DESTRUCT mismatch
-    CircleBody2D() = delete;
-
-    CircleBody2D(const Circle2D<double> & _p)
-      : perimeter(_p), target_radius(_p.GetRadius()), from_links(0), to_links(0) {
-      EMP_TRACK_CONSTRUCT(CircleBody2D);
-    }
-
-    ~CircleBody2D() {
-      // Remove any remaining links from this body.
-      while (from_links.size()) { RemoveLink(from_links[0]); }
-      while (to_links.size()) { RemoveLink(to_links[0]); }
-
-      EMP_TRACK_DESTRUCT(CircleBody2D);
-    }
-
-    const Circle2D<double> & GetPerimeter() const { return perimeter; }
-
-    const Point & GetPosition() const { return perimeter.GetCenter(); }
-
-    const Point & GetCenter() const { return perimeter.GetCenter(); }
-
-    double GetRadius() const { return perimeter.GetRadius(); }
-
-    double GetTargetRadius() const { return target_radius; }
-
-    void SetPosition(const Point & p) { perimeter.SetCenter(p); }
-
-    void SetRadius(double r) { perimeter.SetRadius(r); }
-
-    void SetTargetRadius(double t) { target_radius = t; }
-
-    // Translate immediately (ignoring physics)
-    void Translate(const Point & t) { perimeter.Translate(t); }
+    constexpr void SetDetachOnDivide(bool in = true) { detach_on_divide = in; }
 
     // Creating, testing, and unlinking other organisms
-    bool IsLinkedFrom(const CircleBody2D & link_org) const {
+    [[nodiscard]] constexpr bool IsLinkedFrom(const Body2D & link_org) const {
       for (auto cur_link : from_links) {
         if (cur_link->to == &link_org) { return true; }
       }
       return false;
     }
 
-    bool IsLinkedTo(const CircleBody2D & link_org) const { return link_org.IsLinkedFrom(*this); }
+    [[nodiscard]] constexpr bool IsLinkedTo(const Body2D & link_org) const {
+      return link_org.IsLinkedFrom(*this);
+    }
 
-    bool IsLinked(const CircleBody2D & link_org) const {
+    [[nodiscard]] constexpr bool IsLinked(const Body2D & link_org) const {
       return IsLinkedFrom(link_org) || IsLinkedTo(link_org);
     }
 
-    size_t GetLinkCount() const { return from_links.size() + to_links.size(); }
+    [[nodiscard]] constexpr size_t GetLinkCount() const { return from_links.size() + to_links.size(); }
 
-    void AddLink(LINK_TYPE type, CircleBody2D & link_org, double cur_dist, double target_dist) {
+    constexpr void AddLink(LinkType type, Body2D & link_org, double cur_dist, double target_dist) {
       emp_assert(!IsLinked(link_org));  // Don't link twice!
 
       // Build connections in both directions.
-      auto new_link = NewPtr<BodyLink<CircleBody2D> >(type, this, &link_org, cur_dist, target_dist);
+      auto new_link = NewPtr<BodyLink>(type, this, &link_org, cur_dist, target_dist);
       from_links.push_back(new_link);
       link_org.to_links.push_back(new_link);
     }
 
-    void RemoveLink(Ptr<BodyLink<CircleBody2D> > link) {
+    constexpr void RemoveLink(Ptr<BodyLink> link) {
       // We should always initiate link removal from the FROM side.
       if (link->to == ToPtr(this)) {
         link->from->RemoveLink(link);
@@ -241,7 +181,7 @@ namespace emp {
       link.Delete();
     }
 
-    const BodyLink<CircleBody2D> & FindLink(const CircleBody2D & link_org) const {
+    [[nodiscard]] constexpr const BodyLink & FindLink(const Body2D & link_org) const {
       emp_assert(IsLinked(link_org));
       for (auto link : from_links) {
         if (link->to == &link_org) { return *link; }
@@ -249,7 +189,7 @@ namespace emp {
       return link_org.FindLink(*this);
     }
 
-    BodyLink<CircleBody2D> & FindLink(CircleBody2D & link_org) {
+    [[nodiscard]] constexpr BodyLink & FindLink(Body2D & link_org) {
       emp_assert(IsLinked(link_org));
       for (auto link : from_links) {
         if (link->to == ToPtr(&link_org)) { return *link; }
@@ -257,36 +197,36 @@ namespace emp {
       return link_org.FindLink(*this);
     }
 
-    double GetLinkDist(const CircleBody2D & link_org) const {
+    [[nodiscard]] constexpr double GetLinkDist(const Body2D & link_org) const {
       emp_assert(IsLinked(link_org));
       return FindLink(link_org).cur_dist;
     }
 
-    double GetTargetLinkDist(const CircleBody2D & link_org) const {
+    [[nodiscard]] constexpr double GetTargetLinkDist(const Body2D & link_org) const {
       emp_assert(IsLinked(link_org));
       return FindLink(link_org).target_dist;
     }
 
-    void ShiftLinkDist(CircleBody2D & link_org, double change) {
+    constexpr void ShiftLinkDist(Body2D & link_org, double change) {
       auto & link = FindLink(link_org);
       link.cur_dist += change;
     }
 
-    Ptr<CircleBody2D> BuildOffspring(Point offset) {
+    [[nodiscard]] constexpr Ptr<Body2D> BuildOffspring(Point offset) {
       // Offspring cannot be right on top of parent.
       emp_assert(offset.GetX() != 0 || offset.GetY() != 0);
 
       // Create the offspring as a paired link.
-      auto offspring = NewPtr<CircleBody2D>(perimeter);
-      AddLink(LINK_TYPE::REPRODUCTION, *offspring, offset.Magnitude(), perimeter.GetRadius() * 2.0);
-      offspring->Translate(offset);
+      auto offspring = NewPtr<Body2D>(perimeter);
+      AddLink(LinkType::REPRODUCTION, *offspring, offset.Magnitude(), perimeter.GetRadius() * 2.0);
+      offspring->MoveBy(offset);
       repro_count++;
 
       return offspring;
     }
 
     // If a body is not at its target radius, grow it or shrink it, as needed.
-    void BodyUpdate(double change_factor = 1) {
+    constexpr void BodyUpdate(double change_factor = 1) {
       // Test if this body needs to grow or shrink.
       if ((int) target_radius > (int) GetRadius()) {
         SetRadius(GetRadius() + change_factor);
@@ -305,7 +245,7 @@ namespace emp {
         if (std::abs(link->cur_dist - link->target_dist) <= change_factor) {
           link->cur_dist = link->target_dist;
           // IF this organism was gestating, finish the reproduction.
-          if (link->type == LINK_TYPE::REPRODUCTION) {
+          if (link->type == LinkType::REPRODUCTION) {
             emp_assert(repro_count > 0);
             repro_count--;
             if (detach_on_divide) {  // Flag link for removal!
@@ -324,14 +264,14 @@ namespace emp {
     }
 
     // Move this body by its velocity and reduce velocity based on friction.
-    void ProcessStep(double friction = 0) {
-      if (velocity.NonZero()) {
-        perimeter.Translate(velocity);
+    constexpr void ProcessStep(double friction = 0) {
+      if (velocity.IsNonZero()) {
+        perimeter += velocity;
         const double velocity_mag = velocity.Magnitude();
 
         // If body is close to stopping stop it!
         if (friction > velocity_mag) {
-          velocity.ToOrigin();
+          velocity.Set(0.0, 0.0);
         }
 
         // Otherwise slow it down proportionately in the x and y directions.
@@ -342,60 +282,60 @@ namespace emp {
     }
 
     // Determine where the circle will end up and force it to be within a bounding box.
-    void FinalizePosition(const Point & max_coords) {
+    constexpr void FinalizePosition(const Point & max_coords) {
       const double max_x = max_coords.GetX() - GetRadius();
       const double max_y = max_coords.GetY() - GetRadius();
 
       // Update the calculation for pressure.
 
       // Act on the accumulated shifts only when they add up enough.
-      cum_shift += shift;
-      if (cum_shift.SquareMagnitude() > 0.25) {
-        perimeter.Translate(cum_shift);
-        cum_shift.ToOrigin();
+      total_shift += shift;
+      if (total_shift.SquareMagnitude() > 0.25) {
+        perimeter += total_shift;
+        total_shift.Set(0.0, 0.0);
       }
       pressure = (total_abs_shift - shift.Abs()).SquareMagnitude();
-      shift.ToOrigin();  // Clear out the shift for the next round.
-      total_abs_shift.ToOrigin();
+      shift.Set(0.0, 0.0);  // Clear out the shift for the next round.
+      total_abs_shift.Set(0.0, 0.0);
 
       // If this body is linked to another, enforce the distance between them.
       for (auto link : from_links) {
-        if (GetPosition() == link->to->GetPosition()) {
+        if (GetCenter() == link->to->GetCenter()) {
           // If two organisms are on top of each other... shift one.
-          Translate(Point(0.01, 0.01));
+          MoveBy(Point(0.01, 0.01));
         }
 
         // Figure out how much each organism should move so that they will be properly spaced.
-        const double start_dist  = GetPosition().Distance(link->to->GetPosition());
+        const double start_dist  = GetCenter().Distance(link->to->GetCenter());
         const double link_dist   = link->cur_dist;
         const double frac_change = (1.0 - ((double) link_dist) / ((double) start_dist)) / 2.0;
 
-        Point dist_move = (GetPosition() - link->to->GetPosition()) * frac_change;
+        Point dist_move = (GetCenter() - link->to->GetCenter()) * frac_change;
 
-        perimeter.Translate(-dist_move);
-        link->to->perimeter.Translate(dist_move);
+        perimeter += -dist_move;
+        link->to->perimeter += dist_move;
       }
 
       // Adjust the organism so it stays within the bounding box of the world.
       if (GetCenter().GetX() < GetRadius()) {
         perimeter.SetCenterX(GetRadius());  // Put back in range...
-        velocity.NegateX();                 // Bounce off left side.
+        velocity = velocity.NegateX();      // Bounce off left side.
       } else if (GetCenter().GetX() > max_x) {
-        perimeter.SetCenterX(max_x);  // Put back in range...
-        velocity.NegateX();           // Bounce off right side.
+        perimeter.SetCenterX(max_x);    // Put back in range...
+        velocity = velocity.NegateX();  // Bounce off right side.
       }
 
       if (GetCenter().GetY() < GetRadius()) {
         perimeter.SetCenterY(GetRadius());  // Put back in range...
-        velocity.NegateY();                 // Bounce off top.
+        velocity = velocity.NegateY();      // Bounce off top.
       } else if (GetCenter().GetY() > max_y) {
-        perimeter.SetCenterY(max_y);  // Put back in range...
-        velocity.NegateY();           // Bounce off bottom.
+        perimeter.SetCenterY(max_y);    // Put back in range...
+        velocity = velocity.NegateY();  // Bounce off bottom.
       }
     }
 
     // Check to make sure there are no obvious issues with this object.
-    bool OK() {
+    constexpr bool OK() {
       for (auto link : from_links) {
         (void) link;
         emp_assert(link->cur_dist >= 0);     // Distances cannot be negative.
