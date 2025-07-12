@@ -10,7 +10,6 @@
 //#ifndef EMP_TRACK_MEM
 //#define EMP_TRACK_MEM
 
-
 #include <functional>
 #include <iostream>
 #include <sstream>
@@ -245,7 +244,7 @@ TEST_CASE("Tests for Ptr<void> specialization.", "[base]")
   emp::Ptr<const int> x_ptr = &x;
   REQUIRE(*x_ptr == 42);
 
-  emp::Ptr<const void> xv_ptr = x_ptr.ReinterpretCast<const void>();
+  [[maybe_unused]] emp::Ptr<const void> xv_ptr = x_ptr.ReinterpretCast<const void>();
 
   test_sptr.Delete();
 }
