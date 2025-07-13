@@ -40,7 +40,7 @@ namespace emp {
     [[nodiscard]] static constexpr bool ValidIDs(size_t id1, size_t id2) { return id1 < MAX_ID && id2 < MAX_ID; }
 
     [[nodiscard]] static constexpr pos_t ToPosT(size_t id) {
-      emp_assert(ValidID(id));
+      emp_assert(OK_ID(id));
       return static_cast<pos_t>(id);
     }
   public:
@@ -60,7 +60,7 @@ namespace emp {
 
     [[nodiscard]] constexpr bool OK() const { return OK_IDs(row_id, col_id); }
     [[nodiscard]] constexpr bool IsValid() const { return ValidIDs(row_id, col_id); }
-    constexpr void MakeInvalid() { row_id = col_id = MAX_ID; }
+    constexpr void SetInvalid() { row_id = col_id = MAX_ID; }
 
     constexpr GridPos & SetRow(size_t in_row) {
       row_id = in_row;
@@ -117,6 +117,10 @@ namespace emp {
       return *this = GetOffset(shift_row, shift_col);
     }
 
+    constexpr GridPos & Offset(const GridPos & shift) {
+      return *this += shift;
+    }
+
     constexpr GridPos & ToOrigin() {
       row_id = 0;
       col_id = 0;
@@ -143,8 +147,6 @@ namespace emp {
   };
 
   class GridSize : public GridPos {
-  private:
-    constexpr static GridPos InvalidPos() { return {MAX_ID, MAX_ID}; }
   public:
     constexpr GridSize() = default;  // Default = 0,0
 
@@ -170,6 +172,8 @@ namespace emp {
     [[nodiscard]] constexpr size_t NumCols() const { return col_id; }
     [[nodiscard]] constexpr size_t NumCells() const { return NumRows() * NumCols(); }
 
+    static constexpr GridPos InvalidPos() { return {MAX_ID, MAX_ID}; }
+
     [[nodiscard]] constexpr bool IsInside(const GridPos & pos) const {
       return pos.Row() < NumRows() && pos.Col() < NumCols();
     }
@@ -192,12 +196,12 @@ namespace emp {
 
     // Convert a GridPos to a linear index.
     [[nodiscard]] constexpr size_t ToIndex(const GridPos & pos) const {
-      emp_assert(IsInside(pos));
+      if (!IsInside(pos)) return MAX_SIZE_T;
       return NumCols() * pos.Row() + pos.Col();
     }
 
     [[nodiscard]] constexpr GridPos FromIndex(size_t id) const {
-      return { id / NumRows(), id % NumRows() };
+      return { id / NumCols(), id % NumCols() };
     }
 
     [[nodiscard]] constexpr GridPos PosUp(const GridPos & in, bool wrap=false) const {
