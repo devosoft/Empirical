@@ -41,28 +41,6 @@ extern "C" {
 
 namespace emp {
 
-  /// Setup timings on animations through Emscripten.
-  static void InitializeAnim() {
-    thread_local bool init = false;  // Make sure we only initialize once!
-    if (!init) {
-      // clang-format off
-      // Setup the animation callback in Javascript
-      MAIN_THREAD_EM_ASM({
-        window.requestAnimFrame = (function(callback) {
-            return window.requestAnimationFrame
-              || window.webkitRequestAnimationFrame
-              || window.mozRequestAnimationFrame
-              || window.oRequestAnimationFrame
-              || window.msRequestAnimationFrame
-              || function(callback) { window.setTimeout(callback, 1000 / 60); }
-        })();
-      });
-      // clang-format on
-    }
-
-    init = true;
-  }
-
   /// Add a listener on the browser thread that will look for incoming
   /// bitmaps and transfer them into web canvases.
   static void InitializeBitmapListener() {
@@ -119,7 +97,6 @@ namespace emp {
 
     if (should_run) {
       EMP_Initialize();  // Call JS initializations for current thread.
-      InitializeAnim();
 
       if constexpr (emp::compile::EMSCRIPTEN_PTHREADS) {
         // Make sure _EMP_Initialize has been run in the main thread.
