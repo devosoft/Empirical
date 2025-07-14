@@ -292,11 +292,13 @@ namespace emp {
       emp_assert(surface_size.Contains(circle.GetCenter()), surface_size, circle.GetCenter());
 
       const size_t id = ReserveBodyID();
-      body_set[id] = BODY_T{id, circle, color};
+      auto & body = body_set[id];
+      body = BODY_T{circle, color};
+      body.Activate(id);
 
-      TestBodySize(body_set[id]);                    // Track largest body seen.
-      if (data_active) { PlaceBody(body_set[id]); }  // Add new body to a sector (if tracking).
-      return body_set[id];
+      TestBodySize(body);                    // Track largest body seen.
+      if (data_active) { PlaceBody(body); }  // Add new body to a sector, if tracking.
+      return body;
     }
 
     /// Remove all bodies from the surface.
@@ -347,11 +349,11 @@ namespace emp {
       // Loop through all of the sectors to identify collisions.
       for (size_t sector_id = 0; sector_id < num_sectors; ++sector_id) {
         const Sector & sector = sectors[sector_id];
-        const auto & bodies = sector.GetBodyIDs();
+        const auto & body_ids = sector.GetBodyIDs();
 
         // Loop through all bodies in this sector
-        for (size_t pos=0; pos < bodies.size(); ++pos) {
-          const BODY_T & body = bodies[pos];
+        for (size_t pos=0; pos < body_ids.size(); ++pos) {
+          const BODY_T & body = body_set[body_ids[pos]];
           out_ids.clear();  // Clear the set of IDs that could overlap with this body.
           FindOverlaps(body, sector, pos+1, true);
           if (sector.HasLeft()) FindOverlaps(body, sectors[sector.GetLeft()]);
