@@ -22,35 +22,69 @@
 namespace emp {
 
   class SurfaceBody {
-  protected:
+  private:
     static constexpr size_t NO_ID = MAX_SIZE_T;
+    size_t id = NO_ID; ///< Index in body_set to find body info
 
-    size_t id;         ///< Index in body_set to find body info
+  protected:
     Circle perimeter;  ///< Outer shape for body
     Color color;       ///< What color should this body be?
 
   public:
-    SurfaceBody(size_t id = NO_ID, Circle circle = Circle{1.0}, Color color = Palette::BLACK)
-      : id(id), perimeter(circle), color(color) {}
+    SurfaceBody(Circle circle = Circle{1.0}, Color color = Palette::BLACK)
+      : perimeter(circle), color(color) {}
 
-    SurfaceBody(SurfaceBody &&) = default;  // Move constructor.
+    // Move constructor.
+    SurfaceBody(SurfaceBody && in) : id(in.id), perimeter(in.perimeter), color(in.color) {
+      in.id = NO_ID; // Deactivate old version.
+    }
 
     ~SurfaceBody() { Deactivate(); }
 
     SurfaceBody & operator=(SurfaceBody &&) = default;
 
-    [[nodiscard]] size_t GetID() const { return id; }
     [[nodiscard]] bool IsActive() const { return id != NO_ID; }
+
+    [[nodiscard]] size_t GetID() const {
+      emp_assert(IsActive());
+      return id;
+    }
+    void Activate(size_t in_id) {
+      emp_assert(id == NO_ID);
+      emp_assert(in_id != NO_ID);
+      id = in_id;
+    }
     void Deactivate() { id = NO_ID; }
 
-    [[nodiscard]] const Circle & GetPerimeter() const { return perimeter; }
-    [[nodiscard]] const Point & GetCenter() const { return perimeter.GetCenter(); }
-    [[nodiscard]] double GetRadius() const { return perimeter.GetRadius(); }
-    [[nodiscard]] const Color & GetColor() const { return color; }
+    [[nodiscard]] const Circle & GetPerimeter() const {
+      emp_assert(IsActive());
+      return perimeter;
+    }
+    [[nodiscard]] const Point & GetCenter() const {
+      emp_assert(IsActive());
+      return perimeter.GetCenter();
+    }
+    [[nodiscard]] double GetRadius() const {
+      emp_assert(IsActive());
+      return perimeter.GetRadius();
+    }
+    [[nodiscard]] const Color & GetColor() const {
+      emp_assert(IsActive());
+      return color;
+    }
 
-    void MoveTo(const Point & s) { perimeter.SetCenter(s); }
-    void MoveBy(const Point & s) { perimeter += s; }
-    void SetRadius(double r) { perimeter.SetRadius(r); }
+    void MoveTo(const Point & s) {
+      emp_assert(IsActive());
+      perimeter.SetCenter(s);
+    }
+    void MoveBy(const Point & s) {
+      emp_assert(IsActive());
+      perimeter += s;
+    }
+    void SetRadius(double r) {
+      emp_assert(IsActive());
+      perimeter.SetRadius(r);
+    }
   };
 }
 
