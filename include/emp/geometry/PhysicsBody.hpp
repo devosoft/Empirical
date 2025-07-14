@@ -13,6 +13,8 @@
 #ifndef INCLUDE_EMP_GEOMETRY_PHYSICS_BODY_HPP_GUARD
 #define INCLUDE_EMP_GEOMETRY_PHYSICS_BODY_HPP_GUARD
 
+#include <ranges>
+
 #include "Angle.hpp"
 #include "Point2D.hpp"
 #include "Surface.hpp"
@@ -38,8 +40,8 @@ namespace emp {
     emp::vector<size_t> link_ids;  // Ids of bodies that are attached to this one
 
   public:
-    PhysicsBody(size_t id = NO_ID, Circle circle = Circle{1.0}, Color color = Palette::BLACK)
-      : SurfaceBody(id, circle, color) {}
+    PhysicsBody(Circle circle = Circle{1.0}, Color color = Palette::BLACK)
+      : SurfaceBody(circle, color), target_radius(circle.GetRadius()) {}
 
     // Accessors
     [[nodiscard]] double GetStartTime() const { return start_time; }
@@ -81,7 +83,7 @@ namespace emp {
     }
     void RemoveLink(size_t id) {
       emp_assert(HasLink(id), "Do not try to remove a link not currently used.", id);
-      link_ids.erase(std::ranges::find(link_ids, id));
+      link_ids.erase(std::find(link_ids.begin(), link_ids.end(), id));
     }
 
     void UpdateSize(double max_size_change) {
