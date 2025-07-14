@@ -70,7 +70,7 @@ namespace emp {
     auto & AddBody(Circle in_body, Color color = Palette::RED, size_t link_id = NO_ID) {
       auto & new_body = surface.AddBody(in_body, color);
       new_body.SetStartTime(time);
-      if (link_id != NO_ID) new_body.AddLink(link_id);
+      if (link_id != NO_ID) AddLink(link_id, new_body.GetID());
       return new_body;
     }
 
@@ -118,9 +118,10 @@ namespace emp {
     }
 
     void RemoveLink(size_t id1, size_t id2) {
-      emp_assert(!TestLinked(id1, id2), "Should not link same bodies twice.", id1, id2);
+      emp_assert(TestLinked(id1, id2), "Must make sure link exists before removing it.", id1, id2);
+      emp_assert(TestLinked(id2, id1), "Must make sure link exists before removing it.", id1, id2);
       GetBody(id1).RemoveLink(id2);
-      GetBody(id2).RemoveLink(id2);
+      GetBody(id2).RemoveLink(id1);
     }
 
     bool TestPairCollision(size_t id1, size_t id2) {
