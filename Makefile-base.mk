@@ -3,18 +3,19 @@
 .PHONY: clean print-%
 
 # Identify all directory locations
-# Get the path of this file
-MAKEFILE_PATH = $(lastword $(MAKEFILE_LIST)) # Pull the current makefile from the list.
-EMP_DIR = $(dir $(abspath $(MAKEFILE_PATH))) # Strip the filename off this path.
+# Get the path of this file and then its directory.
+MAKEFILE_PATH = $(lastword $(MAKEFILE_LIST))
+EMP_DIR = $(dir $(abspath $(MAKEFILE_PATH)))
 
-# EMP_DIR   = $(MABE_DIR)/source/third-party/empirical
 CATCH_DIR = $(EMP_DIR)/third-party/Catch/single_include/catch2
 
 # Specify sets of compilation flags to use
 FLAGS_version = -std=c++23
 FLAGS_warn    = -Wall -Wextra -Wno-unused-function -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -pedantic
-FLAGS_include = -I$(EMP_DIR)/include/ -I$(CATCH_DIR)
-FLAGS_main    = $(FLAGS_version) $(FLAGS_warn) $(FLAGS_include) -pthread
+FLAGS_include = -I$(EMP_DIR)/include/
+FLAGS_main    = $(FLAGS_version) $(FLAGS_warn) $(FLAGS_include)
+FLAGS_test    = -I$(CATCH_DIR)
+FLAGS_threads = -pthread
 
 FLAGS_QUICK  = $(FLAGS_main) -DNDEBUG
 FLAGS_DEBUG  = $(FLAGS_main) -g -DEMP_TRACK_MEM
@@ -25,16 +26,16 @@ FLAGS_COVERAGE = $(FLAGS_main)  -O0 -DEMP_TRACK_MEM -ftemplate-backtrace-limit=0
 # Extra flags for web compilation
 EMP_METHODS = EXPORTED_RUNTIME_METHODS="['ccall', 'cwrap', 'UTF8ToString', 'stringToUTF8', 'lengthBytesUTF8']"
 EMP_FUNCTIONS = EXPORTED_FUNCTIONS="['_main', "_malloc", "_free", '_empCppCallback']"
-JS_LIB = --js-library $(EMP_DIR)/emp/web/library_emp.js
-FLAGS_web_only = -s $(EMP_METHODS) -s TOTAL_MEMORY=67108864 $(JS_LIB) -s $(EMP_FUNCTIONS) -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
+JS_LIB = --js-library $(EMP_DIR)/include/emp/web/library_emp.js
+FLAGS_web_only = -s $(EMP_METHODS) -s TOTAL_MEMORY=67108864 $(JS_LIB) -s $(EMP_FUNCTIONS) -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1 -Wno-dollar-in-identifier-extension
 FLAGS_web_main = $(FLAGS_main) $(FLAGS_web_only)
 
 FLAGS_WEB_OPT = $(FLAGS_web_main) -Oz -DNDEBUG
 FLAGS_WEB_DEBUG = $(FLAGS_web_main) -g4 -pedantic -Wno-dollar-in-identifier-extension
+FLAGS_WEB_THREADS = $(FLAGS_web_main) $(FLAGS_threads) -s USE_PTHREADS=1
 
-CXX = clang++
+CXX = c++
 CXX_web = emcc
-
 
 # Debugging information
 print-%: ; @echo '$(subst ','\'',$*=$($*))'
