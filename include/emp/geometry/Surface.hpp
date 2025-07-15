@@ -1,6 +1,6 @@
 /**
  * This file is part of Empirical, https://github.com/devosoft/Empirical
- * Copyright (C) 2021 Michigan State University
+ * Copyright (C) 2021-2025 Michigan State University
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/geometry/Surface.hpp
@@ -38,7 +38,6 @@ namespace emp {
   class Surface {
   public:
     static constexpr size_t NO_ID = MAX_SIZE_T;
-    using overlap_fun_t = std::function<void(size_t, size_t)>;
 
     class Sector {
     public:
@@ -103,7 +102,6 @@ namespace emp {
     const Size2D surface_size;     ///< Lower-left corner of the surface.
     emp::vector<BODY_T> body_set;  ///< Set of all bodies on surface
     emp::vector<size_t> open_ids;  ///< Set of body_set ids ready for re-use.
-    overlap_fun_t overlap_fun;     ///< Function to trigger when overlaps occur.
 
     // Data tracking the current bodies on this surface using SECTORS.
     bool data_active = false;  ///< Are we trying to keep measurements up-to-date?
@@ -222,6 +220,7 @@ namespace emp {
     ~Surface() { Clear(); }
 
     [[nodiscard]] const Size2D & GetSize() const { return surface_size; }
+    [[nodiscard]] bool GetWrap() const { return wrap; }
 
     [[nodiscard]] BODY_T & GetBody(size_t id) {
       emp_assert(body_set[id].IsActive());
@@ -310,11 +309,9 @@ namespace emp {
       return *this;
     }
 
-    /// Add a function to call in the case of overlaps (using an std::function object)
-    void SetOverlapFun(const overlap_fun_t & in_overlap_fun) { overlap_fun = in_overlap_fun; }
-
     /// Determine if two bodies overlap.
-    static inline bool TestOverlap(const BODY_T & body1, const BODY_T & body2) {
+    static bool TestOverlap(const BODY_T & body1, const BODY_T & body2) {
+      emp_assert(body1.IsActive() && body2.IsActive());
       const Point xy_dist       = body1.GetPerimeter().GetCenter() - body2.GetPerimeter().GetCenter();
       const double sqr_dist     = xy_dist.SquareMagnitude();
       const double total_radius = body1.GetRadius() + body2.GetRadius();
@@ -343,7 +340,8 @@ namespace emp {
     }
 
     /// Find pairs of bodies that overlap, and run passed-in function on those IDs.
-    void TriggerOverlaps() {
+    template <typename OVERLAP_FUN_T>
+    void TriggerOverlaps(OVERLAP_FUN_T && overlap_fun) {
       Activate();  // Set up data structures, if needed.
 
       // Loop through all of the sectors to identify collisions.
@@ -368,13 +366,35 @@ namespace emp {
           }
         }
       }
+    }
 
-      // Make sure all bodies are in a legal position on the surface.
-      // @CAO: Need to move to physics!
-      // for (Ptr<BODY_TYPE> cur_body : body_set) {
-      //   if (body_set[id].IsActive() == false) continue;
-      //   cur_body->FinalizePosition(max_pos);
-      // }
+    template <typename LOW_X_T, typename HIGH_X_T, typename LOW_Y_T, typename HIGH_Y_T>
+    void TriggerOffsides(LOW_X_T low_x_fun, HIGH_X_T high_x_fun, LOW_Y_T low_y_fun, HIGH_Y_T high_y_fun) {
+      emp_assert(wrap == false);
+      // Check for high or low x.
+      for (size_t row_id = 0; row_id < grid_size.NumRows(); ++row_id) {
+        const auto & left_sector = sectors[row_id * grid_size.NumCols()];
+        for (size_t id : left_sector.GetBodyIDs()) {
+          if (body_set[id].GetX() < 0.0) low_x_fun(id);
+        }
+
+        const auto & right_sector = sectors[(row_id+1) * grid_size.NumCols() - 1];
+        for (size_t id : right_sector.GetBodyIDs()) {
+          if (body_set[id].GetX() > surface_size.Width()) high_x_fun(id);
+        }
+      }
+
+      for (size_t col_id = 0; col_id < grid_size.NumCols(); ++col_id) {
+        const auto & top_sector = sectors[col_id];
+        for (size_t id : top_sector.GetBodyIDs()) {
+          if (body_set[id].GetY() < 0.0) low_y_fun(id);
+        }
+
+        const auto & bottom_sector = sectors[(grid_size.NumRows()-1) * grid_size.NumCols() + col_id];
+        for (size_t id : bottom_sector.GetBodyIDs()) {
+          if (body_set[id].GetY() > surface_size.Height()) high_y_fun(id);
+        }
+      }
     }
 
     /// Determine if there are any overlaps with a single provided body (that may or may not be on surface).
