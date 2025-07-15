@@ -70,6 +70,8 @@ namespace emp {
     void RotateDegrees(double degrees) { orientation.RotateDegrees(degrees); }
 
     // Other velocity controls...
+    void NegateVelocityX() { velocity.SetX(-velocity.X()); }
+    void NegateVelocityY() { velocity.SetY(-velocity.Y()); }
     void IncSpeed(const Point & offset) { velocity += offset; }
     void IncSpeed(double val=1.0) { velocity += orientation.GetPoint() * val; }
     void DecSpeed(double val=1.0) { velocity -= orientation.GetPoint() * val; }
