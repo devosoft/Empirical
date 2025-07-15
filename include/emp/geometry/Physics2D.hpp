@@ -27,11 +27,14 @@ namespace emp {
 
   template <typename BODY_T>
     requires std::is_base_of_v<PhysicsBody, BODY_T>
-  class Physics2D {
+  class Physics2D : public emp::Surface<BODY_T>{
   private:
     using surface_t = emp::Surface<BODY_T>;
-    surface_t surface;                 // Track current position of bodies.
+    using surface_t::body_set;
+    using surface_t::GetSize;
+
     const double max_diameter = 20.0;  // Size limit for bodies.
+    const double max_pressure = 3.0;   // Pressure limit for bodies.
     double time = 0;                   // Current time point
     bool detach_on_birth = true;       // Do bodies detach from parents at birth?
 
@@ -40,41 +43,30 @@ namespace emp {
     using body_type = BODY_T;
 
     Physics2D(double width, double height, double max_diameter = 20, bool detach = true)
-      : surface({width, height})
+      : surface_t({width, height})
       , max_diameter(max_diameter)
       , detach_on_birth(detach) {}
 
     ~Physics2D() = default;
 
     // Main accessors
-    [[nodiscard]] const auto & GetSurface() const { return surface; }
     [[nodiscard]] double GetMaxDiameter() const { return max_diameter; }
     [[nodiscard]] bool GetDetach() const { return detach_on_birth; }
 
     void SetDetach(bool _in) { detach_on_birth = _in; }
 
-    // Body getters
-    [[nodiscard]] auto & GetBody(size_t id) { return surface.GetBody(id); }
-    [[nodiscard]] const auto & GetBody(size_t id) const { return surface.GetBody(id); }
-    [[nodiscard]] emp::vector<body_type> & GetBodySet() { return surface.GetBodySet(); }
-    [[nodiscard]] const emp::vector<body_type> & GetConstBodySet() const {
-      return surface.GetConstBodySet();
-    }
-
-    [[nodiscard]] double GetStartTime(size_t id) const { return GetBody(id).start_time; }
-    [[nodiscard]] const Point & GetVelocity(size_t id) const { return GetBody(id).velocity; }
-    [[nodiscard]] Angle GetOrientation(size_t id) const { return GetBody(id).orientation; }
-    [[nodiscard]] double GetMass(size_t id) const { return GetBody(id).mass; }
-    [[nodiscard]] double GetTargetRadius(size_t id) const { return GetBody(id).target_radius; }
+    [[nodiscard]] double GetStartTime(size_t id) const { return body_set[id].start_time; }
+    [[nodiscard]] const Point & GetVelocity(size_t id) const { return body_set[id].velocity; }
+    [[nodiscard]] Angle GetOrientation(size_t id) const { return body_set[id].orientation; }
+    [[nodiscard]] double GetMass(size_t id) const { return body_set[id].mass; }
+    [[nodiscard]] double GetTargetRadius(size_t id) const { return body_set[id].target_radius; }
 
     auto & AddBody(Circle in_body, Color color = Palette::RED, size_t link_id = NO_ID) {
-      auto & new_body = surface.AddBody(in_body, color);
+      auto & new_body = surface_t::AddBody(in_body, color);
       new_body.SetStartTime(time);
       if (link_id != NO_ID) AddLink(link_id, new_body.GetID());
       return new_body;
     }
-
-    void Clear() { surface.Clear(); }
 
     // Search through all active bodies to find the oldest.
     [[nodiscard]] size_t FindOldest() const {
@@ -82,7 +74,7 @@ namespace emp {
       size_t oldest_birth_time = MAX_SIZE_T;
 
       // Search through all bodies for the oldest.
-      for (const auto & body : surface.GetBodySet()) {
+      for (const auto & body : body_set) {
         if (body.IsActive() && body.GetStartTime() < oldest_birth_time) {
           oldest_id = body.GetID();
           oldest_birth_time = body.GetStartTime();
@@ -96,10 +88,10 @@ namespace emp {
       for (size_t link_id : body.GetLinkIDs()) {
         RemoveLink(body.GetID(), link_id);
       }
-      surface.RemoveBody(body.GetID());
+      surface_t::RemoveBody(body.GetID());
     }
 
-    void RemoveBody(size_t id) { RemoveBody(GetBody(id)); }
+    void RemoveBody(size_t id) { RemoveBody(body_set[id]); }
 
     void RemoveOldest() {
       size_t oldest_id = FindOldest();
@@ -108,36 +100,36 @@ namespace emp {
 
     // Test if org with id1 is linked to org with id2.
     bool TestLinked(size_t id1, size_t id2) {
-      return GetBody(id1).HasLink(id2);
+      return body_set[id1].HasLink(id2);
     }
 
     void AddLink(size_t id1, size_t id2) {
       emp_assert(!TestLinked(id1, id2), "Should not link same bodies twice.", id1, id2);
-      GetBody(id1).AddLink(id2);
-      GetBody(id2).AddLink(id1);
+      body_set[id1].AddLink(id2);
+      body_set[id2].AddLink(id1);
     }
 
     void RemoveLink(size_t id1, size_t id2) {
       emp_assert(TestLinked(id1, id2), "Must make sure link exists before removing it.", id1, id2);
       emp_assert(TestLinked(id2, id1), "Must make sure link exists before removing it.", id1, id2);
-      GetBody(id1).RemoveLink(id2);
-      GetBody(id2).RemoveLink(id1);
+      body_set[id1].RemoveLink(id2);
+      body_set[id2].RemoveLink(id1);
     }
 
     bool TestPairCollision(size_t id1, size_t id2) {
       // If bodies are not overlapping OR are linked, they do no collide.
-      if (!surface.TestOverlap(id1, id2) || TestLinked(id1, id2)) { return false; }
+      if (!surface_t::TestOverlap(id1, id2) || TestLinked(id1, id2)) { return false; }
 
-      auto & body1 = GetBody(id1);
-      auto & body2 = GetBody(id2);
+      auto & body1 = body_set[id1];
+      auto & body2 = body_set[id2];
 
       // Don't allow bodies to be directly on top of each other.
       if (body1.GetCenter() == body2.GetCenter()) { body1.MoveBy({0.0, 0.01}); }
 
-      const double contact_dist = body1.GetRadius() + body2.GetRadius();
+      const double collide_dist = body1.GetRadius() + body2.GetRadius();
       const Point cur_offset = body1.GetCenter() - body2.GetCenter();
       const double cur_dist = cur_offset.Magnitude();
-      const double shift_fract = (contact_dist / cur_dist - 1.0) / 2.0;
+      const double shift_fract = (collide_dist / cur_dist - 1.0) / 2.0;
       const Point shift_offset = cur_offset * shift_fract;
 
       // Re-adjust position to remove overlap.
@@ -148,8 +140,8 @@ namespace emp {
       // and let them move together.
 
       // Assume elastic: Re-adjust velocity to reflect bounce.
-      Point v1 = GetBody(id1).GetVelocity();
-      Point v2 = GetBody(id2).GetVelocity();
+      Point v1 = body_set[id1].GetVelocity();
+      Point v2 = body_set[id2].GetVelocity();
 
       if (cur_offset.GetX() == 0) { // Same X; bounce vertically.
         std::swap(v1.Y(), v2.Y());
@@ -186,33 +178,63 @@ namespace emp {
     }
 
     void Update() {
-      // Handle movement of bodies
+      // Handle initial movement and size change of bodies
+      UpdateBodies(0.25, 0.0125);
 
-      auto & body_set = surface.GetBodySet();
-
-      for (auto & cur_body : body_set) {
-        UpdateBody(cur_body, 0.25, 0.0125); // Update body size and velocity
-      }
-
-      // Handle collisions
-      surface.SetOverlapFun([this](size_t b1, size_t b2) {
+      // Deal with collisions between bodies.
+      surface_t::TriggerOverlaps([this](size_t b1, size_t b2) {
         return this->TestPairCollision(b1, b2);
       });
-      surface.TriggerOverlaps();
 
-      // Determine which bodies we should remove due to high pressure.
-      for (auto & body : body_set) {
-        // If pressure too high, burst this cell!
-        if (body.GetPressure() > 3.0) { RemoveBody(body); }  // @CAO Arbitrary pressure threshold!
+      // Deal with edges.
+      if (surface_t::wrap) { WrapBodies(); }
+      else { // Bound off edges, if needed.
+        surface_t::TriggerOffsides(
+          [this](size_t id){  // X < 0
+            auto & body = body_set[id];
+            emp_assert(body.IsActive());
+            Point2D & center = body.GetCenter();
+            center.SetX(-center.X()); // Reflect back into range.
+            if (body.GetVelocity().X() < 0) body.NegateVelocityX();
+          },
+          [this](size_t id){  // X > MAX_X
+            auto & body = body_set[id];
+            Point2D & center = body.GetCenter();
+            double overshoot = center.X() - GetSize().X();
+            center.SetX(GetSize().X() - overshoot); // Reflect back into range.
+            if (body.GetVelocity().X() > 0) body.NegateVelocityX();
+          },
+          [this](size_t id){  // Y < 0
+            auto & body = body_set[id];
+            Point2D & center = body.GetCenter();
+            center.SetY(-center.Y()); // Reflect back into range.
+            if (body.GetVelocity().Y() < 0) body.NegateVelocityY();
+          },
+          [this](size_t id){  // Y > MAX_Y
+            auto & body = body_set[id];
+            Point2D & center = body.GetCenter();
+            double overshoot = center.Y() - GetSize().Y();
+            center.SetY(GetSize().Y() - overshoot); // Reflect back into range.
+            if (body.GetVelocity().Y() > 0) body.NegateVelocityY();
+          }
+        );
       }
 
+      // Finalize body positions and remove those with too high pressure.
+      for (auto & body : body_set) {
+        if (!body.IsActive()) continue;
+
+        // If pressure too high, burst this cell!
+        if (body.GetPressure() > max_pressure) { RemoveBody(body); }
+      }
     }
 
-    // Physics-related functionality.
-    // @CAO: Make these easy to override.
-    void UpdateBody(body_type & body, double max_size_change = 1.0, double friction = 0.0) {
-      body.UpdateSize(max_size_change);
-      body.UpdatePosition(friction);
+    // Change size and position of bodies, initially ignoring other bodies on surface.
+    void UpdateBodies(double max_size_change = 1.0, double friction = 0.0) {
+      for (auto & body : body_set) {
+        body.UpdateSize(max_size_change);
+        body.UpdatePosition(friction);
+      }
     }
   };
 
