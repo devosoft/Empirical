@@ -64,6 +64,14 @@ namespace emp {
       emp_assert(IsActive());
       return perimeter.GetCenter();
     }
+    [[nodiscard]] double GetX() const {
+      emp_assert(IsActive());
+      return perimeter.GetCenterX();
+    }
+    [[nodiscard]] double GetY() const {
+      emp_assert(IsActive());
+      return perimeter.GetCenterY();
+    }
     [[nodiscard]] double GetRadius() const {
       emp_assert(IsActive());
       return perimeter.GetRadius();
@@ -71,6 +79,11 @@ namespace emp {
     [[nodiscard]] const Color & GetColor() const {
       emp_assert(IsActive());
       return color;
+    }
+
+    [[nodiscard]] Point & GetCenter() {
+      emp_assert(IsActive());
+      return perimeter.GetCenter();
     }
 
     void MoveTo(const Point & s) {
