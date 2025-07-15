@@ -35,6 +35,7 @@ namespace emp {
     constexpr int operator<=>(const Circle2D &) const = default;
 
     constexpr const Point2D & GetCenter() const { return center; }
+    constexpr Point2D & GetCenter() { return center; }
 
     constexpr double GetCenterX() const { return center.GetX(); }
 
