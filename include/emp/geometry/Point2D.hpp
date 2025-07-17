@@ -77,6 +77,8 @@ namespace emp {
       return self;
     }
 
+    void Reset() { x = 0.0; y = 0.0; }
+
     [[nodiscard]] constexpr double SquareMagnitude() const { return x * x + y * y; }
 
     [[nodiscard]] constexpr double Magnitude() const { return sqrt(x * x + y * y); }
@@ -85,7 +87,7 @@ namespace emp {
 
     [[nodiscard]] constexpr bool IsNonZero() const { return x != 0.0 || y != 0.0; }
 
-    [[nodiscard]] constexpr bool IsNonNegative() const { return x >= 0.0 || y >= 0.0; }
+    [[nodiscard]] constexpr bool IsNonNegative() const { return x >= 0.0 && y >= 0.0; }
 
     // Determine a new point, but don't change this one
     template <class Self>
@@ -309,7 +311,7 @@ namespace emp {
     [[nodiscard]] constexpr double Area() const { return Width() * Height(); }
 
     [[nodiscard]] constexpr bool Contains(const Point2D in) const {
-      return in.X() <= X() && in.Y() <= Y();
+      return in.IsNonNegative() && in.X() < X() && in.Y() < Y();
     }
 
     [[nodiscard]] constexpr Size2D ToCellSize(size_t num_rows, size_t num_cols) const {
