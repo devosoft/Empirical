@@ -19,6 +19,7 @@
 #include <string>
 #include <type_traits>
 #include <unordered_map>
+#include <vector>
 
 #include "../base/notify.hpp"
 
@@ -95,6 +96,51 @@ namespace emp {
 #else  // #ifdef NDEBUG
 #define EMP_TRACK_LINE(NAME) emp::AddDebugLine(NAME, __FILE__, __LINE__)
 #endif  // #ifdef NDEBUG : #else
+
+// DebugStack will use RAII to track which functions you are in.
+struct DebugStackInfo {
+  std::string filename{};
+  int line_num = -1;
+  std::string extras{};
+  std::string FilePos() const {
+    return filename + ':' + std::to_string(line_num);
+  }
+};
+
+static std::vector<DebugStackInfo> & GetDebugStack() {
+  static std::vector<DebugStackInfo> debug_stack;
+  return debug_stack;
+}
+
+struct DebugStackEntry {
+  DebugStackInfo info;
+  DebugStackEntry(std::string filename, int line_num, std::string extras)
+    : info({filename, line_num, extras}) { GetDebugStack().push_back(info); }
+  ~DebugStackEntry() {
+    if (GetDebugStack().back().filename != info.filename ||
+        GetDebugStack().back().line_num != info.line_num) {
+      notify::Error("Debug Stack Corruption!  Found '", GetDebugStack().back().FilePos(),
+                    "', but expected '", info.FilePos(), "'.");
+    }
+    GetDebugStack().pop_back();
+  }
+};
+
+static std::string DebugStackToString() {
+  const auto & stack = GetDebugStack();
+  std::string out{"\n"};
+  for (const auto & entry : stack) {
+    out += entry.FilePos() + "(" + entry.extras + ")\n";
+  }
+  return out;
+}
+
+#ifdef NDEBUG
+#define DEBUG_STACK(...)
+#else  // #ifdef NDEBUG
+#define DEBUG_STACK() emp::DebugStackEntry emp_debug_stack_entry(__FILE__, __LINE__, __func__);
+#endif  // #ifdef NDEBUG : #else
+
 
 }  // namespace emp
 
