@@ -28,7 +28,6 @@
 #include "Canvas.hpp"
 #include "canvas_utils.hpp"
 #include "CheckBox.hpp"
-#include "color_map.hpp"
 #include "Div.hpp"
 #include "Element.hpp"
 #include "events.hpp"
