@@ -1,12 +1,14 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2018
+ *  date: 2015-2025
 */
 /**
  *  @file
  */
 
+#include "emp/geometry/Line2D.hpp"
+#include "emp/geometry/Polygon.hpp"
 #include "emp/math/Random.hpp"
 #include "emp/web/Animate.hpp"
 #include "emp/web/canvas_utils.hpp"
@@ -16,13 +18,11 @@
 namespace UI = emp::web;
 
 UI::Document doc("emp_base");
-UI::CanvasPolygon poly(200, 300, "red", "black");
-UI::CanvasLine line(5,5, 395,395, "green");
-
-double cx = 150;
-double cy = 150;
-double cr = 50;
-double can_size = 400;
+emp::Polygon poly(200, 300);
+emp::Line2D line({5, 5}, {395, 395});
+// emp::Palette::BLUE, emp::Palette::BLACK
+emp::Circle circle{{150,150}, 50};
+emp::Size2D can_size = {400, 400};
 double poly_rot = 0.0;
 
 void CanvasAnim(double time) {
@@ -31,13 +31,12 @@ void CanvasAnim(double time) {
   std::cerr << time << std::endl;
 
   // Update the circle position.
-  cx+=3;
-  if (cx >= can_size + cr) cx -= can_size;
+  circle += emp::Point{3, 0};
+  if (circle.GetCenterX() >= can_size.Width() + circle.GetRadius()) circle.SetCenterX(-50);
 
   // Draw the new circle.
   mycanvas.Clear();
-  mycanvas.Circle(cx, cy, cr, "green", "purple");
-  if (cx + cr > can_size) mycanvas.Circle(cx-can_size, cy, cr, "green", "purple");
+  mycanvas.Draw(circle, emp::Palette::BLUE, emp::Palette::BLACK);
 
   // Update the polygon position
   poly_rot += 0.01;
