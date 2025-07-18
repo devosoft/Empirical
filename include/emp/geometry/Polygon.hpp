@@ -25,7 +25,7 @@ namespace emp {
     emp::vector<Point2D> other_points; // Relative to the anchor.
 
   public:
-    Polygon(const Point2D & a_, const emp::vector<Point2D> & other_)
+    Polygon(const Point2D & a_, const emp::vector<Point2D> & other_ = emp::vector<Point2D>{})
       : anchor(a_), other_points(other_) {}
 
     Polygon(const Polygon &) = default;
@@ -44,7 +44,12 @@ namespace emp {
       return *this;
     }
 
-    Polygon & SetOther(const emp::vector<Point2D> & in) {
+    Polygon & AddPoint(Point2D point) {
+      other_points.push_back(point);
+      return *this;
+    }
+
+    Polygon & SetPoints(const emp::vector<Point2D> & in) {
       other_points = in;
       return *this;
     }
