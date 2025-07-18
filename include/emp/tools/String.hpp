@@ -70,7 +70,8 @@ namespace emp {
   [[nodiscard]] inline String MakeTitleCase(String value);
   [[nodiscard]] inline String PascalToCaps(String value);
   [[nodiscard]] inline String MakeCount(int val, const String & item, const String & plural_suffix);
-  [[nodiscard]] inline String MakeHexString(uint64_t value, size_t min_width=1);
+  [[nodiscard]] inline String MakeHexString(std::unsigned_integral auto value, size_t min_width=1);
+  [[nodiscard]] inline String MakeHexString(std::signed_integral auto value, size_t min_width=1);
   [[nodiscard]] inline String MakeRoman(int val);
   template <typename CONTAINER_T>
   [[nodiscard]] inline String MakeList(const CONTAINER_T & container, std::string separator = ",");
@@ -1162,11 +1163,11 @@ namespace emp {
       return *this;
     }
 
-    String & AppendHex(uint64_t val, size_t min_width=1) {
+    String & AppendHex(auto val, size_t min_width=1) {
       return (*this += MakeHexString(val, min_width));
     }
 
-    String & SetHex(uint64_t val, size_t min_width=1) {
+    String & SetHex(auto val, size_t min_width=1) {
       return (*this = MakeHexString(val, min_width));
     }
 
@@ -2683,7 +2684,8 @@ namespace emp {
     return MakeCount(val, item, "s");
   }
 
-  [[nodiscard]] String MakeHexString(uint64_t value, size_t min_width) {
+  /// Convert a unsigned integer into its hexadecimal equivalent.
+  [[nodiscard]] String MakeHexString(std::unsigned_integral auto  value, size_t min_width) {
     constexpr char hex_lookup[] = "0123456789ABCDEF";
     if (value == 0) return emp::String(min_width, '0');
 
@@ -2693,6 +2695,12 @@ namespace emp {
       value /= 16;
     }
     return result.PadFront('0', min_width);
+  }
+
+  /// Allow hex strings to be generated from signed values as well.
+  [[nodiscard]] String MakeHexString(std::signed_integral auto  value, size_t min_width) {
+    if (value < 0) return "-" + MakeHexString(static_cast<uint64_t>(-value), min_width);
+    return MakeHexString(static_cast<uint64_t>(value), min_width);
   }
 
   /// Convert an integer to a roman numeral string.
