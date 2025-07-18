@@ -1,12 +1,14 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2018
+ *  date: 2015-2025
 */
 /**
  *  @file
  */
 
+#include "emp/geometry/Line2D.hpp"
+#include "emp/geometry/Polygon.hpp"
 #include "emp/math/Random.hpp"
 #include "emp/web/Animate.hpp"
 #include "emp/web/canvas_utils.hpp"
@@ -18,31 +20,27 @@ namespace UI = emp::web;
 class MyAnimate : public UI::Animate {
 private:
   UI::Document doc;
-  UI::CanvasPolygon poly;
-  UI::CanvasLine line;
+  emp::Polygon poly{emp::Point{200,300}};
+  emp::Line2D line{{5,5}, {390,390}};
+  emp::Circle2D circle{{150, 150}, 50};
 
   emp::Random random;
 
-  double cx = 150;
-  double cy = 150;
-  double cr = 50;
-  double can_size = 400;
+  emp::Size2D can_size{800, 400};
   double poly_rot = 0.0;
 
 public:
-  MyAnimate() : doc("emp_base"), poly( 200, 300, "red", "black"), line({5,5}, {395,395}, "green") {
-    // How big should each canvas be?
-    const double w = can_size;
-    const double h = can_size;
-
+  MyAnimate() : doc("emp_base") {
+    DEBUG_STACK();
     // Draw a simple circle animation on a canvas
-    auto mycanvas = doc.AddCanvas(w, h, "can");
-    mycanvas.Circle(cx, cy, cr, "blue", "purple");
-    targets.push_back(mycanvas);
+    auto test_canvas = doc.AddCanvas(can_size, "can");
+
+    test_canvas.Draw(circle, emp::Palette::BLUE, emp::Palette::MAGENTA);
+    targets.push_back(test_canvas);
 
     // Draw the new polygon.
-    poly.AddPoint(0,0).AddPoint(60,25).AddPoint(50,50).AddPoint(-50,50).AddPoint(25,40);
-    mycanvas.Draw(poly);
+    poly.AddPoint({60,25}).AddPoint({50,50}).AddPoint({-50,50}).AddPoint({25,40});
+    test_canvas.Draw(poly, emp::Palette::GRAY, emp::Palette::BLUE);
 
     // Add a button.
     doc << "<br>";
@@ -57,25 +55,27 @@ public:
   }
 
   void DoFrame() {
-    auto mycanvas = doc.Canvas("can");
+    DEBUG_STACK();
+    auto canvas = doc.Canvas("can");
 
     // Update the circle position.
-    cx+=3;
-    if (cx >= can_size + cr) cx -= can_size;
+    circle += emp::Point{3, 0};
+    if (circle.GetCenterX() >= can_size.Width() + circle.GetRadius()) {
+      circle.SetCenterX(-50.0);
+    }
 
     // Draw the new circle.
-    mycanvas.Clear();
-    mycanvas.Draw(emp::Circle(cx,cy,cr), "blue", "purple");
-    if (cx + cr > can_size) mycanvas.Circle(cx-can_size, cy, cr, "blue", "purple");
+    canvas.Clear();
+    canvas.Draw(circle, emp::Palette::BLUE, emp::Palette::MAGENTA);
 
     // Update the polygon position
     poly_rot += 0.01;
-    mycanvas.Rotate(poly_rot);
-    mycanvas.Draw(poly);
-    mycanvas.Rotate(-poly_rot);
+    canvas.SetRotate(poly_rot);
+    canvas.Draw(poly, emp::Palette::GRAY, emp::Palette::BLUE);
+    canvas.SetRotate(-poly_rot);
 
     // Update the line.
-    mycanvas.Draw(line);
+    canvas.Draw(line);
 
     doc.Text("fps").Redraw();
   }
