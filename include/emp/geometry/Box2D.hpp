@@ -34,43 +34,28 @@ namespace emp {
     Box2D & operator=(const Box2D & _in) = default;
     Box2D & operator=(Box2D && _in)      = default;
 
-    constexpr int operator<=>(const Box2D &) const = default;
+    [[nodiscard]] constexpr auto operator<=>(const Box2D &) const = default;
 
-    constexpr const Point2D & GetUL() const { return ul_corner; }
+    [[nodiscard]] constexpr const Point2D & GetUL() const { return ul_corner; }
+    [[nodiscard]] constexpr const Size2D & GetSize() const { return size; }
 
-    constexpr const Size2D & GetSize() const { return size; }
+    [[nodiscard]] constexpr double GetLeft() const { return ul_corner.GetX(); }
+    [[nodiscard]] constexpr double GetRight() const { return ul_corner.GetX() + size.Width(); }
+    [[nodiscard]] constexpr double GetTop() const { return ul_corner.GetY(); }
+    [[nodiscard]] constexpr double GetBottom() const { return ul_corner.GetY() + size.Height(); }
 
-    constexpr double GetLeft() const { return ul_corner.GetX(); }
-
-    constexpr double GetRight() const { return ul_corner.GetX() + size.Width(); }
-
-    constexpr double GetTop() const { return ul_corner.GetY(); }
-
-    constexpr double GetBottom() const { return ul_corner.GetY() + size.Height(); }
-
-    constexpr double GetArea() const { return size.Area(); }
-
-    constexpr double GetPerimeter() const { return 2.0 * (size.Width() + size.Height()); }
+    [[nodiscard]] constexpr double GetArea() const { return size.Area(); }
+    [[nodiscard]] constexpr double GetPerimeter() const {
+      return 2.0 * (size.Width() + size.Height());
+    }
 
     constexpr void SetPosition(const Point2D & in) { ul_corner = in; }
-
     constexpr void SetSize(const Size2D & in) { size = in; }
 
-    constexpr Box2D operator+(Point2D shift) {
-      return {ul_corner + shift, size};
-    }
-
-    constexpr Box2D operator-(Point2D shift) {
-      return {ul_corner - shift, size};
-    }
-
-    constexpr Box2D operator*(Point2D dilate) {
-      return {ul_corner, size * dilate};
-    }
-
-    constexpr Box2D operator/(Point2D dilate) {
-      return {ul_corner, size / dilate};
-    }
+    [[nodiscard]] constexpr Box2D operator+(Point2D shift) { return {ul_corner + shift, size}; }
+    [[nodiscard]] constexpr Box2D operator-(Point2D shift) { return {ul_corner - shift, size}; }
+    [[nodiscard]] constexpr Box2D operator*(Point2D dilate) { return {ul_corner, size * dilate}; }
+    [[nodiscard]] constexpr Box2D operator/(Point2D dilate) { return {ul_corner, size / dilate}; }
 
     constexpr Box2D & operator+=(Point2D shift) {
       ul_corner += shift;
@@ -102,18 +87,18 @@ namespace emp {
       return *this;
     }
 
-    constexpr bool Contains(const Point2D & point) const {
+    [[nodiscard]] constexpr bool Contains(const Point2D & point) const {
       return point.GetX() >= GetLeft() && point.GetX() <= GetRight() && point.GetY() >= GetTop() &&
              point.GetY() <= GetBottom();
     }
 
     // Is "other" fully contained inside of this box?
-    constexpr bool Contains(const Box2D & other) const {
+    [[nodiscard]] constexpr bool Contains(const Box2D & other) const {
       return other.GetLeft() >= GetLeft() && other.GetRight() <= GetRight() &&
              other.GetTop() >= GetTop() && other.GetBottom() <= GetBottom();
     }
 
-    constexpr bool HasOverlap(const Box2D & other) const {
+    [[nodiscard]] constexpr bool HasOverlap(const Box2D & other) const {
       // Make sure THIS is higher than OTHER.
       if (other.GetTop() < GetTop()) { return other.HasOverlap(*this); }
 
