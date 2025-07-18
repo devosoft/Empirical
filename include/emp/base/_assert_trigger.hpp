@@ -72,8 +72,13 @@ namespace emp {
     }
 
     // Print the current state of the stack.
-    EM_ASM(console.log('Callstack:\n' + stackTrace()););
-
+    EM_ASM({
+      if (typeof stackTrace === 'function') {
+        console.log('Callstack:\n' + stackTrace());
+      } else {
+        console.trace();
+      }
+    });
     return false;
   }
 
