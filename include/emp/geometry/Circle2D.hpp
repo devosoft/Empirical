@@ -37,9 +37,11 @@ namespace emp {
     constexpr const Point2D & GetCenter() const { return center; }
     constexpr Point2D & GetCenter() { return center; }
 
-    constexpr double GetCenterX() const { return center.GetX(); }
+    constexpr double GetX() const { return center.X(); }
+    constexpr double & GetX() { return center.X(); }
 
-    constexpr double GetCenterY() const { return center.GetY(); }
+    constexpr double GetY() const { return center.Y(); }
+    constexpr double & GetY() { return center.Y(); }
 
     constexpr double GetRadius() const { return radius; }
 
@@ -49,17 +51,22 @@ namespace emp {
 
     constexpr double GetCircumference() const { return PI * 2.0 * radius; }
 
+    constexpr Point2D TopPoint() const { return center - Point2D{0, radius}; }
+    constexpr Point2D BottomPoint() const { return center + Point2D{0, radius}; }
+    constexpr Point2D LeftPoint() const { return center - Point2D{radius, 0}; }
+    constexpr Point2D RightPoint() const { return center + Point2D{radius, 0}; }
+
     constexpr Circle2D & SetCenter(const Point2D & c) {
       center = c;
       return *this;
     }
 
-    constexpr Circle2D & SetCenterX(double x) {
+    constexpr Circle2D & SetX(double x) {
       center.SetX(x);
       return *this;
     }
 
-    constexpr Circle2D & SetCenterY(double y) {
+    constexpr Circle2D & SetY(double y) {
       center.SetY(y);
       return *this;
     }
