@@ -60,8 +60,8 @@ public:
 
     // Update the circle position.
     circle += emp::Point{3, 0};
-    if (circle.GetCenterX() >= can_size.Width() + circle.GetRadius()) {
-      circle.SetCenterX(-50.0);
+    if (circle.GetX() >= can_size.Width() + circle.GetRadius()) {
+      circle.SetX(-50.0);
     }
 
     // Draw the new circle.
@@ -76,6 +76,16 @@ public:
 
     // Update the line.
     canvas.Draw(line);
+
+    // Draw a series of circles along the bottom.
+    const double num_colors = 20;
+    auto color_map = emp::MakeHSLRange(num_colors, 400.0, 100.0, 100, 100, 20, 100);
+    const double radius = can_size.Width() / (2.0 * num_colors) - 1;
+    for (size_t i = 0; i < num_colors; i++) {
+      double x_pos = (num_colors + (2 * static_cast<double>(i) + 1) * radius);
+      emp::Circle circle{{x_pos, 300}, radius};
+      canvas.Draw(circle, color_map[i]);
+    }
 
     doc.Text("fps").Redraw();
   }
