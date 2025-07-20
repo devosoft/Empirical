@@ -47,15 +47,21 @@ namespace emp {
     static constexpr Color NONE{""};
     
     static constexpr Color BLACK{"black"};
+    static constexpr Color WHITE{"white"};
+
     static constexpr Color RED{"red"};
     static constexpr Color GREEN{"green"};
     static constexpr Color BLUE{"blue"};
+
     static constexpr Color CYAN{"cyan"};
     static constexpr Color MAGENTA{"magenta"};
     static constexpr Color YELLOW{"yellow"};
-    static constexpr Color WHITE{"white"};
+
     static constexpr Color GRAY{"gray"};
     static constexpr Color PINK{"pink"};
+    static constexpr Color TAN{"tan"};
+    static constexpr Color ORANGE{"orange"};    
+    static constexpr Color PURPLE{"purple"};    
   }
 
   class HSL : public Color {
@@ -146,6 +152,28 @@ namespace emp {
     return result;
   }
 
+  /// Simple mechanism for tracking a pair of colors
+  /// (often foreground/background or fill color / line color)
+  class ColorPair {
+  private:
+    Color color1 = Palette::BLACK;
+    Color color2 = Palette::WHITE;
+  public:
+    constexpr ColorPair(Color c1, Color c2) : color1(c1), color2(c2) {}
+    constexpr ColorPair() {}
+    
+    [[nodiscard]] const Color & Foreground() const { return color1; }
+    [[nodiscard]] Color & Foreground() { return color1; }
+
+    [[nodiscard]] const Color & Background() const { return color2; }
+    [[nodiscard]] Color & Background() { return color2; }
+
+    [[nodiscard]] const Color & LineColor() const { return color1; }
+    [[nodiscard]] Color & LineColor() { return color1; }
+
+    [[nodiscard]] const Color & FillColor() const { return color2; }
+    [[nodiscard]] Color & FillColor() { return color2; }
+  };
 
 }  // namespace emp
 
