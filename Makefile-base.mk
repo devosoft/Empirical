@@ -31,8 +31,11 @@ FLAGS_web_only = -s $(EMP_METHODS) -s TOTAL_MEMORY=67108864 $(JS_LIB) -s $(EMP_F
 FLAGS_web_main = $(FLAGS_main) $(FLAGS_web_only)
 
 FLAGS_WEB_OPT = $(FLAGS_web_main) -Oz -DNDEBUG
-FLAGS_WEB_DEBUG = $(FLAGS_web_main) -g4 -pedantic -Wno-dollar-in-identifier-extension
+FLAGS_WEB_DEBUG = $(FLAGS_web_main) -gsource-map -pedantic -Wno-dollar-in-identifier-extension
 FLAGS_WEB_THREADS = $(FLAGS_web_main) $(FLAGS_threads) -s USE_PTHREADS=1
+
+# Default to optimized.
+FLAGS_WEB = $(FLAGS_WEB_OPT)
 
 CXX = c++
 CXX_web = emcc
