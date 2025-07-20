@@ -56,6 +56,11 @@ namespace emp {
     }
     void Deactivate() { id = NO_ID; }
 
+    [[nodiscard]] double X() const { return perimeter.GetX(); }
+    [[nodiscard]] double Y() const { return perimeter.GetY(); }
+    [[nodiscard]] double & X() { return perimeter.GetX(); }
+    [[nodiscard]] double & Y() { return perimeter.GetY(); }
+
     [[nodiscard]] const Circle & GetPerimeter() const {
       emp_assert(IsActive());
       return perimeter;
@@ -63,14 +68,6 @@ namespace emp {
     [[nodiscard]] const Point & GetCenter() const {
       emp_assert(IsActive());
       return perimeter.GetCenter();
-    }
-    [[nodiscard]] double GetX() const {
-      emp_assert(IsActive());
-      return perimeter.GetCenterX();
-    }
-    [[nodiscard]] double GetY() const {
-      emp_assert(IsActive());
-      return perimeter.GetCenterY();
     }
     [[nodiscard]] double GetRadius() const {
       emp_assert(IsActive());
@@ -97,6 +94,10 @@ namespace emp {
     void SetRadius(double r) {
       emp_assert(IsActive());
       perimeter.SetRadius(r);
+    }
+    void SetColor(Color in) {
+      emp_assert(IsActive());
+      color = in;
     }
   };
 }
