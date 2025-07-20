@@ -589,6 +589,24 @@ namespace emp::web {
       return *this;
     }
 
+    // DRAW PROVIDED TEXT
+    Canvas & Draw(Point pos, emp::String text, bool center=true,
+                  const Color & line_color=Color{}, double line_width=0.0) {
+      DEBUG_STACK();
+      AddText(pos, text, center);
+      if (line_color) SetLineColor(line_color);
+      if (line_width > 0) SetLineWidth(line_width);
+      FinalizeLine();
+      return *this;
+    }
+
+    // DRAW IMAGE
+    Canvas & Draw(emp::RawImage & image, emp::Point position, emp::Size2D size) {
+      DEBUG_STACK();
+      AddImageWhenReady(position, image, size);
+      return *this;
+    }
+
     /// Clear everything off of this canvas.
     Canvas & Clear(Color bg_color = Color{}) {
       DEBUG_STACK();
