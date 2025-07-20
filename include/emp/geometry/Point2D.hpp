@@ -35,6 +35,8 @@ namespace emp {
     constexpr Point2D(const Point2D & in) = default;  // Copy constructor
 
     constexpr Point2D(double x, double y) : x(x), y(y) {}
+    constexpr Point2D(std::integral auto x, std::integral auto y)
+      : x(static_cast<double>(x)), y(static_cast<double>(y)) {}
 
     constexpr explicit Point2D(const GridPos & pos) : x(pos.Col()), y(pos.Row()) {}
 
