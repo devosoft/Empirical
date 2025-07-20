@@ -20,7 +20,9 @@
 #include <concepts>
 #include <functional>
 #include <stddef.h>
+#include <type_traits>
 
+#include "../base/array.hpp"
 #include "../datastructs/vector_utils.hpp"
 #include "../math/constants.hpp"
 #include "../tools/GridSize.hpp"
@@ -40,18 +42,13 @@ namespace emp {
     static constexpr size_t NO_ID = MAX_SIZE_T;
 
     class Sector {
-    public:
-      enum Direction { UP=0, UP_RIGHT, RIGHT, DOWN_RIGHT, DOWN, DOWN_LEFT, LEFT, UP_LEFT, SIZE };
-
     private:
       size_t sector_id = NO_ID;
       emp::vector<size_t> body_ids = {};
-
       Box2D area = {};      // Specific portion of surface covered.
-      Box2D mid_area = {};  // Internal area that cannot be touched by neighbors
 
-      // Track neighbor sector IDs (clockwise from 12): U, UR, R, DR, D, DL, L, UL
-      emp::array<size_t, Direction::SIZE> neighbor_ids =
+      // Track neighbor sector IDs (clockwise from UP): U, UR, R, DR, D, DL, L, UL
+      emp::array<size_t, GridDir::SIZE> neighbor_ids =
         {NO_ID, NO_ID, NO_ID, NO_ID, NO_ID, NO_ID, NO_ID, NO_ID};
 
     public:
@@ -59,33 +56,31 @@ namespace emp {
       [[nodiscard]] const emp::vector<size_t> & GetBodyIDs() const { return body_ids; }
       [[nodiscard]] size_t NumBodies() const { return body_ids.size(); }
 
-      [[nodiscard]] bool HasUp() const { return neighbor_ids[UP] != NO_ID; }
-      [[nodiscard]] bool HasDown() const { return neighbor_ids[DOWN] != NO_ID; }
-      [[nodiscard]] bool HasLeft() const { return neighbor_ids[LEFT] != NO_ID; }
-      [[nodiscard]] bool HasRight() const { return neighbor_ids[RIGHT] != NO_ID; }
+      [[nodiscard]] bool HasUp() const { return neighbor_ids[GridDir::UP] != NO_ID; }
+      [[nodiscard]] bool HasDown() const { return neighbor_ids[GridDir::DOWN] != NO_ID; }
+      [[nodiscard]] bool HasLeft() const { return neighbor_ids[GridDir::LEFT] != NO_ID; }
+      [[nodiscard]] bool HasRight() const { return neighbor_ids[GridDir::RIGHT] != NO_ID; }
 
-      [[nodiscard]] bool HasUL() const { return neighbor_ids[UP_LEFT] != NO_ID; }
-      [[nodiscard]] bool HasUR() const { return neighbor_ids[UP_RIGHT] != NO_ID; }
-      [[nodiscard]] bool HasDL() const { return neighbor_ids[DOWN_LEFT] != NO_ID; }
-      [[nodiscard]] bool HasDR() const { return neighbor_ids[DOWN_RIGHT] != NO_ID; }
+      [[nodiscard]] bool HasUL() const { return neighbor_ids[GridDir::UP_LEFT] != NO_ID; }
+      [[nodiscard]] bool HasUR() const { return neighbor_ids[GridDir::UP_RIGHT] != NO_ID; }
+      [[nodiscard]] bool HasDL() const { return neighbor_ids[GridDir::DOWN_LEFT] != NO_ID; }
+      [[nodiscard]] bool HasDR() const { return neighbor_ids[GridDir::DOWN_RIGHT] != NO_ID; }
 
-      [[nodiscard]] size_t GetUp() const { return neighbor_ids[UP]; }
-      [[nodiscard]] size_t GetDown() const { return neighbor_ids[DOWN]; }
-      [[nodiscard]] size_t GetLeft() const { return neighbor_ids[LEFT]; }
-      [[nodiscard]] size_t GetRight() const { return neighbor_ids[RIGHT]; }
+      [[nodiscard]] size_t GetUp() const { return neighbor_ids[GridDir::UP]; }
+      [[nodiscard]] size_t GetDown() const { return neighbor_ids[GridDir::DOWN]; }
+      [[nodiscard]] size_t GetLeft() const { return neighbor_ids[GridDir::LEFT]; }
+      [[nodiscard]] size_t GetRight() const { return neighbor_ids[GridDir::RIGHT]; }
 
-      [[nodiscard]] size_t GetUL() const { return neighbor_ids[UP_LEFT]; }
-      [[nodiscard]] size_t GetUR() const { return neighbor_ids[UP_RIGHT]; }
-      [[nodiscard]] size_t GetDL() const { return neighbor_ids[DOWN_LEFT]; }
-      [[nodiscard]] size_t GetDR() const { return neighbor_ids[DOWN_RIGHT]; }
+      [[nodiscard]] size_t GetUL() const { return neighbor_ids[GridDir::UP_LEFT]; }
+      [[nodiscard]] size_t GetUR() const { return neighbor_ids[GridDir::UP_RIGHT]; }
+      [[nodiscard]] size_t GetDL() const { return neighbor_ids[GridDir::DOWN_LEFT]; }
+      [[nodiscard]] size_t GetDR() const { return neighbor_ids[GridDir::DOWN_RIGHT]; }
 
-      void Setup(size_t in_sector_id, emp::array<size_t, 8> in_neighbor_ids,
-                 Box2D in_area, Box2D in_mid_area) {
+      void Setup(size_t in_sector_id, emp::array<size_t, 8> in_neighbor_ids, Box2D in_area) {
         body_ids.resize(0);
         sector_id = in_sector_id;
         neighbor_ids = in_neighbor_ids;
         area = in_area;
-        mid_area = in_mid_area;
       }
 
       void Insert(size_t body_id) { body_ids.push_back(body_id); }
@@ -106,7 +101,6 @@ namespace emp {
     // Data tracking the current bodies on this surface using SECTORS.
     bool data_active = false;  ///< Are we trying to keep measurements up-to-date?
     double max_radius = 0.0;   ///< Largest radius of any body.
-    size_t max_count = 0;      ///< How many instances of max_radius? (rescan when 0)
 
     static constexpr uint32_t MAX_SECTOR_ROWS = 32;
     static constexpr uint32_t MAX_SECTOR_COLS = 32;
@@ -120,28 +114,34 @@ namespace emp {
 
     emp::vector<size_t> out_ids;  ///< Reusable vector to return ID sets by const reference.
 
+    // === Helper Functions ===
+
+    // Run a function on each active body.
+    template <typename FUN_T>
+    void ForEachBody(FUN_T && fun) {
+      for (auto & body : body_set) {
+        if (body.IsActive()) fun(body);
+      }
+    }
+
     // Make sure there are num_sectors sectors and remove all bodies from existing ones.
     void InitSectors() {
       num_sectors = grid_size.NumCells();
       emp::array<size_t, 8> neighbor_ids;
-      Size2D offset_size{4*max_radius, 4*max_radius};
-      Size2D mid_size = sector_size - offset_size;
 
       for (size_t i = 0; i < num_sectors; ++i) {
         GridPos pos = grid_size.FromIndex(i); // Where is this sector on the grid?
-        neighbor_ids[Sector::UP]         = grid_size.ToIndex(grid_size.PosUp(pos, wrap));
-        neighbor_ids[Sector::UP_RIGHT]   = grid_size.ToIndex(grid_size.PosUR(pos, wrap));
-        neighbor_ids[Sector::RIGHT]      = grid_size.ToIndex(grid_size.PosRight(pos, wrap));
-        neighbor_ids[Sector::DOWN_RIGHT] = grid_size.ToIndex(grid_size.PosDR(pos, wrap));
-        neighbor_ids[Sector::DOWN]       = grid_size.ToIndex(grid_size.PosDown(pos, wrap));
-        neighbor_ids[Sector::DOWN_LEFT]  = grid_size.ToIndex(grid_size.PosDL(pos, wrap));
-        neighbor_ids[Sector::LEFT]       = grid_size.ToIndex(grid_size.PosLeft(pos, wrap));
-        neighbor_ids[Sector::UP_LEFT]    = grid_size.ToIndex(grid_size.PosUL(pos, wrap));
+        neighbor_ids[GridDir::UP]         = grid_size.ToIndex(grid_size.PosUp(pos, wrap));
+        neighbor_ids[GridDir::UP_RIGHT]   = grid_size.ToIndex(grid_size.PosUR(pos, wrap));
+        neighbor_ids[GridDir::RIGHT]      = grid_size.ToIndex(grid_size.PosRight(pos, wrap));
+        neighbor_ids[GridDir::DOWN_RIGHT] = grid_size.ToIndex(grid_size.PosDR(pos, wrap));
+        neighbor_ids[GridDir::DOWN]       = grid_size.ToIndex(grid_size.PosDown(pos, wrap));
+        neighbor_ids[GridDir::DOWN_LEFT]  = grid_size.ToIndex(grid_size.PosDL(pos, wrap));
+        neighbor_ids[GridDir::LEFT]       = grid_size.ToIndex(grid_size.PosLeft(pos, wrap));
+        neighbor_ids[GridDir::UP_LEFT]    = grid_size.ToIndex(grid_size.PosUL(pos, wrap));
 
         Box2D area{sector_size*pos, sector_size};
-        Box2D mid_area = {area.GetUL() + offset_size/2, mid_size};
-
-        sectors[i].Setup(i, neighbor_ids, area, mid_area);
+        sectors[i].Setup(i, neighbor_ids, area);
       }
     }
 
@@ -173,20 +173,21 @@ namespace emp {
     // Clear out the watermarked body size and update the current largest.
     void RefreshBodySize() {
       max_radius = 0.0;
-      for (BODY_T & body : body_set) {
-        if (body.IsActive()) { TestBodySize(body); }
-      }
+      ForEachBody([this](BODY_T & body){ TestBodySize(body); });
+    }
+
+    // Determine the index of a sector a point is in.
+    size_t FindSectorID(Point point) {
+      emp_assert(Contains(point), point);
+      GridPos sector_pos = (point / sector_size).ToGridPos();
+      return grid_size.ToIndex(sector_pos);
     }
 
     // Determine which sector a point is in.
-    Sector & FindSector(Point point) {
-      emp_assert(point.IsNonNegative() && surface_size.Contains(point));
-      GridPos sector_pos = (point / sector_size).ToGridPos();
-      return sectors[grid_size.ToIndex(sector_pos)];
-    }
+    Sector & FindSector(Point point) { return sectors[FindSectorID(point)]; }
 
-    // Determine which sectos a body is in.
-    Sector & FindSector(BODY_T & body) { return FindSector(body.GetPerimeter().GetCenter()); }
+    // Determine which sector a body is in.
+    Sector & FindSector(BODY_T & body) { return FindSector(body.GetCenter()); }
 
     // Place an active body into a sector.
     void PlaceBody(BODY_T & body) {
@@ -208,9 +209,8 @@ namespace emp {
 
       InitSectors();  // Now that we know the sizes, we can initialize sectors.
 
-      for (BODY_T & body : body_set) {  // Put active bodies into sectors
-        if (body.IsActive()) PlaceBody(body);
-       } 
+      // Put active bodies into sectors
+      ForEachBody([this](BODY_T & body){ PlaceBody(body); });
     }
 
   public:
@@ -221,6 +221,9 @@ namespace emp {
 
     [[nodiscard]] const Size2D & GetSize() const { return surface_size; }
     [[nodiscard]] bool GetWrap() const { return wrap; }
+    [[nodiscard]] size_t NumBodies() const { return body_set.size() - open_ids.size(); }
+
+    [[nodiscard]] size_t NumOpen() const { return open_ids.size(); } // DEBUG!
 
     [[nodiscard]] BODY_T & GetBody(size_t id) {
       emp_assert(body_set[id].IsActive());
@@ -235,6 +238,14 @@ namespace emp {
     [[nodiscard]] emp::vector<BODY_T> & GetBodySet() { return body_set; }
     [[nodiscard]] const emp::vector<BODY_T> & GetBodySet() const { return body_set; }
 
+    /// Get the first active body you can find.
+    [[nodiscard]] BODY_T & GetActiveBody() {
+      size_t out_id = 0;
+      while (out_id < body_set.size() && body_set[out_id].IsActive() == false) ++out_id;
+      emp_assert(out_id < body_set.size());
+      return body_set[out_id];
+    }
+
     /// Does an id represent an active body on a surface?
     [[nodiscard]] bool IsActive(size_t id) const { return body_set[id].IsActive(); }
 
@@ -244,9 +255,13 @@ namespace emp {
 
     [[nodiscard]] const Color & GetColor(size_t id) const { return GetBody(id).GetColor(); }
 
+    [[nodiscard]] bool Contains(const Point2D & point) const {
+      return surface_size.Contains(point);
+    }
+
     void MoveTo(size_t id, Point pos) {
       if (wrap) pos = pos.Wrap(surface_size);
-      emp_assert(surface_size.Contains(pos));
+      emp_assert(Contains(pos));
 
       // If data is active, update sectors.
       if (data_active) {
@@ -262,7 +277,17 @@ namespace emp {
     }
 
     void MoveBy(size_t id, Point translation) {
-      MoveTo(id, body_set[id].GetPerimeter().GetCenter() + translation);
+      MoveTo(id, body_set[id].GetCenter() + translation);
+    }
+
+    void FinalizePosition(BODY_T & body) {
+      size_t start_sector = FindSectorID(body.GetCenter());
+      body.FinalizePosition();
+      size_t end_sector = FindSectorID(body.GetCenter());
+      if (start_sector != end_sector) {
+        sectors[start_sector].Remove(body.GetID());
+        sectors[end_sector].Insert(body.GetID());
+      }
     }
 
     void SetRadius(size_t id, double _in) {
@@ -272,23 +297,22 @@ namespace emp {
       TestBodySize(body);
     }
 
-    void SetColorID(size_t id, size_t _in) {
-      emp_assert(body_set[id].IsActive());
-      body_set[id].SetColorID(_in);
-    }
+    void SetColor(size_t id, Color in) { body_set[id].SetColor(in); }
 
     void RemoveBody(size_t id) {
-      emp_assert(body_set[id].IsActive());
-      body_set[id].Deactivate();               // Deactivate this body (so we know not to use it)
-      open_ids.push_back(id);                  // Mark this position as open for a new body.
-      if (data_active) {                       // If we are tracking data right now...
-        FindSector(body_set[id]).Remove(id);   // ...remove this body from its sector.
+      BODY_T & body = body_set[id];
+      emp_assert(body.IsActive());    // Ensure that this body is available to be removed.
+      emp_assert(Contains(body.GetCenter()));
+      if (data_active) {              // If we are tracking data right now...
+        FindSector(body).Remove(id);  // ...remove this body from its sector.
       }
+      body.Deactivate();              // Deactivate this body (so we know not to use it)
+      open_ids.push_back(id);         // Mark this position as open for a new body.
     }
 
     /// Add a single body to surface; return its unique ID.
     auto & AddBody(Circle circle, emp::Color color) {
-      emp_assert(surface_size.Contains(circle.GetCenter()), surface_size, circle.GetCenter());
+      emp_assert(Contains(circle.GetCenter()), surface_size, circle.GetCenter());
 
       const size_t id = ReserveBodyID();
       auto & body = body_set[id];
@@ -303,7 +327,8 @@ namespace emp {
     /// Remove all bodies from the surface.
     Surface & Clear() {
       data_active = false;
-      body_set.clear();
+      body_set.resize(0);
+      open_ids.resize(0);
       max_radius  = 0.0;
       num_sectors = 0;
       return *this;
@@ -312,7 +337,7 @@ namespace emp {
     /// Determine if two bodies overlap.
     static bool TestOverlap(const BODY_T & body1, const BODY_T & body2) {
       emp_assert(body1.IsActive() && body2.IsActive());
-      const Point xy_dist       = body1.GetPerimeter().GetCenter() - body2.GetPerimeter().GetCenter();
+      const Point xy_dist       = body1.GetCenter() - body2.GetCenter();
       const double sqr_dist     = xy_dist.SquareMagnitude();
       const double total_radius = body1.GetRadius() + body2.GetRadius();
       const double sqr_radius   = total_radius * total_radius;
@@ -324,7 +349,7 @@ namespace emp {
     }
 
     /// Update the list of overlaps in an internal sector.
-    /// If add_on is false, it will add on to the list of overlaps already found.
+    /// If add_on is false, it will reset the list of overlaps already found.
     const emp::vector<size_t> & FindOverlaps(const BODY_T & body, const Sector & sector,
                                              size_t start_pos = 0, bool add_on = false) {
       emp_assert(body.IsActive());
@@ -349,7 +374,9 @@ namespace emp {
         const Sector & sector = sectors[sector_id];
         const auto & body_ids = sector.GetBodyIDs();
 
-        // Loop through all bodies in this sector
+        // Loop through all bodies in this sector.
+        // Note, we only test four of the eight directions since the other four will be tested
+        // by neighbors.
         for (size_t pos=0; pos < body_ids.size(); ++pos) {
           const BODY_T & body = body_set[body_ids[pos]];
           out_ids.clear();  // Clear the set of IDs that could overlap with this body.
@@ -368,6 +395,15 @@ namespace emp {
       }
     }
 
+    void WrapBodies() {
+      ForEachBody([this](BODY_T & body){
+        if (body.X() < 0.0) body.X() += surface_size.X();
+        else if (body.X() >= surface_size.X()) body.X() -= surface_size.X();
+        if (body.Y() < 0.0) body.Y() += surface_size.Y();
+        else if (body.Y() >= surface_size.Y()) body.Y() -= surface_size.Y();
+      });
+    }
+
     template <typename LOW_X_T, typename HIGH_X_T, typename LOW_Y_T, typename HIGH_Y_T>
     void TriggerOffsides(LOW_X_T low_x_fun, HIGH_X_T high_x_fun, LOW_Y_T low_y_fun, HIGH_Y_T high_y_fun) {
       emp_assert(wrap == false);
@@ -375,24 +411,24 @@ namespace emp {
       for (size_t row_id = 0; row_id < grid_size.NumRows(); ++row_id) {
         const auto & left_sector = sectors[row_id * grid_size.NumCols()];
         for (size_t id : left_sector.GetBodyIDs()) {
-          if (body_set[id].GetX() < 0.0) low_x_fun(id);
+          if (body_set[id].X() < 0.0) low_x_fun(id);
         }
 
         const auto & right_sector = sectors[(row_id+1) * grid_size.NumCols() - 1];
         for (size_t id : right_sector.GetBodyIDs()) {
-          if (body_set[id].GetX() > surface_size.Width()) high_x_fun(id);
+          if (body_set[id].X() > surface_size.Width()) high_x_fun(id);
         }
       }
 
       for (size_t col_id = 0; col_id < grid_size.NumCols(); ++col_id) {
         const auto & top_sector = sectors[col_id];
         for (size_t id : top_sector.GetBodyIDs()) {
-          if (body_set[id].GetY() < 0.0) low_y_fun(id);
+          if (body_set[id].Y() < 0.0) low_y_fun(id);
         }
 
         const auto & bottom_sector = sectors[(grid_size.NumRows()-1) * grid_size.NumCols() + col_id];
         for (size_t id : bottom_sector.GetBodyIDs()) {
-          if (body_set[id].GetY() > surface_size.Height()) high_y_fun(id);
+          if (body_set[id].Y() > surface_size.Height()) high_y_fun(id);
         }
       }
     }
