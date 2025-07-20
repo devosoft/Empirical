@@ -32,10 +32,8 @@ namespace emp {
     double target_radius;   // For growing/shrinking
 
     // Update calculations
-    Point shift;            // How should this body be updated to minimize overlap.
     Point total_shift;      // Build up of shift not yet acted upon.
     Point total_abs_shift;  // Total absolute-value of shifts (to calculate pressure)
-    double pressure = 0.0;  // Current pressure on this body.
 
     emp::vector<size_t> link_ids;  // Ids of bodies that are attached to this one
 
@@ -45,26 +43,47 @@ namespace emp {
 
     // Accessors
     [[nodiscard]] double GetStartTime() const { return start_time; }
-    [[nodiscard]] Point GetVelocity() const { return velocity; }
+    [[nodiscard]] const Point & GetVelocity() const { return velocity; }
     [[nodiscard]] Angle GetOrientation() const { return orientation; }
     [[nodiscard]] double GetMass() const { return mass; }
     [[nodiscard]] double GetTargetRadius() const { return target_radius; }
-    [[nodiscard]] Point GetShift() const { return shift; }
-    [[nodiscard]] Point GetTotalShift() const { return total_shift; }
-    [[nodiscard]] Point GetTotalAbsShift() const { return total_abs_shift; }
-    [[nodiscard]] double GetPressure() const { return pressure; }
     [[nodiscard]] const emp::vector<size_t> & GetLinkIDs() const { return link_ids; }
+
+    [[nodiscard]] Point & GetVelocity() { return velocity; }
 
     void SetStartTime(double in) { start_time = in; }
     void SetVelocity(Point in) { velocity = in; }
     void SetOrientation(Angle in) { orientation = in; }
     void SetMass(double in) { mass = in; }
     void SetTargetRadius(double in) { target_radius = in; }
-    void SetShift(Point in) { shift = in; }
-    void SetTotalShift(Point in) { total_shift = in; }
-    void SetTotalAbsShift(Point in) { total_abs_shift = in; }
-    void SetPressure(double in) { pressure = in; }
     void SetLinkIDs(const emp::vector<size_t> & in) { link_ids = in; }
+
+    // Reset this body to be reused.
+    void Deactivate() {
+      start_time = std::numeric_limits<double>::max();
+      velocity.Set(0.0, 0.0);
+      link_ids.resize(0);
+      SurfaceBody::Deactivate();
+    }
+
+    void ProcessShift(Point in) {
+      total_shift += in;
+      total_abs_shift += in.Abs();
+    }
+
+    // Where will this body be post shift?
+    Point2D CalcShiftPos() const { return perimeter.GetCenter() + total_shift; }
+
+    double CalcPressure() const {
+      const Point contested_shift = total_abs_shift - total_shift.Abs();
+      return contested_shift.SquareMagnitude();
+    }
+
+    void FinalizePosition() {
+      perimeter += total_shift;
+      total_shift.Reset();
+      total_abs_shift.Reset();
+    }
 
     // Other orientation and position controls...
     void RotateDegrees(double degrees) { orientation.RotateDegrees(degrees); }
@@ -96,9 +115,9 @@ namespace emp {
       }
     }
 
-    void UpdatePosition(double friction) {
+    void ProcessVelocity(double friction) {
       if (velocity.AtOrigin()) return; // No velocity; nothing to update.
-      MoveBy(velocity);
+      ProcessShift(velocity);
       const double speed = velocity.Magnitude();
 
       // If body is close to stopping stop it!
