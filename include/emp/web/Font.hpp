@@ -59,7 +59,7 @@ namespace emp::web {
       ;
     }
 
-    Font(int _size, const std::string & _color = "black", bool _bold = false, bool _italic = false)
+    Font(int _size, Color _color=emp::Palette::BLACK, bool _bold=false, bool _italic=false)
       : Font("Helvetica", _size, _color, _bold, _italic) {
       ;
     }

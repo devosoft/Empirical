@@ -1,7 +1,7 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2017
+ *  date: 2015-2025
 */
 /**
  *  @file
@@ -47,12 +47,15 @@ int main()
   sel.SetOption("Option IV");
 
   doc << canvas << sel << "<br>" << tab;
-  canvas.Rect(0,0,200,200, "#AAAAAA", "black");
-  canvas.Circle(100,75,50, "red", "black");
+  emp::Box2D box{{0,0}, {200,200}};
+  canvas.Draw(box, emp::Palette::ORANGE, emp::Palette::BLACK);
+
+  emp::Circle circle{{100,75}, 50};
+  canvas.Draw(circle, emp::Palette::RED, emp::Palette::BLACK);
 
   my_but.AddDependant(text);
   my_but.SetSize(100,100);
-  my_but.SetBackground("blue");
+  my_but.SetBackground(emp::Palette::BLUE);
 
   motiv.SetSize(100,100);
 }

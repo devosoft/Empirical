@@ -56,13 +56,13 @@ namespace emp::web {
   /// @param canvas The Canvas to draw on.
   /// @param surface A surface containing a set of shapes to draw.
   template <typename BODY_T>
-  void Draw(Canvas canvas,
-            const Surface<BODY_T> & surface) {
+  void Draw(Canvas canvas, const Surface<BODY_T> & surface) {
     canvas.Clear();
+    DrawGridBG(canvas, surface.GetGridSize(), Palette::BLACK, Palette::GRAY);
 
-    // Setup a black background for the surface
-    Box2D box{{0.0, 0.0}, surface.GetSize()};
-    canvas.Draw(box, Palette::BLACK);
+    // // Setup a black background for the surface
+    // Box2D box{{0.0, 0.0}, surface.GetSize()};
+    // canvas.Draw(box, Palette::BLACK);
 
     // Draw the circles.
     // RawImage image("images/cell.png");

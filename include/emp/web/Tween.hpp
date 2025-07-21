@@ -1,6 +1,6 @@
 /**
  * This file is part of Empirical, https://github.com/devosoft/Empirical
- * Copyright (C) 2015-2017 Michigan State University
+ * Copyright (C) 2015-2025 Michigan State University
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/web/Tween.hpp
@@ -64,16 +64,15 @@ namespace emp::web {
     Widget default_target;        // Default widget to use for specifying paths
     emp::vector<Path *> paths;    // Paths to be updated as part of this tween.
     emp::vector<Event *> events;  // Events to be triggered as specific steps.
-    emp::vector < std::function <
-      void() >> update_funs;         // Call after paths are triggered to UD screen.
+    emp::vector<std::function<void()>> update_funs; // Call after paths are triggered to UD screen.
     emp::vector<Widget> dependants;  // Widgets to be refreshed at each frame.
 
-    bool running;
+    bool running = false;
     size_t callback_id;
 
-    double start_time;  // When did the most recent run start?
-    double cur_time;    // What time is it now?
-    double run_time;    // How long did this previously run?
+    double start_time = 0.0;  // When did the most recent run start?
+    double cur_time = 0.0;    // What time is it now?
+    double run_time = 0.0;    // How long did this previously run?
 
     static double LINEAR(double in) { return in; }
 
@@ -111,11 +110,7 @@ namespace emp::web {
     Tween(double d = 1.0, const Widget & t = nullptr)
       : duration(d * 1000)
       , default_target(t)
-      , running(false)
-      , start_time(0.0)
-      , cur_time(0.0)
-      , run_time(0.0) {
-      emp::InitializeAnim();  // Make sure JS is initialized for animations.
+    {
       callback_id = JSWrap(std::function<void()>([this]() { this->AdvanceFrame(); }));
     }
 

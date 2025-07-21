@@ -1,7 +1,7 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2017
+ *  date: 2015-2025
 */
 /**
  *  @file
@@ -16,10 +16,8 @@ UI::Tween tween(7);
 
 double myvar = 20.0;
 
-double cx = 150;
-double cy = 150;
-double cr = 50;
-double can_size = 400;
+emp::Circle circle{{150, 150}, 50};
+emp::Size2D can_size{400, 400};
 
 void SetVar(double v) { myvar = v; }
 
@@ -27,8 +25,10 @@ void TweenAnim() {
   auto mycanvas = doc.Canvas("can");
 
   mycanvas.Clear();
-  mycanvas.Circle(cx, cy, cr, "green", "purple");
-  if (cx + cr > can_size) mycanvas.Circle(cx-can_size, cy, cr, "green", "purple");
+  mycanvas.Draw(circle, emp::Palette::GREEN, emp::Palette::PURPLE);
+  if (!can_size.Contains(circle.RightPoint())) {
+    mycanvas.Draw(circle - emp::Point{can_size, 0}, emp::Palette::GREEN, emp::Palette::PURPLE);
+  }
 };
 
 int main()
@@ -44,10 +44,12 @@ int main()
   doc << UI::Button([](){tween.Start();}, "Start!");
 
   doc << "<br>";
-  auto mycanvas = doc.AddCanvas((size_t) can_size, (size_t) can_size, "can");
-  mycanvas.Circle(cx, cy, cr, "green", "purple");
-  tween.AddPath(cx, cr, can_size-cr);
-  tween.AddPath(cy, cr, can_size-cr);
+  auto mycanvas = doc.AddCanvas(can_size, "can");
+  mycanvas.Draw(circle, emp::Palette::GREEN, emp::Palette::PURPLE);
+
+  // Set a path for the circle to go from the upper left to the lower right.
+  tween.AddPath(circle.GetX(), circle.GetRadius(), can_size.Width() - circle.GetRadius());
+  tween.AddPath(circle.GetY(), circle.GetRadius(), can_size.Height() - circle.GetRadius());
   tween.AddUpdate(TweenAnim);
 }
 

@@ -1,15 +1,17 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2018
+ *  date: 2018-2025
 */
 /**
  *  @file
  */
 
+#include "emp/geometry/Angle.hpp"
 #include "emp/math/Random.hpp"
 #include "emp/web/Animate.hpp"
 #include "emp/web/canvas_utils.hpp"
+#include "emp/web/CanvasShape.hpp"
 #include "emp/web/color_map.hpp"
 #include "emp/web/emfunctions.hpp"
 #include "emp/web/Input.hpp"
@@ -25,29 +27,30 @@ private:
 
   emp::Random random;
 
-  double cx = 150.0;
-  double cy = 150.0;
-  double cr = 50;
+  emp::Circle circle = emp::Circle{{150,150}, 50};
   const double can_size = 700;
 
   double test_var = 0.5;
 
   emp::vector<emp::Point> position;
   emp::vector<emp::Point> velocity;
-  double image_size = 100.0;
+  emp::Size2D image_size = {100.0, 100.0};
   const size_t num_images = 100;
 
-  const double can_limit = can_size - image_size;
+  const double can_limit = can_size - image_size.Width();
 
 public:
-  MyAnimate() : doc("emp_base"), poly(200, 300, "red", "black"), line(5,5, 695, 695, "red") {
+  MyAnimate()
+    : doc("emp_base")
+    , poly({200, 300}, {}, {emp::Palette::RED, emp::Palette::BLACK})
+    , line({5,5}, {695, 695}, emp::Palette::RED) {
     // How big should each canvas be?
     const double w = can_size;
     const double h = can_size;
 
     // Draw a simple circle animation on a canvas
-    auto mycanvas = doc.AddCanvas(w, h, "can");
-    targets.push_back(mycanvas);
+    auto canvas = doc.AddCanvas(w, h, "can");
+    targets.push_back(canvas);
 
     // Add a button.
     doc << "<br>";
@@ -86,19 +89,21 @@ public:
   }
 
   void DoFrame() {
-    auto mycanvas = doc.Canvas("can");
+    auto canvas = doc.Canvas("can");
 
     // Update the circle position.
-    cx+=3.0;
-    if (cx >= can_size + cr) cx -= can_size;
+    circle.GetX() +=3.0;
+    if (circle.GetX() >= can_size + circle.GetRadius()) circle.GetX() -= can_size;
 
     // Draw the new circle.
-    mycanvas.Clear();
-    mycanvas.Circle(cx, cy, cr, "blue", "purple");
-    if (cx + cr > can_size) mycanvas.Circle(cx-can_size, cy, cr, "blue", "purple");
+    canvas.Clear();
+    canvas.Draw(circle, emp::Palette::BLUE, emp::Palette::PURPLE);
+    if (circle.RightPoint().X() > can_size) {
+      canvas.Draw(circle - emp::Point{can_size,0}, emp::Palette::BLUE, emp::Palette::PURPLE);
+    }
 
     // Update the line.
-    mycanvas.Draw(line);
+    canvas.Draw(line);
 
     // Draw the cells...
     emp::RawImage cell("images/cell.png");
@@ -107,12 +112,12 @@ public:
     emp::Point offsetXY(can_size, can_size);
 
     for (size_t i = 0; i < position.size(); i++) {
-      mycanvas.Image(cell, position[i], image_size, image_size);
+      canvas.Draw(cell, position[i], image_size);
       const bool x_wrap = (position[i].GetX() > can_limit);
       const bool y_wrap = (position[i].GetY() > can_limit);
-      if (x_wrap) mycanvas.Image(cell, position[i] - offsetX, image_size, image_size);
-      if (y_wrap) mycanvas.Image(cell, position[i] - offsetY, image_size, image_size);
-      if (x_wrap && y_wrap) mycanvas.Image(cell, position[i] - offsetXY, image_size, image_size);
+      if (x_wrap) canvas.Draw(cell, position[i] - offsetX, image_size);
+      if (y_wrap) canvas.Draw(cell, position[i] - offsetY, image_size);
+      if (x_wrap && y_wrap) canvas.Draw(cell, position[i] - offsetXY, image_size);
       position[i] += velocity[i];
       if (position[i].GetX() < 0.0) position[i] += offsetX;
       if (position[i].GetY() < 0.0) position[i] += offsetY;

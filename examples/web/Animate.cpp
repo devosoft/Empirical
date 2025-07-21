@@ -36,7 +36,7 @@ public:
     auto test_canvas = doc.AddCanvas(can_size, "can");
 
     test_canvas.Draw(circle, emp::Palette::BLUE, emp::Palette::MAGENTA);
-    targets.push_back(test_canvas);
+    targets.push_back(test_canvas);  // Set Animate to automatically refresh the canvas.
 
     // Draw the new polygon.
     poly.AddPoint({60,25}).AddPoint({50,50}).AddPoint({-50,50}).AddPoint({25,40});

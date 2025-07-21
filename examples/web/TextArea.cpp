@@ -1,7 +1,7 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2017
+ *  date: 2015-2025
 */
 /**
  *  @file
@@ -23,11 +23,11 @@ int main()
 {
   doc << "<h1>Testing!</h1>";
 
-  text_area.SetCallback([](const std::string & in){
+  text_area.SetCallback([](const std::string &){
       text_area.SetText("Changed!");
     });
 
-  text_area2.SetCallback([](const std::string & in){
+  text_area2.SetCallback([](const std::string &){
       text_reflect.Clear();
       text_reflect << text_area2.GetText() << "<br>";
     });
@@ -42,8 +42,8 @@ int main()
       << "<br>" << text_reflect
       << "<br><br>" << text_reflect2;
 
-  out1_font.SetColor("green");
-  out2_font.SetColor("blue");
+  out1_font.SetColor(emp::Palette::GREEN);
+  out2_font.SetColor(emp::Palette::BLUE);
   text_reflect << out1_font;
   text_reflect2 << out2_font;
 

@@ -1,7 +1,7 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2017
+ *  date: 2017-2025
 */
 /**
  *  @file
@@ -37,12 +37,11 @@ struct AdjMatrix {
 };
 
 struct Node {
-  double x;
-  double y;
+  emp::Point pos;
   int id;
   int state = 0;
 
-  Node(double _x, double _y, int _id) : x(_x), y(_y), id(_id) { ; }
+  Node(emp::Point pos, int id) : pos(pos), id(id) {}
 };
 
 struct Edge {
@@ -89,13 +88,12 @@ private:
 
   int active_node = -1;
   int edge_node = -1;
-  int mouse_x = -1;
-  int mouse_y = -1;
+  emp::Point mouse_pos = emp::Point{-1, -1};
   bool update_graph = true;
 
-  size_t AddNode(double x, double y) {
+  size_t AddNode(emp::Point pos) {
     size_t id = nodes.size();
-    nodes.emplace_back(x,y,id);
+    nodes.emplace_back(pos,id);
     adj_list.emplace_back();
     adj_matrix.Inc();
     update_graph = true;
@@ -147,12 +145,10 @@ private:
     return '+';
   }
 
-  void MouseDown(int x, int y) {
+  void MouseDown(emp::Point pos) {
     // Test if the mouse is on an existing node.
     for (auto & node : nodes) {
-      double x_dist = node.x - x;
-      double y_dist = node.y - y;
-      double sqr_dist = x_dist * x_dist + y_dist * y_dist;
+      double sqr_dist = pos.SquareDistance(node.pos);
       if (sqr_dist < node_r_sqr) {
         active_node = (int) node.id;
       }
@@ -160,7 +156,7 @@ private:
 
     // If we did not find an existing node, make a new one and stop.
     if (active_node == -1) {
-      active_node = (int) AddNode(x,y);
+      active_node = (int) AddNode(pos);
       if (edge_node >= 0) AddEdge((size_t) edge_node, (size_t) active_node);
       return;
     }
@@ -168,7 +164,7 @@ private:
     // If we are clicking on the same node again, stop trying to make an edge.
     if (active_node == edge_node) {
       edge_node = -1;
-      mouse_x = mouse_y = -1;
+      mouse_pos.Set(-1, -1);
       return;
     }
 
@@ -187,17 +183,15 @@ private:
     active_node = -1;
   }
 
-  void MouseMove(int x, int y) {
-    mouse_x = mouse_y = -1;
+  void MouseMove(emp::Point pos) {
+    mouse_pos.Set(-1, -1);
     if (active_node >= 0) {
       auto & node = nodes[(size_t) active_node];
-      node.x = x;
-      node.y = y;
+      node.pos = pos;
       edge_node = -1;
     }
     else if (edge_node >= 0) {
-      mouse_x = x;
-      mouse_y = y;
+      mouse_pos = pos;
     }
   }
 
@@ -235,17 +229,17 @@ public:
     main_table.GetCell(0,0).SetCSS("vertical-align", "top");
     main_table.GetCell(0,1).SetCSS("vertical-align", "top");
 
-    graph_canvas.OnMouseDown([this](int x, int y){ MouseDown(x,y); });
+    graph_canvas.OnMouseDown([this](int x, int y){ MouseDown(emp::Point{x,y}); });
     graph_canvas.OnMouseUp([this](){ MouseUp(); });
-    graph_canvas.OnMouseMove([this](int x, int y){ MouseMove(x,y); });
+    graph_canvas.OnMouseMove([this](int x, int y){ MouseMove(emp::Point{x,y}); });
 
     mode_select.SetOption("Adjacency Matrix", [this](){ ActivateAdjMatrix(); });
     mode_select.SetOption("Adjacency List", [this](){ ActivateAdjList(); });
     mode_select.SetOption("Vertex Info", [this](){ ActivateNodeViewer(); });
 
-    AddNode(50,50);
-    AddNode(100,100);
-    AddNode(100,200);
+    AddNode({50,50});
+    AddNode({100,100});
+    AddNode({100,200});
 
     doc << UI::Text("fps") << "FPS = " << UI::Live( [this](){return 1000.0 / GetStepTime();} ) ;
     Start();
@@ -254,30 +248,30 @@ public:
   GraphDriver(GraphDriver &&) = delete;
 
   void DoFrame() {
-    graph_canvas.Clear("black");
+    graph_canvas.Clear(emp::Palette::BLACK);
 
     // Draw all edges on the canvas.
     for (auto & edge : edges) {
       Node & node1 = nodes[edge.from];
       Node & node2 = nodes[edge.to];
-      graph_canvas.Line(node1.x, node1.y, node2.x, node2.y, "yellow");
+      graph_canvas.Draw(node1.pos, node2.pos, emp::Palette::YELLOW);
     }
 
     // If we are in the middle of drawing an edge, place it.
-    if (edge_node >= 0 && mouse_x > 0) {
+    if (edge_node >= 0 && mouse_pos.X() > 0) {
       auto & node = nodes[(size_t)edge_node];
-      graph_canvas.Line(node.x, node.y, mouse_x, mouse_y, "red");
+      graph_canvas.Draw(node.pos, mouse_pos, emp::Palette::RED);
     }
 
     // Draw all vertices on the canvas.
-    graph_canvas.Font("20px Arial");
+    graph_canvas.SetFont("20px Arial");
     for (auto & node : nodes) {
-      std::string color = "white";
-      if (node.id == active_node) color = "yellow";
-      else if (node.id == edge_node) color = "purple";
-      graph_canvas.Circle(node.x, node.y, node_r, color, "blue");
+      emp::Color color = emp::Palette::WHITE;
+      if (node.id == active_node) color = emp::Palette::YELLOW;
+      else if (node.id == edge_node) color = emp::Palette::PURPLE;
+      graph_canvas.Draw(emp::Circle{node.pos, node_r}, color, emp::Palette::BLUE);
       std::string symbol = emp::to_string(ID2Symbol(node.id));
-      graph_canvas.CenterText(node.x, node.y, symbol, "black", "red");
+      graph_canvas.Draw(node.pos, symbol, true, emp::Palette::BLACK); // emp::Palette::RED);
     }
 
     doc.Text("fps").Redraw();

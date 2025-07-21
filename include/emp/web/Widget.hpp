@@ -1131,10 +1131,10 @@ namespace emp::web {
       return_t & SetMiddleText() { return SetCSS("vertical-align", "middle"); }
 
       /// Set the background color of this Widget.
-      return_t & SetBackground(const std::string & v) { return SetCSS("background-color", v); }
+      return_t & SetBackground(const emp::Color & c) { return SetCSS("background-color", c); }
 
       /// Set the foreground color of this Widget.
-      return_t & SetColor(const std::string & v) { return SetCSS("color", v); }
+      return_t & SetColor(const emp::Color & c) { return SetCSS("color", c); }
 
       /// Set the opacity level of this Widget.
       return_t & SetOpacity(double v) { return SetCSS("opacity", v); }
