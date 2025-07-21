@@ -38,7 +38,6 @@ namespace emp {
     bool detach_on_birth = true;        // Do bodies detach from parents at birth?
 
   public:
-    static constexpr size_t NO_ID = surface_t::NO_ID;
     using body_type = BODY_T;
 
     using surface_t::Contains;
@@ -61,11 +60,17 @@ namespace emp {
     [[nodiscard]] double GetMass(size_t id) const { return body_set[id].mass; }
     [[nodiscard]] double GetTargetRadius(size_t id) const { return body_set[id].target_radius; }
 
-    auto & AddBody(Circle in_body, Color color = Palette::RED, size_t link_id = NO_ID) {
-      auto & new_body = surface_t::AddBody(in_body, color);
-      new_body.SetStartTime(time);
-      if (link_id != NO_ID) AddLink(link_id, new_body.GetID());
-      return new_body;
+    size_t AddBody(Circle in_body, Color color = Palette::RED) {
+      size_t id = surface_t::AddBody(in_body, color);
+      surface_t::GetBody(id).SetStartTime(time);
+      return id;
+    }
+
+    /// Add a body with a specified link to an existing body.
+    size_t AddBody(Circle in_body, Color color, size_t link_id) {
+      size_t id = AddBody(in_body, color);
+      AddLink(link_id, id);
+      return id;
     }
 
     void RemoveBody(body_type & body) {
@@ -76,7 +81,9 @@ namespace emp {
       surface_t::RemoveBody(body.GetID());
     }
 
-    void RemoveBody(size_t id) { RemoveBody(body_set[id]); }
+    void RemoveBody(size_t id) {
+      RemoveBody(body_set[id]);
+    }
 
     // Search through all active bodies to find the oldest.
     [[nodiscard]] size_t FindOldest() const {
@@ -86,10 +93,14 @@ namespace emp {
       });
     }
 
-    void RemoveOldest() { if (surface_t::NumBodies() > 0) { RemoveBody(FindOldest()); } }
+    void RemoveOldest() {
+      if (surface_t::NumBodies() > 0) { RemoveBody(FindOldest()); }
+    }
 
     // Test if org with id1 is linked to org with id2.
-    bool TestLinked(size_t id1, size_t id2) { return body_set[id1].HasLink(id2); }
+    bool TestLinked(size_t id1, size_t id2) {
+      return body_set[id1].HasLink(id2);
+    }
 
     void AddLink(size_t id1, size_t id2) {
       emp_assert(!TestLinked(id1, id2), "Should not link same bodies twice.", id1, id2);
@@ -170,28 +181,33 @@ namespace emp {
 
           // If a shift will put a body in an invalid position, fix it!
 
-          Point2D shift_pos = body.CalcShiftPos();
+          const Point2D shift_pos = body.CalcShiftPos();
+          const double radius = body.GetRadius();
           Point2D reflect_adjust;
 
-          if (shift_pos.X() < 0.0) {
-            reflect_adjust.SetX(shift_pos.X() * -2.0);
+          if (shift_pos.X() < radius) {
+            const double overshoot = radius - shift_pos.X();
+            reflect_adjust.SetX(2*overshoot);
             if (body.GetVelocity().X() < 0.0) body.NegateVelocityX();
           }
-          else if (shift_pos.X() >= surface_size.X()) {
-            reflect_adjust.SetX(surface_size.X() - shift_pos.X() - 0.000001);
+          else if (shift_pos.X() + radius >= surface_size.Width()) {
+            const double overshoot = shift_pos.X() + radius - surface_size.Width();
+            reflect_adjust.SetX(-2 * overshoot - 0.000001);
             if (body.GetVelocity().X() > 0.0) body.NegateVelocityX();
           }
-          if (shift_pos.Y() < 0.0) {
-            reflect_adjust.SetY(shift_pos.Y() * -2.0); 
+          if (shift_pos.Y() < radius) {
+            const double overshoot = radius - shift_pos.Y();
+            reflect_adjust.SetY(2*overshoot);
             if (body.GetVelocity().Y() < 0.0) body.NegateVelocityY();
           }
-          else if (shift_pos.Y() >= surface_size.Y()) {
-            reflect_adjust.SetY(surface_size.Y() - shift_pos.Y() - 0.000001);
+          else if (shift_pos.Y() + radius >= surface_size.Height()) {
+            const double overshoot = shift_pos.Y() + radius - surface_size.Height();
+            reflect_adjust.SetY(-2 * overshoot - 0.000001);
             if (body.GetVelocity().Y() > 0.0) body.NegateVelocityY();
           }
           if (!reflect_adjust.AtOrigin()) { body.ProcessShift(reflect_adjust); }
 
-          emp_assert(Contains(body.CalcShiftPos())); // Shift pos should now be valid.
+          emp_assert(Contains(body.CalcShiftPos()), body.CalcShiftPos()); // Shift pos should now be valid.
         });
       }
     }
