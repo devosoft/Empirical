@@ -92,8 +92,9 @@ namespace emp {
     [[nodiscard]] constexpr bool IsNonNegative() const { return x >= 0.0 && y >= 0.0; }
 
     // Determine a new point, but don't change this one
+
     template <class Self>
-    [[nodiscard]] constexpr Self Midpoint(this const Self & self, const Point2D & p2) {
+    [[nodiscard]] constexpr Self Midpoint(this const Self & self, const Point2D & p2={0,0}) {
       return (self + p2) / 2.0;
     }
 
