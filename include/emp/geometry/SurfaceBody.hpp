@@ -13,6 +13,7 @@
 #ifndef INCLUDE_EMP_GEOMETRY_SURFACE_BODY_HPP_GUARD
 #define INCLUDE_EMP_GEOMETRY_SURFACE_BODY_HPP_GUARD
 
+#include "../debug/debug.hpp"
 #include "../math/constants.hpp"
 
 #include "Circle2D.hpp"
@@ -43,7 +44,21 @@ namespace emp {
 
     SurfaceBody & operator=(SurfaceBody &&) = default;
 
-    [[nodiscard]] bool IsActive() const { return id != NO_ID; }
+    // Track body version with surface version to ensure no mis-matches.
+    #ifndef NDEBUG
+    mutable int version = -1;
+    mutable emp::Ptr<const int> surface_version_ptr = nullptr;
+    void SetVersion(const int & in_version) const {
+      version = in_version;
+      surface_version_ptr = &in_version;
+    }
+    #endif
+
+    [[nodiscard]] bool IsActive() const {
+      emp_assert(surface_version_ptr && version == *surface_version_ptr,
+                 version, *surface_version_ptr, DebugStackToString());
+      return id != NO_ID;
+    }
 
     [[nodiscard]] size_t GetID() const {
       emp_assert(IsActive());
@@ -52,14 +67,27 @@ namespace emp {
     void Activate(size_t in_id) {
       emp_assert(id == NO_ID);
       emp_assert(in_id != NO_ID);
+      emp_assert(surface_version_ptr && version == *surface_version_ptr);
       id = in_id;
     }
     void Deactivate() { id = NO_ID; }
 
-    [[nodiscard]] double X() const { return perimeter.GetX(); }
-    [[nodiscard]] double Y() const { return perimeter.GetY(); }
-    [[nodiscard]] double & X() { return perimeter.GetX(); }
-    [[nodiscard]] double & Y() { return perimeter.GetY(); }
+    [[nodiscard]] double X() const {
+      emp_assert(IsActive());
+      return perimeter.GetX();
+    }
+    [[nodiscard]] double Y() const {
+      emp_assert(IsActive());
+      return perimeter.GetY();
+    }
+    [[nodiscard]] double & X() {
+      emp_assert(IsActive());
+      return perimeter.GetX();
+    }
+    [[nodiscard]] double & Y() {
+      emp_assert(IsActive());
+      return perimeter.GetY();
+    }
 
     [[nodiscard]] const Circle & GetPerimeter() const {
       emp_assert(IsActive());
