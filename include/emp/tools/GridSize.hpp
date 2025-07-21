@@ -24,6 +24,11 @@ namespace emp {
   /// Use ++ or -- (mod SIZE) to rotate clockwise or counterclockwise, respectively.
   struct Grid {
     enum Dir {UP_LEFT=0, UP, UP_RIGHT, RIGHT, DOWN_RIGHT, DOWN, DOWN_LEFT, LEFT, SIZE };
+    static constexpr std::array<Dir, 8> DIR_SET{
+      Dir::UP_LEFT, Dir::UP, Dir::UP_RIGHT, Dir::RIGHT,
+      Dir::DOWN_RIGHT, Dir::DOWN, Dir::DOWN_LEFT, Dir::LEFT
+    };
+    static constexpr size_t NUM_DIRS = static_cast<size_t>(Dir::SIZE);
 
     /// A simple 2-dimensional grid point.
     class Pos {
@@ -245,6 +250,11 @@ namespace emp {
         default: emp_assert(false, "Invalid direction.");
         }
         return out;
+      }
+
+      // If a wrap argument is included in PosDir, allow run-time determination of wrapping.
+      [[nodiscard]] constexpr Pos PosDir(const Pos & in, Dir dir, bool wrap) const {
+        return wrap ? PosDirWrap(in, dir) : PosDir(in, dir);
       }
 
       [[nodiscard]] constexpr Pos PosUp(Pos in) const { return PosDir(in, UP); }
