@@ -24,6 +24,7 @@
 
 #include "../base/array.hpp"
 #include "../datastructs/vector_utils.hpp"
+#include "../io/io_utils.hpp"
 #include "../math/constants.hpp"
 #include "../tools/GridSize.hpp"
 #include "../web/Color.hpp"
@@ -38,18 +39,19 @@ namespace emp {
   template <typename BODY_T>
     requires std::is_base_of_v<SurfaceBody, BODY_T>
   class Surface {
-  public:
+  private:
     static constexpr size_t NO_ID = MAX_SIZE_T;
 
     class Sector {
+    public:
+      using neighbors_t = emp::array<size_t, GridDir::SIZE>;
     private:
       size_t sector_id = NO_ID;
       emp::vector<size_t> body_ids = {};
       Box2D area = {};      // Specific portion of surface covered.
 
       // Track neighbor sector IDs (clockwise from UP): U, UR, R, DR, D, DL, L, UL
-      emp::array<size_t, GridDir::SIZE> neighbor_ids =
-        {NO_ID, NO_ID, NO_ID, NO_ID, NO_ID, NO_ID, NO_ID, NO_ID};
+      neighbors_t neighbor_ids = {NO_ID, NO_ID, NO_ID, NO_ID, NO_ID, NO_ID, NO_ID, NO_ID};
 
     public:
       [[nodiscard]] size_t GetID() const { return sector_id; }
@@ -76,39 +78,45 @@ namespace emp {
       [[nodiscard]] size_t GetDL() const { return neighbor_ids[GridDir::DOWN_LEFT]; }
       [[nodiscard]] size_t GetDR() const { return neighbor_ids[GridDir::DOWN_RIGHT]; }
 
-      void Setup(size_t in_sector_id, emp::array<size_t, 8> in_neighbor_ids, Box2D in_area) {
-        body_ids.resize(0);
+      void Setup(size_t in_sector_id, const neighbors_t & in_neighbor_ids, Box2D in_area) {
+        body_ids.resize(0);  // Clear out any bodies previously in sector.
         sector_id = in_sector_id;
         neighbor_ids = in_neighbor_ids;
         area = in_area;
       }
 
-      void Insert(size_t body_id) { body_ids.push_back(body_id); }
+      [[nodiscard]] bool HasID(size_t body_id) const {
+        return std::find(body_ids.begin(), body_ids.end(), body_id) != body_ids.end();
+      }
+
+      void Insert(size_t body_id) {
+        emp_assert(!HasID(body_id), body_id);
+        body_ids.push_back(body_id);
+      }
 
       void Remove(size_t body_id) {
+        emp_assert(HasID(body_id), body_id);
         auto it = std::find(body_ids.begin(), body_ids.end(), body_id);
-        emp_assert(it != body_ids.end());  // Make sure we found the id!
-        *it = std::move(body_ids.back());  // Move the last id into place.
-        body_ids.pop_back();
+        *it = body_ids.back();  // Copy the last ID into place.
+        body_ids.pop_back();    // Remove the last ID.
       }
     };
 
   protected:
     const Size2D surface_size;     ///< Lower-left corner of the surface.
     emp::vector<BODY_T> body_set;  ///< Set of all bodies on surface
+    EMP_DEBUG(int body_version = 1000); // Changes to body_set may invalidate body references.
+
     emp::vector<size_t> open_ids;  ///< Set of body_set ids ready for re-use.
 
-    // Data tracking the current bodies on this surface using SECTORS.
-    bool data_active = false;  ///< Are we trying to keep measurements up-to-date?
+    // Make sure that we know if sectors need to be updated.
     double max_radius = 0.0;   ///< Largest radius of any body.
 
-    static constexpr uint32_t MAX_SECTOR_ROWS = 32;
-    static constexpr uint32_t MAX_SECTOR_COLS = 32;
-    static constexpr uint32_t MAX_SECTORS = MAX_SECTOR_ROWS * MAX_SECTOR_COLS;
+    static constexpr GridSize MAX_GRID_SIZE{32, 32};
+    static constexpr uint32_t MAX_SECTORS = MAX_GRID_SIZE.NumCells();
 
     GridSize grid_size;                       ///< How are sectors organized?
     Size2D sector_size;                       ///< How big is each sector?
-    uint32_t num_sectors = 0;                 ///< Current number of sectors used.
     emp::array<Sector, MAX_SECTORS> sectors;  ///< Info about the actual sectors.
     bool wrap = false;                        ///< Should edges wrap around?
 
@@ -116,64 +124,73 @@ namespace emp {
 
     // === Helper Functions ===
 
-    // Run a function on each active body.
+    // Run a provided function on each active body.
     template <typename FUN_T>
     void ForEachBody(FUN_T && fun) {
+      DEBUG_STACK();
       for (auto & body : body_set) {
         if (body.IsActive()) fun(body);
       }
     }
 
-    // Make sure there are num_sectors sectors and remove all bodies from existing ones.
-    void InitSectors() {
-      num_sectors = grid_size.NumCells();
-      emp::array<size_t, 8> neighbor_ids;
+    // Determine how many sectors there should be and rebuild existing ones, as needed.
+    void ResetSectors() {
+      // Figure out the actual number of sectors to use.
+      const double max_diameter = max_radius * 2.0;
+      emp_assert(max_diameter < surface_size.Width() && max_diameter < surface_size.Height());
+      grid_size = (surface_size / max_diameter).ToGridSize();
+      grid_size.BoundUpper(MAX_GRID_SIZE);  // Limit how big the grid should be.
+      sector_size = surface_size / grid_size;
 
-      for (size_t i = 0; i < num_sectors; ++i) {
-        GridPos pos = grid_size.FromIndex(i); // Where is this sector on the grid?
-        neighbor_ids[GridDir::UP]         = grid_size.ToIndex(grid_size.PosUp(pos, wrap));
-        neighbor_ids[GridDir::UP_RIGHT]   = grid_size.ToIndex(grid_size.PosUR(pos, wrap));
-        neighbor_ids[GridDir::RIGHT]      = grid_size.ToIndex(grid_size.PosRight(pos, wrap));
-        neighbor_ids[GridDir::DOWN_RIGHT] = grid_size.ToIndex(grid_size.PosDR(pos, wrap));
-        neighbor_ids[GridDir::DOWN]       = grid_size.ToIndex(grid_size.PosDown(pos, wrap));
-        neighbor_ids[GridDir::DOWN_LEFT]  = grid_size.ToIndex(grid_size.PosDL(pos, wrap));
-        neighbor_ids[GridDir::LEFT]       = grid_size.ToIndex(grid_size.PosLeft(pos, wrap));
-        neighbor_ids[GridDir::UP_LEFT]    = grid_size.ToIndex(grid_size.PosUL(pos, wrap));
+      typename Sector::neighbors_t neighbor_ids;
+
+      for (size_t sector_id = 0; sector_id < grid_size.NumCells(); ++sector_id) {
+        const GridPos pos = grid_size.FromIndex(sector_id); // Where is this sector on the grid?
+        for (GridDir dir : Grid::DIR_SET) {
+          neighbor_ids[dir] = grid_size.ToIndex(grid_size.PosDir(pos, dir, wrap));
+        }
 
         Box2D area{sector_size*pos, sector_size};
-        sectors[i].Setup(i, neighbor_ids, area);
+        sectors[sector_id].Setup(sector_id, neighbor_ids, area);
       }
+
+      // Put active bodies into sectors
+      ForEachBody([this](BODY_T & body){ PlaceBody(body); });
     }
 
     /// Get (or make) an available ID for a new body.
-    size_t ReserveBodyID() {
+    BODY_T & ReserveBody(const emp::Circle & circle, emp::Color color) {
+      EMP_DEBUG(++body_version);
+      size_t body_id;
       if (open_ids.size()) {  // If we have an available ID, use it.
-        size_t id = open_ids.back();
+        body_id = open_ids.back();
         open_ids.pop_back();
-        return id;
-      }
-      else {
-        size_t id = body_set.size();
+      } else {
+        body_id = body_set.size();
         body_set.resize(body_set.size()+1);
-        return id;
       }
+
+      body_set[body_id] = BODY_T{circle, color};
+      EMP_DEBUG(body_set[body_id].SetVersion(body_version));
+      body_set[body_id].Activate(body_id);
+      return body_set[body_id];
     }
 
     // Keep track of the largest body size found.
     // Note: Uses watermarking, so largest body will never shrink, even if removed
     //       unless the user explicitly calls RefreshBodySize()
-    void TestBodySize(BODY_T & body) {
-      const double cur_radius = body.GetPerimeter().GetRadius();
-      if (cur_radius > max_radius) {
-        max_radius  = cur_radius;  // Record the new radius.
-        data_active = false;       // May need to rebuild sectors, so deactivate data.
+    void TestBodySize(const double radius) {
+      emp_assert(radius > 0.0);
+      if (radius > max_radius) {
+        max_radius  = radius;  // Record the new radius.
+        ResetSectors();
       }
     }
 
     // Clear out the watermarked body size and update the current largest.
     void RefreshBodySize() {
       max_radius = 0.0;
-      ForEachBody([this](BODY_T & body){ TestBodySize(body); });
+      ForEachBody([this](BODY_T & body){ TestBodySize(body.GetRadius()); });
     }
 
     // Determine the index of a sector a point is in.
@@ -184,34 +201,25 @@ namespace emp {
     }
 
     // Determine which sector a point is in.
-    Sector & FindSector(Point point) { return sectors[FindSectorID(point)]; }
+    Sector & FindSector(Point point) {
+      return sectors[FindSectorID(point)];
+    }
 
     // Determine which sector a body is in.
     Sector & FindSector(BODY_T & body) { return FindSector(body.GetCenter()); }
 
     // Place an active body into a sector.
     void PlaceBody(BODY_T & body) {
+      DEBUG_STACK();
       emp_assert(body.IsActive());  // Only place active bodies.
       FindSector(body).Insert(body.GetID());
     }
 
-    // Cleanup all of the data and mark the sector as active.
-    void Activate() {
-      if (data_active) { return; } // Already active!
-      data_active = true;
-
-      // Figure out the actual number of sectors to use.
-      const double max_diameter = max_radius * 2.0;
-      emp_assert(max_diameter < surface_size.Width() && max_diameter < surface_size.Height());
-      grid_size = (surface_size / max_diameter).ToGridSize();
-      grid_size.BoundUpper({32, 32});  // Max sectors is 1024.
-      sector_size = surface_size / grid_size;
-
-      InitSectors();  // Now that we know the sizes, we can initialize sectors.
-
-      // Put active bodies into sectors
-      ForEachBody([this](BODY_T & body){ PlaceBody(body); });
+    #ifndef NDEBUG
+    void UpdateBodyVersions() const {
+      for (const auto & body : body_set) { body.SetVersion(body_version); }
     }
+    #endif
 
   public:
     /// Create a surface providing maximum size.
@@ -220,34 +228,50 @@ namespace emp {
     ~Surface() { Clear(); }
 
     [[nodiscard]] const Size2D & GetSize() const { return surface_size; }
+    [[nodiscard]] const GridSize & GetGridSize() const { return grid_size; }
     [[nodiscard]] bool GetWrap() const { return wrap; }
     [[nodiscard]] size_t NumBodies() const { return body_set.size() - open_ids.size(); }
 
     [[nodiscard]] size_t NumOpen() const { return open_ids.size(); } // DEBUG!
 
     [[nodiscard]] BODY_T & GetBody(size_t id) {
+      DEBUG_STACK();
+      EMP_DEBUG(body_set[id].SetVersion(body_version));
       emp_assert(body_set[id].IsActive());
       return body_set[id];      
     }
 
     [[nodiscard]] const BODY_T & GetBody(size_t id) const {
+      DEBUG_STACK();
+      EMP_DEBUG(body_set[id].SetVersion(body_version));
       emp_assert(body_set[id].IsActive());
       return body_set[id];      
     }
 
-    [[nodiscard]] emp::vector<BODY_T> & GetBodySet() { return body_set; }
-    [[nodiscard]] const emp::vector<BODY_T> & GetBodySet() const { return body_set; }
+    [[nodiscard]] emp::vector<BODY_T> & GetBodySet() {
+      EMP_DEBUG(UpdateBodyVersions());
+      return body_set;
+    }
+    [[nodiscard]] const emp::vector<BODY_T> & GetBodySet() const {
+      EMP_DEBUG(UpdateBodyVersions());
+      return body_set;
+    }
 
     /// Get the first active body you can find.
     [[nodiscard]] BODY_T & GetActiveBody() {
+      DEBUG_STACK();
       size_t out_id = 0;
       while (out_id < body_set.size() && body_set[out_id].IsActive() == false) ++out_id;
       emp_assert(out_id < body_set.size());
+      EMP_DEBUG(body_set[out_id].SetVersion(body_version));
       return body_set[out_id];
     }
 
     /// Does an id represent an active body on a surface?
-    [[nodiscard]] bool IsActive(size_t id) const { return body_set[id].IsActive(); }
+    [[nodiscard]] bool IsActive(size_t id) const {
+      DEBUG_STACK();
+      return body_set[id].IsActive();
+    }
 
     [[nodiscard]] const Circle & GetPerimeter(size_t id) const {
       return GetBody(id).GetPerimeter();
@@ -264,13 +288,11 @@ namespace emp {
       emp_assert(Contains(pos));
 
       // If data is active, update sectors.
-      if (data_active) {
-        Sector & old_sector = FindSector(GetBody(id));
-        Sector & new_sector = FindSector(pos);
-        if (old_sector.GetID() != new_sector.GetID()) {
-          old_sector.Remove(id);
-          new_sector.Insert(id);
-        }
+      Sector & old_sector = FindSector(GetBody(id));
+      Sector & new_sector = FindSector(pos);
+      if (old_sector.GetID() != new_sector.GetID()) {
+        old_sector.Remove(id);
+        new_sector.Insert(id);
       }
 
       GetBody(id).MoveTo(pos);
@@ -290,52 +312,55 @@ namespace emp {
       }
     }
 
-    void SetRadius(size_t id, double _in) {
+    void SetRadius(size_t id, double radius) {
+      DEBUG_STACK();
       emp_assert(body_set[id].IsActive());
       BODY_T & body = body_set[id];
-      body.SetRadius(_in);
-      TestBodySize(body);
+      body.SetRadius(radius);
+      TestBodySize(radius);
     }
 
-    void SetColor(size_t id, Color in) { body_set[id].SetColor(in); }
+    void SetColor(size_t id, Color in) {
+      DEBUG_STACK();
+      emp_assert(body_set[id].IsActive());
+      body_set[id].SetColor(in);
+    }
 
     void RemoveBody(size_t id) {
+      DEBUG_STACK();
       BODY_T & body = body_set[id];
       emp_assert(body.IsActive());    // Ensure that this body is available to be removed.
       emp_assert(Contains(body.GetCenter()));
-      if (data_active) {              // If we are tracking data right now...
-        FindSector(body).Remove(id);  // ...remove this body from its sector.
-      }
+      FindSector(body).Remove(id);  // ...remove this body from its sector.
       body.Deactivate();              // Deactivate this body (so we know not to use it)
       open_ids.push_back(id);         // Mark this position as open for a new body.
     }
 
     /// Add a single body to surface; return its unique ID.
-    auto & AddBody(Circle circle, emp::Color color) {
+    size_t AddBody(Circle circle, emp::Color color) {
+      DEBUG_STACK();
       emp_assert(Contains(circle.GetCenter()), surface_size, circle.GetCenter());
+      TestBodySize(circle.GetRadius()); // Update sector sizes, if needed.
 
-      const size_t id = ReserveBodyID();
-      auto & body = body_set[id];
-      body = BODY_T{circle, color};
-      body.Activate(id);
+      auto & body = ReserveBody(circle, color);
 
-      TestBodySize(body);                    // Track largest body seen.
-      if (data_active) { PlaceBody(body); }  // Add new body to a sector, if tracking.
-      return body;
+      PlaceBody(body);  // Add new body to a sector, if tracking.
+      return body.GetID();
     }
 
     /// Remove all bodies from the surface.
     Surface & Clear() {
-      data_active = false;
+      DEBUG_STACK();
+      EMP_DEBUG(++body_version);
       body_set.resize(0);
       open_ids.resize(0);
       max_radius  = 0.0;
-      num_sectors = 0;
       return *this;
     }
 
     /// Determine if two bodies overlap.
     static bool TestOverlap(const BODY_T & body1, const BODY_T & body2) {
+      DEBUG_STACK();
       emp_assert(body1.IsActive() && body2.IsActive());
       const Point xy_dist       = body1.GetCenter() - body2.GetCenter();
       const double sqr_dist     = xy_dist.SquareMagnitude();
@@ -345,15 +370,16 @@ namespace emp {
     }
 
     bool TestOverlap(size_t id1, size_t id2) {
+      DEBUG_STACK();
       return TestOverlap(body_set[id1], body_set[id2]);
     }
 
     /// Update the list of overlaps in an internal sector.
-    /// If add_on is false, it will reset the list of overlaps already found.
+    // NOTE: Will always add on to out_ids, so manually clear it first if needed.
     const emp::vector<size_t> & FindOverlaps(const BODY_T & body, const Sector & sector,
-                                             size_t start_pos = 0, bool add_on = false) {
+                                             size_t start_pos = 0) {
+      DEBUG_STACK();
       emp_assert(body.IsActive());
-      if (!add_on) out_ids.clear();
       const auto & body_ids = sector.GetBodyIDs();
       for (size_t pos = start_pos; pos < body_ids.size(); ++pos) {
         size_t test_id = body_ids[pos];
@@ -367,20 +393,22 @@ namespace emp {
     /// Find pairs of bodies that overlap, and run passed-in function on those IDs.
     template <typename OVERLAP_FUN_T>
     void TriggerOverlaps(OVERLAP_FUN_T && overlap_fun) {
-      Activate();  // Set up data structures, if needed.
+      DEBUG_STACK();
 
       // Loop through all of the sectors to identify collisions.
+      const size_t num_sectors = grid_size.NumCells();
       for (size_t sector_id = 0; sector_id < num_sectors; ++sector_id) {
         const Sector & sector = sectors[sector_id];
-        const auto & body_ids = sector.GetBodyIDs();
+        const emp::vector<size_t> & body_ids = sector.GetBodyIDs();
 
         // Loop through all bodies in this sector.
         // Note, we only test four of the eight directions since the other four will be tested
         // by neighbors.
         for (size_t pos=0; pos < body_ids.size(); ++pos) {
           const BODY_T & body = body_set[body_ids[pos]];
+
           out_ids.clear();  // Clear the set of IDs that could overlap with this body.
-          FindOverlaps(body, sector, pos+1, true);
+          FindOverlaps(body, sector, pos+1);
           if (sector.HasLeft()) FindOverlaps(body, sectors[sector.GetLeft()]);
           if (sector.HasUL()) FindOverlaps(body, sectors[sector.GetUL()]);
           if (sector.HasUp()) FindOverlaps(body, sectors[sector.GetUp()]);
@@ -396,6 +424,7 @@ namespace emp {
     }
 
     void WrapBodies() {
+      DEBUG_STACK();
       ForEachBody([this](BODY_T & body){
         if (body.X() < 0.0) body.X() += surface_size.X();
         else if (body.X() >= surface_size.X()) body.X() -= surface_size.X();
@@ -406,6 +435,7 @@ namespace emp {
 
     template <typename LOW_X_T, typename HIGH_X_T, typename LOW_Y_T, typename HIGH_Y_T>
     void TriggerOffsides(LOW_X_T low_x_fun, HIGH_X_T high_x_fun, LOW_Y_T low_y_fun, HIGH_Y_T high_y_fun) {
+      DEBUG_STACK();
       emp_assert(wrap == false);
       // Check for high or low x.
       for (size_t row_id = 0; row_id < grid_size.NumRows(); ++row_id) {
@@ -435,12 +465,13 @@ namespace emp {
 
     /// Determine if there are any overlaps with a single provided body (that may or may not be on surface).
     const emp::vector<size_t> & FindOverlaps(BODY_T & body) {
-      Activate();  // Make sure data structures are setup.
+      DEBUG_STACK();
 
       Sector & sector = FindSector(body);
       out_ids.clear();  // Prepare the return variable.
 
       // Compare against bodies in its own sector.
+      out_ids.clear();  // Clear the set of IDs that could overlap with this body.
       FindOverlaps(body, sector);
 
       // Compare against bodies in other sectors....
@@ -457,12 +488,14 @@ namespace emp {
     }
 
     const emp::vector<size_t> & FindOverlaps(size_t body_id) {
+      DEBUG_STACK();
       emp_assert(body_set[body_id].IsActive());
       return FindOverlaps(body_set[body_id]);
     }
 
     // Find overlaps using a distance from a point.
     void FindOverlaps(Circle circle) {
+      DEBUG_STACK();
       BODY_T tmp_body(NO_ID, circle);
       FindOverlaps(tmp_body);
     }
