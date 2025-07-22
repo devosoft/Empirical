@@ -129,8 +129,9 @@ struct DebugStackEntry {
 static std::string DebugStackToString() {
   const auto & stack = GetDebugStack();
   std::string out{"\n"};
-  for (const auto & entry : stack) {
-    out += entry.FilePos() + "(" + entry.extras + ")\n";
+  for (size_t i = stack.size()-1; i < stack.size(); --i) {
+    out += std::to_string(stack.size()-i) + ": " + stack[i].FilePos()
+        + "(" + std::to_string(stack.size()-i) + ": " + stack[i].extras + ")\n";
   }
   return out;
 }
