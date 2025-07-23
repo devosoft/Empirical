@@ -33,7 +33,7 @@ namespace emp {
     using surface_t::body_set;
     using surface_t::surface_size;
 
-    const double pressure_limit = 3.0;  // Pressure limit for bodies.
+    const double pressure_limit = 6.0;  // Pressure limit for bodies.
     double time = 0;                    // Current time point
     bool detach_on_birth = true;        // Do bodies detach from parents at birth?
 
@@ -61,6 +61,7 @@ namespace emp {
     [[nodiscard]] double GetTargetRadius(size_t id) const { return body_set[id].target_radius; }
 
     size_t AddBody(Circle in_body, Color color = Palette::RED) {
+      DEBUG_STACK();
       size_t id = surface_t::AddBody(in_body, color);
       surface_t::GetBody(id).SetStartTime(time);
       return id;
@@ -68,12 +69,14 @@ namespace emp {
 
     /// Add a body with a specified link to an existing body.
     size_t AddBody(Circle in_body, Color color, size_t link_id) {
+      DEBUG_STACK();
       size_t id = AddBody(in_body, color);
       AddLink(link_id, id);
       return id;
     }
 
     void RemoveBody(body_type & body) {
+      DEBUG_STACK();
       emp_assert(body.IsActive());                   // Can only remove active bodies.
       for (size_t link_id : body.GetLinkIDs()) {     // Step through all attached bodies...
         body_set[link_id].RemoveLink(body.GetID());  // ...and remove link to this one.
@@ -82,11 +85,13 @@ namespace emp {
     }
 
     void RemoveBody(size_t id) {
+      DEBUG_STACK();
       RemoveBody(body_set[id]);
     }
 
     // Search through all active bodies to find the oldest.
     [[nodiscard]] size_t FindOldest() const {
+      DEBUG_STACK();
       // Find index of lowest start time.
       return emp::FindIndex(body_set, [](const BODY_T & a, const BODY_T & b) {
         return a.GetStartTime() < b.GetStartTime();
@@ -94,21 +99,25 @@ namespace emp {
     }
 
     void RemoveOldest() {
+      DEBUG_STACK();
       if (surface_t::NumBodies() > 0) { RemoveBody(FindOldest()); }
     }
 
     // Test if org with id1 is linked to org with id2.
     bool TestLinked(size_t id1, size_t id2) {
+      DEBUG_STACK();
       return body_set[id1].HasLink(id2);
     }
 
     void AddLink(size_t id1, size_t id2) {
+      DEBUG_STACK();
       emp_assert(!TestLinked(id1, id2), "Should not link same bodies twice.", id1, id2);
       body_set[id1].AddLink(id2);
       body_set[id2].AddLink(id1);
     }
 
     void RemoveLink(size_t id1, size_t id2) {
+      DEBUG_STACK();
       emp_assert(TestLinked(id1, id2), "Must make sure link exists before removing it.", id1, id2);
       emp_assert(TestLinked(id2, id1), "Link to be removed is not bi-directional!", id1, id2);
       body_set[id1].RemoveLink(id2);
@@ -116,13 +125,15 @@ namespace emp {
     }
 
     bool ProcessPairCollision(BODY_T & body1, BODY_T & body2) {
+      DEBUG_STACK();
       emp_assert(body1.IsActive() && body2.IsActive());
 
       // If bodies are not overlapping OR are linked, they do not collide.
-      if (!surface_t::TestOverlap(body1, body2) || body1.HasLink(body2.GetID())) { return false; }
+      // if (!surface_t::TestOverlap(body1, body2) || body1.HasLink(body2.GetID())) { return false; }
+      if (!surface_t::TestOverlap(body1, body2)) { return false; }
 
       // Don't allow bodies to be perfectly on top of each other (will ALMOST never happen)
-      if (body1.GetCenter() == body2.GetCenter()) { body1.MoveBy({0.0, 0.01}); }
+      if (body1.GetCenter() == body2.GetCenter()) { body1.ProcessShift({-0.01, 0.00}); }
 
       // @CAO Some of these recalculate from TestOverlap() above...
       const double collide_dist = body1.GetRadius() + body2.GetRadius();
@@ -157,7 +168,30 @@ namespace emp {
       return true;
     }
 
+    bool ProcessPairLink(BODY_T & body1, BODY_T & body2) {
+      DEBUG_STACK();
+      emp_assert(body1.IsActive() && body2.IsActive() && TestLinked(body1.GetID(), body2.GetID()));
+
+      const double target_dist = body1.GetRadius() + body2.GetRadius();
+      const Point cur_offset   = body1.GetCenter() - body2.GetCenter();
+      const double cur_dist    = cur_offset.Magnitude();
+      const double shift_fract = (target_dist / cur_dist - 1.0) / 2.0;
+      const Point shift_offset = cur_offset * shift_fract;
+
+      // Re-adjust position to remove overlap.
+      body1.ProcessShift(shift_offset);
+      body2.ProcessShift(-shift_offset);
+
+      // Align velocities.
+      Point & v1 = body1.GetVelocity();
+      Point & v2 = body2.GetVelocity();
+      v1 = v2 = (v1 + v2) / 2.0;
+
+      return true;
+    }
+
     void Update_Bodies() {
+      DEBUG_STACK();
       ForEachBody([this, max_size_change=0.25, friction=0.0125](BODY_T & body){
         (void) this;
         emp_assert(Contains(body.GetCenter()));  // Bodies must be at valid positions.
@@ -168,12 +202,25 @@ namespace emp {
     }
 
     void Update_BodyCollisions() {
+      DEBUG_STACK();
       surface_t::TriggerOverlaps([this](size_t b1, size_t b2) {
         return this->ProcessPairCollision(body_set[b1], body_set[b2]);
       });
     }
 
+    void Update_LinkAttachments() {
+      // Linked cells should always stay attached.
+      ForEachBody([this](BODY_T & body) {
+        for (size_t link_id : body.GetLinkIDs()) {
+          if (link_id < body.GetID()) continue; // Process links only in one direction.
+          BODY_T & body2 = body_set[link_id];
+          ProcessPairLink(body, body2);
+        }
+      });
+    }
+
     void Update_EdgeCollisions() {
+      DEBUG_STACK();
       if (surface_t::wrap) { surface_t::WrapBodies(); }
       else { // Otherwise reflect bodies, as needed.
         ForEachBody([this](BODY_T & body){
@@ -192,7 +239,7 @@ namespace emp {
           }
           else if (shift_pos.X() + radius >= surface_size.Width()) {
             const double overshoot = shift_pos.X() + radius - surface_size.Width();
-            reflect_adjust.SetX(-2 * overshoot - 0.000001);
+            reflect_adjust.SetX(-2 * overshoot);
             if (body.GetVelocity().X() > 0.0) body.NegateVelocityX();
           }
           if (shift_pos.Y() < radius) {
@@ -202,7 +249,7 @@ namespace emp {
           }
           else if (shift_pos.Y() + radius >= surface_size.Height()) {
             const double overshoot = shift_pos.Y() + radius - surface_size.Height();
-            reflect_adjust.SetY(-2 * overshoot - 0.000001);
+            reflect_adjust.SetY(-2 * overshoot);
             if (body.GetVelocity().Y() > 0.0) body.NegateVelocityY();
           }
           if (!reflect_adjust.AtOrigin()) { body.ProcessShift(reflect_adjust); }
@@ -213,6 +260,7 @@ namespace emp {
     }
 
     void Update_FinalizePositions() {
+      DEBUG_STACK();
       ForEachBody([this](BODY_T & body){
         // If pressure is too high, burst this cell!
         if (body.CalcPressure() > pressure_limit) { RemoveBody(body); }
@@ -223,10 +271,12 @@ namespace emp {
     }
 
     void Update() {
+      DEBUG_STACK();
       Update_Bodies();
       Update_BodyCollisions();
       Update_EdgeCollisions();
       Update_FinalizePositions();
+      Update_LinkAttachments();
     }
   };
 
