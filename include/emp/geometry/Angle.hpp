@@ -144,6 +144,8 @@ namespace emp {
     static constexpr double Byte2ToRadians(uint16_t byte2) { return byte2 * BYTE2_TO_RADIANS; }
 
     static constexpr uint16_t DegreesToByte2(double degrees) {
+      // Remove loops by modding into range: 0 <= degrees < 360
+      degrees -= std::floor(degrees / MAX_DEGREES) * MAX_DEGREES;
       return static_cast<uint16_t>(degrees * DEGREES_TO_BYTE2);
     }
     static constexpr double DegreesToPortion(double degrees) {
@@ -154,12 +156,16 @@ namespace emp {
     }
 
     static constexpr uint16_t PortionToByte2(double portion) {
+      // Remove loops by modding into range: 0 <= portion < 1.0
+      portion -= std::floor(portion);
       return static_cast<uint16_t>(portion * ANGLE_CAP);
     }
     static constexpr double PortionToDegree(double portion) { return portion * MAX_DEGREES; }
     static constexpr double PortionToRadians(double portion) { return portion * MAX_RADIANS; }
 
     static constexpr uint16_t RadiansToByte2(double rads) {
+      // Remove loops by modding into range: 0 <= portion < 2 PI
+      rads -= std::floor(rads / MAX_RADIANS) * MAX_RADIANS;
       return static_cast<uint16_t>(rads * RADIANS_TO_BYTE2);
     }
     static constexpr double RadiansToDegree(double rads) { return rads * RADIANS_TO_DEGREE; }
@@ -206,7 +212,7 @@ namespace emp {
     }
 
     constexpr Angle & RotateDegrees(double degrees) {
-      angle += RadiansToByte2(degrees);
+      angle += DegreesToByte2(degrees);
       return *this;
     }
 
