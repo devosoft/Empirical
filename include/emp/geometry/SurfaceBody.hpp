@@ -49,22 +49,26 @@ namespace emp {
     mutable int version = -1;
     mutable emp::Ptr<const int> surface_version_ptr = nullptr;
     void SetVersion(const int & in_version) const {
+      DEBUG_STACK();
       version = in_version;
       surface_version_ptr = &in_version;
     }
     #endif
 
     [[nodiscard]] bool IsActive() const {
-      emp_assert(surface_version_ptr && version == *surface_version_ptr,
-                 version, *surface_version_ptr, DebugStackToString());
+      DEBUG_STACK();
+      emp_assert(id == NO_ID || (surface_version_ptr && version == *surface_version_ptr),
+                 id, version, *surface_version_ptr, DebugStackToString());
       return id != NO_ID;
     }
 
     [[nodiscard]] size_t GetID() const {
+      DEBUG_STACK();
       emp_assert(IsActive());
       return id;
     }
     void Activate(size_t in_id) {
+      DEBUG_STACK();
       emp_assert(id == NO_ID);
       emp_assert(in_id != NO_ID);
       emp_assert(surface_version_ptr && version == *surface_version_ptr);
@@ -73,57 +77,70 @@ namespace emp {
     void Deactivate() { id = NO_ID; }
 
     [[nodiscard]] double X() const {
+      DEBUG_STACK();
       emp_assert(IsActive());
       return perimeter.GetX();
     }
     [[nodiscard]] double Y() const {
+      DEBUG_STACK();
       emp_assert(IsActive());
       return perimeter.GetY();
     }
     [[nodiscard]] double & X() {
+      DEBUG_STACK();
       emp_assert(IsActive());
       return perimeter.GetX();
     }
     [[nodiscard]] double & Y() {
+      DEBUG_STACK();
       emp_assert(IsActive());
       return perimeter.GetY();
     }
 
     [[nodiscard]] const Circle & GetPerimeter() const {
+      DEBUG_STACK();
       emp_assert(IsActive());
       return perimeter;
     }
     [[nodiscard]] const Point & GetCenter() const {
+      DEBUG_STACK();
       emp_assert(IsActive());
       return perimeter.GetCenter();
     }
     [[nodiscard]] double GetRadius() const {
+      DEBUG_STACK();
       emp_assert(IsActive());
       return perimeter.GetRadius();
     }
     [[nodiscard]] const Color & GetColor() const {
+      DEBUG_STACK();
       emp_assert(IsActive());
       return color;
     }
 
     [[nodiscard]] Point & GetCenter() {
+      DEBUG_STACK();
       emp_assert(IsActive());
       return perimeter.GetCenter();
     }
 
     void MoveTo(const Point & s) {
+      DEBUG_STACK();
       emp_assert(IsActive());
       perimeter.SetCenter(s);
     }
     void MoveBy(const Point & s) {
+      DEBUG_STACK();
       emp_assert(IsActive());
       perimeter += s;
     }
     void SetRadius(double r) {
+      DEBUG_STACK();
       emp_assert(IsActive());
       perimeter.SetRadius(r);
     }
     void SetColor(Color in) {
+      DEBUG_STACK();
       emp_assert(IsActive());
       color = in;
     }
