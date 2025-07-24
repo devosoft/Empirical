@@ -86,7 +86,9 @@ namespace emp {
     }
 
     // Other orientation and position controls...
-    void RotateDegrees(double degrees) { orientation.RotateDegrees(degrees); }
+    void RotateDegrees(double degrees) { 
+      orientation.RotateDegrees(degrees);
+    }
 
     // Other velocity controls...
     void NegateVelocityX() { velocity.SetX(-velocity.X()); }
@@ -99,7 +101,9 @@ namespace emp {
     [[nodiscard]] bool HasLink(size_t id) const { return std::ranges::find(link_ids, id) != link_ids.end(); }
     [[nodiscard]] size_t GetLinkCount() const { return link_ids.size(); }
     void AddLink(size_t id) {
+      DEBUG_STACK();
       emp_assert(!HasLink(id), "Do not add a link to a body multiple times.", id);
+      emp_assert(id != GetID(), "Cannot link a body to itself.");
       link_ids.push_back(id);
     }
     void RemoveLink(size_t id) {
@@ -116,18 +120,10 @@ namespace emp {
     }
 
     void ProcessVelocity(double friction) {
-      if (velocity.AtOrigin()) return; // No velocity; nothing to update.
+      if (velocity.AtOrigin()) return; // No velocity; nothing to update. //@CAO remove branch?
       ProcessShift(velocity);
       const double speed = velocity.Magnitude();
-
-      // If body is close to stopping stop it!
-      if (friction > speed) { SetVelocity({0.0, 0.0}); }
-
-      // Otherwise slow it down proportionately in the x and y directions.
-      else {
-        const double friction_slowdown = 1.0 - friction / speed;
-        SetVelocity(GetVelocity() * friction_slowdown);
-      }
+      velocity *= (speed > friction) ? (1.0 - friction/speed) : 0.0;
     }
 
   }; // End of Physics2D::PhysicsBody class
