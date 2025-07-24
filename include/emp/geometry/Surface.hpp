@@ -79,6 +79,7 @@ namespace emp {
       [[nodiscard]] size_t GetDR() const { return neighbor_ids[GridDir::DOWN_RIGHT]; }
 
       void Setup(size_t in_sector_id, const neighbors_t & in_neighbor_ids, Box2D in_area) {
+        DEBUG_STACK();
         body_ids.resize(0);  // Clear out any bodies previously in sector.
         sector_id = in_sector_id;
         neighbor_ids = in_neighbor_ids;
@@ -86,15 +87,18 @@ namespace emp {
       }
 
       [[nodiscard]] bool HasID(size_t body_id) const {
+        DEBUG_STACK();
         return std::find(body_ids.begin(), body_ids.end(), body_id) != body_ids.end();
       }
 
       void Insert(size_t body_id) {
+        DEBUG_STACK();
         emp_assert(!HasID(body_id), body_id);
         body_ids.push_back(body_id);
       }
 
       void Remove(size_t body_id) {
+        DEBUG_STACK();
         emp_assert(HasID(body_id), body_id);
         auto it = std::find(body_ids.begin(), body_ids.end(), body_id);
         *it = body_ids.back();  // Copy the last ID into place.
@@ -103,11 +107,11 @@ namespace emp {
     };
 
   protected:
-    const Size2D surface_size;     ///< Lower-left corner of the surface.
-    emp::vector<BODY_T> body_set;  ///< Set of all bodies on surface
+    const Size2D surface_size;          ///< Lower-left corner of the surface.
+    emp::vector<BODY_T> body_set;       ///< Set of all bodies on surface
     EMP_DEBUG(int body_version = 1000); // Changes to body_set may invalidate body references.
 
-    emp::vector<size_t> open_ids;  ///< Set of body_set ids ready for re-use.
+    emp::vector<size_t> open_ids;  ///< Set of body_set IDs ready for re-use.
 
     // Make sure that we know if sectors need to be updated.
     double max_radius = 0.0;   ///< Largest radius of any body.
@@ -124,17 +128,9 @@ namespace emp {
 
     // === Helper Functions ===
 
-    // Run a provided function on each active body.
-    template <typename FUN_T>
-    void ForEachBody(FUN_T && fun) {
-      DEBUG_STACK();
-      for (auto & body : body_set) {
-        if (body.IsActive()) fun(body);
-      }
-    }
-
     // Determine how many sectors there should be and rebuild existing ones, as needed.
     void ResetSectors() {
+      DEBUG_STACK();
       // Figure out the actual number of sectors to use.
       const double max_diameter = max_radius * 2.0;
       emp_assert(max_diameter < surface_size.Width() && max_diameter < surface_size.Height());
@@ -160,6 +156,7 @@ namespace emp {
 
     /// Get (or make) an available ID for a new body.
     BODY_T & ReserveBody(const emp::Circle & circle, emp::Color color) {
+      DEBUG_STACK();
       EMP_DEBUG(++body_version);
       size_t body_id;
       if (open_ids.size()) {  // If we have an available ID, use it.
@@ -170,9 +167,9 @@ namespace emp {
         body_set.resize(body_set.size()+1);
       }
 
-      body_set[body_id] = BODY_T{circle, color};
-      EMP_DEBUG(body_set[body_id].SetVersion(body_version));
-      body_set[body_id].Activate(body_id);
+      body_set[body_id] = BODY_T{circle, color};             // Build the new body
+      EMP_DEBUG(body_set[body_id].SetVersion(body_version)); // Algin its version with surface
+      body_set[body_id].Activate(body_id);                   // Assign its ID.
       return body_set[body_id];
     }
 
@@ -180,6 +177,7 @@ namespace emp {
     // Note: Uses watermarking, so largest body will never shrink, even if removed
     //       unless the user explicitly calls RefreshBodySize()
     void TestBodySize(const double radius) {
+      DEBUG_STACK();
       emp_assert(radius > 0.0);
       if (radius > max_radius) {
         max_radius  = radius;  // Record the new radius.
@@ -189,12 +187,14 @@ namespace emp {
 
     // Clear out the watermarked body size and update the current largest.
     void RefreshBodySize() {
+      DEBUG_STACK();
       max_radius = 0.0;
       ForEachBody([this](BODY_T & body){ TestBodySize(body.GetRadius()); });
     }
 
     // Determine the index of a sector a point is in.
     size_t FindSectorID(Point point) {
+      DEBUG_STACK();
       emp_assert(Contains(point), point);
       GridPos sector_pos = (point / sector_size).ToGridPos();
       return grid_size.ToIndex(sector_pos);
@@ -202,6 +202,7 @@ namespace emp {
 
     // Determine which sector a point is in.
     Sector & FindSector(Point point) {
+      DEBUG_STACK();
       return sectors[FindSectorID(point)];
     }
 
@@ -217,6 +218,7 @@ namespace emp {
 
     #ifndef NDEBUG
     void UpdateBodyVersions() const {
+      DEBUG_STACK();
       for (const auto & body : body_set) { body.SetVersion(body_version); }
     }
     #endif
@@ -237,14 +239,12 @@ namespace emp {
     [[nodiscard]] BODY_T & GetBody(size_t id) {
       DEBUG_STACK();
       EMP_DEBUG(body_set[id].SetVersion(body_version));
-      emp_assert(body_set[id].IsActive());
       return body_set[id];      
     }
 
     [[nodiscard]] const BODY_T & GetBody(size_t id) const {
       DEBUG_STACK();
       EMP_DEBUG(body_set[id].SetVersion(body_version));
-      emp_assert(body_set[id].IsActive());
       return body_set[id];      
     }
 
@@ -260,9 +260,10 @@ namespace emp {
     /// Get the first active body you can find.
     [[nodiscard]] BODY_T & GetActiveBody() {
       DEBUG_STACK();
+      emp_assert(NumBodies() > 0);  // Function requires at least one active body to exist.
       size_t out_id = 0;
-      while (out_id < body_set.size() && body_set[out_id].IsActive() == false) ++out_id;
-      emp_assert(out_id < body_set.size());
+      EMP_DEBUG(UpdateBodyVersions());
+      while (out_id < body_set.size() && !body_set[out_id].IsActive()) ++out_id;
       EMP_DEBUG(body_set[out_id].SetVersion(body_version));
       return body_set[out_id];
     }
@@ -270,20 +271,37 @@ namespace emp {
     /// Does an id represent an active body on a surface?
     [[nodiscard]] bool IsActive(size_t id) const {
       DEBUG_STACK();
-      return body_set[id].IsActive();
+      return GetBody(id).IsActive();
     }
 
     [[nodiscard]] const Circle & GetPerimeter(size_t id) const {
+      DEBUG_STACK();
       return GetBody(id).GetPerimeter();
     }
 
-    [[nodiscard]] const Color & GetColor(size_t id) const { return GetBody(id).GetColor(); }
+    [[nodiscard]] const Color & GetColor(size_t id) const {
+      DEBUG_STACK();
+      return GetBody(id).GetColor();
+    }
+
+    /// Run a provided function on each active body.
+    template <typename FUN_T>
+    void ForEachBody(FUN_T && fun) {
+      DEBUG_STACK();
+      // Use an index-based for loop in case body_set memory changes during loop.
+      for (size_t body_id = 0; body_id < body_set.size(); ++body_id) {
+        auto & body = GetBody(body_id);
+        if (body.IsActive()) fun(body);
+      }
+    }
 
     [[nodiscard]] bool Contains(const Point2D & point) const {
+      DEBUG_STACK();
       return surface_size.Contains(point);
     }
 
     void MoveTo(size_t id, Point pos) {
+      DEBUG_STACK();
       if (wrap) pos = pos.Wrap(surface_size);
       emp_assert(Contains(pos));
 
@@ -299,10 +317,12 @@ namespace emp {
     }
 
     void MoveBy(size_t id, Point translation) {
-      MoveTo(id, body_set[id].GetCenter() + translation);
+      DEBUG_STACK();
+      MoveTo(id, GetBody(id).GetCenter() + translation);
     }
 
     void FinalizePosition(BODY_T & body) {
+      DEBUG_STACK();
       size_t start_sector = FindSectorID(body.GetCenter());
       body.FinalizePosition();
       size_t end_sector = FindSectorID(body.GetCenter());
@@ -314,21 +334,20 @@ namespace emp {
 
     void SetRadius(size_t id, double radius) {
       DEBUG_STACK();
-      emp_assert(body_set[id].IsActive());
-      BODY_T & body = body_set[id];
-      body.SetRadius(radius);
+      emp_assert(GetBody(id).IsActive());
+      GetBody(id).SetRadius(radius);
       TestBodySize(radius);
     }
 
     void SetColor(size_t id, Color in) {
       DEBUG_STACK();
-      emp_assert(body_set[id].IsActive());
-      body_set[id].SetColor(in);
+      emp_assert(GetBody(id).IsActive());
+      GetBody(id).SetColor(in);
     }
 
     void RemoveBody(size_t id) {
       DEBUG_STACK();
-      BODY_T & body = body_set[id];
+      BODY_T & body = GetBody(id);
       emp_assert(body.IsActive());    // Ensure that this body is available to be removed.
       emp_assert(Contains(body.GetCenter()));
       FindSector(body).Remove(id);  // ...remove this body from its sector.
@@ -344,7 +363,8 @@ namespace emp {
 
       auto & body = ReserveBody(circle, color);
 
-      PlaceBody(body);  // Add new body to a sector, if tracking.
+      PlaceBody(body);              // Add new body to a sector.
+      emp_assert(body.IsActive());  // If everything went well, body is now active.
       return body.GetID();
     }
 
@@ -371,7 +391,7 @@ namespace emp {
 
     bool TestOverlap(size_t id1, size_t id2) {
       DEBUG_STACK();
-      return TestOverlap(body_set[id1], body_set[id2]);
+      return TestOverlap(GetBody(id1), GetBody(id2));
     }
 
     /// Update the list of overlaps in an internal sector.
@@ -383,9 +403,9 @@ namespace emp {
       const auto & body_ids = sector.GetBodyIDs();
       for (size_t pos = start_pos; pos < body_ids.size(); ++pos) {
         size_t test_id = body_ids[pos];
-        emp_assert(body_set[test_id].IsActive());
+        emp_assert(GetBody(test_id).IsActive());
         if (body.GetID() == test_id) { continue; }  // Don't match with self!
-        if (TestOverlap(body, body_set[test_id])) { out_ids.push_back(test_id); }
+        if (TestOverlap(body, GetBody(test_id))) { out_ids.push_back(test_id); }
       }
       return out_ids;
     }
@@ -405,7 +425,7 @@ namespace emp {
         // Note, we only test four of the eight directions since the other four will be tested
         // by neighbors.
         for (size_t pos=0; pos < body_ids.size(); ++pos) {
-          const BODY_T & body = body_set[body_ids[pos]];
+          const BODY_T & body = GetBody(body_ids[pos]);
 
           out_ids.clear();  // Clear the set of IDs that could overlap with this body.
           FindOverlaps(body, sector, pos+1);
@@ -441,24 +461,24 @@ namespace emp {
       for (size_t row_id = 0; row_id < grid_size.NumRows(); ++row_id) {
         const auto & left_sector = sectors[row_id * grid_size.NumCols()];
         for (size_t id : left_sector.GetBodyIDs()) {
-          if (body_set[id].X() < 0.0) low_x_fun(id);
+          if (GetBody(id).X() < 0.0) low_x_fun(id);
         }
 
         const auto & right_sector = sectors[(row_id+1) * grid_size.NumCols() - 1];
         for (size_t id : right_sector.GetBodyIDs()) {
-          if (body_set[id].X() > surface_size.Width()) high_x_fun(id);
+          if (GetBody(id).X() > surface_size.Width()) high_x_fun(id);
         }
       }
 
       for (size_t col_id = 0; col_id < grid_size.NumCols(); ++col_id) {
         const auto & top_sector = sectors[col_id];
         for (size_t id : top_sector.GetBodyIDs()) {
-          if (body_set[id].Y() < 0.0) low_y_fun(id);
+          if (GetBody(id).Y() < 0.0) low_y_fun(id);
         }
 
         const auto & bottom_sector = sectors[(grid_size.NumRows()-1) * grid_size.NumCols() + col_id];
         for (size_t id : bottom_sector.GetBodyIDs()) {
-          if (body_set[id].Y() > surface_size.Height()) high_y_fun(id);
+          if (GetBody(id).Y() > surface_size.Height()) high_y_fun(id);
         }
       }
     }
@@ -489,8 +509,8 @@ namespace emp {
 
     const emp::vector<size_t> & FindOverlaps(size_t body_id) {
       DEBUG_STACK();
-      emp_assert(body_set[body_id].IsActive());
-      return FindOverlaps(body_set[body_id]);
+      emp_assert(GetBody(body_id).IsActive());
+      return FindOverlaps(GetBody(body_id));
     }
 
     // Find overlaps using a distance from a point.
