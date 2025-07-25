@@ -167,6 +167,12 @@ namespace emp::web {
       return *this;
     }
 
+    /// Set a specific ID as active AND run the function associated with it.
+    Selector & TriggerID(size_t id) {
+      Info()->DoChange(id);
+      return *this;
+    }
+
     /// Add a new option to the selector and the function to be called if it is chosen.
     Selector & SetOption(const std::string & in_option, const std::function<void()> & in_cb) {
       Info()->SetOption(in_option, in_cb);
