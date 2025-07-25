@@ -125,7 +125,7 @@ jobs:
   # === Check that our unit tests cover as much code as possible ===
   test-coverage:
     name: Measure Test Coverage
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Set up clang
         uses: egor-tensin/setup-clang@v1
