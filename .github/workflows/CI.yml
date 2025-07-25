@@ -134,6 +134,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: 'recursive'
+      - run: clang++ --version
       - run: sudo apt-get update -qq
       - run: sudo apt-get install cmake build-essential python3-virtualenv python3-pip nodejs tar gzip clang llvm-dev libclang-dev
       - run: git fetch origin master:refs/remotes/origin/master
