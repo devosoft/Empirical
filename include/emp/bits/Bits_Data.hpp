@@ -1,6 +1,6 @@
 /**
  * This file is part of Empirical, https://github.com/devosoft/Empirical
- * Copyright (C) 2022-2023 Michigan State University
+ * Copyright (C) 2022-2025 Michigan State University
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/bits/Bits_Data.hpp
@@ -60,14 +60,14 @@ namespace emp {
       // Number of bits locked in at compile time.
       [[nodiscard]] static constexpr size_t NumCTBits() noexcept { return 0; }
 
-      /// Number of bits used in partial field at the end; 0 = perfect fit.
+      /// Number of bits used in partial field at the end; NUM_FIELD_BITS is perfect fit.
       [[nodiscard]] constexpr size_t NumEndBits() const noexcept {
-        return num_bits & (NUM_FIELD_BITS - 1);
+        return ((num_bits - 1) & (NUM_FIELD_BITS - 1)) + 1;
       }
 
       /// EXTRA bits leftover in the gap at the end
       [[nodiscard]] constexpr size_t EndGap() const noexcept {
-        return NumEndBits() ? (NUM_FIELD_BITS - NumEndBits()) : 0;
+        return NUM_FIELD_BITS - NumEndBits();
       }
 
       /// Mask to cut off all of the final bits.
@@ -128,14 +128,14 @@ namespace emp {
       // Number of bits locked in at compile time.
       [[nodiscard]] static constexpr size_t NumCTBits() noexcept { return NUM_BITS; }
 
-      /// Number of bits used in partial field at the end; 0 if perfect fit.
+      /// Number of bits used in partial field at the end; NUM_FIELD_BITS if perfect fit.
       [[nodiscard]] constexpr size_t NumEndBits() const noexcept {
-        return NUM_BITS & (NUM_FIELD_BITS - 1);
+        return ((NUM_BITS - 1) & (NUM_FIELD_BITS - 1)) + 1;
       }
 
       /// How many EXTRA bits are leftover in the gap at the end?
       [[nodiscard]] constexpr size_t EndGap() const noexcept {
-        return (NUM_FIELD_BITS - NumEndBits()) % NUM_FIELD_BITS;
+        return NUM_FIELD_BITS - NumEndBits();
       }
 
       /// A mask to cut off all of the final bits.
@@ -207,7 +207,7 @@ namespace emp {
       void RawResize(const size_t new_size, const bool preserve_data = false) {
         const size_t old_num_fields = BASE_T::NumFields();
         BASE_T::SetSize(new_size);
-        if (preserve_data && BASE_T::NumEndBits()) {
+        if (preserve_data) {
           bits[BASE_T::LastField()] &= BASE_T::EndMask();
           for (size_t id = BASE_T::NumFields(); id < old_num_fields; ++id) { bits[id] = 0; }
         }
@@ -309,7 +309,7 @@ namespace emp {
         base_t::SetSize(new_size);
 
         // Clear out any extra bits in the last field.
-        if (preserve_data && base_t::NumEndBits()) {
+        if (preserve_data) {
           bits[base_t::LastField()] &= base_t::EndMask();
         }
       }
@@ -423,7 +423,7 @@ namespace emp {
           for (size_t i = num_old_fields; i < num_new_fields; ++i) { bits[i] = 0; }
 
           // Clear out any extra end bits.
-          if (base_t::NumEndBits()) { bits[base_t::LastField()] &= base_t::EndMask(); }
+          bits[base_t::LastField()] &= base_t::EndMask();
         }
       }
 
@@ -483,9 +483,8 @@ namespace emp {
       [[nodiscard]] bool OK() const {
         bool result = BASE_T::OK();
 
-        // If there are end bits, make sure that everything past the last one is clear.
-        if (BASE_T::NumEndBits()) {
-          // Make sure final bits are zeroed out.
+        // Make sure final bits are zeroed out.
+        if (BASE_T::NumFields() >= 1) {
           const field_t excess_bits =
             BASE_T::bits[BASE_T::LastField()] & ~MaskLow<field_t>(BASE_T::NumEndBits());
           result &= !excess_bits;
