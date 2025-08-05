@@ -1,6 +1,6 @@
 /**
  * This file is part of Empirical, https://github.com/devosoft/Empirical
- * Copyright (C) 2022-2024 Michigan State University
+ * Copyright (C) 2022-2025 Michigan State University
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/bits/Bits.hpp
@@ -142,9 +142,11 @@ namespace emp {
     // Convert the bits to const bytes array (note that bits are NOT in order at the byte level!)
     [[nodiscard]] emp::Ptr<const unsigned char> BytePtr() const { return _data.BytePtr(); }
 
-    // Any bits past the last "real" bit in the last field should be kept as zeros.
+    // Any bits past the last "real" bit in the last field should be zeros.
     constexpr this_t & ClearExcessBits() {
-      if (_data.NumEndBits()) { _data.bits[_data.LastField()] &= _data.EndMask(); }
+      if (_data.NumFields()) {
+        _data.bits[_data.LastField()] &= _data.EndMask();
+      }
       return *this;
     }
 
@@ -193,11 +195,8 @@ namespace emp {
         SetIf(std::forward<T>(init_val));
         ClearExcessBits();
       } else if constexpr (std::integral<std::remove_reference_t<T>>) {
-        if (init_val == 0) {
-          Clear();
-        } else {
-          SetAll();
-        }
+        if (init_val == 0) { Clear(); }
+        else { SetAll(); }
       } else if constexpr (std::same_as<std::remove_reference_t<T>, Random>) {
         Randomize(std::forward<T>(init_val));  // Pass random generator to Randomize.
         ClearExcessBits();
@@ -270,13 +269,17 @@ namespace emp {
     /// @brief Assignment operator from a literal string of '0's and '1's.
     Bits & operator=(const char * bitstring) & { return Set(emp::String(bitstring)); }
 
+    /// @brief Assignment from an unsigned int, optionally specifying size.
+    Bits & Import(uint64_t from_bits, size_t new_size = emp::MAX_SIZE_T);
+
     /// @brief Assignment from another Bits object without changing size.
     template <typename DATA2_T, bool ZERO_LEFT2>
     Bits & Import(const Bits<DATA2_T, ZERO_LEFT2> & from_bits,
                   const size_t from_start_pos = 0,
                   size_t max_copy_bits        = emp::MAX_SIZE_T);
 
-    /// @brief Convert to a Bits of a different size.
+
+                  /// @brief Convert to a Bits of a different size.
     template <typename OUT_T = Bits<Bits_DynamicData, ZERO_LEFT>>
     [[nodiscard]] OUT_T Export(size_t out_size, size_t start_bit = 0) const;
 
@@ -1493,6 +1496,23 @@ namespace emp {
     return ClearExcessBits();  // Set excess bits to zeros.
   }
 
+  /// @brief Assignment from an unsigned int, optionally specifying size.
+  template <typename DATA_T, bool ZERO_LEFT>
+  Bits<DATA_T, ZERO_LEFT> &
+  Bits<DATA_T, ZERO_LEFT>::Import(uint64_t from_bits, size_t new_size) {
+    if (new_size != MAX_SIZE_T) { _data.RawResize(new_size); }
+    emp_assert(size() > 0, "Make sure Import always has a size!");
+    Clear();
+    if constexpr (sizeof(field_t) == sizeof(from_bits)) {
+      _data.bits[0] = from_bits;
+    } else {
+      emp_assert(sizeof(field_t) == 4, sizeof(field_t));
+      _data.bits[0] = static_cast<field_t>(from_bits);
+      if (_data.NumFields() > 1) _data.bits[1] = static_cast<field_t>(from_bits >> 32);
+    }
+    return *this;
+  }
+
   /// Assign from a Bits object of a different size, while keeping current size.
   /// If there are too many bits being imported, extras are cut off.
   /// If there are fewer bits, the remainder are zero'd out (up to max_copy_bits)
@@ -2015,7 +2035,7 @@ namespace emp {
     _data.bits[field_id]   = (_data.bits[field_id] & ~(FIELD_255 << pos_id)) | (val_uint << pos_id);
   }
 
-  /// Get the overall value of this BitSet, using a uint encoding, but including all bits
+  /// Get the overall value of this Bits object, using a uint encoding, but including all bits
   /// and returning the value as a double.
   template <typename DATA_T, bool ZERO_LEFT>
   double Bits<DATA_T, ZERO_LEFT>::GetValue() const {
@@ -2183,7 +2203,7 @@ namespace emp {
   template <typename DATA_T, bool ZERO_LEFT>
   void Bits<DATA_T, ZERO_LEFT>::PushFront(const bool bit, const size_t num) {
     Resize(GetSize() + num);
-    SHIFT_SELF(num);
+    SHIFT_SELF(-num);
     if (bit) { SetRange(0, num); }
   }
 
@@ -2463,9 +2483,7 @@ namespace emp {
       }
       out << " : " << field << std::endl;
     }
-    size_t end_pos = _data.NumEndBits();
-    if (end_pos == 0) { end_pos = FIELD_BITS; }
-    for (size_t i = 0; i < end_pos; i++) { out << " "; }
+    for (size_t i = 0; i < _data.NumEndBits(); i++) { out << " "; }
     out << "^" << std::endl;
   }
 
@@ -2650,7 +2668,7 @@ namespace emp {
     for (auto & cur_field : bit_span) { cur_field = emp::ReverseBits(cur_field); }
 
     // Move the gap to the other side.
-    if (_data.NumEndBits()) { ShiftRight(_data.EndGap(), true); }
+    ShiftRight(_data.EndGap(), true);
 
     return *this;
   }
@@ -2713,7 +2731,7 @@ namespace emp {
       _data.bits[i] = sum;
     }
 
-    if (_data.NumEndBits()) {
+    if (_data.EndGap()) {
       _data.bits[GetSize() / FIELD_BITS] =
         (_data.bits[GetSize() / FIELD_BITS] + set2._data.bits[GetSize() / FIELD_BITS] +
          static_cast<field_t>(carry)) &
@@ -2746,7 +2764,7 @@ namespace emp {
       _data.bits[i] -= subtrahend;
     }
 
-    if (_data.NumEndBits()) {
+    if (_data.EndGap()) {
       _data.bits[GetSize() / FIELD_BITS] =
         (_data.bits[GetSize() / FIELD_BITS] - set2._data.bits[GetSize() / FIELD_BITS] -
          static_cast<field_t>(carry)) &
