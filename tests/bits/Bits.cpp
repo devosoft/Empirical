@@ -1098,6 +1098,20 @@ TEST_CASE("10: Test functions that trigger size changes", "[bits]") {
   CHECK(bv.CountOnes(500,700) == 100);
   CHECK(bv.CountOnes(700,1200) == 500);
   CHECK(bv.CountOnes(1200,1450) == 125);
+
+  // Now try PushFront()
+  bv.Resize(0);
+  // Push (50*2=) 100 bits with intensive checking.
+  for (size_t i = 0; i < 50; i++) {
+    CHECK(bv.GetSize() == i*2);
+    CHECK(bv.CountOnes() == i);
+    bv.PushFront(0);
+    CHECK(bv.GetSize() == i*2+1);
+    CHECK(bv.CountOnes() == i);
+    bv.PushFront(1);
+    CHECK(bv.GetSize() == i*2+2);
+    CHECK(bv.CountOnes() == i+1);
+  }
 }
 
 TEST_CASE("11: Test BitVector", "[bits]")
