@@ -41,15 +41,18 @@
 template<typename T>
 void TestBasics(const T & bits, size_t _size, std::string vals="") {
 
-  CHECK( bits.GetSize() == _size);
+  REQUIRE( bits.GetSize() == _size);
   if (vals == "") { return; } // No values to check.
-  else if (vals == "Zeros") { CHECK(bits.CountOnes() == 0); }
-  else if (vals == "Ones")  { CHECK(bits.CountOnes() == _size); }
-  else if (vals == "Mixed") { CHECK(bits.CountOnes() > 0); CHECK(bits.CountOnes() < _size); }
+  else if (vals == "Zeros") { REQUIRE(bits.CountOnes() == 0); }
+  else if (vals == "Ones")  { REQUIRE(bits.CountOnes() == _size); }
+  else if (vals == "Mixed") {
+    REQUIRE(bits.CountOnes() > 0);
+    REQUIRE(bits.CountOnes() < _size);
+  }
 
   // If vals is a number, use that as the expected number of ones.
   else if (emp::is_digits(vals)) {
-    CHECK(bits.CountOnes() == emp::from_string<size_t>(vals));
+    REQUIRE(bits.CountOnes() == emp::from_string<size_t>(vals));
   }
 
   // If vals is a range in the format "[100,200]" then make sure in that range.
@@ -76,6 +79,19 @@ TEST_CASE("0: Diagnosing current problems", "[bits]"){
   // std::cout << "DEBUG   : ";
   // bv.PrintDebug();
   // CHECK(bv.CountOnes() == 9);
+  emp::BitValue bv(72);
+  emp_assert(bv.size() == 72);
+  emp_assert(bv.CountOnes() == 0);
+  emp_assert(bv.CountZeros() == 72);
+  bv.SetAll();
+  emp_assert(bv.size() == 72);
+  emp_assert(bv.CountOnes() == 72);
+  emp_assert(bv.CountZeros() == 0);
+
+  emp::BitValue bv2(5000, true);
+  emp_assert(bv2.size() == 5000);
+  emp_assert(bv2.CountOnes() == 5000);
+  emp_assert(bv2.CountZeros() == 0);
 }
 
 TEST_CASE("1: Test Bits Constructors", "[bits]"){
@@ -1101,8 +1117,8 @@ TEST_CASE("10: Test functions that trigger size changes", "[bits]") {
 
   // Now try PushFront()
   bv.Resize(0);
-  // Push (50*2=) 100 bits with intensive checking.
-  for (size_t i = 0; i < 50; i++) {
+  // Push (100*2=) 200 bits with intensive checking.
+  for (size_t i = 0; i < 100; i++) {
     CHECK(bv.GetSize() == i*2);
     CHECK(bv.CountOnes() == i);
     bv.PushFront(0);
