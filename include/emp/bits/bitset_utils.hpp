@@ -1,10 +1,10 @@
 /**
  * This file is part of Empirical, https://github.com/devosoft/Empirical
- * Copyright (C) 2016-2023 Michigan State University
+ * Copyright (C) 2016-2025 Michigan State University
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/bits/bitset_utils.hpp
- * @brief A set of simple functions to manipulate bitsets.
+ * @brief A set of simple functions to manipulate bit sets stored as unsigned ints.
  * @note Status: BETA
  */
 
@@ -129,17 +129,21 @@ namespace emp {
   }
 
   /// Quick bit-mask generator for low bits.
-  template <typename TYPE = size_t>
+  template <typename TYPE = std::size_t>
   [[nodiscard]] inline constexpr TYPE MaskLow(std::size_t num_bits) {
     static_assert(std::is_unsigned_v<TYPE>, "Bit manipulation requires unsigned values.");
-    return (num_bits == 8 * sizeof(TYPE)) ? ((TYPE) -1) : ((((TYPE) 1) << num_bits) - 1);
+    constexpr std::size_t MAX_BITS = 8 * sizeof(TYPE);
+    constexpr TYPE ONE = 1;
+    emp_assert(num_bits <= MAX_BITS, num_bits);
+    return (num_bits == MAX_BITS) ? ((TYPE) -1) : ((ONE << num_bits) - 1);
   }
 
   /// Quick bit-mask generator for high bits.
-  template <typename TYPE = size_t>
+  template <typename TYPE = std::size_t>
   [[nodiscard]] inline constexpr TYPE MaskHigh(std::size_t num_bits) {
     static_assert(std::is_unsigned_v<TYPE>, "Bit manipulation requires unsigned values.");
-    return MaskLow<TYPE>(num_bits) << (8 * sizeof(TYPE) - num_bits);
+    constexpr std::size_t MAX_BITS = 8 * sizeof(TYPE);
+    return MaskLow<TYPE>(num_bits) << (MAX_BITS - num_bits);
   }
 
   template <typename TYPE = size_t>
