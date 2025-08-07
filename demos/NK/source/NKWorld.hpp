@@ -25,7 +25,7 @@ EMP_BUILD_CONFIG( NKConfig,
   VALUE(K, uint32_t, 10, "Level of epistasis in the NK model"),
   VALUE(N, uint32_t, 100, "Number of bits in each organisms (must be > K)"), ALIAS(GENOME_SIZE),
   VALUE(SEED, int, 0, "Random number seed (0 for based on time)"),
-  VALUE(POP_SIZE, uint32_t, 100, "Number of organisms in the popoulation."),
+  VALUE(POP_SIZE, uint32_t, 100, "Number of organisms in the population."),
   VALUE(MAX_GENS, uint32_t, 2000, "How many generations should we process?"),
   VALUE(MUT_COUNT, uint32_t, 3, "How many bit positions should be randomized?"), ALIAS(NUM_MUTS),
   VALUE(TEST, std::string, "TestString", "This is a test string.")
@@ -132,3 +132,6 @@ struct NKWorld : public emp::World<BitOrg> {
 };
 
 #endif // #ifndef DEMOS_NK_SOURCE_NKWORLD_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: lexi

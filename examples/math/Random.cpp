@@ -44,3 +44,6 @@ int main()
   std::cout << "\np = " << p << std::endl;
   for (size_t s  = 0; s < num_samples; s++) std::cout << random.GetExponential(p) << std::endl;
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: permut

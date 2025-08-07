@@ -1,16 +1,17 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2017
-*/
 /**
- *  @file
- *  @brief ActionManager collects sets of Actions to be looked up or manipulated later.
- *  @note Status: Beta
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2017 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/control/ActionManager.hpp
+ * @brief ActionManager collects sets of Actions to be looked up or manipulated later.
+ * @note Status: Beta
  */
 
-#ifndef EMP_CONTROL_ACTIONMANAGER_HPP_INCLUDE
-#define EMP_CONTROL_ACTIONMANAGER_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_CONTROL_ACTION_MANAGER_HPP_GUARD
+#define INCLUDE_EMP_CONTROL_ACTION_MANAGER_HPP_GUARD
 
 #include <stddef.h>
 #include <string>
@@ -24,20 +25,24 @@ namespace emp {
 
   class ActionManager {
   private:
-    std::unordered_map<std::string, ActionBase *> action_map;  ///< A set of all actions handled by manager.
-    int next_id=1;                                             ///< Unique ID for next new function.
-    std::string prefix = "emp_action_";                        ///< Prefix for function names to keep unique.
+    std::unordered_map<std::string, ActionBase *>
+      action_map;                        ///< A set of all actions handled by manager.
+    int next_id        = 1;              ///< Unique ID for next new function.
+    std::string prefix = "emp_action_";  ///< Prefix for function names to keep unique.
 
   public:
     ActionManager() : action_map() { ; }
-    ActionManager(ActionManager &&) = default;     // Normal juggle is okay for move constructor
+
+    ActionManager(ActionManager &&) = default;  // Normal juggle is okay for move constructor
+
     ActionManager(const ActionManager & in) : action_map(), next_id(in.next_id), prefix(in.prefix) {
       // Copy all actions from input manager.
-      for (const auto & x : in.action_map) {
-        action_map[x.first] = x.second->Clone();
-      }
+      for (const auto & x : in.action_map) { action_map[x.first] = x.second->Clone(); }
     }
-    ~ActionManager() { for (auto & x : action_map) delete x.second; }
+
+    ~ActionManager() {
+      for (auto & x : action_map) { delete x.second; }
+    }
 
     /// Get the ID to be used for the next new function.
     int GetNextID() const { return next_id; }
@@ -58,12 +63,12 @@ namespace emp {
       return *(it->second);
     }
 
-    /// Add a functon to this manager with a pre-specified name.
+    /// Add a function to this manager with a pre-specified name.
     template <typename RETURN, typename... ARGS>
     auto & Add(const std::function<RETURN(ARGS...)> & in_fun, const std::string & name) {
       // Create the new action, save it, and return it.
       auto * new_action = new Action<RETURN(ARGS...)>(in_fun, name);
-      action_map[name] = new_action;
+      action_map[name]  = new_action;
       return *new_action;
     }
 
@@ -77,18 +82,18 @@ namespace emp {
 
     /// Add an action to this manager.
     auto & Add(const ActionBase & action) {
-      auto * new_action = action.Clone();
+      auto * new_action            = action.Clone();
       action_map[action.GetName()] = new_action;
       return *new_action;
     }
 
     /// Print out the name of all actions maintained by this manager.
-    void PrintNames(std::ostream & os=std::cout) {
+    void PrintNames(std::ostream & os = std::cout) {
       os << action_map.size() << " actions found:\n";
-      for (auto & x : action_map) os << "  " << x.first << std::endl;
+      for (auto & x : action_map) { os << "  " << x.first << std::endl; }
     }
   };
 
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_CONTROL_ACTIONMANAGER_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_CONTROL_ACTION_MANAGER_HPP_GUARD

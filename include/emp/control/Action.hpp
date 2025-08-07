@@ -1,19 +1,20 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2017
-*/
 /**
- *  @file
- *  @brief A mechanism to abstract functions from their underlying type and provide run-time names.
- *  @note Status: Beta
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2017 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  @todo Create an ActionDefaults class that can take fewer args than expected and fill in rest.
- *  @todo Allow for named arguments to facilitate interpreted functions.
+ * @file include/emp/control/Action.hpp
+ * @brief A mechanism to abstract functions from their underlying type and provide run-time names.
+ * @note Status: Beta
+ *
+ * @todo Create an ActionDefaults class that can take fewer args than expected and fill in rest.
+ * @todo Allow for named arguments to facilitate interpreted functions.
  */
 
-#ifndef EMP_CONTROL_ACTION_HPP_INCLUDE
-#define EMP_CONTROL_ACTION_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_CONTROL_ACTION_HPP_GUARD
+#define INCLUDE_EMP_CONTROL_ACTION_HPP_GUARD
 
 #include <functional>
 #include <stddef.h>
@@ -33,10 +34,10 @@ namespace emp {
     ActionBase(const std::string & in_name) : name(in_name) { ; }
 
     // Protected: ActionBase should not be copied directly, only through derived class.
-    ActionBase(const ActionBase &) = default;
-    ActionBase(ActionBase &&) = default;
+    ActionBase(const ActionBase &)             = default;
+    ActionBase(ActionBase &&)                  = default;
     ActionBase & operator=(const ActionBase &) = default;
-    ActionBase & operator=(ActionBase &&) = default;
+    ActionBase & operator=(ActionBase &&)      = default;
   public:
     virtual ~ActionBase() { ; }
 
@@ -62,7 +63,8 @@ namespace emp {
 
   /// The declaration for Action has any template types; the only defined specializations require
   /// a function type to be specified (with void and non-void return type variants.)
-  template <typename... ARGS> class Action;
+  template <typename... ARGS>
+  class Action;
 
   /// This Action class specialization takes a function with a void return type and builds it off
   /// of the action base classes.
@@ -71,22 +73,27 @@ namespace emp {
   protected:
     std::function<void(ARGS...)> fun;  ///< The specific function associated with this action.
   public:
-    using this_t = Action<void(ARGS...)>;
+    using this_t   = Action<void(ARGS...)>;
     using parent_t = ActionSize<sizeof...(ARGS)>;
 
-    Action(const std::function<void(ARGS...)> & in_fun, const std::string & in_name="")
-      : parent_t(in_name), fun(in_fun) { ; }
+    Action(const std::function<void(ARGS...)> & in_fun, const std::string & in_name = "")
+      : parent_t(in_name), fun(in_fun) {
+      ;
+    }
+
     template <typename RETURN>
-    Action(const std::function<RETURN(ARGS...)> & in_fun, const std::string & in_name="")
-      : parent_t(in_name)
-      , fun([in_fun](ARGS &&... args){in_fun(std::forward<ARGS>(args)...);}) { ; }
+    Action(const std::function<RETURN(ARGS...)> & in_fun, const std::string & in_name = "")
+      : parent_t(in_name), fun([in_fun](ARGS &&... args) { in_fun(std::forward<ARGS>(args)...); }) {
+      ;
+    }
+
     Action(const this_t &) = default;
-    Action(this_t &&) = default;
+    Action(this_t &&)      = default;
 
     this_t & operator=(const this_t &) = default;
-    this_t & operator=(this_t &&) = default;
+    this_t & operator=(this_t &&)      = default;
 
-    const std::function<void(ARGS...)> & GetFun() const { return fun; };
+    const std::function<void(ARGS...)> & GetFun() const { return fun; }
 
     /// Call the function associated with this action.
     void Call(ARGS &&... args) { return fun(std::forward<ARGS>(args)...); }
@@ -95,7 +102,6 @@ namespace emp {
     this_t * Clone() const { return new this_t(*this); }
   };
 
-
   /// This Action class specialization takes a function with any non-void return type and builds it
   /// off of the action base classes.
   template <typename RETURN, typename... ARGS>
@@ -103,19 +109,22 @@ namespace emp {
   protected:
     std::function<RETURN(ARGS...)> fun;  ///< The specific function associated with this action.
   public:
-    using fun_t = RETURN(ARGS...);
-    using this_t = Action<fun_t>;
+    using fun_t    = RETURN(ARGS...);
+    using this_t   = Action<fun_t>;
     using parent_t = ActionSize<sizeof...(ARGS)>;
 
-    Action(const std::function<RETURN(ARGS...)> & in_fun, const std::string & in_name="")
-      : parent_t(in_name), fun(in_fun) { ; }
+    Action(const std::function<RETURN(ARGS...)> & in_fun, const std::string & in_name = "")
+      : parent_t(in_name), fun(in_fun) {
+      ;
+    }
+
     Action(const this_t &) = default;
-    Action(this_t &&) = default;
+    Action(this_t &&)      = default;
 
     this_t & operator=(const this_t &) = default;
-    this_t & operator=(this_t &&) = default;
+    this_t & operator=(this_t &&)      = default;
 
-    const std::function<fun_t> & GetFun() const { return fun; };
+    const std::function<fun_t> & GetFun() const { return fun; }
 
     /// Call the function associated with this action.
     RETURN Call(ARGS &&... args) { return fun(std::forward<ARGS>(args)...); }
@@ -126,9 +135,9 @@ namespace emp {
 
   /// Build an action object using this function.
   template <typename RETURN, typename... ARGS>
-  auto make_action(const std::function<RETURN(ARGS...)> & in_fun, const std::string & name="") {
+  auto make_action(const std::function<RETURN(ARGS...)> & in_fun, const std::string & name = "") {
     return Action<RETURN(ARGS...)>(in_fun, name);
   }
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_CONTROL_ACTION_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_CONTROL_ACTION_HPP_GUARD

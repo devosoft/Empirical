@@ -1,16 +1,17 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2019-2022
-*/
 /**
- *  @file
- *  @brief A mapping of names to variables stored in a MemoryImage.
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2019-2022 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/data/DataLayout.hpp
+ * @brief A mapping of names to variables stored in a MemoryImage.
+ * @note Status: ALPHA
  */
 
-#ifndef EMP_DATA_DATALAYOUT_HPP_INCLUDE
-#define EMP_DATA_DATALAYOUT_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_DATA_DATA_LAYOUT_HPP_GUARD
+#define INCLUDE_EMP_DATA_DATA_LAYOUT_HPP_GUARD
 
 #include <stddef.h>
 #include <string>
@@ -37,7 +38,7 @@ namespace emp {
       std::string notes;  ///< Any additional notes about this setting.
       size_t count;       ///< Number of objects in this entry.
 
-      bool is_log;        ///< Is this setting a current value or a log of all values?
+      bool is_log;  ///< Is this setting a current value or a log of all values?
     };
 
   protected:
@@ -45,11 +46,11 @@ namespace emp {
     std::unordered_map<size_t, SettingInfo> setting_map;  ///< Lookup setting info by id.
     size_t image_size;                                    ///< What size image is expected?
     size_t num_maps = 1;                                  ///< How many DataMaps use this layout?
-    bool is_locked = false;                               ///< Can this layout still be modified?
+    bool is_locked  = false;                              ///< Can this layout still be modified?
 
     /// Collect all of the constructors and destructors that we need to worry about.
-    using copy_fun_t = std::function<void(const MemoryImage &, MemoryImage &)>;
-    using move_fun_t = std::function<void(MemoryImage &, MemoryImage &)>;
+    using copy_fun_t     = std::function<void(const MemoryImage &, MemoryImage &)>;
+    using move_fun_t     = std::function<void(MemoryImage &, MemoryImage &)>;
     using destruct_fun_t = std::function<void(MemoryImage &)>;
     emp::vector<copy_fun_t> copy_constructors;
     emp::vector<move_fun_t> move_constructors;
@@ -57,19 +58,23 @@ namespace emp {
 
   public:
     DataLayout() = default;
+
     DataLayout(const DataLayout & _in)
-      : id_map(_in.id_map), setting_map(_in.setting_map), image_size(_in.image_size), num_maps(1)
-    { }
-    //DataLayout(DataLayout &&) = default;
+      : id_map(_in.id_map), setting_map(_in.setting_map), image_size(_in.image_size), num_maps(1) {}
+
+    // DataLayout(DataLayout &&) = default;
     ~DataLayout() { ; }
 
     // Existing layouts should never change out from under a DataMap.
     DataLayout & operator=(const DataLayout &) = delete;
-    DataLayout & operator=(DataLayout &&) = delete;
+    DataLayout & operator=(DataLayout &&)      = delete;
 
     void IncMaps() { num_maps++; }
+
     void DecMaps() { num_maps--; }
+
     size_t GetNumMaps() const { return num_maps; }
+
     bool IsLocked() const { return is_locked; }
 
     /// Determine if we have a variable by a given name.
@@ -87,43 +92,46 @@ namespace emp {
 
     // Verify type, position, AND count.
     template <typename T>
-    bool Has(size_t id, size_t count=1) const {
+    bool Has(size_t id, size_t count = 1) const {
       auto it = setting_map.find(id);
-      return it != setting_map.end() &&
-             it->second.type == emp::GetTypeID<T>() &&
+      return it != setting_map.end() && it->second.type == emp::GetTypeID<T>() &&
              it->second.count == count;
     }
 
     // Verify name, position, AND count.
     template <typename T>
-    bool Has(const std::string & name, size_t count=1) const {
+    bool Has(const std::string & name, size_t count = 1) const {
       auto it = id_map.find(name);
       return (it != id_map.end()) && Has<T>(it->second, count);
     }
 
     template <typename T, typename KEY_T>
-    std::string DiagnoseHas(KEY_T key, size_t count=1) const {
+    std::string DiagnoseHas(KEY_T key, size_t count = 1) const {
       size_t id = 0;
       if constexpr (std::is_arithmetic<KEY_T>()) {
         id = key;
-      } else { // key is name.
+      } else {  // key is name.
         auto it = id_map.find(key);
-        if (it == id_map.end()) return emp::to_string("Unknown trait name '", key, "'");
+        if (it == id_map.end()) { return emp::to_string("Unknown trait name '", key, "'"); }
         id = it->second;
       }
 
       auto setting_it = setting_map.find(id);
       if (setting_it == setting_map.end()) {
-        if (id == emp::MAX_SIZE_T) return emp::to_string("Unknown ID ", id, " (aka -1)");
+        if (id == emp::MAX_SIZE_T) { return emp::to_string("Unknown ID ", id, " (aka -1)"); }
         return emp::to_string("Unknown ID ", id);
       }
       if (setting_it->second.type != emp::GetTypeID<T>()) {
-        return emp::to_string("Checking for type as ", emp::GetTypeID<T>(),
-                              ", but recorded as ", setting_it->second.type);
+        return emp::to_string("Checking for type as ",
+                              emp::GetTypeID<T>(),
+                              ", but recorded as ",
+                              setting_it->second.type);
       }
       if (setting_it->second.count != count) {
-        return emp::to_string("Checking for count of ", count,
-                              ", but recorded as ", setting_it->second.count);
+        return emp::to_string("Checking for count of ",
+                              count,
+                              ", but recorded as ",
+                              setting_it->second.count);
       }
       return emp::to_string("Has<", emp::GetTypeID<T>(), ">(", key, ",", count, ") should be true.");
     }
@@ -150,34 +158,30 @@ namespace emp {
     }
 
     /// Determine is entry is some form of numeric type.
-    bool IsNumeric(size_t id) const {
-      return GetType(id).IsArithmetic();
-    }
+    bool IsNumeric(size_t id) const { return GetType(id).IsArithmetic(); }
 
-    bool IsNumeric(const std::string & name) const {
-      return IsNumeric(GetID(name));
-    }
+    bool IsNumeric(const std::string & name) const { return IsNumeric(GetID(name)); }
 
     /// Prevent this layout from being modified.
     void Lock() { is_locked = true; }
 
     /// Add a new variable with a specified type, name and value.
     template <typename T>
-    size_t Add(MemoryImage & base_memory,      // Memory to store prototype objects.
-                const std::string & name,      // Lookup name for this variable.
-                const T & default_value,       // Initial value for each object in this entry.
-                const std::string & desc="",   // Description associated with this variable
-                const std::string & notes="",  // Additional information.
-                const size_t count = 1         // Number of values to store with this entry.
-              ) {
-      emp_assert(!HasName(name), name);        // Make sure this doesn't already exist.
-      emp_assert(count >= 1);                  // Must add at least one instance of an object.
-      emp_assert(is_locked == false);          // Cannot add to a locked layout.
+    size_t Add(MemoryImage & base_memory,       // Memory to store prototype objects.
+               const std::string & name,        // Lookup name for this variable.
+               const T & default_value,         // Initial value for each object in this entry.
+               const std::string & desc  = "",  // Description associated with this variable
+               const std::string & notes = "",  // Additional information.
+               const size_t count        = 1    // Number of values to store with this entry.
+    ) {
+      emp_assert(!HasName(name), name);  // Make sure this doesn't already exist.
+      emp_assert(count >= 1);            // Must add at least one instance of an object.
+      emp_assert(is_locked == false);    // Cannot add to a locked layout.
 
       // Analyze the size of the new object(s) and where it will go.
       constexpr const size_t obj_size = sizeof(T);
-      const size_t entry_size = obj_size * count;
-      const size_t pos = image_size;
+      const size_t entry_size         = obj_size * count;
+      const size_t pos                = image_size;
 
       // Create a new image with enough room for the new object and move the old data over.
       MemoryImage new_memory(image_size + entry_size);
@@ -189,45 +193,38 @@ namespace emp {
       // Setup this new object.
       image_size = base_memory.GetSize();
       for (size_t i = 0; i < count; ++i) {
-        base_memory.Construct<T>(pos + i*obj_size, default_value);
+        base_memory.Construct<T>(pos + i * obj_size, default_value);
       }
       base_memory.init_to = image_size;
 
       // Store the information about this object.
-      id_map[name] = pos;
-      setting_map[pos] = { emp::GetTypeID<T>(), name, desc, notes, count, false };
+      id_map[name]     = pos;
+      setting_map[pos] = {emp::GetTypeID<T>(), name, desc, notes, count, false};
 
       // Store copy constructor if needed.
       if (std::is_trivially_copyable<T>() == false) {
         copy_constructors.push_back(
-          [pos,count](const MemoryImage & from_image, MemoryImage & to_image) {
+          [pos, count](const MemoryImage & from_image, MemoryImage & to_image) {
             for (size_t i = 0; i < count; ++i) {
-              to_image.CopyObj<T>(pos + i*sizeof(T), from_image);
+              to_image.CopyObj<T>(pos + i * sizeof(T), from_image);
             }
-          }
-        );
+          });
       }
 
       // Store destructor if needed.
       if (std::is_trivially_destructible<T>() == false) {
-        destructors.push_back(
-          [pos,count](MemoryImage & image) {
-            for (size_t i = 0; i < count; ++i) {
-              image.Destruct<T>(pos + i*sizeof(T));
-            }
-          }
-        );
+        destructors.push_back([pos, count](MemoryImage & image) {
+          for (size_t i = 0; i < count; ++i) { image.Destruct<T>(pos + i * sizeof(T)); }
+        });
       }
 
       // Store move constructor if needed.
       if (std::is_trivially_destructible<T>() == false) {
-        move_constructors.push_back(
-          [pos,count](MemoryImage & from_image, MemoryImage & to_image) {
-            for (size_t i = 0; i < count; ++i) {
-              to_image.MoveObj<T>(pos + i*sizeof(T), from_image);
-            }
+        move_constructors.push_back([pos, count](MemoryImage & from_image, MemoryImage & to_image) {
+          for (size_t i = 0; i < count; ++i) {
+            to_image.MoveObj<T>(pos + i * sizeof(T), from_image);
           }
-        );
+        });
       }
 
       return pos;
@@ -238,7 +235,7 @@ namespace emp {
     /// Run destructors on all objects in a memory image (but otherwise leave it intact.)
     void DestructImage(MemoryImage & image) const {
       // If there is no memory in the image, stop.
-      if (image.GetSize() == 0) return;
+      if (image.GetSize() == 0) { return; }
 
       // Run destructor on contents of image and then empty it!
       for (auto & d : destructors) { d(image); }
@@ -248,7 +245,7 @@ namespace emp {
     /// Destruct and delete all memory associated in the provided image.
     void ClearImage(MemoryImage & image) const {
       // If this memory image is already clear, stop.
-      if (image.GetSize() == 0) return;
+      if (image.GetSize() == 0) { return; }
 
       // Run destructor on contents of image and then empty it!
       emp_assert(image.GetInitSize() == image_size);
@@ -278,12 +275,11 @@ namespace emp {
       // Transfer over the from image and then run the required copy constructors.
       to_image.RawCopy(from_image);
       for (auto & c : move_constructors) { c(from_image, to_image); }
-      to_image.init_to = image_size;  // Everything in the to image is now initialized.
-      from_image.init_to = 0;         // Everything in the from image has been destructed.
+      to_image.init_to   = image_size;  // Everything in the to image is now initialized.
+      from_image.init_to = 0;           // Everything in the from image has been destructed.
     }
-
   };
 
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_DATA_DATALAYOUT_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_DATA_DATA_LAYOUT_HPP_GUARD

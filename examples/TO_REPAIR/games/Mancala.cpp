@@ -5,7 +5,7 @@
 */
 /**
  *  @file
- *  @brief This is an example file demonstrating Manacala.
+ *  @brief This is an example file demonstrating Mancala.
  */
 
 #include <iostream>

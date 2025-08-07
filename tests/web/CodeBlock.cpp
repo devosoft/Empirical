@@ -50,7 +50,7 @@ struct Test_Code_Block_HTMLLayout : public emp::web::BaseTest {
     EM_ASM({
       describe("emp::prefab::CodeBlock HTML Layout Scenario", function() {
 
-        // test that everything got layed out correctly in the HTML document
+        // test that everything got laid out correctly in the HTML document
         describe("div#test_div", function() {
 
           it('should exist', function() {
@@ -137,3 +137,6 @@ int main() {
   test_runner.Run();
 
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: highlightjs hljs

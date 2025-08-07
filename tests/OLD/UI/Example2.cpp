@@ -41,3 +41,6 @@ int main() {
 
   UI::document.Update();
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: mytable myvar

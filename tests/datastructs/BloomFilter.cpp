@@ -61,3 +61,6 @@ TEST_CASE("Test Bloom Filter", "[datastructs]")
   CHECK(b4 != b3);
   CHECK(b4 == b4);
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: cbf fpp

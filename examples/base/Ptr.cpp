@@ -76,7 +76,7 @@ int main()
   int_ptr.DeleteArray();
 
 
-  // Creat a vector of pointers; set just the first 26, and delete them.
+  // Create a vector of pointers; set just the first 26, and delete them.
   emp::vector< emp::Ptr<char> > ptr_v(26);
   for (size_t i = 0; i < 26; i++) {
     ptr_v[i] = emp::NewPtr<char>((char)('A' + (char) i));

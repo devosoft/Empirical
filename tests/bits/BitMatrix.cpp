@@ -317,7 +317,7 @@ TEST_CASE("Test BitMatrix", "[bits]")
 // this templating is necessary to force full coverage of templated classes.
 // Since c++ doesn't generate code for templated methods if those methods aren't
 // explicitly called (and thus our profiling doesn't see them), we have to
-// force them all to be included in the comilation.
+// force them all to be included in the compilation.
 template class emp::BitMatrix<4, 5>;
 TEST_CASE("Another test BitMatrix", "[bits]")
 {
@@ -392,3 +392,6 @@ TEST_CASE("Another test BitMatrix", "[bits]")
   bm100.Set(9,9);
 */
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: setall

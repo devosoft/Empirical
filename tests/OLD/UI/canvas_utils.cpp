@@ -78,3 +78,6 @@ int main() {
 
   doc.Update();
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: hsl

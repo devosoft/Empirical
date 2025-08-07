@@ -1,35 +1,37 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2023
-*/
 /**
- *  @file
- *  @brief This file contains tools for dealing with command-line flags (from argv and argc).
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2023-2025 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  The FlagManager class will take command line arguments (either in its constructor or with
- *  the AddFlags() function) and process them appropriately.
+ * @file include/emp/config/FlagManager.hpp
+ * @brief This file contains tools for dealing with command-line flags (from argv and argc).
+ * @note Status: ALPHA
  *
- *  For setup, the user must run AddOption with the function to call.  Functions to call can take
- *  zero, one, or two Strings as arguments OR they can take a vector of Strings and the range of
- *  allowed arguments should be specified.  When Process() is run, the appropriate function will
- *  be called on each and any invalid arguments will trigger an error.
+ * The FlagManager class will take command line arguments (either in its constructor or with
+ * the AddFlags() function) and process all options appropriately.
  *
- *  Flags are expected to begin with a '-' and non-flags are expected to NOT begin with a '-'.
+ * For setup, a FlagManager instance must be configured by calling AddOption once for each flag
+ * option, providing a the function to call when the option is triggered.  The functions can
+ * take zero, one, or two Strings as arguments OR they can take a vector of Strings and the
+ * range of allowed arguments should be specified.
  *
- *  If a single dash is followed by multiple characters, each will be processed independently.
- *  So, "-abc" will be the same as "-a -b -c".
+ * When Process() is run, the appropriate function will be called on each and any invalid
+ * arguments will trigger an error.
  *
- *  Extra command line arguments will be saves as a vector of strings called "extras" and must
- *  be processed manually.  They can be retrieved with GetExtras().
+ * Flags are expected to begin with a '--' followed by at least one non dash, non whitespace
+ * character.  If a shortcut character is provided, it must be called with a single '-'.
  *
+ * If a single dash is followed by multiple characters, each will be processed independently.
+ * So, "-abc" will be the same as "-a -b -c".
  *
- *  @todo: Make variable numbers of flag arguments work.
+ * Extra command line arguments will be saved as a vector of strings called "extras" and must
+ * be processed manually.  They can be retrieved with GetExtras().
  */
 
-#ifndef EMP_CONFIG_FLAGMANAGER_HPP_INCLUDE
-#define EMP_CONFIG_FLAGMANAGER_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_CONFIG_FLAG_MANAGER_HPP_GUARD
+#define INCLUDE_EMP_CONFIG_FLAG_MANAGER_HPP_GUARD
 
 #include <functional>
 #include <iostream>
@@ -42,35 +44,144 @@
 
 namespace emp {
 
-  class FlagManager {
+  class FlagInfo {
+  public:
+    using fun_t = std::function<void(const emp::vector<String> &)>;
+
   private:
-    emp::vector<String> args;
-    emp::vector<String> extras;
+    String name;           ///< Name used for this option.
+    String desc;           ///< Name to type to trigger option.  E.g. "--help"
+    size_t min_args = 0;   ///< Minimum number of arguments option needs to operate.
+    size_t max_args = 0;   ///< Maximum number of arguments option can handle.
+    fun_t fun;             ///< Function to run when this option is selected.
+    char shortcut = '\0';  ///< Single-letter shortcut for this option.  E.g., 'h' is for "-h"
 
-    struct FlagInfo {
-      String desc;
-      size_t min_args = 0;
-      size_t max_args = 0;
-      std::function<void(const emp::vector<String> &)> fun;
-      char shortcut = '\0';
-    };
-
-    std::map<String, FlagInfo> flag_options;
-    std::map<char, String> shortcuts;
+    String group = "none";  ///< Which option group does this belong to?
 
   public:
-    FlagManager() { }
-    FlagManager(int argc, char* argv[]) { AddFlags(argc, argv); }
+    FlagInfo()                 = default;
+    FlagInfo(const FlagInfo &) = default;
+
+    FlagInfo(String name,
+             String desc,
+             size_t min_args,
+             size_t max_args,
+             fun_t fun,
+             char shortcut = '\0')
+      : name(name)
+      , desc(desc)
+      , min_args(min_args)
+      , max_args(max_args)
+      , fun(fun)
+      , shortcut(shortcut) {}
+
+    FlagInfo & operator=(const FlagInfo &) = default;
+
+    [[nodiscard]] const String & GetName() const { return name; }
+
+    [[nodiscard]] const String & GetDesc() const { return desc; }
+
+    [[nodiscard]] size_t GetMinArgs() const { return min_args; }
+
+    [[nodiscard]] size_t GetMaxArgs() const { return max_args; }
+
+    [[nodiscard]] fun_t GetFun() const { return fun; }
+
+    [[nodiscard]] char GetShortcut() const { return shortcut; }
+
+    [[nodiscard]] const String & GetGroup() const { return group; }
+
+    FlagInfo & SetDesc(const String & in) {
+      desc = in;
+      return *this;
+    }
+
+    FlagInfo & SetMinArgs(size_t in) {
+      min_args = in;
+      return *this;
+    }
+
+    FlagInfo & SetMaxArgs(size_t in) {
+      max_args = in;
+      return *this;
+    }
+
+    FlagInfo & SetFun(fun_t in) {
+      fun = in;
+      return *this;
+    }
+
+    FlagInfo & SetShortcut(char in) {
+      shortcut = in;
+      return *this;
+    }
+
+    FlagInfo & SetGroup(String in) {
+      group = in;
+      return *this;
+    }
+
+    template <typename... Ts>
+    void Run(Ts &&... args) {
+      fun(std::forward<Ts>(args)...);
+    }
+  };
+
+  class FlagManager {
+  private:
+    emp::vector<String> args;    ///< Command-line arguments to be processed
+    emp::vector<String> extras;  ///< Set of command line arguments not handled by FlagManager
+
+    std::map<String, FlagInfo> flag_options;  ///< Set of flags known by this manager.
+    std::map<char, String> shortcuts;         ///< Single-character shortcuts to particular flags.
+
+    struct GroupInfo {
+      String name;
+      String desc;
+    };
+
+    emp::vector<GroupInfo> groups;  ///< Info about flag groups to organize "help".
+    int cur_group = -1;             ///< Which group are we currently adding to?
+
+    // --- Helper functions ---
+    int _FindGroupID(const String & name) {
+      for (size_t i = 0; i < groups.size(); ++i) {
+        if (groups[i].name == name) { return static_cast<int>(i); }
+      }
+      return -1;
+    }
+
+    FlagInfo & _AddOption(String name,
+                          std::function<void(const emp::vector<String> &)> fun,
+                          size_t min_args = 0,
+                          size_t max_args = npos,
+                          String desc     = "") {
+      emp_assert(name.size() > 0, "FlagManager cannot take an empty option name.");
+      emp_assert(!name.HasWhitespace(), "Option names cannot contain whitespace.");
+      if (!name.HasPrefix("--")) { name.Prepend("--"); }
+      emp_assert(name[2] != '-', name, "Option names cannot begin with a single '-')");
+      emp_assert(!emp::Has(flag_options, name), "Duplicate flag option name.", name);
+      flag_options[name] = FlagInfo{name, desc, min_args, max_args, fun};
+      if (cur_group >= 0) { flag_options[name].SetGroup(groups[cur_group].name); }
+      return flag_options[name];
+    }
+  public:
+    FlagManager() = default;
+
+    FlagManager(int argc, char * argv[]) { AddFlags(argc, argv); }
 
     constexpr static size_t npos = static_cast<size_t>(-1);
 
     [[nodiscard]] String & operator[](size_t pos) { return args[pos]; }
+
     [[nodiscard]] const String & operator[](size_t pos) const { return args[pos]; }
 
-    emp::vector<String> GetExtras() const { return extras; }
+    [[nodiscard]] const emp::vector<String> & GetExtras() const { return extras; }
 
     [[nodiscard]] size_t Find(String pattern) const {
-      for (size_t i = 0; i < args.size(); ++i) if (args[i] == pattern) return i;
+      for (size_t i = 0; i < args.size(); ++i) {
+        if (args[i] == pattern) { return i; }
+      }
       return npos;
     }
 
@@ -79,95 +190,285 @@ namespace emp {
     // Return true/false if a specific argument is present and REMOVE IT.
     bool Use(String pattern) {
       size_t pos = Find(pattern);
-      if (pos == npos) return false;
+      if (pos == npos) { return false; }
       args.erase(args.begin() + pos);
       return true;
     }
 
-    void AddOption(String name, String desc="") {
-      flag_options[name] = FlagInfo{desc, 0, 0, [](const emp::vector<String> &){} };
+    /// Add a new option group.
+    int AddGroup(String name, String desc = "") {
+      cur_group = static_cast<int>(groups.size());
+      groups.emplace_back(name, desc);
+      return cur_group;
     }
-    void AddOption(String name, std::function<void()> fun, String desc="") {
-      flag_options[name] = FlagInfo{desc, 0,0, [fun](const emp::vector<String> &){fun();}};
+
+    /// Change the option group back to a previously created group.
+    int SetGroup(String name) {
+      cur_group = _FindGroupID(name);
+      return cur_group;
     }
-    void AddOption(String name, std::function<void(String)> fun, String desc="") {
-      flag_options[name] = FlagInfo{desc, 1,1, [fun](const emp::vector<String> & in){fun(in[0]);}};
+
+    /// Add a new option that doesn't do anything when triggered.
+    FlagInfo & AddOption(String name, String desc = "") {
+      return _AddOption(name, [](const emp::vector<String> &) {}, 0, 0, desc);
     }
-    void AddOption(String name, std::function<void(String,String)> fun, String desc="") {
-      flag_options[name] = FlagInfo{desc, 2,2, [fun](const emp::vector<String> & in){fun(in[0],in[1]);}};
+
+    /// Add an option that doesn't take any arguments and runs a function when triggered.
+    FlagInfo & AddOption(String name, std::function<void()> fun, String desc = "") {
+      return _AddOption(name, [fun](const emp::vector<String> &) { fun(); }, 0, 0, desc);
     }
-    void AddOption(String name, std::function<void(const emp::vector<String> &)> fun,
-                   size_t min_args=0, size_t max_args=npos, String desc="") {
-      flag_options[name] = FlagInfo{desc, min_args,max_args, fun};
+
+    /// Add an option that takes one argument that it passes to a function when triggered.
+    FlagInfo & AddOption(String name, std::function<void(String)> fun, String desc = "") {
+      return _AddOption(name, [fun](const emp::vector<String> & in) { fun(in[0]); }, 1, 1, desc);
+    }
+
+    /// Add an option that takes two arguments that it passes to a function when triggered.
+    FlagInfo & AddOption(String name, std::function<void(String, String)> fun, String desc = "") {
+      return _AddOption(
+        name,
+        [fun](const emp::vector<String> & in) { fun(in[0], in[1]); },
+        2,
+        2,
+        desc);
+    }
+
+    /// Add an option that takes a vector of arguments that it passes to a function when triggered.
+    FlagInfo & AddOption(String name,
+                         std::function<void(const emp::vector<String> &)> fun,
+                         size_t min_args = 0,
+                         size_t max_args = npos,
+                         String desc     = "") {
+      return _AddOption(name, fun, min_args, max_args, desc);
     }
 
     // Allow an option to have a single-letter flag (e.g. "-h" is short for "--help")
     template <typename FUN_T>
-    void AddOption(char shortcut, String name, FUN_T fun, String desc="") {
-      AddOption(name, fun, desc);
-      shortcuts[shortcut] = name;
-      flag_options[name].shortcut = shortcut;
+    FlagInfo & AddOption(char shortcut, String name, FUN_T fun, String desc = "") {
+      notify::TestError(shortcuts.count(shortcut), "Already added shortcut for '", shortcut, "'");
+      FlagInfo & option   = AddOption(name, fun, desc);
+      shortcuts[shortcut] = option.GetName();
+      option.SetShortcut(shortcut);
+      return option;
     }
 
-    void AddFlags(int argc, char* argv[]) {
-      for (size_t i = 0; i < (size_t) argc; i++) {
-        args.push_back(argv[i]);
+    void AddFlags(int argc, char * argv[]) {
+      for (size_t i = 0; i < (size_t) argc; i++) { args.push_back(argv[i]); }
+    }
+
+    [[deprecated("ProcessArg has been changed to ProcessOption")]] size_t
+    ProcessArg(String name, size_t cur_pos = 0) {
+      return ProcessOption(name, cur_pos);
+    }
+
+    [[deprecated("ProcessArg has been changed to ProcessOption")]] size_t
+    ProcessArg(char c, size_t cur_pos = 0) {
+      return ProcessOption(c, cur_pos);
+    }
+
+    // Process an argument associated with a particular option; return num additional args used.
+    size_t ProcessOption(String name, size_t cur_pos) {
+      if (!emp::Has(flag_options, name)) {
+        emp::notify::Error("Unknown flag '", name, "'.");
+        return 0;
       }
-    }
-
-    // Process an argument associated with a particular name; return num additional args used.
-    size_t ProcessArg(String name, size_t cur_pos=0) {
-      if (!emp::Has(flag_options, name)) { emp::notify::Error("Unknown flag '", name , "'."); }
-      auto option = flag_options[name];
+      FlagInfo & option = flag_options[name];
       emp::vector<String> flag_args;
-      for (size_t i = 1; i <= option.min_args; ++i) {
-        flag_args.push_back(args[cur_pos+i]);
+      for (size_t i = 0; i < option.GetMinArgs(); ++i) {
+        const size_t test_pos = cur_pos + i + 1;
+        if (test_pos >= args.size()) {
+          emp::notify::Error("Insufficient arguments for flag '", name, "'");
+          return 0;
+        }
+        flag_args.push_back(args[test_pos]);
       }
-      option.fun(flag_args);
-      return option.min_args;
+      for (size_t i = option.GetMinArgs(); i < option.GetMaxArgs(); ++i) {
+        const size_t test_pos = cur_pos + i + 1;
+        if (test_pos >= args.size()) {
+          break;  // No more args.
+        }
+        if (args[test_pos][0] == '-') {
+          break;  // New flag; stop collecting args for previous.
+        }
+        flag_args.push_back(args[test_pos]);
+      }
+      option.Run(flag_args);
+      return flag_args.size();
     }
 
-    // Process an argument associated with a particular character; return num additional args used.
-    size_t ProcessArg(char c, size_t cur_pos=0) {
-      if (!emp::Has(shortcuts, c)) { emp::notify::Error("Unknown flag '-", c , "'."); }
-      return ProcessArg(shortcuts[c], cur_pos);
+    // Process an option associated with a particular character; return num additional args used.
+    size_t ProcessOption(char c, size_t cur_pos) {
+      if (!emp::Has(shortcuts, c)) { emp::notify::Error("Unknown flag '-", c, "'."); }
+      return ProcessOption(shortcuts[c], cur_pos);
     }
 
     // Process the argument at a given position.  Return number of additional args consumed.
-    size_t ProcessFlagSet(String name, size_t cur_pos=0) {
+    size_t ProcessFlagSet(String name, size_t cur_pos = 0) {
       size_t offset = 0;
       for (size_t i = 1; i < name.size(); ++i) {
-        offset += ProcessArg(name[i], cur_pos+offset);
+        offset += ProcessOption(name[i], cur_pos + offset);
       }
       return offset;
     }
 
+    // Skip an option associated with a particular name; return num additional args used.
+    size_t SkipOption(String name, size_t cur_pos) {
+      if (!emp::Has(flag_options, name)) {
+        emp::notify::Error("Unknown flag '", name, "'.");
+        return 0;
+      }
+      FlagInfo & option = flag_options[name];
+      size_t arg_count  = option.GetMinArgs();
+      if (cur_pos + arg_count >= args.size()) {
+        emp::notify::Error("Insufficient arguments for flag '", name, "'");
+      }
+      for (size_t i = option.GetMinArgs(); i < option.GetMaxArgs(); ++i) {
+        const size_t test_pos = cur_pos + i + 1;
+        if (test_pos >= args.size()) {
+          break;  // No more args.
+        }
+        if (args[test_pos][0] == '-') {
+          break;  // New flag; stop collecting args for previous.
+        }
+        ++arg_count;
+      }
+      return arg_count;
+    }
+
+    // Process an argument associated with a particular character; return num additional args used.
+    size_t SkipOption(char c, size_t cur_pos) {
+      if (!emp::Has(shortcuts, c)) { emp::notify::Error("Unknown flag '-", c, "'."); }
+      return SkipOption(shortcuts[c], cur_pos);
+    }
+
+    // Process the argument at a given position.  Return number of additional args consumed.
+    size_t SkipFlagSet(String name, size_t cur_pos = 0) {
+      size_t offset = 0;
+      for (size_t i = 1; i < name.size(); ++i) { offset += SkipOption(name[i], cur_pos + offset); }
+      return offset;
+    }
+
     // Process all of the flag data that we have.
+    // Flags should have their effects triggered; non-flags should be collected in "extras"
     void Process() {
+      extras.clear();  // Reset the extras since we are processing again.
+
+      // Step through all of the arguments from the command line.
       for (size_t i = 1; i < args.size(); ++i) {
         String & arg = args[i];
         if (arg[0] == '-') {  // We have a flag!
-          if (arg.size() > 1 && arg[1] == '-') i += ProcessArg(arg, i);
-          else i += ProcessFlagSet(arg, i);
+          // If there a two dashes at the front (--) assume we have a single, full option name.
+          if (arg.size() > 1 && arg[1] == '-') {
+            i += ProcessOption(arg, i);
+          }
+
+          // Otherwise with a single '-', assume we have one or more option shortcuts.
+          else {
+            i += ProcessFlagSet(arg, i);
+          }
+        } else {
+          extras.push_back(arg);
         }
-        else extras.push_back(arg);
       }
     }
 
-    void PrintOptions(std::ostream & os=std::cout) const {
+    /// Process a specific argument, if available (return whether it was found).
+    // @CAO - should allow shortcuts to be in found in a block of shortcuts, skipping others.
+    // @CAO - should allow multiple options to be specified at once.
+    bool FindAndProcess(emp::String option_name) {
+      if (!option_name.HasPrefix("--")) { option_name.Prepend("--"); }
+      emp_assert(flag_options.contains(option_name), option_name);
+
+      char shortcut          = flag_options[option_name].GetShortcut();
+      emp::String short_name = shortcut ? emp::MakeString('-', shortcut) : "";
+
+      // Step through all of the arguments from the command line.
+      for (size_t cur_pos = 1; cur_pos < args.size(); ++cur_pos) {
+        const emp::String & cur_arg = args[cur_pos];
+        if (cur_arg == option_name) {
+          ProcessOption(option_name, cur_pos);
+          return true;
+        }
+        if (shortcut && cur_arg.size() >= 2 && cur_arg[0] == '-' && cur_arg[1] != '-') {
+          size_t offset = 0;
+          for (size_t i = 1; i < cur_arg.size(); ++i) {
+            // Run target option; skip over all others.
+            if (cur_arg[i] == shortcut) {
+              offset += ProcessOption(shortcut, cur_pos + offset);
+            } else {
+              offset += SkipOption(cur_arg[i], cur_pos + offset);
+            }
+          }
+        }
+      }
+      return false;  // Not found.
+    }
+
+    /// ONLY process to collect the extras; don't trigger any actual flags yet.
+    const emp::vector<String> & ProcessExtras() {
+      extras.clear();  // Reset the extras to collect again (if we have any).
+
+      // Step through all of the arguments from the command line.
+      for (size_t i = 1; i < args.size(); ++i) {
+        String & arg = args[i];
+        if (arg[0] == '-') {  // We have a flag!
+          // If there a two dashes at the front (--) assume we have a single, full option name.
+          if (arg.size() > 1 && arg[1] == '-') {
+            i += SkipOption(arg, i);
+          }
+
+          // Otherwise with a single '-', assume we have one or more option shortcuts.
+          else {
+            i += SkipFlagSet(arg, i);
+          }
+        } else {
+          extras.push_back(arg);
+        }
+      }
+
+      return extras;
+    }
+
+    size_t GroupSize(emp::String group_name) const {
+      size_t size = 0;
       for (const auto & [name, options] : flag_options) {
+        if (options.GetGroup() == group_name) { ++size; }
+      }
+      return size;
+    }
+
+    void PrintGroupOptions(emp::String group, std::ostream & os = std::cout) const {
+      for (const auto & [name, options] : flag_options) {
+        if (options.GetGroup() != group) { continue; }
         os << "  " << name;
-        if (options.shortcut) {
-          os << " (or '-" << options.shortcut << "')";
-        }
-        if (options.desc.size()) {
-          os << " : " << options.desc;
-        }
+        if (options.GetShortcut()) { os << " (or '-" << options.GetShortcut() << "')"; }
+        if (options.GetDesc().size()) { os << " : " << options.GetDesc(); }
         os << "\n";
       }
     }
+
+    void PrintOptions(std::ostream & os = std::cout) const {
+      // Step through groups, printing each of them.
+      for (const auto & group : groups) {
+        os << "=== " << group.name << " ===\n";
+        if (group.desc.size()) { os << group.desc << '\n'; }
+        PrintGroupOptions(group.name, os);
+        os << '\n';
+      }
+      os.flush();
+
+      // Print any uncategorized options
+      if (GroupSize("none") == 0) {
+        return;  // No uncategorized options.
+      }
+
+      // If there are other groups, list this one as specifically uncategorized.
+      if (groups.size()) { os << "=== Other Options ===\n"; }
+      PrintGroupOptions("none", os);
+      os.flush();
+    }
   };
 
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_CONFIG_FLAGMANAGER_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_CONFIG_FLAG_MANAGER_HPP_GUARD

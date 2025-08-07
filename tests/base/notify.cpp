@@ -7,8 +7,6 @@
  *  @file
  */
 
-#define CATCH_CONFIG_MAIN
-
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/base/notify.hpp"
@@ -71,6 +69,18 @@ TEST_CASE("Test notifications", "[base]")
   emp::notify::Warning("Warning3");
   CHECK(warning_results.size() == 3);
   CHECK(warning_results.back() == "Warning3");
+
+  // Make sure Alert triggers Warning.
+  emp::Alert("Alert!");
+  CHECK(warning_results.size() == 4);
+  CHECK(warning_results.back() == "Alert!");
+
+  // Make sure CappedAlert works the specified number of times.
+  emp::CappedAlert(2, "Capped ONE");
+  emp::CappedAlert(2, "Capped TWO");
+  emp::CappedAlert(2, "Capped THREE");
+  CHECK(warning_results.size() == 6);
+  CHECK(warning_results.back() == "Capped TWO");
 
   emp::notify::Error("ERROR!!!");
   CHECK(error_results.size() == 1);

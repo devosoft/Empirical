@@ -193,3 +193,6 @@ namespace emp {
 }
 
 #endif // #ifndef DEMOS_SLIDESHOW_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: vw's

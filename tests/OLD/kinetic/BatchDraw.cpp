@@ -50,3 +50,6 @@ extern "C" int emkMain()
   KineticExample * example = new KineticExample();
   return (int) example;
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: emk

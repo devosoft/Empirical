@@ -41,3 +41,6 @@ TEST_CASE("Test tuple_utils", "[datastructs]")
   REQUIRE(list[4] == 25.0);
   REQUIRE(list[5] == 25.0);
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: tup

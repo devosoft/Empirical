@@ -7,8 +7,6 @@
  *  @file
  */
 
-#define CATCH_CONFIG_MAIN
-
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include <sstream>
@@ -290,3 +288,6 @@ TEST_CASE("Test FunInfo", "[meta]")
   // CHECK( concat5d() == "<<<==()==>>>" );
 
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: abcdefghijkl fghij bcd abcabcabcabcabcabcabcabcabcabc doubledouble abcabcabcabcabcabc

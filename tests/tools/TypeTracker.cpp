@@ -84,7 +84,7 @@ TEST_CASE("Test TypeTracker", "[tools]") {
     REQUIRE(tt_result == results[i]);
   }
 
-  // Make sure TypeTracker can determine consistant IDs.
+  // Make sure TypeTracker can determine consistent IDs.
   REQUIRE( (tt_t::GetID<int,std::string,double>()) == (tt_t::GetTrackedID(tt_int1, tt_str, tt_doub)) );
   REQUIRE( (tt_t::GetComboID<int,std::string,double>()) == (tt_t::GetTrackedComboID(tt_int1, tt_str, tt_doub)) );
 
@@ -107,3 +107,6 @@ TEST_CASE("Test TypeTracker", "[tools]") {
   REQUIRE(num_args == 3);
 
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: doub

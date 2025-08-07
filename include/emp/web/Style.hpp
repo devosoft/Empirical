@@ -1,67 +1,72 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2018
-*/
 /**
- *  @file
- *  @brief A CSS class for tracking font style, etc.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2015-2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/web/Style.hpp
+ * @brief A CSS class for tracking font style, etc.
  */
 
-#ifndef EMP_WEB_STYLE_HPP_INCLUDE
-#define EMP_WEB_STYLE_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_WEB_STYLE_HPP_GUARD
+#define INCLUDE_EMP_WEB_STYLE_HPP_GUARD
 
 
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
-#endif
-
-#include "../tools/string_utils.hpp"
+#endif  // #ifdef __EMSCRIPTEN__
 
 #include <map>
 #include <set>
 #include <stddef.h>
 #include <string>
 
-namespace emp {
-namespace web {
+#include "../tools/string_utils.hpp"
+
+namespace emp { namespace web {
 
   ///  Class to maintain a map of setting names to values that can be easily ported
-  ///  over to JavaScript.  A companial class, Attributes, also exists.
+  ///  over to JavaScript.  A companion class, Attributes, also exists.
   class Style {
   private:
     std::map<std::string, std::string> settings;  ///< CSS Setting values being tracked.
-    std::set<std::string> classes;  ///< CSS classes
+    std::set<std::string> classes;                ///< CSS classes
 
   public:
-    Style() { ; }
+    Style()              = default;
     Style(const Style &) = default;
-    Style(Style &&) = default;
+    Style(Style &&)      = default;
+
+    template <typename... Ts>
+    Style(Ts &&... args) {
+      Set(std::forward<Ts>(args)...);
+    }
+
     Style & operator=(const Style &) = default;
-    Style & operator=(Style &&) = default;
+    Style & operator=(Style &&)      = default;
 
     /// Return a count of the number of settings that have been set.
     size_t GetSize() const { return settings.size(); }
+
     /// Return a count of the number of classes that have been added.
     size_t GetNClasses() const { return classes.size(); }
 
-   Style & AddClass(const std::string & in_clss) {
-      classes.insert(in_clss);
-      return *this;
-    }
-
-
-    Style & DoSet(const std::string & in_set, const std::string & in_val) {
-      settings[in_set] = in_val;
+    Style & AddClass(const std::string & in_class) {
+      classes.insert(in_class);
       return *this;
     }
 
     /// Record that setting "s" is set to value "v" (converted to string) and return this object.
-    template <typename SET_TYPE>
-    Style & Set(const std::string & s, SET_TYPE v) {
-      return DoSet(s, emp::to_string(v));
+    template <typename SET_TYPE, typename... EXTRA_Ts>
+    Style & Set(const std::string & s, SET_TYPE v, EXTRA_Ts &&... extras) {
+      settings[s] = emp::to_string(v);
+      return Set(std::forward<EXTRA_Ts>(extras)...);
     }
+
+    /// Null condition; Set may have no arguments.
+    Style & Set() { return *this; }
 
     /// Set all values from in_css here as well.  Return this object.
     Style & Insert(const Style & in_css) {
@@ -70,9 +75,7 @@ namespace web {
     }
 
     /// Return true/false based on whether "setting" has been given a value in this Style.
-    bool Has(const std::string & setting) const {
-      return settings.find(setting) != settings.end();
-    }
+    bool Has(const std::string & setting) const { return settings.find(setting) != settings.end(); }
 
     /// Return the (string) value of "setting" that has been recorded in this Style.
     const std::string & Get(const std::string & setting) const {
@@ -80,69 +83,68 @@ namespace web {
       return (it == settings.end()) ? emp::empty_string() : it->second;
     }
 
-    const std::map<std::string, std::string> & GetMap() const {
-      return settings;
-    }
+    const std::map<std::string, std::string> & GetMap() const { return settings; }
 
-    const std::set<std::string> & GetClasses() const {
-      return classes;
-    }
-
+    const std::set<std::string> & GetClasses() const { return classes; }
 
     /// Remove all setting values and all classes.
-    void Clear() { settings.clear(); classes.clear(); }
+    void Clear() {
+      settings.clear();
+      classes.clear();
+    }
 
     /// Remove a specific setting value.
-    void Remove(const std::string & setting) {
-      settings.erase(setting);
-    }
+    void Remove(const std::string & setting) { settings.erase(setting); }
 
     /// Remove a specific class
-    void RemoveClass(const std::string & clss) {
-      classes.erase(clss);
-    }
+    void RemoveClass(const std::string & css_class) { classes.erase(css_class); }
 
     /// Apply ALL of the style settings to a specified widget.
     void Apply(const std::string & widget_id) {
-
       // Stop immediately if nothing to set.
-      if (settings.size() == 0 && classes.size() == 0) return;
+      if (settings.size() == 0 && classes.size() == 0) { return; }
 
       // Find the current object only once.
 #ifdef __EMSCRIPTEN__
-      MAIN_THREAD_EM_ASM({
-          var id = UTF8ToString($0);
+      MAIN_THREAD_EM_ASM(
+        {
+          var id        = UTF8ToString($0);
           emp_i.cur_obj = document.getElementById(id);
-        }, widget_id.c_str());
-#endif
+        },
+        widget_id.c_str());
+#endif  // #ifdef __EMSCRIPTEN__
 
       for (auto css_pair : settings) {
-        if (css_pair.second == "") continue; // Ignore empty entries.
+        if (css_pair.second == "") {
+          continue;  // Ignore empty entries.
+        }
 #ifdef __EMSCRIPTEN__
-        MAIN_THREAD_EM_ASM({
-            var name = UTF8ToString($0);
+        MAIN_THREAD_EM_ASM(
+          {
+            var name  = UTF8ToString($0);
             var value = UTF8ToString($1);
-            if (emp_i.cur_obj) emp_i.cur_obj.style[name] = value;
-          }, css_pair.first.c_str(), css_pair.second.c_str());
-#else
-        std::cout << "Setting '" << widget_id << "' attribute '" << css_pair.first
-                  << "' to '" << css_pair.second << "'.";
-#endif
+            if (emp_i.cur_obj) { emp_i.cur_obj.style[name] = value; }
+          },
+          css_pair.first.c_str(),
+          css_pair.second.c_str());
+#else   // #ifdef __EMSCRIPTEN__
+        std::cout << "Setting '" << widget_id << "' attribute '" << css_pair.first << "' to '"
+                  << css_pair.second << "'.";
+#endif  // #ifdef __EMSCRIPTEN__ : #else
       }
 
       for (std::string class_ : classes) {
-
 #ifdef EMSCRIPTEN
-        EM_ASM_ARGS({
+        EM_ASM_ARGS(
+          {
             var name = UTF8ToString($0);
-            if (emp_i.cur_obj) emp_i.cur_obj.classList.add(name);
-          }, class_.c_str());
-#else
+            if (emp_i.cur_obj) { emp_i.cur_obj.classList.add(name); }
+          },
+          class_.c_str());
+#else   // #ifdef EMSCRIPTEN
         std::cout << "Adding class to '" << widget_id << "': '" << class_;
-#endif
-
+#endif  // #ifdef EMSCRIPTEN : #else
       }
-
     }
 
     /// Apply only a SPECIFIC style setting from the setting library.
@@ -150,61 +152,75 @@ namespace web {
       emp_assert(Has(setting));
 
 #ifdef __EMSCRIPTEN__
-      MAIN_THREAD_EM_ASM({
-          var id = UTF8ToString($0);
+      MAIN_THREAD_EM_ASM(
+        {
+          var id      = UTF8ToString($0);
           var setting = UTF8ToString($1);
-          var value = UTF8ToString($2);
+          var value   = UTF8ToString($2);
           var element = document.getElementById(id);
-          if (element) element.style[setting] = value;
-        }, widget_id.c_str(), setting.c_str(), settings[setting].c_str());
-#else
-      std::cout << "Setting '" << widget_id << "' attribute '" << setting
-                << "' to '" << settings[setting] << "'.";
-#endif
+          if (element) { element.style[setting] = value; }
+        },
+        widget_id.c_str(),
+        setting.c_str(),
+        settings[setting].c_str());
+#else   // #ifdef __EMSCRIPTEN__
+      std::cout << "Setting '" << widget_id << "' attribute '" << setting << "' to '"
+                << settings[setting] << "'.";
+#endif  // #ifdef __EMSCRIPTEN__ : #else
     }
 
-    /// Apply onlay a SPECIFIC style setting with a specifid value!
-    static void Apply(const std::string & widget_id, const std::string & setting,
+    /// Apply only a SPECIFIC style setting with a specified value!
+    static void Apply(const std::string & widget_id,
+                      const std::string & setting,
                       const std::string & value) {
 #ifdef __EMSCRIPTEN__
-      MAIN_THREAD_EM_ASM({
-          var id = UTF8ToString($0);
+      MAIN_THREAD_EM_ASM(
+        {
+          var id      = UTF8ToString($0);
           var setting = UTF8ToString($1);
-          var value = UTF8ToString($2);
+          var value   = UTF8ToString($2);
           var element = document.getElementById(id);
-          if (element) element.style[setting] = value;
-        }, widget_id.c_str(), setting.c_str(), value.c_str());
-#else
-      std::cout << "Setting '" << widget_id << "' attribute '" << setting
-                << "' to '" << value << "'.";
-#endif
+          if (element) { element.style[setting] = value; }
+        },
+        widget_id.c_str(),
+        setting.c_str(),
+        value.c_str());
+#else   // #ifdef __EMSCRIPTEN__
+      std::cout << "Setting '" << widget_id << "' attribute '" << setting << "' to '" << value
+                << "'.";
+#endif  // #ifdef __EMSCRIPTEN__ : #else
     }
 
-    static void ApplyClass(const std::string & widget_id, const std::string & clss){
-
+    static void ApplyClass(const std::string & widget_id, const std::string & css_class) {
 #ifdef EMSCRIPTEN
-      EM_ASM_ARGS({
-          var id = UTF8ToString($0);
-          var name = UTF8ToString($1);
+      EM_ASM_ARGS(
+        {
+          var id      = UTF8ToString($0);
+          var name    = UTF8ToString($1);
           var element = document.getElementById(id);
-          if (element) element.classList.add(name);
-        }, widget_id.c_str(), clss.c_str());
-#else
-      std::cout << "Adding class to '" << widget_id << "': '" << clss;
-#endif
+          if (element) { element.classList.add(name); }
+        },
+        widget_id.c_str(),
+        css_class.c_str());
+#else   // #ifdef EMSCRIPTEN
+      std::cout << "Adding class to '" << widget_id << "': '" << css_class;
+#endif  // #ifdef EMSCRIPTEN : #else
     }
 
-    static void ApplyRemoveClass(const std::string & widget_id, const std::string & clss){
+    static void ApplyRemoveClass(const std::string & widget_id, const std::string & css_class) {
 #ifdef EMSCRIPTEN
-      EM_ASM_ARGS({
-          var id = UTF8ToString($0);
-          var name = UTF8ToString($1);
+      EM_ASM_ARGS(
+        {
+          var id      = UTF8ToString($0);
+          var name    = UTF8ToString($1);
           var element = document.getElementById(id);
-          if (element) element.classList.remove(name);
-        }, widget_id.c_str(), clss.c_str());
-#else
-      std::cout << "Adding class to '" << widget_id << "': '" << clss;
-#endif
+          if (element) { element.classList.remove(name); }
+        },
+        widget_id.c_str(),
+        css_class.c_str());
+#else   // #ifdef EMSCRIPTEN
+      std::cout << "Adding class to '" << widget_id << "': '" << css_class;
+#endif  // #ifdef EMSCRIPTEN : #else
     }
 
     /// Have any settings be set?
@@ -212,8 +228,7 @@ namespace web {
   };
 
 
-}
-}
+}}  // namespace emp::web
 
 
-#endif // #ifndef EMP_WEB_STYLE_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_WEB_STYLE_HPP_GUARD

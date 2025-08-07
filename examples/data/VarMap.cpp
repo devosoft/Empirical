@@ -47,3 +47,6 @@ int main()
 //   std::cout << "name2:   " << vmap.GetType("name2") << std::endl;
 //   std::cout << "name3:   " << vmap.GetType("name3") << std::endl;
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: vmap

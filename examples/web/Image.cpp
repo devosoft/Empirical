@@ -131,3 +131,6 @@ MyAnimate anim;
 int main()
 {
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: poly

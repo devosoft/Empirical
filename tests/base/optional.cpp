@@ -107,3 +107,6 @@ TEST_CASE("Test make_optional", "[base]") {
   }
 
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: aaa optref

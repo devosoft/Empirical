@@ -15,7 +15,7 @@
  * where options can be:
  *
  * GROUP(group name, group description string) -- Start a new group for configuration
- *  options.  Any group structure will be visable to users.
+ *  options.  Any group structure will be visible to users.
  *
  * VALUE(value name, type, default value, description string, aliases...) -- Create a new
  *  variable in the config object that can be easily accessed, changed, etc.  Zero or more
@@ -48,3 +48,6 @@ EMP_BUILD_CONFIG( MyConfig,
 )
 
 #endif // #ifndef TESTS_CONFIG_ASSETS_CONFIG_SETUP_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: soit'sodd andonemore ghi

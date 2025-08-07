@@ -54,7 +54,7 @@ struct ArmOrg {
   }
 
   emp::Point CalcEndPoint(const emp::vector<double> & segments) const {
-    // If we haven't caclulated the end point yet, do so.
+    // If we haven't calculated the end point yet, do so.
     if (end_point.AtOrigin()) {
       emp::Angle facing(angles[0]);
       end_point = facing.GetPoint(segments[0]);

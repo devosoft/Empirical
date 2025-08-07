@@ -25,7 +25,7 @@
  *
  * Thoughts:
  *  - Give control back to the browser for click and take it back for tests.
- *  - Sleep between clicks so bowser doesn't think we're double clicking
+ *  - Sleep between clicks so browser doesn't think we're double clicking
  *  - Compile tests inside of docker, and serve them in regular browser
  */
 
@@ -71,7 +71,7 @@ struct Test_Collapse_Click_Initial : emp::web::BaseTest {
     EM_ASM({
 
       describe("Initial HTML", function() {
-        // Note: If the loading modal is removed from DOM, decrement all indicies by 1
+        // Note: If the loading modal is removed from DOM, decrement all indices by 1
         const controller = document.getElementsByTagName("span")[1];
         const target = document.getElementsByTagName("span")[2];
 
@@ -179,7 +179,7 @@ struct Test_Collapse_Two_Clicks : emp::web::BaseTest {
    *  - double click element after first click (no time delay)
    *  - click element twice after first click (1 sec time delay)
    *  - put whole describe in setTimeout()
-   *  - put whole it or multile it statements in setTimeout()
+   *  - put whole it or multiple it statements in setTimeout()
    *
    * Suggestions to try next:
    *  - change settimeout to 1 ms
@@ -252,7 +252,7 @@ struct Test_show_timing : emp::web::BaseTest {
   /*
    * Use setTimeout() when needing to check if an element has the
    * class show after triggering a click. If not, the assert may
-   * incorrectly return false. This is becuase Bootstrap briefly
+   * incorrectly return false. This is because Bootstrap briefly
    * gives elements that are in the process of collapsing or expanding
    * the class "collapsing" before the "show" class is removed or added,
    * respectively. If setTimeout() is not used, the element will be
@@ -263,7 +263,7 @@ struct Test_show_timing : emp::web::BaseTest {
     EM_ASM({
 
       describe("Target after clicking controller", function() {
-        // Note: If the loading modal is removed from DOM, decrement all indicies by 1
+        // Note: If the loading modal is removed from DOM, decrement all indices by 1
         const controller = document.getElementsByTagName("span")[1];
         const target = document.getElementsByTagName("span")[2];
 
@@ -288,7 +288,7 @@ int main() {
   test_runner.AddTest<Test_Collapse_Click_Initial>("Test DOM of original emp::prefab::Collapse element"); // Passes
   test_runner.AddTest<Test_Collapse_One_Click>("Test DOM after 1st click of emp::prefab::Collapse element"); // Passes
   test_runner.AddTest<Test_Collapse_Two_Clicks>("Test DOM after 2nd click of emp::prefab::Collapse element"); // Passes, but not efficient
-  test_runner.AddTest<Test_show_timing>("Test existance of class show after expanding"); // Passes
+  test_runner.AddTest<Test_show_timing>("Test existence of class show after expanding"); // Passes
 
   test_runner.Run();
 }

@@ -50,3 +50,6 @@ int main()
   std::cout << "End weight = " << test_imap.GetWeight() << std::endl;
 
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: imap

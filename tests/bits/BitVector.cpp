@@ -94,11 +94,11 @@ TEST_CASE("1: Test BitVector Constructors", "[bits]"){
   REQUIRE( bv13.CountOnes() == 7 );
 }
 
-TEST_CASE("2: Test BitVector Assignemnts", "[bits]"){
+TEST_CASE("2: Test BitVector Assignments", "[bits]"){
   emp::vector< emp::old::BitVector > v;
 
   // Try all BitVector sizes from 0 to 128.
-  // Lot's of move operators will trigger as vector grows.
+  // Lots of move operators will trigger as vector grows.
   for (size_t i = 0; i <= 128; i++) {
     v.emplace_back(i);
   }
@@ -420,10 +420,10 @@ TEST_CASE("5: Test Randomize() and variants", "[bits]") {
     // Test the probabilistic CHANGE functions.
     bv.Clear();                     REQUIRE(bv.CountOnes() == 0);   // Set all bits to 0.
 
-    bv.FlipRandom(random, 0.3);     // Exprected: 300 ones (from flipping zeros)
+    bv.FlipRandom(random, 0.3);     // Expected: 300 ones (from flipping zeros)
     num_ones = bv.CountOnes();      REQUIRE(num_ones > 230);  REQUIRE(num_ones < 375);
 
-    bv.FlipRandom(random, 0.3);     // Exprected: 420 ones (hit by ONE but not both flips)
+    bv.FlipRandom(random, 0.3);     // Expected: 420 ones (hit by ONE but not both flips)
     num_ones = bv.CountOnes();      REQUIRE(num_ones > 345);  REQUIRE(num_ones < 495);
 
     bv.SetRandom(random, 0.5);      // Expected: 710 (already on OR newly turned on)
@@ -435,7 +435,7 @@ TEST_CASE("5: Test Randomize() and variants", "[bits]") {
     bv.ClearRandom(random, 0.2);    // Expected 753.6 (20% of those on now off)
     num_ones = bv.CountOnes();      REQUIRE(num_ones > 675);  REQUIRE(num_ones < 825);
 
-    bv.FlipRandom(random, 0.5);     // Exprected: 500 ones (each bit has a 50% chance of flipping)
+    bv.FlipRandom(random, 0.5);     // Expected: 500 ones (each bit has a 50% chance of flipping)
     num_ones = bv.CountOnes();      REQUIRE(num_ones > 425);  REQUIRE(num_ones < 575);
 
 
@@ -796,7 +796,7 @@ TEST_CASE("9: Test Boolean logic and shifting functions.", "[bits]") {
   REQUIRE( (bv >> 3) == emp::old::BitVector("11001000"));
   REQUIRE( (bv >> 4) == emp::old::BitVector("10010000"));
 
-  // Now some tests with bitvectors longer than one field.
+  // Now some tests with BitVectors longer than one field.
   const emp::old::BitVector bvl80 =
     "00110111000101110001011100010111000101110001011100010111000101110001011100010111";
   REQUIRE( bvl80.GetSize() == 80 );
@@ -1038,7 +1038,7 @@ TEST_CASE("Test BitVector", "[bits]")
   bv4.Toggle(55, 75);
   ss.str(std::string()); bv4.PrintFields(ss); // Clear & resend bits.
   REQUIRE(ss.str() == "00000000000000000000011111011110 0101111110000000000000000000000000000000000000000000000100000000");
-  // test clearing a field across bounderies
+  // test clearing a field across boundaries
   bv4.Clear(56, 74);
   ss.str(std::string()); bv4.PrintFields(ss); // Clear & resend bits.
   REQUIRE(ss.str() == "00000000000000000000010000000000 0000000010000000000000000000000000000000000000000000000100000000");
@@ -1369,3 +1369,6 @@ TEST_CASE("BitVector regression test for #277", "[bits]") {
   // #endif
 
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: bvl

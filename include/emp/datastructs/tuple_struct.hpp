@@ -1,17 +1,16 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2021
-*/
 /**
- *  @file
- *  @brief These macros will build a tuple and accessors to that tuple's members inside of a
- * class definintion.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2021 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/datastructs/tuple_struct.hpp
+ * @brief These macros will build a tuple and accessors to that tuple's members inside of a
+ * class definition.
  *
  *  @note Status: ALPHA
  *
  *  "But WHY???" you ask. Let me explain: Keeping a tuple allows us to easily track the
- *  members in the stuct or class, and makes possible powerful types of reflection
+ *  members in the struct or class, and makes possible powerful types of reflection
  *  including identifying all members and performing an action on each (such as
  *  serialization).  Since tuples instantiate members directly, these benefits should
  *  come at no cost to performance.
@@ -47,7 +46,7 @@
  *      )
  *    };`
  *
- *  This struct can now be used as a C++ stand-in for Javscript objects for use with
+ *  This struct can now be used as a C++ stand-in for Javascript objects for use with
  *  JSWrap.
  *
  *  Introspective tuple structs have a static member n_fields that indicates how
@@ -67,8 +66,10 @@
  * all members of a tuple.
  */
 
-#ifndef EMP_DATASTRUCTS_TUPLE_STRUCT_HPP_INCLUDE
-#define EMP_DATASTRUCTS_TUPLE_STRUCT_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_DATASTRUCTS_TUPLE_STRUCT_HPP_GUARD
+#define INCLUDE_EMP_DATASTRUCTS_TUPLE_STRUCT_HPP_GUARD
 
 #include <tuple>
 #include <typeindex>
@@ -87,7 +88,7 @@
   TYPE & NAME(const typename std::decay<TYPE>::type & _in) {       \
     std::get<POS>(TUPLE_NAME) = _in;                               \
     return std::get<POS>(TUPLE_NAME);                              \
-  }                                                                \
+  }
 
 
 // We have to figure out how many arguments we have.
@@ -176,7 +177,7 @@
 
 /// @cond SIMPLIFY
 
-//Helper macros for building introspective tuples
+// Helper macros for building introspective tuples
 #define GET_TYPEID(t) typeid(t)
 #define GET_POINTER(A) &A()
 
@@ -202,11 +203,13 @@ namespace emp {
   using n_fields_member_type = decltype(T::n_fields);
 
   template <typename T>
-  constexpr bool is_introspective_tuple() { return test_type_exist<n_fields_member_type, T>(); };
+  constexpr bool is_introspective_tuple() {
+    return test_type_exist<n_fields_member_type, T>();
+  }
 
-}
+}  // namespace emp
 
-/// This varient of the tuple building macro can be used in situations where
+/// This variant of the tuple building macro can be used in situations where
 /// access to stringified versions of variable names is necessary.
 /// It stores an array of stringified variable names called var_names in the
 /// struct this macro was called from. It also stores an array containing the
@@ -226,6 +229,6 @@ namespace emp {
 ///
 #define EMP_BUILD_INTROSPECTIVE_TUPLE(...) EMP_BUILD_INTROSPECTIVE_NAMED_TUPLE(emp__tuple_body, __VA_ARGS__)
 
-#endif /*DOXYGEN_SHOULD_SKIP_THIS*/
+#endif /*DOXYGEN_SHOULD_SKIP_THIS*/  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-#endif // #ifndef EMP_DATASTRUCTS_TUPLE_STRUCT_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_DATASTRUCTS_TUPLE_STRUCT_HPP_GUARD

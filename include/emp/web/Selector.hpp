@@ -1,29 +1,30 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2018
-*/
 /**
- *  @file
- *  @brief Specs for the Selector widget.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2015-2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  A Selector widget provides the user with a pull-down menu.  It can be
- *  examined at any time (via GetSelectID()) or else alerts call a designated
- *  function when a particular option is chosen.
+ * @file include/emp/web/Selector.hpp
+ * @brief Specs for the Selector widget.
  *
- *     UI::Selector sel("sel");
+ * A Selector widget provides the user with a pull-down menu.  It can be
+ * examined at any time (via GetSelectID()) or else alerts call a designated
+ * function when a particular option is chosen.
  *
- *     sel.SetOption("Option 1");
- *     sel.SetOption("Option B", TriggerB) ;
- *     sel.SetOption("Option the Third", [](){ emp::Alert("3 chosen!"} );
- *     sel.SetOption("Option IV");
+ *    UI::Selector sel("sel");
  *
- *  In this example, the second option will call TriggerB when it is chosen,
- *  while the third option will call the provided lambda function.
+ *    sel.SetOption("Option 1");
+ *    sel.SetOption("Option B", TriggerB) ;
+ *    sel.SetOption("Option the Third", [](){ emp::Alert("3 chosen!"} );
+ *    sel.SetOption("Option IV");
+ *
+ * In this example, the second option will call TriggerB when it is chosen,
+ * while the third option will call the provided lambda function.
  */
 
-#ifndef EMP_WEB_SELECTOR_HPP_INCLUDE
-#define EMP_WEB_SELECTOR_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_WEB_SELECTOR_HPP_GUARD
+#define INCLUDE_EMP_WEB_SELECTOR_HPP_GUARD
 
 #include <stddef.h>
 
@@ -32,31 +33,36 @@
 #include "JSWrap.hpp"
 #include "Widget.hpp"
 
-namespace emp {
-namespace web {
+namespace emp { namespace web {
 
   class Selector : public internal::WidgetFacet<Selector> {
     friend class SelectorInfo;
   protected:
-    #ifndef DOXYGEN_SHOULD_SKIP_THIS
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
     class SelectorInfo : public internal::WidgetInfo {
       friend Selector;
     protected:
-      emp::vector<std::string> options;               ///< What are the options to choose from?
-      emp::vector<std::function<void()> > callbacks;  ///< Which funtion to run for each option?
-      size_t select_id;                               ///< Which index is currently selected?
+      emp::vector<std::string> options;                 ///< What are the options to choose from?
+      emp::vector<std::function < void()> > callbacks;  ///< Which function to run for each option?
+      size_t select_id;                                 ///< Which index is currently selected?
 
       bool autofocus;
       bool disabled;
 
       size_t callback_id;
 
-      SelectorInfo(const std::string & in_id="")
-        : internal::WidgetInfo(in_id), select_id(0), autofocus(false), disabled(false) { ; }
-      SelectorInfo(const SelectorInfo &) = delete;               // No copies of INFO allowed
-      SelectorInfo & operator=(const SelectorInfo &) = delete;   // No copies of INFO allowed
+      SelectorInfo(const std::string & in_id = "")
+        : internal::WidgetInfo(in_id), select_id(0), autofocus(false), disabled(false) {
+        ;
+      }
+
+      SelectorInfo(const SelectorInfo &)             = delete;  // No copies of INFO allowed
+      SelectorInfo & operator=(const SelectorInfo &) = delete;  // No copies of INFO allowed
+
       virtual ~SelectorInfo() {
-        if (callback_id) emp::JSDelete(callback_id);             // Delete callback wrapper.
+        if (callback_id) {
+          emp::JSDelete(callback_id);  // Delete callback wrapper.
+        }
       }
 
       std::string GetTypeName() const override { return "SelectorInfo"; }
@@ -64,25 +70,26 @@ namespace web {
       void SetOption(const std::string & name, const std::function<void()> & cb, size_t id) {
         // If we need more room for options, increase the array size.
         if (id >= options.size()) {
-          options.resize(id+1);
-          callbacks.resize(id+1);
+          options.resize(id + 1);
+          callbacks.resize(id + 1);
         }
-        options[id] = name;
+        options[id]   = name;
         callbacks[id] = cb;
       }
+
       void SetOption(const std::string & name, const std::function<void()> & cb) {
-        SetOption(name, cb, options.size()); // No option id specified, so choose the next one.
+        SetOption(name, cb, options.size());  // No option id specified, so choose the next one.
       }
 
       void DoChange(size_t new_id) {
         select_id = new_id;
-        if (callbacks[new_id]) callbacks[new_id]();
+        if (callbacks[new_id]) { callbacks[new_id](); }
       }
 
       virtual void GetHTML(std::stringstream & HTML) override {
-        HTML << "<select";                              // Start the select tag.
-        if (disabled) { HTML << " disabled=true"; }     // Check if should be disabled
-        HTML << " id=\"" << id << "\"";                 // Indicate ID.
+        HTML << "<select";                           // Start the select tag.
+        if (disabled) { HTML << " disabled=true"; }  // Check if should be disabled
+        HTML << " id=\"" << id << "\"";              // Indicate ID.
 
         // Indicate action on change.
         HTML << " onchange=\"emp.Callback(" << callback_id << ", this.selectedIndex)\">";
@@ -90,7 +97,7 @@ namespace web {
         // List out options
         for (size_t i = 0; i < options.size(); i++) {
           HTML << "<option value=\"" << i << "\"";
-          if (i == select_id) HTML << " selected";
+          if (i == select_id) { HTML << " selected"; }
           HTML << ">" << options[i] << "</option>";
         }
         HTML << "</select>";
@@ -98,39 +105,43 @@ namespace web {
 
       void UpdateAutofocus(bool in_af) {
         autofocus = in_af;
-        if (state == Widget::ACTIVE) ReplaceHTML();
+        if (state == Widget::ACTIVE) { ReplaceHTML(); }
       }
+
       void UpdateDisabled(bool in_dis) {
         disabled = in_dis;
-        if (state == Widget::ACTIVE) ReplaceHTML();
+        if (state == Widget::ACTIVE) { ReplaceHTML(); }
       }
 
     public:
       virtual std::string GetType() override { return "web::SelectorInfo"; }
     };  // End of SelectorInfo class.
-    #endif // DOXYGEN_SHOULD_SKIP_THIS
+#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-    // Get a properly cast version of indo.
+    // Get a properly cast version of info.
     SelectorInfo * Info() { return (SelectorInfo *) info; }
+
     const SelectorInfo * Info() const { return (SelectorInfo *) info; }
 
     Selector(SelectorInfo * in_info) : WidgetFacet(in_info) { ; }
 
   public:
-    Selector(const std::string & in_id="") : WidgetFacet(in_id)
-    {
+    Selector(const std::string & in_id = "") : WidgetFacet(in_id) {
       info = new SelectorInfo(in_id);
 
       Info()->select_id = 0;
       Info()->autofocus = false;
-      Info()->disabled = false;
+      Info()->disabled  = false;
 
       SelectorInfo * s_info = Info();
       Info()->callback_id =
-        JSWrap( std::function<void(size_t)>([s_info](size_t new_id){s_info->DoChange(new_id);}) );
+        JSWrap(std::function<void(size_t)>([s_info](size_t new_id) { s_info->DoChange(new_id); }));
     }
+
     Selector(const Selector & in) : WidgetFacet(in) { ; }
+
     Selector(const Widget & in) : WidgetFacet(in) { emp_assert(in.IsSelector()); }
+
     virtual ~Selector() { ; }
 
     using INFO_TYPE = SelectorInfo;
@@ -151,11 +162,13 @@ namespace web {
     bool IsDisabled() const { return Info()->disabled; }
 
     /// Set a specific ID as currently active.
-    Selector & SelectID(size_t id) { Info()->select_id = id; return *this; }
+    Selector & SelectID(size_t id) {
+      Info()->select_id = id;
+      return *this;
+    }
 
     /// Add a new option to the selector and the function to be called if it is chosen.
-    Selector & SetOption(const std::string & in_option,
-                         const std::function<void()> & in_cb) {
+    Selector & SetOption(const std::string & in_option, const std::function<void()> & in_cb) {
       Info()->SetOption(in_option, in_cb);
       return *this;
     }
@@ -171,23 +184,31 @@ namespace web {
 
     /// Set a selector option name, but no function to be called.
     Selector & SetOption(const std::string & in_option) {
-      return SetOption(in_option, std::function<void()>([](){}));
+      return SetOption(in_option, std::function<void()>([]() {}));
     }
 
     /// Set a specific selection option name, determined by the ID, but no function to call.
     Selector & SetOption(const std::string & in_option, size_t opt_id) {
-      return SetOption(in_option, std::function<void()>([](){}), opt_id);
+      return SetOption(in_option, std::function<void()>([]() {}), opt_id);
     }
 
     /// Update autofocus setting.
-    Selector & Autofocus(bool in_af) { Info()->UpdateAutofocus(in_af); return *this; }
+    Selector & Autofocus(bool in_af) {
+      Info()->UpdateAutofocus(in_af);
+      return *this;
+    }
 
     /// Update disabled status.
-    Selector & Disabled(bool in_dis) { Info()->UpdateDisabled(in_dis); return *this; }
+    Selector & Disabled(bool in_dis) {
+      Info()->UpdateDisabled(in_dis);
+      return *this;
+    }
   };
 
 
-}
-}
+}}  // namespace emp::web
 
-#endif // #ifndef EMP_WEB_SELECTOR_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_WEB_SELECTOR_HPP_GUARD
+
+// Local settings for Empecable file checker.
+// empecable_words: sel

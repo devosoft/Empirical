@@ -54,3 +54,6 @@ TEST_CASE("Test World select", "[Evolve]")
   world.Update();
   REQUIRE(world.GetNumOrgs() == 1);
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: remainthree isoddconst isodd

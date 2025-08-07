@@ -56,7 +56,7 @@ int main()
   emp::Random random;
   emp::evo::EAWorld<emp::AvidaGP> world(random, "AvidaWorld");
 
-  // Build a random initial popoulation.
+  // Build a random initial population.
   for (size_t i = 0; i < POP_SIZE; i++) {
     emp::AvidaGP cpu(inst_lib);
     cpu.PushRandom(random, GENOME_SIZE);

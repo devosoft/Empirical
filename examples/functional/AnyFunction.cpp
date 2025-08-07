@@ -28,3 +28,6 @@ int main()
   fun3.Call<void>(20.20);
   fun3.Call(11.11);
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: sfun

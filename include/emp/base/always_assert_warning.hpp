@@ -1,72 +1,73 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2023
-*/
 /**
- *  @file
- *  @brief A more dynamic replacement for standard library asserts.
- *  @note Status: RELEASE
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2023 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  A replacement for the system-level assert.h, called "emp_always_assert"
- *  Added functionality:
- *   - If compiled with Emscripten, will provide pop-up alerts in a web browser.
- *   - emp_assert can take additional arguments.  If the assert is triggered,
- *     those extra arguments will be evaluated and printed.
- *   - if EMP_TDEBUG is defined, emp_assert() goes into test mode and records
- *     failures, but does not abort.  (useful for unit tests of asserts)
+ * @file include/emp/base/always_assert_warning.hpp
+ * @brief A more dynamic replacement for standard library asserts.
+ * @note Status: RELEASE
  *
- *  Example:
+ * A replacement for the system-level assert.h, called "emp_always_assert"
+ * Added functionality:
+ *  - If compiled with Emscripten, will provide pop-up alerts in a web browser.
+ *  - emp_assert can take additional arguments.  If the assert is triggered,
+ *    those extra arguments will be evaluated and printed.
+ *  - if EMP_TDEBUG is defined, emp_assert() goes into test mode and records
+ *    failures, but does not abort.  (useful for unit tests of asserts)
  *
- *     int a = 6;
- *     emp_always_assert(a==5, a);
+ * Example:
  *
- *  Unlike "emp_assert_warning", "emp_always_assert_warning" will trigger an
- *  assertion error whether compiled in debug mode or not.
+ *    int a = 6;
+ *    emp_always_assert(a==5, a);
+ *
+ * Unlike "emp_assert_warning", "emp_always_assert_warning" will trigger an
+ * assertion error whether compiled in debug mode or not.
  */
 
-#ifndef EMP_BASE_ALWAYS_ASSERT_WARNING_HPP_INCLUDE
-#define EMP_BASE_ALWAYS_ASSERT_WARNING_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_BASE_ALWAYS_ASSERT_WARNING_HPP_GUARD
+#define INCLUDE_EMP_BASE_ALWAYS_ASSERT_WARNING_HPP_GUARD
 
 #include <cstdlib>
 
 #include "_assert_macros.hpp"
 #include "_assert_trigger.hpp"
 
-#if defined( _MSC_VER )
+#if defined(_MSC_VER)
 
-  #define emp_always_assert_warning_msvc_impl(TEST)                            \
-    do {                                                                       \
-      !(TEST)                                                                  \
-      && emp::assert_trigger(__FILE__, __LINE__, #TEST, 0);                    \
+#define emp_always_assert_warning_msvc_impl(TEST)                      \
+    do {                                                               \
+      !(TEST)                                                          \
+      && emp::assert_trigger(__FILE__, __LINE__, #TEST, 0);            \
     } while(0)
 
-  #define emp_always_assert_warning_impl(TEST) \
+#define emp_always_assert_warning_impl(TEST) \
     emp_always_assert_warning_msvc_impl(TEST)
 
-#else
+#else  // #if defined(_MSC_VER)
 
-  #define emp_always_assert_warning_impl(...)                                  \
-    do {                                                                       \
-      !(emp_assert_GET_ARG_1(__VA_ARGS__, ~))                                  \
-      && emp::assert_trigger(                                                  \
-        __FILE__, __LINE__,                                                    \
-        emp_assert_STRINGIFY( emp_assert_GET_ARG_1(__VA_ARGS__, ~) ),          \
-        emp_assert_TO_PAIRS(__VA_ARGS__)                                       \
-      );                                                                       \
+#define emp_always_assert_warning_impl(...)                            \
+    do {                                                               \
+      !(emp_assert_GET_ARG_1(__VA_ARGS__, ~))                          \
+      && emp::assert_trigger(                                          \
+        __FILE__, __LINE__,                                            \
+        emp_assert_STRINGIFY( emp_assert_GET_ARG_1(__VA_ARGS__, ~) ),  \
+        emp_assert_TO_PAIRS(__VA_ARGS__)                               \
+      );                                                               \
     } while(0)
 
-#endif
+#endif  // #if defined(_MSC_VER) : #else
 
 /// Require a specified condition to be true. If it is false, immediately
 /// halt execution. Print also extra information on any variables or
 /// expressions provided as variadic args. Will be evaluated when compiled in
 /// both debug and release mode. Can be disabled with -DEMP_NO_WARNINGS.
 #ifndef EMP_NO_WARNINGS
-  #define emp_always_assert_warning(...) \
+#define emp_always_assert_warning(...)          \
     emp_always_assert_warning_impl(__VA_ARGS__)
-#else
-  #define emp_always_assert_warning(...)
-#endif
+#else  // #ifndef EMP_NO_WARNINGS
+#define emp_always_assert_warning(...)
+#endif  // #ifndef EMP_NO_WARNINGS : #else
 
-#endif // #ifndef EMP_BASE_ALWAYS_ASSERT_WARNING_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_BASE_ALWAYS_ASSERT_WARNING_HPP_GUARD

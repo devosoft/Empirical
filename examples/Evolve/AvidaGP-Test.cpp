@@ -8,8 +8,8 @@
  *  @brief A simple test of AvidaGP with World for copies and mutations.
  *
  *  A few basic steps to examine AvidaGP organisms in a world.
- *  1. Inject a lenght 10 organism
- *  2. Copy that first oranism
+ *  1. Inject a length 10 organism
+ *  2. Copy that first organism
  *  3. Mutate the copy
  *  4. Make a copy of the mutant.
  *
@@ -31,9 +31,9 @@ void Print(const emp::AvidaGP & cpu) {
   std::cout << " IP=" << cpu.GetIP() << std::endl;
 }
 
-constexpr size_t POP_SIZE = 1000;
-constexpr size_t GENOME_SIZE = 50;
-constexpr size_t UPDATES = 50;
+// constexpr size_t POP_SIZE = 1000;
+// constexpr size_t GENOME_SIZE = 50;
+// constexpr size_t UPDATES = 50;
 
 int main()
 {

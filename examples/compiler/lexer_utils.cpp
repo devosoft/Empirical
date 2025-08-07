@@ -132,3 +132,6 @@ int main()
             << "dfa_all example:   " << emp::FindExample(dfa_all) << std::endl
             << "dfa_inc size 5 example: " << emp::FindExample(dfa_inc, 5) << std::endl;
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: ddef cbabab edffed fedfed defdef ccbababc defed ffed ccbabab edffedf ccc ababcbc ababaabbab

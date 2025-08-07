@@ -1,7 +1,7 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2024
+ *  date: 2024-2025
 */
 /**
  *  @file
@@ -145,25 +145,25 @@ TEST_CASE("Test Systematics", "[Evolve]") {
 
   // std::cout << "\nAddOrg 25 (id1, no parent)\n";
   sys.SetUpdate(0);
-  auto id1 = sys.AddOrg(25, nullptr);
+  [[maybe_unused]] auto id1 = sys.AddOrg(25, nullptr);
   // std::cout << "\nAddOrg -10 (id2; parent id1)\n";
   sys.SetUpdate(6);
-  auto id2 = sys.AddOrg(-10, id1);
+  [[maybe_unused]] auto id2 = sys.AddOrg(-10, id1);
   // std::cout << "\nAddOrg 26 (id3; parent id1)\n";
   sys.SetUpdate(10);
-  auto id3 = sys.AddOrg(26, id1);
+  [[maybe_unused]] auto id3 = sys.AddOrg(26, id1);
   // std::cout << "\nAddOrg 27 (id4; parent id2)\n";
   sys.SetUpdate(25);
-  auto id4 = sys.AddOrg(27, id2);
+  [[maybe_unused]] auto id4 = sys.AddOrg(27, id2);
   // std::cout << "\nAddOrg 28 (id5; parent id2)\n";
   sys.SetUpdate(32);
-  auto id5 = sys.AddOrg(28, id2);
+  [[maybe_unused]] auto id5 = sys.AddOrg(28, id2);
   // std::cout << "\nAddOrg 29 (id6; parent id5)\n";
   sys.SetUpdate(39);
-  auto id6 = sys.AddOrg(29, id5);
+  [[maybe_unused]] auto id6 = sys.AddOrg(29, id5);
   // std::cout << "\nAddOrg 30 (id7; parent id1)\n";
   sys.SetUpdate(6);
-  auto id7 = sys.AddOrg(30, id1);
+  [[maybe_unused]] auto id7 = sys.AddOrg(30, id1);
 
   CHECK(*id1 < *id2);
   CHECK(sys.Parent(id2) == id1);
@@ -182,10 +182,10 @@ TEST_CASE("Test Systematics", "[Evolve]") {
 
   // std::cout << "\nAddOrg 31 (id8; parent id7)\n";
   sys.SetUpdate(11);
-  auto id8 = sys.AddOrg(31, id7);
+  [[maybe_unused]] auto id8 = sys.AddOrg(31, id7);
   // std::cout << "\nAddOrg 32 (id9; parent id8)\n";
   sys.SetUpdate(19);
-  auto id9 = sys.AddOrg(32, id8);
+  [[maybe_unused]] auto id9 = sys.AddOrg(32, id8);
 
 
   CHECK(sys.GetEvolutionaryDistinctiveness(id3, 10) == 10);
@@ -196,7 +196,7 @@ TEST_CASE("Test Systematics", "[Evolve]") {
   CHECK(sys.GetEvolutionaryDistinctiveness(id9, 19) == 12.5);
 
   // std::cout << "\nAddOrg 33 (id10; parent id8)\n";
-  auto id10 = sys.AddOrg(33, id8);
+  [[maybe_unused]] auto id10 = sys.AddOrg(33, id8);
 
   sys.RemoveOrg(id7);
   sys.RemoveOrg(id8);
@@ -211,10 +211,10 @@ TEST_CASE("Test Systematics", "[Evolve]") {
 
   // std::cout << "\nAddOrg 34 (id11; parent id9)\n";
   sys.SetUpdate(22);
-  auto id11 = sys.AddOrg(34, id9);
+  [[maybe_unused]] auto id11 = sys.AddOrg(34, id9);
   // std::cout << "\nAddOrg 35 (id12; parent id10)\n";
   sys.SetUpdate(23);
-  auto id12 = sys.AddOrg(35, id11);
+  [[maybe_unused]] auto id12 = sys.AddOrg(35, id11);
 
   sys.RemoveOrg(id9);
 
@@ -223,10 +223,10 @@ TEST_CASE("Test Systematics", "[Evolve]") {
 
   // std::cout << "\nAddOrg 36 (id13; parent id12)\n";
   sys.SetUpdate(27);
-  auto id13 = sys.AddOrg(36, id12);
+  [[maybe_unused]] auto id13 = sys.AddOrg(36, id12);
   // std::cout << "\nAddOrg 37 (id14; parent id13)\n";
   sys.SetUpdate(30);
-  auto id14 = sys.AddOrg(37, id13);
+  [[maybe_unused]] auto id14 = sys.AddOrg(37, id13);
 
   sys.RemoveOrg(id13);
 
@@ -234,7 +234,7 @@ TEST_CASE("Test Systematics", "[Evolve]") {
 
   // std::cout << "\nAddOrg 38 (id15; parent id14)\n";
   sys.SetUpdate(33);
-  auto id15 = sys.AddOrg(38, id14);
+  [[maybe_unused]] auto id15 = sys.AddOrg(38, id14);
 
   sys.RemoveOrg(id14);
 
@@ -242,16 +242,16 @@ TEST_CASE("Test Systematics", "[Evolve]") {
 
   // std::cout << "\nAddOrg 39 (id16; parent id11)\n";
   sys.SetUpdate(35);
-  auto id16 = sys.AddOrg(39, id11);
+  [[maybe_unused]] auto id16 = sys.AddOrg(39, id11);
   // std::cout << "\nAddOrg 40 (id17; parent id11)\n";
-  auto id17 = sys.AddOrg(40, id11);
+  [[maybe_unused]] auto id17 = sys.AddOrg(40, id11);
 
   CHECK(sys.GetEvolutionaryDistinctiveness(id16, 35) == Approx(17.4));
   CHECK(sys.GetEvolutionaryDistinctiveness(id17, 35) == Approx(17.4));
 
   // std::cout << "\nAddOrg 41 (id18; parent id17)\n";
   sys.SetUpdate(36);
-  auto id18 = sys.AddOrg(41, id17);
+  [[maybe_unused]] auto id18 = sys.AddOrg(41, id17);
 
   CHECK(sys.GetEvolutionaryDistinctiveness(id18, 37) == Approx(12.1666667));
 
@@ -261,7 +261,7 @@ TEST_CASE("Test Systematics", "[Evolve]") {
 
   std::cout << "\nAddOrg 42 (id19; parent id17)\n";
   sys.SetUpdate(37);
-  auto id19 = sys.AddOrg(42, id17);
+  [[maybe_unused]] auto id19 = sys.AddOrg(42, id17);
   CHECK(sys.GetBranchesToRoot(id19) == 2);
   CHECK(sys.GetDistanceToRoot(id19) == 6);
   CHECK(sys.GetTaxonDistinctiveness(id19) == Approx(1.0/6.0));
@@ -294,7 +294,7 @@ TEST_CASE("Test Systematics", "[Evolve]") {
   CHECK(sys.GetNumAncestors() == 7);
   CHECK(sys.GetNumOutside() == 1);
 
-  auto ancestors = sys.GetAncestors();
+  [[maybe_unused]] auto ancestors = sys.GetAncestors();
   emp::vector<emp::Ptr<emp::Taxon<int>>> ancestor_vec(ancestors.begin(), ancestors.end());
   emp::Sort(ancestor_vec, [](emp::Ptr<emp::Taxon<int>> & a, emp::Ptr<emp::Taxon<int>> & b){
     return a->GetID() < b->GetID();
@@ -335,7 +335,7 @@ TEST_CASE("Test Systematics", "[Evolve]") {
   CHECK(ancestor_vec[6]->GetNumOff() == 1);
   CHECK(ancestor_vec[6]->GetParent()->GetID() == 13);
 
-  auto outside_taxon = *(sys.GetOutside().begin());
+  [[maybe_unused]] auto outside_taxon = *(sys.GetOutside().begin());
   CHECK(outside_taxon->GetID() == 10);
   CHECK(outside_taxon->GetNumOrgs() == 0);
   CHECK(outside_taxon->GetNumOff() == 0);
@@ -343,7 +343,7 @@ TEST_CASE("Test Systematics", "[Evolve]") {
 
   CHECK(sys.GetMaxDepth() == 8);
 
-  auto active = sys.GetActive();
+  [[maybe_unused]] auto active = sys.GetActive();
   emp::vector<emp::Ptr<emp::Taxon<int>>> active_vec(active.begin(), active.end());
   emp::Sort(active_vec, [](emp::Ptr<emp::Taxon<int>> & a, emp::Ptr<emp::Taxon<int>> & b){
     return a->GetID() < b->GetID();
@@ -410,25 +410,25 @@ TEST_CASE("Test not tracking ancestors", "[Evolve]") {
 
   // std::cout << "\nAddOrg 25 (id1, no parent)\n";
   sys.SetUpdate(0);
-  auto id1 = sys.AddOrg(25, nullptr);
+  [[maybe_unused]] auto id1 = sys.AddOrg(25, nullptr);
   // std::cout << "\nAddOrg -10 (id2; parent id1)\n";
   sys.SetUpdate(6);
-  auto id2 = sys.AddOrg(-10, id1);
+  [[maybe_unused]] auto id2 = sys.AddOrg(-10, id1);
   // std::cout << "\nAddOrg 26 (id3; parent id1)\n";
   sys.SetUpdate(10);
-  auto id3 = sys.AddOrg(26, id1);
+  [[maybe_unused]] auto id3 = sys.AddOrg(26, id1);
   // std::cout << "\nAddOrg 27 (id4; parent id2)\n";
   sys.SetUpdate(25);
-  auto id4 = sys.AddOrg(27, id2);
+  [[maybe_unused]] auto id4 = sys.AddOrg(27, id2);
   // std::cout << "\nAddOrg 28 (id5; parent id2)\n";
   sys.SetUpdate(32);
-  auto id5 = sys.AddOrg(28, id2);
+  [[maybe_unused]] auto id5 = sys.AddOrg(28, id2);
   // std::cout << "\nAddOrg 29 (id6; parent id5)\n";
   sys.SetUpdate(39);
-  auto id6 = sys.AddOrg(29, id5);
+  [[maybe_unused]] auto id6 = sys.AddOrg(29, id5);
   // std::cout << "\nAddOrg 30 (id7; parent id1)\n";
   sys.SetUpdate(6);
-  auto id7 = sys.AddOrg(30, id1);
+  [[maybe_unused]] auto id7 = sys.AddOrg(30, id1);
 
 
   // std::cout << "\nRemoveOrg (id2)\n";
@@ -437,13 +437,13 @@ TEST_CASE("Test not tracking ancestors", "[Evolve]") {
 
   // std::cout << "\nAddOrg 31 (id8; parent id7)\n";
   sys.SetUpdate(11);
-  auto id8 = sys.AddOrg(31, id7);
+  [[maybe_unused]] auto id8 = sys.AddOrg(31, id7);
   // std::cout << "\nAddOrg 32 (id9; parent id8)\n";
   sys.SetUpdate(19);
-  auto id9 = sys.AddOrg(32, id8);
+  [[maybe_unused]] auto id9 = sys.AddOrg(32, id8);
 
   // std::cout << "\nAddOrg 33 (id10; parent id8)\n";
-  auto id10 = sys.AddOrg(33, id8);
+  [[maybe_unused]] auto id10 = sys.AddOrg(33, id8);
 
   sys.RemoveOrg(id7);
   sys.RemoveOrg(id8);
@@ -452,41 +452,41 @@ TEST_CASE("Test not tracking ancestors", "[Evolve]") {
 
   // std::cout << "\nAddOrg 34 (id11; parent id9)\n";
   sys.SetUpdate(22);
-  auto id11 = sys.AddOrg(34, id9);
+  [[maybe_unused]] auto id11 = sys.AddOrg(34, id9);
   // std::cout << "\nAddOrg 35 (id12; parent id10)\n";
   sys.SetUpdate(23);
-  auto id12 = sys.AddOrg(35, id11);
+  [[maybe_unused]] auto id12 = sys.AddOrg(35, id11);
 
   sys.RemoveOrg(id9);
 
   // std::cout << "\nAddOrg 36 (id13; parent id12)\n";
   sys.SetUpdate(27);
-  auto id13 = sys.AddOrg(36, id12);
+  [[maybe_unused]] auto id13 = sys.AddOrg(36, id12);
   // std::cout << "\nAddOrg 37 (id14; parent id13)\n";
   sys.SetUpdate(30);
-  auto id14 = sys.AddOrg(37, id13);
+  [[maybe_unused]] auto id14 = sys.AddOrg(37, id13);
 
   sys.RemoveOrg(id13);
 
   // std::cout << "\nAddOrg 38 (id15; parent id14)\n";
   sys.SetUpdate(33);
-  auto id15 = sys.AddOrg(38, id14);
+  [[maybe_unused]] auto id15 = sys.AddOrg(38, id14);
 
   sys.RemoveOrg(id14);
 
   // std::cout << "\nAddOrg 39 (id16; parent id11)\n";
   sys.SetUpdate(35);
-  auto id16 = sys.AddOrg(39, id11);
+  [[maybe_unused]] auto id16 = sys.AddOrg(39, id11);
   // std::cout << "\nAddOrg 40 (id17; parent id11)\n";
-  auto id17 = sys.AddOrg(40, id11);
+  [[maybe_unused]] auto id17 = sys.AddOrg(40, id11);
 
   // std::cout << "\nAddOrg 41 (id18; parent id17)\n";
   sys.SetUpdate(36);
-  auto id18 = sys.AddOrg(41, id17);
+  [[maybe_unused]] auto id18 = sys.AddOrg(41, id17);
 
   std::cout << "\nAddOrg 42 (id19; parent id17)\n";
   sys.SetUpdate(37);
-  auto id19 = sys.AddOrg(42, id17);
+  [[maybe_unused]] auto id19 = sys.AddOrg(42, id17);
 
   CHECK(id17->GetTotalOffspring() > 0);
 
@@ -509,7 +509,7 @@ TEST_CASE("Test not tracking ancestors", "[Evolve]") {
   CHECK(sys.GetNumAncestors() == 0);
   CHECK(sys.GetNumOutside() == 0);
 
-  auto active = sys.GetActive();
+  [[maybe_unused]] auto active = sys.GetActive();
   emp::vector<emp::Ptr<emp::Taxon<int>>> active_vec(active.begin(), active.end());
   emp::Sort(active_vec, [](emp::Ptr<emp::Taxon<int>> & a, emp::Ptr<emp::Taxon<int>> & b){
     return a->GetID() < b->GetID();
@@ -586,27 +586,27 @@ TEST_CASE("Test Data Struct", "[evo]") {
   sys->AddVolatilityDataNode();
   sys->AddUniqueTaxaDataNode();
 
-  auto id1 = sys->AddOrg(1, nullptr);
+  [[maybe_unused]] auto id1 = sys->AddOrg(1, nullptr);
   id1->GetData().fitness.Add(2);
   id1->GetData().phenotype = 6;
 
-  auto id2 = sys->AddOrg(2, id1);
+  [[maybe_unused]] auto id2 = sys->AddOrg(2, id1);
   id2->GetData().mut_counts["substitution"] = 2;
   id2->GetData().fitness.Add(1);
   id2->GetData().phenotype = 6;
   CHECK(id2->GetData().mut_counts["substitution"] == 2);
 
-  auto id3 = sys->AddOrg(3, id1);
+  [[maybe_unused]] auto id3 = sys->AddOrg(3, id1);
   id3->GetData().mut_counts["substitution"] = 5;
   id3->GetData().fitness.Add(0);
   id3->GetData().phenotype = 6;
 
-  auto id4 = sys->AddOrg(4, id2);
+  [[maybe_unused]] auto id4 = sys->AddOrg(4, id2);
   id4->GetData().mut_counts["substitution"] = 1;
   id4->GetData().fitness.Add(3);
   id4->GetData().phenotype = 3;
 
-  auto id5 = sys->AddOrg(5, id4);
+  [[maybe_unused]] auto id5 = sys->AddOrg(5, id4);
   std::unordered_map<std::string, int> muts;
   muts["substitution"] = 1;
   id5->GetData().RecordMutation(muts);
@@ -652,7 +652,7 @@ TEST_CASE("Test Data Struct", "[evo]") {
   sys2.New([](const int & i){return i;}, true, true, true, false);
   sys2->AddDeleteriousStepDataNode();
 
-  auto new_tax = sys2->AddOrg(1, nullptr);
+  [[maybe_unused]] auto new_tax = sys2->AddOrg(1, nullptr);
   new_tax->GetData().RecordFitness(2);
   CHECK(new_tax->GetData().GetFitness() == 2);
   new_tax->GetData().RecordFitness(4);
@@ -663,7 +663,7 @@ TEST_CASE("Test Data Struct", "[evo]") {
   new_tax->SetData(fit_data);
   CHECK(new_tax->GetData().GetFitness() == 5);
 
-  auto tax2 = sys2->AddOrg(2, new_tax);
+  [[maybe_unused]] auto tax2 = sys2->AddOrg(2, new_tax);
   tax2->GetData().RecordFitness(1);
 
   sys2->GetDataNode("deleterious_steps")->PullData();
@@ -707,7 +707,7 @@ TEST_CASE("World systematics integration", "[evo]") {
   mut_counts["substitution"] = 3;
 
   emp::vector<int> new_org({4,2,3});
-  auto old_taxon = sys->GetTaxonAt(0);
+  [[maybe_unused]] auto old_taxon = sys->GetTaxonAt(0);
   world.DoBirth(new_org,0);
 
   CHECK(old_taxon->GetNumOrgs() == 0);
@@ -727,7 +727,7 @@ emp::DataFile AddDominantFile(WORLD_TYPE & world){
   using systematics_t = emp::Systematics<org_t, org_t::genome_t, data_t>;
 
 
-  auto & file = world.SetupFile("dominant.csv");
+  [[maybe_unused]] auto & file = world.SetupFile("dominant.csv");
 
   std::function<size_t(void)> get_update = [&world](){return world.GetUpdate();};
   std::function<int(void)> dom_mut_count = [&world](){
@@ -954,18 +954,18 @@ TEST_CASE("Test GetCanopy", "[evo]") {
   emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, false);
 
   sys.SetUpdate(0);
-  auto id1 = sys.AddOrg(1, nullptr);
+  [[maybe_unused]] auto id1 = sys.AddOrg(1, nullptr);
   sys.SetUpdate(2);
-  auto id2 = sys.AddOrg(2, id1);
+  [[maybe_unused]] auto id2 = sys.AddOrg(2, id1);
   sys.SetUpdate(3);
-  auto id3 = sys.AddOrg(3, id1);
-  auto id4 = sys.AddOrg(4, id2);
+  [[maybe_unused]] auto id3 = sys.AddOrg(3, id1);
+  [[maybe_unused]] auto id4 = sys.AddOrg(4, id2);
 
   sys.RemoveOrg(id1);
   sys.SetUpdate(5);
   sys.RemoveOrg(id2);
 
-  auto can_set = sys.GetCanopyExtantRoots(4);
+  [[maybe_unused]] auto can_set = sys.GetCanopyExtantRoots(4);
 
   // Both 3 and 4 were alive at time point 4 so they are the canopy roots
   CHECK(can_set.size() == 2);
@@ -992,11 +992,11 @@ TEST_CASE("Test GetCanopy", "[evo]") {
   CHECK(Has(can_set, id2));
 
   sys.SetUpdate(8);
-  auto id5 = sys.AddOrg(5, id4);
+  [[maybe_unused]] auto id5 = sys.AddOrg(5, id4);
   sys.SetUpdate(9);
   sys.RemoveOrg(id4);
   sys.SetUpdate(10);
-  auto id6 = sys.AddOrg(6, id5);
+  [[maybe_unused]] auto id6 = sys.AddOrg(6, id5);
   sys.SetUpdate(11);
   sys.RemoveOrg(id5);
 
@@ -1011,13 +1011,13 @@ TEST_CASE("Test GetCanopy", "[evo]") {
   CHECK(Has(can_set, id5));
 
   sys.SetUpdate(12);
-  auto id7 = sys.AddOrg(7, id6);
+  [[maybe_unused]] auto id7 = sys.AddOrg(7, id6);
   sys.SetUpdate(13);
-  auto id8 = sys.AddOrg(8, id7);
+  [[maybe_unused]] auto id8 = sys.AddOrg(8, id7);
   sys.SetUpdate(14);
-  auto id9 = sys.AddOrg(9, id8);
+  [[maybe_unused]] auto id9 = sys.AddOrg(9, id8);
   sys.SetUpdate(15);
-  auto id10 = sys.AddOrg(10, id9);
+  [[maybe_unused]] auto id10 = sys.AddOrg(10, id9);
 
   sys.SetUpdate(20);
   sys.RemoveOrg(id6);
@@ -1058,17 +1058,17 @@ TEST_CASE("Test GetCanopy", "[evo]") {
 TEST_CASE("Tree balance", "[evo]") {
   emp::Systematics<int, int> tree1([](const int & i){return i;}, true, true, false, false);
 
-  auto tree1org1 = tree1.AddOrg(1, nullptr);
-  auto tree1org2 = tree1.AddOrg(2, tree1org1);
-  auto tree1org3 = tree1.AddOrg(3, tree1org2);
-  auto tree1org4 = tree1.AddOrg(4, tree1org3);
-  auto tree1org5 = tree1.AddOrg(5, tree1org3);
-  auto tree1org6 = tree1.AddOrg(6, tree1org2);
-  auto tree1org7 = tree1.AddOrg(7, tree1org6);
-  auto tree1org8 = tree1.AddOrg(8, tree1org6);
-  auto tree1org9 = tree1.AddOrg(9, tree1org1);
-  auto tree1org10 = tree1.AddOrg(10, tree1org9);
-  auto tree1org11 = tree1.AddOrg(11, tree1org9);
+  [[maybe_unused]] auto tree1org1 = tree1.AddOrg(1, nullptr);
+  [[maybe_unused]] auto tree1org2 = tree1.AddOrg(2, tree1org1);
+  [[maybe_unused]] auto tree1org3 = tree1.AddOrg(3, tree1org2);
+  [[maybe_unused]] auto tree1org4 = tree1.AddOrg(4, tree1org3);
+  [[maybe_unused]] auto tree1org5 = tree1.AddOrg(5, tree1org3);
+  [[maybe_unused]] auto tree1org6 = tree1.AddOrg(6, tree1org2);
+  [[maybe_unused]] auto tree1org7 = tree1.AddOrg(7, tree1org6);
+  [[maybe_unused]] auto tree1org8 = tree1.AddOrg(8, tree1org6);
+  [[maybe_unused]] auto tree1org9 = tree1.AddOrg(9, tree1org1);
+  [[maybe_unused]] auto tree1org10 = tree1.AddOrg(10, tree1org9);
+  [[maybe_unused]] auto tree1org11 = tree1.AddOrg(11, tree1org9);
   tree1.RemoveOrg(tree1org1);
   tree1.RemoveOrg(tree1org2);
   tree1.RemoveOrg(tree1org3);
@@ -1079,17 +1079,17 @@ TEST_CASE("Tree balance", "[evo]") {
 
   emp::Systematics<int, int> tree2([](const int & i){return i;}, true, true, false, false);
 
-  auto tree2org1 = tree2.AddOrg(1, nullptr);
-  auto tree2org2 = tree2.AddOrg(2, tree2org1);
-  auto tree2org3 = tree2.AddOrg(3, tree2org2);
-  auto tree2org4 = tree2.AddOrg(4, tree2org3);
-  auto tree2org5 = tree2.AddOrg(5, tree2org3);
-  auto tree2org6 = tree2.AddOrg(6, tree2org2);
-  auto tree2org7 = tree2.AddOrg(7, tree2org1);
-  auto tree2org8 = tree2.AddOrg(8, tree2org7);
-  auto tree2org9 = tree2.AddOrg(9, tree2org7);
-  auto tree2org10 = tree2.AddOrg(10, tree2org9);
-  auto tree2org11 = tree2.AddOrg(11, tree2org9);
+  [[maybe_unused]] auto tree2org1 = tree2.AddOrg(1, nullptr);
+  [[maybe_unused]] auto tree2org2 = tree2.AddOrg(2, tree2org1);
+  [[maybe_unused]] auto tree2org3 = tree2.AddOrg(3, tree2org2);
+  [[maybe_unused]] auto tree2org4 = tree2.AddOrg(4, tree2org3);
+  [[maybe_unused]] auto tree2org5 = tree2.AddOrg(5, tree2org3);
+  [[maybe_unused]] auto tree2org6 = tree2.AddOrg(6, tree2org2);
+  [[maybe_unused]] auto tree2org7 = tree2.AddOrg(7, tree2org1);
+  [[maybe_unused]] auto tree2org8 = tree2.AddOrg(8, tree2org7);
+  [[maybe_unused]] auto tree2org9 = tree2.AddOrg(9, tree2org7);
+  [[maybe_unused]] auto tree2org10 = tree2.AddOrg(10, tree2org9);
+  [[maybe_unused]] auto tree2org11 = tree2.AddOrg(11, tree2org9);
 
   tree2.RemoveOrg(tree2org1);
   tree2.RemoveOrg(tree2org2);
@@ -1101,17 +1101,17 @@ TEST_CASE("Tree balance", "[evo]") {
 
   emp::Systematics<int, int> tree3([](const int & i){return i;}, true, true, false, false);
 
-  auto tree3org1 = tree3.AddOrg(1, nullptr);
-  auto tree3org2 = tree3.AddOrg(2, tree3org1);
-  auto tree3org3 = tree3.AddOrg(3, tree3org2);
-  auto tree3org4 = tree3.AddOrg(4, tree3org2);
-  auto tree3org5 = tree3.AddOrg(5, tree3org4);
-  auto tree3org6 = tree3.AddOrg(6, tree3org4);
-  auto tree3org7 = tree3.AddOrg(7, tree3org6);
-  auto tree3org8 = tree3.AddOrg(8, tree3org6);
-  auto tree3org9 = tree3.AddOrg(9, tree3org1);
-  auto tree3org10 = tree3.AddOrg(10, tree3org9);
-  auto tree3org11 = tree3.AddOrg(11, tree3org9);
+  [[maybe_unused]] auto tree3org1 = tree3.AddOrg(1, nullptr);
+  [[maybe_unused]] auto tree3org2 = tree3.AddOrg(2, tree3org1);
+  [[maybe_unused]] auto tree3org3 = tree3.AddOrg(3, tree3org2);
+  [[maybe_unused]] auto tree3org4 = tree3.AddOrg(4, tree3org2);
+  [[maybe_unused]] auto tree3org5 = tree3.AddOrg(5, tree3org4);
+  [[maybe_unused]] auto tree3org6 = tree3.AddOrg(6, tree3org4);
+  [[maybe_unused]] auto tree3org7 = tree3.AddOrg(7, tree3org6);
+  [[maybe_unused]] auto tree3org8 = tree3.AddOrg(8, tree3org6);
+  [[maybe_unused]] auto tree3org9 = tree3.AddOrg(9, tree3org1);
+  [[maybe_unused]] auto tree3org10 = tree3.AddOrg(10, tree3org9);
+  [[maybe_unused]] auto tree3org11 = tree3.AddOrg(11, tree3org9);
 
   tree3.RemoveOrg(tree3org1);
   tree3.RemoveOrg(tree3org2);
@@ -1123,14 +1123,14 @@ TEST_CASE("Tree balance", "[evo]") {
 
   emp::Systematics<int, int> tree29([](const int & i){return i;}, true, true, false, false);
 
-  auto tree29org1 = tree29.AddOrg(1, nullptr);
-  auto tree29org2 = tree29.AddOrg(2, tree29org1);
-  auto tree29org3 = tree29.AddOrg(3, tree29org1);
-  auto tree29org4 = tree29.AddOrg(4, tree29org3);
-  auto tree29org5 = tree29.AddOrg(5, tree29org3);
-  auto tree29org6 = tree29.AddOrg(6, tree29org3);
-  auto tree29org7 = tree29.AddOrg(7, tree29org3);
-  auto tree29org8 = tree29.AddOrg(8, tree29org3);
+  [[maybe_unused]] auto tree29org1 = tree29.AddOrg(1, nullptr);
+  [[maybe_unused]] auto tree29org2 = tree29.AddOrg(2, tree29org1);
+  [[maybe_unused]] auto tree29org3 = tree29.AddOrg(3, tree29org1);
+  [[maybe_unused]] auto tree29org4 = tree29.AddOrg(4, tree29org3);
+  [[maybe_unused]] auto tree29org5 = tree29.AddOrg(5, tree29org3);
+  [[maybe_unused]] auto tree29org6 = tree29.AddOrg(6, tree29org3);
+  [[maybe_unused]] auto tree29org7 = tree29.AddOrg(7, tree29org3);
+  [[maybe_unused]] auto tree29org8 = tree29.AddOrg(8, tree29org3);
 
   tree29.RemoveOrg(tree29org1);
   tree29.RemoveOrg(tree29org3);
@@ -1139,14 +1139,14 @@ TEST_CASE("Tree balance", "[evo]") {
 
   emp::Systematics<int, int> tree30([](const int & i){return i;}, true, true, false, false);
 
-  auto tree30org1 = tree30.AddOrg(1, nullptr);
-  auto tree30org2 = tree30.AddOrg(2, tree30org1);
-  auto tree30org3 = tree30.AddOrg(3, tree30org1);
-  auto tree30org4 = tree30.AddOrg(4, tree30org1);
-  auto tree30org5 = tree30.AddOrg(5, tree30org4);
-  auto tree30org6 = tree30.AddOrg(6, tree30org4);
-  auto tree30org7 = tree30.AddOrg(7, tree30org4);
-  auto tree30org8 = tree30.AddOrg(8, tree30org4);
+  [[maybe_unused]] auto tree30org1 = tree30.AddOrg(1, nullptr);
+  [[maybe_unused]] auto tree30org2 = tree30.AddOrg(2, tree30org1);
+  [[maybe_unused]] auto tree30org3 = tree30.AddOrg(3, tree30org1);
+  [[maybe_unused]] auto tree30org4 = tree30.AddOrg(4, tree30org1);
+  [[maybe_unused]] auto tree30org5 = tree30.AddOrg(5, tree30org4);
+  [[maybe_unused]] auto tree30org6 = tree30.AddOrg(6, tree30org4);
+  [[maybe_unused]] auto tree30org7 = tree30.AddOrg(7, tree30org4);
+  [[maybe_unused]] auto tree30org8 = tree30.AddOrg(8, tree30org4);
 
   tree30.RemoveOrg(tree30org1);
   tree30.RemoveOrg(tree30org4);
@@ -1155,14 +1155,14 @@ TEST_CASE("Tree balance", "[evo]") {
 
   emp::Systematics<int, int> tree31([](const int & i){return i;}, true, true, false, false);
 
-  auto tree31org1 = tree31.AddOrg(1, nullptr);
-  auto tree31org2 = tree31.AddOrg(2, tree31org1);
-  auto tree31org3 = tree31.AddOrg(3, tree31org1);
-  auto tree31org4 = tree31.AddOrg(4, tree31org1);
-  auto tree31org5 = tree31.AddOrg(5, tree31org1);
-  auto tree31org6 = tree31.AddOrg(6, tree31org5);
-  auto tree31org7 = tree31.AddOrg(7, tree31org5);
-  auto tree31org8 = tree31.AddOrg(8, tree31org5);
+  [[maybe_unused]] auto tree31org1 = tree31.AddOrg(1, nullptr);
+  [[maybe_unused]] auto tree31org2 = tree31.AddOrg(2, tree31org1);
+  [[maybe_unused]] auto tree31org3 = tree31.AddOrg(3, tree31org1);
+  [[maybe_unused]] auto tree31org4 = tree31.AddOrg(4, tree31org1);
+  [[maybe_unused]] auto tree31org5 = tree31.AddOrg(5, tree31org1);
+  [[maybe_unused]] auto tree31org6 = tree31.AddOrg(6, tree31org5);
+  [[maybe_unused]] auto tree31org7 = tree31.AddOrg(7, tree31org5);
+  [[maybe_unused]] auto tree31org8 = tree31.AddOrg(8, tree31org5);
 
   tree31.RemoveOrg(tree31org1);
   tree31.RemoveOrg(tree31org5);
@@ -1171,14 +1171,14 @@ TEST_CASE("Tree balance", "[evo]") {
 
   emp::Systematics<int, int> tree32([](const int & i){return i;}, true, true, false, false);
 
-  auto tree32org1 = tree32.AddOrg(1, nullptr);
-  auto tree32org2 = tree32.AddOrg(2, tree32org1);
-  auto tree32org3 = tree32.AddOrg(3, tree32org1);
-  auto tree32org4 = tree32.AddOrg(4, tree32org1);
-  auto tree32org5 = tree32.AddOrg(5, tree32org1);
-  auto tree32org6 = tree32.AddOrg(6, tree32org1);
-  auto tree32org7 = tree32.AddOrg(7, tree32org6);
-  auto tree32org8 = tree32.AddOrg(8, tree32org6);
+  [[maybe_unused]] auto tree32org1 = tree32.AddOrg(1, nullptr);
+  [[maybe_unused]] auto tree32org2 = tree32.AddOrg(2, tree32org1);
+  [[maybe_unused]] auto tree32org3 = tree32.AddOrg(3, tree32org1);
+  [[maybe_unused]] auto tree32org4 = tree32.AddOrg(4, tree32org1);
+  [[maybe_unused]] auto tree32org5 = tree32.AddOrg(5, tree32org1);
+  [[maybe_unused]] auto tree32org6 = tree32.AddOrg(6, tree32org1);
+  [[maybe_unused]] auto tree32org7 = tree32.AddOrg(7, tree32org6);
+  [[maybe_unused]] auto tree32org8 = tree32.AddOrg(8, tree32org6);
 
   tree32.RemoveOrg(tree32org1);
   tree32.RemoveOrg(tree32org6);
@@ -1187,31 +1187,31 @@ TEST_CASE("Tree balance", "[evo]") {
 
   emp::Systematics<int, int> tree33([](const int & i){return i;}, true, true, false, false);
 
-  auto tree33org1 = tree33.AddOrg(1, nullptr);
-  auto tree33org2 = tree33.AddOrg(2, tree33org1);
-  auto tree33org3 = tree33.AddOrg(3, tree33org1);
-  auto tree33org4 = tree33.AddOrg(4, tree33org1);
-  auto tree33org5 = tree33.AddOrg(5, tree33org1);
-  auto tree33org6 = tree33.AddOrg(6, tree33org1);
-  auto tree33org7 = tree33.AddOrg(7, tree33org1);
+  [[maybe_unused]] auto tree33org1 = tree33.AddOrg(1, nullptr);
+  [[maybe_unused]] auto tree33org2 = tree33.AddOrg(2, tree33org1);
+  [[maybe_unused]] auto tree33org3 = tree33.AddOrg(3, tree33org1);
+  [[maybe_unused]] auto tree33org4 = tree33.AddOrg(4, tree33org1);
+  [[maybe_unused]] auto tree33org5 = tree33.AddOrg(5, tree33org1);
+  [[maybe_unused]] auto tree33org6 = tree33.AddOrg(6, tree33org1);
+  [[maybe_unused]] auto tree33org7 = tree33.AddOrg(7, tree33org1);
 
   tree33.RemoveOrg(tree33org1);
   CHECK(tree33.SackinIndex() == 6);
 
   // From CollessLike metric paper
   emp::Systematics<int, int> treecl([](const int & i){return i;}, true, true, false, false);
-  auto treeclorg1 = treecl.AddOrg(1, nullptr);
-  auto treeclorg2 = treecl.AddOrg(2, treeclorg1);
-  auto treeclorg3 = treecl.AddOrg(3, treeclorg1);
-  auto treeclorg4 = treecl.AddOrg(4, treeclorg2);
-  auto treeclorg5 = treecl.AddOrg(5, treeclorg2);
-  auto treeclorg6 = treecl.AddOrg(6, treeclorg2);
-  auto treeclorg7 = treecl.AddOrg(7, treeclorg2);
-  auto treeclorg8 = treecl.AddOrg(8, treeclorg2);
-  auto treeclorg9 = treecl.AddOrg(9, treeclorg3);
-  auto treeclorg10 = treecl.AddOrg(10, treeclorg3);
-  auto treeclorg11 = treecl.AddOrg(11, treeclorg10);
-  auto treeclorg12 = treecl.AddOrg(12, treeclorg10);
+  [[maybe_unused]] auto treeclorg1 = treecl.AddOrg(1, nullptr);
+  [[maybe_unused]] auto treeclorg2 = treecl.AddOrg(2, treeclorg1);
+  [[maybe_unused]] auto treeclorg3 = treecl.AddOrg(3, treeclorg1);
+  [[maybe_unused]] auto treeclorg4 = treecl.AddOrg(4, treeclorg2);
+  [[maybe_unused]] auto treeclorg5 = treecl.AddOrg(5, treeclorg2);
+  [[maybe_unused]] auto treeclorg6 = treecl.AddOrg(6, treeclorg2);
+  [[maybe_unused]] auto treeclorg7 = treecl.AddOrg(7, treeclorg2);
+  [[maybe_unused]] auto treeclorg8 = treecl.AddOrg(8, treeclorg2);
+  [[maybe_unused]] auto treeclorg9 = treecl.AddOrg(9, treeclorg3);
+  [[maybe_unused]] auto treeclorg10 = treecl.AddOrg(10, treeclorg3);
+  [[maybe_unused]] auto treeclorg11 = treecl.AddOrg(11, treeclorg10);
+  [[maybe_unused]] auto treeclorg12 = treecl.AddOrg(12, treeclorg10);
 
   treecl.RemoveOrg(treeclorg1);
   treecl.RemoveOrg(treeclorg2);
@@ -1230,25 +1230,25 @@ TEST_CASE("Dieing MRCA", "[evo]") {
 
   // std::cout << "\nAddOrg 25 (id1, no parent)\n";
   tree.SetUpdate(0);
-  auto id1 = tree.AddOrg(25, nullptr);
+  [[maybe_unused]] auto id1 = tree.AddOrg(25, nullptr);
   // std::cout << "\nAddOrg -10 (id2; parent id1)\n";
   tree.SetUpdate(6);
-  auto id2 = tree.AddOrg(-10, id1);
+  [[maybe_unused]] auto id2 = tree.AddOrg(-10, id1);
   // std::cout << "\nAddOrg 26 (id3; parent id1)\n";
   tree.SetUpdate(10);
-  auto id3 = tree.AddOrg(26, id1);
+  [[maybe_unused]] auto id3 = tree.AddOrg(26, id1);
   // std::cout << "\nAddOrg 27 (id4; parent id2)\n";
   tree.SetUpdate(25);
-  auto id4 = tree.AddOrg(27, id2);
+  [[maybe_unused]] auto id4 = tree.AddOrg(27, id2);
   // std::cout << "\nAddOrg 28 (id5; parent id2)\n";
   tree.SetUpdate(32);
-  auto id5 = tree.AddOrg(28, id2);
+  [[maybe_unused]] auto id5 = tree.AddOrg(28, id2);
   // std::cout << "\nAddOrg 29 (id6; parent id5)\n";
   tree.SetUpdate(39);
-  auto id6 = tree.AddOrg(29, id5);
+  [[maybe_unused]] auto id6 = tree.AddOrg(29, id5);
   // std::cout << "\nAddOrg 30 (id7; parent id1)\n";
   tree.SetUpdate(6);
-  auto id7 = tree.AddOrg(30, id1);
+  [[maybe_unused]] auto id7 = tree.AddOrg(30, id1);
 
   CHECK(tree.GetMRCA() == id1);
   tree.RemoveOrg(id7);
@@ -1268,30 +1268,30 @@ TEST_CASE("Test RemoveBefore", "[Evolve]") {
 
   // std::cout << "\nAddOrg 25 (id1, no parent)\n";
   sys.SetUpdate(0);
-  auto id1 = sys.AddOrg(25, nullptr);
+  [[maybe_unused]] auto id1 = sys.AddOrg(25, nullptr);
   // std::cout << "\nAddOrg -10 (id2; parent id1)\n";
   sys.SetUpdate(6);
-  auto id2 = sys.AddOrg(-10, id1);
+  [[maybe_unused]] auto id2 = sys.AddOrg(-10, id1);
   // std::cout << "\nAddOrg 26 (id3; parent id1)\n";
   sys.SetUpdate(10);
-  auto id3 = sys.AddOrg(26, id1);
+  [[maybe_unused]] auto id3 = sys.AddOrg(26, id1);
   // std::cout << "\nAddOrg 27 (id4; parent id2)\n";
   sys.SetUpdate(25);
-  auto id4 = sys.AddOrg(27, id2);
+  [[maybe_unused]] auto id4 = sys.AddOrg(27, id2);
   // std::cout << "\nAddOrg 28 (id5; parent id2)\n";
   sys.SetUpdate(32);
-  auto id5 = sys.AddOrg(28, id2);
+  [[maybe_unused]] auto id5 = sys.AddOrg(28, id2);
   // std::cout << "\nAddOrg 29 (id6; parent id5)\n";
   sys.SetUpdate(39);
-  auto id6 = sys.AddOrg(29, id5);
+  [[maybe_unused]] auto id6 = sys.AddOrg(29, id5);
   // std::cout << "\nAddOrg 30 (id7; parent id1)\n";
   sys.SetUpdate(6);
-  auto id7 = sys.AddOrg(30, id1);
+  [[maybe_unused]] auto id7 = sys.AddOrg(30, id1);
   sys.SetUpdate(33);
-  auto id8 = sys.AddOrg(2, id3);
-  auto id9 = sys.AddOrg(4, id8);
+  [[maybe_unused]] auto id8 = sys.AddOrg(2, id3);
+  [[maybe_unused]] auto id9 = sys.AddOrg(4, id8);
   sys.SetUpdate(34);
-  auto id10 = sys.AddOrg(5, id9);
+  [[maybe_unused]] auto id10 = sys.AddOrg(5, id9);
 
   sys.SetUpdate(40);
   sys.RemoveOrg(id1);
@@ -1327,24 +1327,24 @@ TEST_CASE("Test Snapshot", "[Evolve]") {
   emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, false);
 
   sys.SetUpdate(0);
-  auto id1 = sys.AddOrg(25, nullptr);
+  [[maybe_unused]] auto id1 = sys.AddOrg(25, nullptr);
   sys.SetUpdate(6);
-  auto id2 = sys.AddOrg(-10, id1);
+  [[maybe_unused]] auto id2 = sys.AddOrg(-10, id1);
   sys.SetUpdate(10);
-  auto id3 = sys.AddOrg(26, id1);
+  [[maybe_unused]] auto id3 = sys.AddOrg(26, id1);
   sys.SetUpdate(25);
-  auto id4 = sys.AddOrg(27, id2);
+  [[maybe_unused]] auto id4 = sys.AddOrg(27, id2);
   sys.SetUpdate(32);
-  auto id5 = sys.AddOrg(28, id2);
+  [[maybe_unused]] auto id5 = sys.AddOrg(28, id2);
   sys.SetUpdate(39);
-  auto id6 = sys.AddOrg(29, id5);
+  [[maybe_unused]] auto id6 = sys.AddOrg(29, id5);
   sys.SetUpdate(6);
-  auto id7 = sys.AddOrg(30, id1);
+  [[maybe_unused]] auto id7 = sys.AddOrg(30, id1);
   sys.SetUpdate(33);
-  auto id8 = sys.AddOrg(2, id3);
-  auto id9 = sys.AddOrg(4, id8);
+  [[maybe_unused]] auto id8 = sys.AddOrg(2, id3);
+  [[maybe_unused]] auto id9 = sys.AddOrg(4, id8);
   sys.SetUpdate(34);
-  auto id10 = sys.AddOrg(5, id9);
+  [[maybe_unused]] auto id10 = sys.AddOrg(5, id9);
 
   sys.SetUpdate(40);
   sys.RemoveOrg(id1);
@@ -1370,25 +1370,25 @@ TEST_CASE("Test Prune", "[Evolve]") {
   sys.OnPrune(prune_fun);
 
   sys.SetUpdate(0);
-  auto id1 = sys.AddOrg(25, nullptr);
+  [[maybe_unused]] auto id1 = sys.AddOrg(25, nullptr);
   sys.SetUpdate(6);
-  auto id2 = sys.AddOrg(-10, id1);
+  [[maybe_unused]] auto id2 = sys.AddOrg(-10, id1);
   sys.SetUpdate(10);
-  auto id3 = sys.AddOrg(26, id1);
+  [[maybe_unused]] auto id3 = sys.AddOrg(26, id1);
   sys.SetUpdate(25);
-  auto id4 = sys.AddOrg(27, id2);
+  [[maybe_unused]] auto id4 = sys.AddOrg(27, id2);
   sys.SetUpdate(32);
-  auto id5 = sys.AddOrg(28, id2);
+  [[maybe_unused]] auto id5 = sys.AddOrg(28, id2);
   sys.SetUpdate(39);
-  auto id6 = sys.AddOrg(29, id5);
+  [[maybe_unused]] auto id6 = sys.AddOrg(29, id5);
   sys.SetUpdate(6);
-  auto id7 = sys.AddOrg(30, id1);
+  [[maybe_unused]] auto id7 = sys.AddOrg(30, id1);
   sys.SetUpdate(33);
-  auto id8 = sys.AddOrg(2, id3);
-  auto id9 = sys.AddOrg(4, id8);
+  [[maybe_unused]] auto id8 = sys.AddOrg(2, id3);
+  [[maybe_unused]] auto id9 = sys.AddOrg(4, id8);
   sys.SetUpdate(34);
-  auto id10 = sys.AddOrg(5, id9);
-  auto id11 = sys.AddOrg(5, id3);
+  [[maybe_unused]] auto id10 = sys.AddOrg(5, id9);
+  [[maybe_unused]] auto id11 = sys.AddOrg(5, id3);
 
   sys.SetUpdate(40);
   sys.RemoveOrg(id1);
@@ -1420,21 +1420,21 @@ TEST_CASE("Test tracking position", "[Evolve]") {
   emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, true);
 
   sys.SetUpdate(0);
-  auto id1 = sys.AddOrg(25, {0,0}, nullptr);
+  [[maybe_unused]] auto id1 = sys.AddOrg(25, {0,0}, nullptr);
   sys.SetUpdate(6);
-  auto id2 = sys.AddOrg(-10, {1,0}, id1);
+  [[maybe_unused]] auto id2 = sys.AddOrg(-10, {1,0}, id1);
   CHECK(sys.Parent(id2) == id1);
   sys.SetNextParent(id1);
   sys.SetUpdate(10);
   sys.AddOrg(26, {2,0});
-  auto id3 = sys.GetMostRecent();
+  [[maybe_unused]] auto id3 = sys.GetMostRecent();
   CHECK(id3->GetParent() == id1);
   CHECK(id3->GetInfo() == 26);
   CHECK(id3->GetOriginationTime() == 10);
   sys.SetNextParent({1,0});
   sys.SetUpdate(25);
   sys.AddOrg(27, {3,0});
-  auto id4 = sys.GetMostRecent();
+  [[maybe_unused]] auto id4 = sys.GetMostRecent();
   CHECK(id4->GetParent() == id2);
   CHECK(id4->GetInfo() == 27);
   CHECK(id4->GetOriginationTime() == 25);
@@ -1447,7 +1447,7 @@ TEST_CASE("Test tracking position", "[Evolve]") {
   sys.RemoveOrgAfterRepro(id4);
   CHECK(!Has(sys.GetAncestors(), id4));
   sys.SetUpdate(34);
-  auto id5 = sys.AddOrg(88, {4,0}, id4);
+  [[maybe_unused]] auto id5 = sys.AddOrg(88, {4,0}, id4);
   CHECK(id4->GetNumOrgs() == 0);
   CHECK(id4->GetNumOff() == 1);
   CHECK(Has(sys.GetAncestors(), id4));
@@ -1456,19 +1456,19 @@ TEST_CASE("Test tracking position", "[Evolve]") {
 TEST_CASE("Test Remove Org After Repro") {
   emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
 
-  auto org1 = sys.AddOrg(1, nullptr);
-  auto org2 = sys.AddOrg(2, org1);
-  auto org3 = sys.AddOrg(3, org2);
-  auto org4 = sys.AddOrg(4, org3);
-  auto org5 = sys.AddOrg(5, org3);
-  auto org6 = sys.AddOrg(6, org2);
-  auto org7 = sys.AddOrg(7, org6);
-  auto org8 = sys.AddOrg(8, org6);
-  auto org9 = sys.AddOrg(9, org1);
-  auto org10 = sys.AddOrg(10, org9);
-  auto org11 = sys.AddOrg(11, org9);
-  auto org12 = sys.AddOrg(12, org1);
-  auto org13 = sys.AddOrg(13, org4);
+  [[maybe_unused]] auto org1 = sys.AddOrg(1, nullptr);
+  [[maybe_unused]] auto org2 = sys.AddOrg(2, org1);
+  [[maybe_unused]] auto org3 = sys.AddOrg(3, org2);
+  [[maybe_unused]] auto org4 = sys.AddOrg(4, org3);
+  [[maybe_unused]] auto org5 = sys.AddOrg(5, org3);
+  [[maybe_unused]] auto org6 = sys.AddOrg(6, org2);
+  [[maybe_unused]] auto org7 = sys.AddOrg(7, org6);
+  [[maybe_unused]] auto org8 = sys.AddOrg(8, org6);
+  [[maybe_unused]] auto org9 = sys.AddOrg(9, org1);
+  [[maybe_unused]] auto org10 = sys.AddOrg(10, org9);
+  [[maybe_unused]] auto org11 = sys.AddOrg(11, org9);
+  [[maybe_unused]] auto org12 = sys.AddOrg(12, org1);
+  [[maybe_unused]] auto org13 = sys.AddOrg(13, org4);
 
   sys.RemoveOrgAfterRepro(org1);
   sys.RemoveOrgAfterRepro(org2);
@@ -1478,7 +1478,7 @@ TEST_CASE("Test Remove Org After Repro") {
   CHECK(emp::Has(sys.GetActive(), org2));
   CHECK(emp::Has(sys.GetActive(), org3));
 
-  auto org14 = sys.AddOrg(14, org13);
+  [[maybe_unused]] auto org14 = sys.AddOrg(14, org13);
 
   CHECK(!emp::Has(sys.GetActive(), org1));
   CHECK(!emp::Has(sys.GetActive(), org2));
@@ -1488,17 +1488,17 @@ TEST_CASE("Test Remove Org After Repro") {
 TEST_CASE("Test Total Offspring") {
   emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
 
-  auto org1 = sys.AddOrg(1, nullptr);
-  auto org2 = sys.AddOrg(2, org1);
-  auto org3 = sys.AddOrg(3, org2);
-  auto org4 = sys.AddOrg(4, org3);
-  auto org5 = sys.AddOrg(5, org3);
-  auto org6 = sys.AddOrg(6, org2);
-  auto org7 = sys.AddOrg(7, org6);
-  auto org8 = sys.AddOrg(8, org6);
-  auto org9 = sys.AddOrg(9, org1);
-  auto org10 = sys.AddOrg(10, org9);
-  auto org11 = sys.AddOrg(11, org9);
+  [[maybe_unused]] auto org1 = sys.AddOrg(1, nullptr);
+  [[maybe_unused]] auto org2 = sys.AddOrg(2, org1);
+  [[maybe_unused]] auto org3 = sys.AddOrg(3, org2);
+  [[maybe_unused]] auto org4 = sys.AddOrg(4, org3);
+  [[maybe_unused]] auto org5 = sys.AddOrg(5, org3);
+  [[maybe_unused]] auto org6 = sys.AddOrg(6, org2);
+  [[maybe_unused]] auto org7 = sys.AddOrg(7, org6);
+  [[maybe_unused]] auto org8 = sys.AddOrg(8, org6);
+  [[maybe_unused]] auto org9 = sys.AddOrg(9, org1);
+  [[maybe_unused]] auto org10 = sys.AddOrg(10, org9);
+  [[maybe_unused]] auto org11 = sys.AddOrg(11, org9);
 
   CHECK(org1->GetNumOff() == 2);
   CHECK(org1->GetTotalOffspring() == 10);
@@ -1574,20 +1574,20 @@ TEST_CASE("Test Total Offspring") {
 TEST_CASE("Test Degree Distribution") {
   emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
 
-  auto org1 = sys.AddOrg(1, nullptr);
-  auto org2 = sys.AddOrg(2, org1);
-  auto org3 = sys.AddOrg(3, org2);
-  auto org4 = sys.AddOrg(4, org3);
-  auto org5 = sys.AddOrg(5, org3);
-  auto org6 = sys.AddOrg(6, org2);
-  auto org7 = sys.AddOrg(7, org6);
-  auto org8 = sys.AddOrg(8, org6);
-  auto org9 = sys.AddOrg(9, org1);
-  auto org10 = sys.AddOrg(10, org9);
-  auto org11 = sys.AddOrg(11, org9);
-  auto org12 = sys.AddOrg(12, org1);
-  auto org13 = sys.AddOrg(13, org4);
-  auto org14 = sys.AddOrg(14, org13);
+  [[maybe_unused]] auto org1 = sys.AddOrg(1, nullptr);
+  [[maybe_unused]] auto org2 = sys.AddOrg(2, org1);
+  [[maybe_unused]] auto org3 = sys.AddOrg(3, org2);
+  [[maybe_unused]] auto org4 = sys.AddOrg(4, org3);
+  [[maybe_unused]] auto org5 = sys.AddOrg(5, org3);
+  [[maybe_unused]] auto org6 = sys.AddOrg(6, org2);
+  [[maybe_unused]] auto org7 = sys.AddOrg(7, org6);
+  [[maybe_unused]] auto org8 = sys.AddOrg(8, org6);
+  [[maybe_unused]] auto org9 = sys.AddOrg(9, org1);
+  [[maybe_unused]] auto org10 = sys.AddOrg(10, org9);
+  [[maybe_unused]] auto org11 = sys.AddOrg(11, org9);
+  [[maybe_unused]] auto org12 = sys.AddOrg(12, org1);
+  [[maybe_unused]] auto org13 = sys.AddOrg(13, org4);
+  [[maybe_unused]] auto org14 = sys.AddOrg(14, org13);
 
   std::unordered_map<int, int> dist = sys.GetOutDegreeDistribution();
   CHECK(dist[0] == 7);
@@ -1601,39 +1601,39 @@ TEST_CASE("Test Average Origin Time") {
   emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, false);
 
   sys.SetUpdate(0);
-  auto id1 = sys.AddOrg(25, nullptr);
+  [[maybe_unused]] auto id1 = sys.AddOrg(25, nullptr);
   CHECK(sys.GetAverageOriginTime() == 0);
   CHECK(sys.GetAverageOriginTime(true) == 0);
 
   sys.SetUpdate(6);
-  auto id2 = sys.AddOrg(-10, id1);
+  [[maybe_unused]] auto id2 = sys.AddOrg(-10, id1);
   CHECK(sys.GetAverageOriginTime() == 3);
   CHECK(sys.GetAverageOriginTime(true) == 0);
 
   sys.SetUpdate(10);
-  auto id3 = sys.AddOrg(26, id1);
+  [[maybe_unused]] auto id3 = sys.AddOrg(26, id1);
   CHECK(sys.GetAverageOriginTime() == Approx(5.333333));
   CHECK(sys.GetAverageOriginTime(true) == 0);
 
   sys.SetUpdate(25);
-  auto id4 = sys.AddOrg(27, id2);
+  [[maybe_unused]] auto id4 = sys.AddOrg(27, id2);
   CHECK(sys.GetAverageOriginTime() == Approx(10.25));
   CHECK(sys.GetAverageOriginTime(true) == Approx(0));
 
   sys.SetUpdate(32);
-  auto id5 = sys.AddOrg(28, id2);
+  [[maybe_unused]] auto id5 = sys.AddOrg(28, id2);
   CHECK(sys.GetAverageOriginTime() == Approx(14.6));
   CHECK(sys.GetAverageOriginTime(true) == Approx(3));
 
   sys.SetUpdate(39);
-  auto id6 = sys.AddOrg(29, id2);
+  [[maybe_unused]] auto id6 = sys.AddOrg(29, id2);
   CHECK(sys.GetAverageOriginTime() == Approx(18.6666667));
   CHECK(sys.GetAverageOriginTime(true) == Approx(4));
 
   CHECK(sys.CalcDiversity() == Approx(2.58496));
 
   sys.SetUpdate(39);
-  auto id7 = sys.AddOrg(30, id2);
+  [[maybe_unused]] auto id7 = sys.AddOrg(30, id2);
   CHECK(sys.GetAverageOriginTime() == Approx(21.571428571));
   CHECK(sys.GetAverageOriginTime(true) == Approx(4.5));
 }
@@ -1644,7 +1644,7 @@ TEST_CASE("Test Loading Phylogeny From File") {
   CHECK(sys.GetNumRoots() == 1);
   emp::Ptr<emp::Taxon<int>> mrca = sys.GetMRCA();
   CHECK(mrca->GetID() == 1);
-  auto offspring = mrca->GetOffspring();
+  [[maybe_unused]] auto offspring = mrca->GetOffspring();
   for (auto off : offspring) {
     CHECK(((off->GetID() == 7) || (off->GetID() == 2) || (off->GetID() == 3)));
   }
@@ -1668,7 +1668,7 @@ TEST_CASE("Test Loading Phylogeny From File") {
   CHECK(sys2.GetNumRoots() == 1);
   emp::Ptr<emp::Taxon<int>> mrca2 = sys.GetMRCA();
   CHECK(mrca2->GetID() == 1);
-  auto offspring2 = mrca2->GetOffspring();
+  [[maybe_unused]] auto offspring2 = mrca2->GetOffspring();
   for (auto off : offspring2) {
     CHECK(((off->GetID() == 7) || (off->GetID() == 2) || (off->GetID() == 3)));
   }
@@ -1728,13 +1728,13 @@ TEST_CASE("Collapse Unifurcations") {
   int unifurcation_count = 0;
   std::function<void(emp::Ptr<emp::Taxon<int>>)> unifurcation_fun = [&unifurcation_count](emp::Ptr<emp::Taxon<int>> tax){unifurcation_count++;};
   sys.OnCollapseUnifurcation(unifurcation_fun);
-  auto id1 = sys.AddOrg(3, nullptr);
+  [[maybe_unused]] auto id1 = sys.AddOrg(3, nullptr);
   sys.SetUpdate(1);
-  auto id2 = sys.AddOrg(4, id1);
+  [[maybe_unused]] auto id2 = sys.AddOrg(4, id1);
   sys.SetUpdate(2);
-  auto id3 = sys.AddOrg(5, id2);
+  [[maybe_unused]] auto id3 = sys.AddOrg(5, id2);
   sys.SetUpdate(3);
-  auto id4a = sys.AddOrg(6, id2);  
+  [[maybe_unused]] auto id4a = sys.AddOrg(6, id2);  
   CHECK(unifurcation_count == 0);
   CHECK(!sys.RemoveOrg(id4a));
   CHECK(unifurcation_count == 0);  
@@ -1757,11 +1757,11 @@ TEST_CASE("Collapse Unifurcations") {
   CHECK(!id3->GetParent());
   CHECK(sys.GetNumAncestors() == 0);
   CHECK(sys.GetNumTaxa() == 2);
-  auto id4 = sys.AddOrg(6, id3);
-  auto id5 = sys.AddOrg(7, id4);
-  auto id6 = sys.AddOrg(8, id5);
-  auto id7 = sys.AddOrg(9, id5);
-  auto id8 = sys.AddOrg(10, id5);
+  [[maybe_unused]] auto id4 = sys.AddOrg(6, id3);
+  [[maybe_unused]] auto id5 = sys.AddOrg(7, id4);
+  [[maybe_unused]] auto id6 = sys.AddOrg(8, id5);
+  [[maybe_unused]] auto id7 = sys.AddOrg(9, id5);
+  [[maybe_unused]] auto id8 = sys.AddOrg(10, id5);
   sys.RemoveOrg(id5);
   CHECK(sys.GetNumAncestors() == 1);
   sys.RemoveOrg(id7);

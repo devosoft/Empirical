@@ -1,16 +1,17 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2017
-*/
 /**
- *  @file
- *  @brief A string handler where sections update dynamically based on functions.
- *  @note Status: BETA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2017 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/datastructs/DynamicString.hpp
+ * @brief A string handler where sections update dynamically based on functions.
+ * @note Status: BETA
  */
 
-#ifndef EMP_DATASTRUCTS_DYNAMICSTRING_HPP_INCLUDE
-#define EMP_DATASTRUCTS_DYNAMICSTRING_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_DATASTRUCTS_DYNAMIC_STRING_HPP_GUARD
+#define INCLUDE_EMP_DATASTRUCTS_DYNAMIC_STRING_HPP_GUARD
 
 
 #include <functional>
@@ -31,6 +32,7 @@ namespace emp {
 
   public:
     DynamicString() { ; }
+
     DynamicString(const DynamicString &) = default;
 
     /// How many string components (functions or continuous substrings) are in this DynamicString?
@@ -45,12 +47,15 @@ namespace emp {
     const value_t & GetFunction(size_t id) const { return fun_set[id]; }
 
     /// Remove all contents on this DynamicString
-    DynamicString & Clear() { fun_set.clear(); return *this; }
+    DynamicString & Clear() {
+      fun_set.clear();
+      return *this;
+    }
 
     /// Convert to an std::string.
     std::string str() {
       std::stringstream ss;
-      for (auto & cur_fun : fun_set) ss << cur_fun();
+      for (auto & cur_fun : fun_set) { ss << cur_fun(); }
       return ss.str();
     }
 
@@ -62,7 +67,7 @@ namespace emp {
 
     /// Set the value of a specified component to the provided std::string text.
     DynamicString & Set(size_t id, const std::string & in_text) {
-      return Set( id, [in_text](){ return in_text; } );
+      return Set(id, [in_text]() { return in_text; });
     }
 
     /// Add a new function to the end of the DynamicString.
@@ -74,28 +79,26 @@ namespace emp {
     /// Add new std::string text to the end of the DynamicString.
     // (automatically create a function that just returns that string.)
     DynamicString & Append(const std::string & in_text) {
-      return Append( [in_text](){ return in_text; } );
+      return Append([in_text]() { return in_text; });
     }
 
     /// Allow operator<< to append to the back of a DynamicString.
     template <typename IN_TYPE>
-    DynamicString & operator<<(IN_TYPE && _in) { return Append(_in); }
-
+    DynamicString & operator<<(IN_TYPE && _in) {
+      return Append(_in);
+    }
   };
 
-}
+}  // namespace emp
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 namespace std {
   /// Make sure that DynamicString works with with std::ostream.
-  std::ostream & operator<<( std::ostream & os, const emp::DynamicString & strings )
-  {
-    for (size_t i = 0; i < strings.GetSize(); ++i) {
-      os << strings[i];
-    }
+  std::ostream & operator<<(std::ostream & os, const emp::DynamicString & strings) {
+    for (size_t i = 0; i < strings.GetSize(); ++i) { os << strings[i]; }
     return os;
   }
-}
-#endif // DOXYGEN_SHOULD_SKIP_THIS
+}  // namespace std
+#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-#endif // #ifndef EMP_DATASTRUCTS_DYNAMICSTRING_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_DATASTRUCTS_DYNAMIC_STRING_HPP_GUARD

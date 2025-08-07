@@ -182,3 +182,6 @@ TEST_CASE("Test Datum Math", "[data]")
   CHECK(dval == 2.0);
   CHECK(sval == "Num:string");
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: sval dval

@@ -41,3 +41,6 @@ int main()
   for (auto x : out_args) std::cout << "  " << x << std::endl;
 
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: cde

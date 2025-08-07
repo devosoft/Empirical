@@ -1,21 +1,22 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2018
-*/
 /**
- *  @file
- *  @brief Macros and template utilities to help determine details about unknown classes.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/meta/reflection.hpp
+ * @brief Macros and template utilities to help determine details about unknown classes.
  */
 
-#ifndef EMP_META_REFLECTION_HPP_INCLUDE
-#define EMP_META_REFLECTION_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_META_REFLECTION_HPP_GUARD
+#define INCLUDE_EMP_META_REFLECTION_HPP_GUARD
 
 #include "meta.hpp"
 #include "TypePack.hpp"
 
 /// This macro will generate a function that calls a member function on a given object IF that
-/// member exists, but otherwise pass the object as an arguent to a function fallback.
+/// member exists, but otherwise pass the object as an argument to a function fallback.
 ///
 /// NEW_NAME - name of the function to be generated.
 /// METHOD - name of the member function that should be attempted.
@@ -160,11 +161,10 @@ using NAME = typename emp::TypePack<Ts...>::template find_t<EMPDetect_ ## NAME>;
  EMP_IMPL_TYPE_DEFAULT(EMP_DETECT_ ## NEW_TYPE, ..., DEFAULT);                       \
  using NEW_TYPE = decltype(EMP_DETECT_ ## NEW_TYPE ## _impl<BASE_TYPE>(true))
 
-
 namespace emp {
 
-  // Helper tools for SubsetCall.
-  #ifndef DOXYGEN_SHOULD_SKIP_THIS
+// Helper tools for SubsetCall.
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
     template <typename RETURN, typename... FUN_ARGS>
     struct SubsetCall_impl {
@@ -173,8 +173,8 @@ namespace emp {
         return fun(args...);
       }
     };
-  }
-  #endif // DOXYGEN_SHOULD_SKIP_THIS
+  }  // namespace internal
+#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
   /// Identify the number of parameters in a function and pass in correct number of argument.
   template <typename RETURN, typename... FUN_ARGS, typename... CALL_ARGS>
@@ -182,20 +182,25 @@ namespace emp {
     return internal::SubsetCall_impl<RETURN, FUN_ARGS...>::Call(fun, args...);
   }
 
-  #ifndef DOXYGEN_SHOULD_SKIP_THIS
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
   // Helper tools for type_if.
   namespace internal {
-    template< typename T, bool match_ok > struct EMP_eval_type { };
-    template< typename T> struct EMP_eval_type<T,true> { using type = T; }; // If match, define type!
-  }
+    template <typename T, bool match_ok>
+    struct EMP_eval_type {};
+
+    template <typename T>
+    struct EMP_eval_type<T, true> {
+      using type = T;
+    };  // If match, define type!
+  }  // namespace internal
 
   /// A template for making a type exist if and only if it passes a template test.
   /// For example: type_if<T, std::is_integral>
   /// This becomes T if the type is integral; it's undefined otherwise.
   template <typename T, template <typename...> class FILTER>
-  using type_if = typename internal::EMP_eval_type< T, FILTER<T>::value >::type;
-  #endif // DOXYGEN_SHOULD_SKIP_THIS
+  using type_if = typename internal::EMP_eval_type<T, FILTER<T>::value>::type;
+#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_META_REFLECTION_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_META_REFLECTION_HPP_GUARD

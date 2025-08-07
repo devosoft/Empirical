@@ -125,3 +125,6 @@ int main()
   auto NFA7 = emp::to_NFA(re7);
   NFA7.Print();
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: cdef xxzzzxx xxxx abd xxyyxx abcabcd abcnabcdabc abcabc xxxxx aaaabc xxyxx bcdef bcdefg abcdefghijklm

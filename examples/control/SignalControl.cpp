@@ -28,11 +28,11 @@ int main()
   test_sig.AddAction([](int x){ std::cout << "---:" << x << "\n\n"; });
 
   // Trigger actions!
-  std::cout << "Phase 1: For each tigger, print [value], print ***, and print ---:value\n";
+  std::cout << "Phase 1: For each trigger, print [value], print ***, and print ---:value\n";
   test_sig.Trigger(12);
   test_sig.Trigger(-1);
 
-  // Signals dont need to take arguments or have names.
+  // Signals don't need to take arguments or have names.
   std::cout << "Phase 2: Create and trigger a signal with no args; added action to print ***\n";
   emp::Signal<void()> test_sig2;
   test_sig2.AddAction(PrintVoid);
@@ -78,3 +78,6 @@ int main()
   sum4_sig.Trigger(2,3,4,5,result);
   std::cout << "result variable is now set to " << result << std::endl;
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: iprint

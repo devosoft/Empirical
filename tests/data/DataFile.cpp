@@ -229,3 +229,6 @@ TEST_CASE("Test Floating Point DataFile", "[data]") {
     }
 
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: dfile seekg tellg mtrw's

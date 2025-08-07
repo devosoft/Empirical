@@ -1,20 +1,21 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2017-2021.
-*/
 /**
- *  @file
- *  @brief A set of simple functions to manipulate emp::vector
- *  @note Status: BETA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2017-2021 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/datastructs/vector_utils.hpp
+ * @brief A set of simple functions to manipulate emp::vector
+ * @note Status: BETA
  *
  *
- *  @todo consider adding a work-around to avoid vector<bool> ?
- *  @todo speed up Append to count all additions at once, resize, and fill them in.
+ * @todo consider adding a work-around to avoid vector<bool> ?
+ * @todo speed up Append to count all additions at once, resize, and fill them in.
  */
 
-#ifndef EMP_DATASTRUCTS_VECTOR_UTILS_HPP_INCLUDE
-#define EMP_DATASTRUCTS_VECTOR_UTILS_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_DATASTRUCTS_VECTOR_UTILS_HPP_GUARD
+#define INCLUDE_EMP_DATASTRUCTS_VECTOR_UTILS_HPP_GUARD
 
 #include <algorithm>
 #include <functional>
@@ -41,16 +42,16 @@ namespace emp {
   /// Insert a value at a specified position in a vector.
   template <typename T>
   void InsertAt(emp::vector<T> & v, size_t id, T value) {
-    v.insert(v.begin()+id, value);
+    v.insert(v.begin() + id, value);
   }
 
-  #ifndef DOXYGEN_SHOULD_SKIP_THIS
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
   /// Base case for Append; we just have a single vector with nothing to append.
   template <typename T>
   emp::vector<T> & Append(emp::vector<T> & base) {
     return base;
   }
-  #endif // DOXYGEN_SHOULD_SKIP_THIS
+#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
   /// Append one or more vectors on to the end of an existing vector.
   template <typename T, typename V1, typename... Vs>
@@ -78,36 +79,40 @@ namespace emp {
   }
 
   /// Convert a map to a vector.
-  template <typename T, typename INDEX_T=size_t>
-  emp::vector<T> ToVector(
-    const std::map<INDEX_T, T> & in_map,
-    T default_val=T(),
-    INDEX_T index_cap=32768
-  ) {
+  template <typename T, typename INDEX_T = size_t>
+  emp::vector<T> ToVector(const std::map<INDEX_T, T> & in_map,
+                          T default_val     = T(),
+                          INDEX_T index_cap = 32768) {
     INDEX_T max_index = in_map.back().second;
-    if (max_index < 0) max_index = 0; // In case all entries are negative...
-    if (max_index >= index_cap) max_index=index_cap-1;
+    if (max_index < 0) {
+      max_index = 0;  // In case all entries are negative...
+    }
+    if (max_index >= index_cap) { max_index = index_cap - 1; }
     emp::vector<T> out_vec;
-    out_vec.resize(max_index+1, default_val);
+    out_vec.resize(max_index + 1, default_val);
     for (auto [index, val] : in_map) {
-      if (index < 0) continue;       // Skip entries that can't go into a vector...
-      if (index >= index_cap) break; // Stop when we've hit the upper limit on vector size.
+      if (index < 0) {
+        continue;  // Skip entries that can't go into a vector...
+      }
+      if (index >= index_cap) {
+        break;  // Stop when we've hit the upper limit on vector size.
+      }
       out_vec[index] = val;
     }
     return out_vec;
   }
 
   /// Convert an unordered map to a vector.
-  template <typename T, typename INDEX_T=size_t>
-  emp::vector<T> ToVector(
-    const std::unordered_map<INDEX_T, T> & in_map,
-    T default_val=T(),
-    INDEX_T index_cap=32768
-  ) {
+  template <typename T, typename INDEX_T = size_t>
+  emp::vector<T> ToVector(const std::unordered_map<INDEX_T, T> & in_map,
+                          T default_val     = T(),
+                          INDEX_T index_cap = 32768) {
     emp::vector<T> out_vec;
     for (auto [index, val] : in_map) {
-      if (index < 0 || index >= index_cap) continue; // Skip entries that can't go into a vector...
-      if (((size_t) index) >= out_vec.size()) out_vec.resize(index+1, default_val);
+      if (index < 0 || index >= index_cap) {
+        continue;  // Skip entries that can't go into a vector...
+      }
+      if (((size_t) index) >= out_vec.size()) { out_vec.resize(index + 1, default_val); }
       out_vec[index] = val;
     }
     return out_vec;
@@ -117,36 +122,32 @@ namespace emp {
   template <typename T>
   std::map<size_t, T> ToMap(const emp::vector<T> & in_vec) {
     std::map<size_t, T> out_map;
-    for (size_t i=0; i < in_vec.size(); i++) {
-      out_map[i] = in_vec[i];
-    }
+    for (size_t i = 0; i < in_vec.size(); i++) { out_map[i] = in_vec[i]; }
     return out_map;
   }
 
   /// Convert a vector into a map.
-  template <typename INDEX_T=size_t, typename T>
+  template <typename INDEX_T = size_t, typename T>
   std::unordered_map<INDEX_T, T> ToUMap(const emp::vector<T> & in_vec) {
     std::unordered_map<INDEX_T, T> out_map;
-    for (size_t i=0; i < in_vec.size(); i++) {
-      out_map[(INDEX_T) i] = in_vec[i];
-    }
+    for (size_t i = 0; i < in_vec.size(); i++) { out_map[(INDEX_T) i] = in_vec[i]; }
     return out_map;
   }
 
   /// Return the first position of a value in a vector (or -1 if none exists)
   template <typename T>
-  int FindValue(const emp::vector<T> & v, const T & val, size_t start_pos=0) {
+  int FindValue(const emp::vector<T> & v, const T & val, size_t start_pos = 0) {
     for (size_t i = start_pos; i < v.size(); i++) {
-      if (v[i] == val) return (int) i;
+      if (v[i] == val) { return (int) i; }
     }
     return -1;
   }
 
   /// Remove the first value after start_pos with a given value.  Return if removal successful.
   template <typename T>
-  bool RemoveValue(emp::vector<T> & v, const T & val, size_t start_pos=0) {
+  bool RemoveValue(emp::vector<T> & v, const T & val, size_t start_pos = 0) {
     int pos = FindValue(v, val, start_pos);
-    if (pos == -1) return false;
+    if (pos == -1) { return false; }
     v.erase(v.begin() + pos);
     return true;
   }
@@ -160,7 +161,7 @@ namespace emp {
   /// Remove values starting at an index.
   template <typename T>
   void RemoveAt(emp::vector<T> & v, size_t id, size_t count) {
-    if (!count) return;
+    if (!count) { return; }
     v.erase(v.begin() + id, v.begin() + id + count);
   }
 
@@ -183,23 +184,27 @@ namespace emp {
   /// Return number of times a value occurs in a vector
   template <typename T>
   int Count(const emp::vector<T> & vec, const T & val) {
-    return std::count (vec.begin(), vec.end(), val);
+    return std::count(vec.begin(), vec.end(), val);
   }
 
   /// Print the contents of a vector.
   template <typename T>
-  void Print(const emp::vector<T> & v, std::ostream & os=std::cout, const std::string & spacer=" ") {
+  void Print(const emp::vector<T> & v,
+             std::ostream & os          = std::cout,
+             const std::string & spacer = " ") {
     for (size_t id = 0; id < v.size(); id++) {
-      if (id) os << spacer; // Put a space before second element and beyond.
+      if (id) {
+        os << spacer;  // Put a space before second element and beyond.
+      }
       os << emp::to_string(v[id]);
     }
   }
 
   /// Find the first index where the provided function returns true; return -1 otherwise.
   template <typename T, typename FUN>
-  int FindEval(const emp::vector<T> & v, const FUN & fun, size_t start_pos=0) {
+  int FindEval(const emp::vector<T> & v, const FUN & fun, size_t start_pos = 0) {
     for (size_t i = start_pos; i < v.size(); i++) {
-      if (fun(v[i])) return (int) i;
+      if (fun(v[i])) { return (int) i; }
     }
     return -1;
   }
@@ -211,12 +216,12 @@ namespace emp {
   size_t FindIndex(const T & v,
                    const std::function<bool(typename T::value_type, typename T::value_type)> & fun) {
     emp_assert(v.size() > 0);
-    using v_type = typename T::value_type;
-    v_type best_val = v[0];
+    using v_type      = typename T::value_type;
+    v_type best_val   = v[0];
     size_t best_index = 0;
     for (size_t i = 1; i < v.size(); i++) {
       if (fun(v[i], best_val)) {
-        best_val = v[i];
+        best_val   = v[i];
         best_index = i;
       }
     }
@@ -227,29 +232,35 @@ namespace emp {
   template <typename T>
   size_t FindMinIndex(const T & v) {
     using v_type = typename T::value_type;
-    return FindIndex(v, [](v_type a, v_type b){ return a < b; });
+    return FindIndex(v, [](v_type a, v_type b) { return a < b; });
   }
 
   /// Find the index with the maximal value (picks first in cases of a tie).
   template <typename T>
   size_t FindMaxIndex(const T & v) {
     using v_type = typename T::value_type;
-    return FindIndex(v, [](v_type a, v_type b){ return a > b; });
+    return FindIndex(v, [](v_type a, v_type b) { return a > b; });
   }
 
   /// Find the minimum value in a vector.
   template <typename T>
-  T FindMin(const emp::vector<T> & v) { return v[ FindMinIndex(v) ]; }
+  T FindMin(const emp::vector<T> & v) {
+    return v[FindMinIndex(v)];
+  }
 
   /// Find the maximum value in a vector.
   template <typename T>
-  T FindMax(const emp::vector<T> & v) { return v[ FindMaxIndex(v) ]; }
+  T FindMax(const emp::vector<T> & v) {
+    return v[FindMaxIndex(v)];
+  }
 
   /// Find the intersection between this vector and another container.
   template <typename T, typename C2>
   emp::vector<T> FindIntersect(const emp::vector<T> & in1, const C2 & in2) {
     emp::vector<T> out;
-    for (const auto & x : in1) if (emp::Has(in2, x)) out.push_back(x);
+    for (const auto & x : in1) {
+      if (emp::Has(in2, x)) { out.push_back(x); }
+    }
     return out;
   }
 
@@ -257,7 +268,7 @@ namespace emp {
   template <typename T>
   T Sum(const emp::vector<T> & v) {
     T sum = 0;
-    for (auto x : v) sum += x;
+    for (auto x : v) { sum += x; }
     return sum;
   }
 
@@ -265,7 +276,7 @@ namespace emp {
   template <typename T>
   T Product(const emp::vector<T> & v) {
     T product = 1;
-    for (auto x : v) product *= x;
+    for (auto x : v) { product *= x; }
     return product;
   }
 
@@ -278,7 +289,7 @@ namespace emp {
   /// Scale all elements of a vector by the same value.
   template <typename T>
   void Scale(emp::vector<T> & v, T scale) {
-    for (T & x : v) x *= scale;
+    for (T & x : v) { x *= scale; }
   }
 
   /// Returns a vector containing a chunk of elements from @param vec
@@ -286,26 +297,24 @@ namespace emp {
   template <typename T>
   emp::vector<T> Slice(emp::vector<T> vec, int start, int stop) {
     emp_assert(start < stop, start, stop);
-    emp_assert(start < (int)vec.size(), start, vec.size());
-    emp_assert(stop <= (int)vec.size(), stop, vec.size());
+    emp_assert(start < (int) vec.size(), start, vec.size());
+    emp_assert(stop <= (int) vec.size(), stop, vec.size());
 
     emp::vector<T> new_vec;
-    for (int i = start; i < stop; i++){
-      new_vec.push_back(vec[i]);
-    }
+    for (int i = start; i < stop; i++) { new_vec.push_back(vec[i]); }
     return new_vec;
   }
 
   /// Collapse a vector of vectors into a single vector.
   template <typename T>
-  emp::vector<T> Flatten( const emp::vector< emp::vector< T > > & vv ) {
+  emp::vector<T> Flatten(const emp::vector<emp::vector < T> > &vv) {
     size_t element_count = 0;
-    for (const auto & v : vv) element_count += v.size();
+    for (const auto & v : vv) { element_count += v.size(); }
 
     emp::vector<T> out_v;
     out_v.reserve(element_count);
 
-    for (const auto & v : vv) out_v.insert(out_v.end(), v.begin(), v.end());
+    for (const auto & v : vv) { out_v.insert(out_v.end(), v.begin(), v.end()); }
 
     return out_v;
   }
@@ -313,24 +322,24 @@ namespace emp {
   /// Swap the order of a vector of vectors.  That is, swap rows and columns.
   /// NOTE: All rows must be the same size or smaller than those above for this to work.
   template <typename T>
-  emp::vector< emp::vector< T > > Transpose( const emp::vector< emp::vector< T > > & in_vv ) {
+    emp::vector<emp::vector < T> > Transpose(const emp::vector<emp::vector < T> > &in_vv) {
     // If the input vector-of-vectors (in_vv) is empty, return it since inversion is trivial.
-    if (in_vv.size() == 0) return in_vv;
+    if (in_vv.size() == 0) { return in_vv; }
 
     // Setup the new vector to have a number of rows equal to number of cols in original.
-    emp::vector< emp::vector< T > > out_vv(in_vv[0].size());
+    emp::vector<emp::vector < T> > out_vv(in_vv[0].size());
 
     // Assuming a rectangular matrix, reserve enough space to fit each row!
-    for (auto & row : out_vv) row.reserve(in_vv.size());
+    for (auto & row : out_vv) { row.reserve(in_vv.size()); }
 
     // Copy over all of the data!
     for (size_t i = 0; i < in_vv.size(); i++) {
-      emp_assert(i == 0 || in_vv[i].size() <= in_vv[i-1].size(),
+      emp_assert(i == 0 || in_vv[i].size() <= in_vv[i - 1].size(),
                  "Cannot invert a matrix with increasing row length.",
-                 i, in_vv[i].size(), in_vv[i-1].size());
-      for (size_t j = 0; j < in_vv[i].size(); j++) {
-        out_vv[j].push_back( in_vv[i][j] );
-      }
+                 i,
+                 in_vv[i].size(),
+                 in_vv[i - 1].size());
+      for (size_t j = 0; j < in_vv[i].size(); j++) { out_vv[j].push_back(in_vv[i][j]); }
     }
 
     return out_vv;
@@ -339,29 +348,29 @@ namespace emp {
   /// Returns a vector containing the numbers from @param N1 to @param N2
   // from https://stackoverflow.com/questions/13152252/is-there-a-compact-equivalent-to-python-range-in-c-stl
   template <typename T>
-  emp::vector <T> NRange(T N1, T N2) {
-      emp::vector<T> numbers(N2-N1);
-      std::iota(numbers.begin(), numbers.end(), N1);
-      return numbers;
+  emp::vector<T> NRange(T N1, T N2) {
+    emp::vector<T> numbers(N2 - N1);
+    std::iota(numbers.begin(), numbers.end(), N1);
+    return numbers;
   }
 
   /// Build a vector with a range of values from min to max at the provided step size.
   template <typename T>
-  static inline emp::vector<T> BuildRange(T min, T max, T step=1) {
+  static inline emp::vector<T> BuildRange(T min, T max, T step = 1) {
     emp_assert(max > min);
-    size_t vsize = (size_t) ((max-min) / step) + 1;
+    size_t vsize = (size_t) ((max - min) / step) + 1;
     emp::vector<T> out_v(vsize);
     size_t pos = 0;
-    for (T i = min; i < max; i += step) {
-      out_v[pos++] = i;
-    }
+    for (T i = min; i < max; i += step) { out_v[pos++] = i; }
     return out_v;
   }
 
   /// Tree manipulation in vectors.
-  constexpr size_t tree_left(size_t id) { return id*2+1; }
-  constexpr size_t tree_right(size_t id) { return id*2+2; }
-  constexpr size_t tree_parent(size_t id) { return (id-1)/2; }
+  constexpr size_t tree_left(size_t id) { return id * 2 + 1; }
+
+  constexpr size_t tree_right(size_t id) { return id * 2 + 2; }
+
+  constexpr size_t tree_parent(size_t id) { return (id - 1) / 2; }
 
   // == Heap manipulation ==
 
@@ -369,16 +378,18 @@ namespace emp {
   template <typename T>
   bool Heapify(emp::vector<T> & v, size_t id) {
     const size_t id_left = tree_left(id);
-    if (id_left >= v.size()) return false;  // Nothing left to heapify.
+    if (id_left >= v.size()) {
+      return false;  // Nothing left to heapify.
+    }
 
-    const T val = v[id];
+    const T val      = v[id];
     const T val_left = v[id_left];
 
     const size_t id_right = tree_right(id);
     if (id_right < v.size()) {
       const T val_right = v[id_right];
       if (val_left < val_right && val < val_right) {
-        v[id] = val_right;
+        v[id]       = val_right;
         v[id_right] = val;
         Heapify(v, id_right);
         return true;
@@ -386,7 +397,7 @@ namespace emp {
     }
 
     if (val < val_left) {
-      v[id] = val_left;
+      v[id]      = val_left;
       v[id_left] = val;
       Heapify(v, id_left);
       return true;
@@ -399,7 +410,7 @@ namespace emp {
   template <typename T>
   void Heapify(emp::vector<T> & v) {
     size_t id = v.size();
-    while (id-- > 0) emp::Heapify(v, id);
+    while (id-- > 0) { emp::Heapify(v, id); }
   }
 
   /// Extract maximum element from a heap.
@@ -409,27 +420,31 @@ namespace emp {
     T out = v[0];
     if (v.size() > 1) {
       const size_t last_pos = v.size() - 1;
-      v[0] = v[last_pos];
+      v[0]                  = v[last_pos];
       v.resize(last_pos);
-      Heapify(v,0);
+      Heapify(v, 0);
+    } else {
+      v.resize(0);
     }
-    else v.resize(0);
     return out;
   }
 
   /// Insert a new element into a heap.
   template <typename T>
   void HeapInsert(emp::vector<T> & v, T val) {
-    size_t pos = v.size();
+    size_t pos  = v.size();
     size_t ppos = tree_parent(pos);
     v.push_back(val);
     while (pos > 0 && v[ppos] < v[pos]) {
       std::swap(v[pos], v[ppos]);
-      pos = ppos;
+      pos  = ppos;
       ppos = tree_parent(pos);
     }
   }
 
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_DATASTRUCTS_VECTOR_UTILS_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_DATASTRUCTS_VECTOR_UTILS_HPP_GUARD
+
+// Local settings for Empecable file checker.
+// empecable_words: ppos

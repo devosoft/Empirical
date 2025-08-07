@@ -17,21 +17,21 @@
 TEST_CASE("Test Text", "[text]") {
   emp::Text text("Test Text");
   REQUIRE(text.GetSize() == 9);
-  REQUIRE(text.GetText() == "Test Text");
+  REQUIRE(text.AsString() == "Test Text");
   REQUIRE(text.HasBold(0) == false);
   REQUIRE(text.HasBold(5) == false);
 
   // Try adding style.
   text.Bold(5,9);
   REQUIRE(text.GetSize() == 9);
-  REQUIRE(text.GetText() == "Test Text");
+  REQUIRE(text.AsString() == "Test Text");
   REQUIRE(text.HasBold(0) == false);
   REQUIRE(text.HasBold(5) == true);
 
   // Try appending.
   text << " and more Text.";
   REQUIRE(text.GetSize() == 24);
-  REQUIRE(text.GetText() == "Test Text and more Text.");
+  REQUIRE(text.AsString() == "Test Text and more Text.");
   REQUIRE(text.HasBold(0) == false);
   REQUIRE(text.HasBold(5) == true);
   REQUIRE(text.HasBold(18) == false);
@@ -42,7 +42,7 @@ TEST_CASE("Test Text", "[text]") {
   text[21] = 's';
   text[23] = 's';
   REQUIRE(text.GetSize() == 24);
-  REQUIRE(text.GetText() == "Test Text and more Tests");
+  REQUIRE(text.AsString() == "Test Text and more Tests");
   REQUIRE(text.HasBold(0) == false);
   REQUIRE(text.HasBold(5) == true);
   REQUIRE(text.HasBold(18) == false);
@@ -52,7 +52,7 @@ TEST_CASE("Test Text", "[text]") {
   // Try making a change that involves style.
   text[19] = text[5];
   REQUIRE(text.GetSize() == 24);
-  REQUIRE(text.GetText() == "Test Text and more Tests");
+  REQUIRE(text.AsString() == "Test Text and more Tests");
   REQUIRE(text.HasBold(0) == false);
   REQUIRE(text.HasBold(5) == true);
   REQUIRE(text.HasBold(18) == false);

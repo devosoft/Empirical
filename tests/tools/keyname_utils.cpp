@@ -173,3 +173,6 @@ TEST_CASE("Test keyname_utils", "[tools]")
 
 
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: aseed ext asdf

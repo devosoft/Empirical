@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
               << "  4 - Grid" << std::endl
               << "  5 - Lossy Grid" << std::endl
               << "  6 - Linked Cliques" << std::endl
-              << "  7 - Hamiltonion Cycle (with solution)" << std::endl
+              << "  7 - Hamiltonian Cycle (with solution)" << std::endl
               << "  8 - Random DAG" << std::endl
               << "  9 - Multiple Random Components" << std::endl
               << " 10 - Random Weighted" << std::endl;
@@ -139,7 +139,7 @@ int main(int argc, char* argv[])
     graph.PrintSym(of);
   }
   else if (graph_type == 7) {
-    std::cout << "Generating a Random Graph (with hamiltonian cycle and solution)." << std::endl;
+    std::cout << "Generating a Random Graph (with Hamiltonian cycle and solution)." << std::endl;
     size_t nodes = GetValue("How many vertices?", args, cur_arg, 1000);
     size_t edges = GetValue("How many edges?", args, cur_arg, nodes*(nodes-1)/2);
 
@@ -225,3 +225,6 @@ int main(int argc, char* argv[])
 
   std::cout << "Printed to file '" << filename << "'." << std::endl;
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: randw hcycle dag lgrid cliqueset

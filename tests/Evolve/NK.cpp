@@ -53,3 +53,6 @@ TEST_CASE("Test NK Landscapes", "[Evolve]")
   REQUIRE(nk2.GetStateCount() == 8);
   REQUIRE(nk2.GetTotalCount() == 72);
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: rnd

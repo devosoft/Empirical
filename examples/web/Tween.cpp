@@ -50,3 +50,6 @@ int main()
   tween.AddPath(cy, cr, can_size-cr);
   tween.AddUpdate(TweenAnim);
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: myvar

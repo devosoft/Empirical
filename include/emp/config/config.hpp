@@ -1,43 +1,44 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2019.
-*/
 /**
- *  @file
- *  @brief Maintains a set of configuration options.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2019 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  This file defines a master configuration option Config, whose values can be loaded
- *  at runtime or else set as constant values throughout the code.
+ * @file include/emp/config/config.hpp
+ * @brief Maintains a set of configuration options.
  *
- *  Assuming you have an emp::Config object called config, you can:
+ * This file defines a master configuration option Config, whose values can be loaded
+ * at runtime or else set as constant values throughout the code.
  *
- *  access a setting value:            config.SETTING_NAME()
- *  adjust a setting value:            config.SETTING_NAME(new_value)
- *  determine if a setting is locked:  config.SETTING_NAME_is_const()
- *  lookup a setting dynamically:      config("SETTING_NAME")
- *  adjust a setting dynamically:      config("SETTING_NAME", "new_value")
+ * Assuming you have an emp::Config object called config, you can:
  *
- *  load settings from a stream:       config.Read(stream);
- *  load settings from a file:         config.Read(filename);
- *  save settings to a stream:         config.Write(stream);
- *  save settings to a file:           config.Write(filename);
- *  generate a query string:           config.WriteUrlQueryString(stream);
+ * access a setting value:            config.SETTING_NAME()
+ * adjust a setting value:            config.SETTING_NAME(new_value)
+ * determine if a setting is locked:  config.SETTING_NAME_is_const()
+ * lookup a setting dynamically:      config("SETTING_NAME")
+ * adjust a setting dynamically:      config("SETTING_NAME", "new_value")
  *
- *  write settings macros to a stream: config.WriteMacros(stream);
- *  write settings macros to a file:   config.WriteMacros(filename);
+ * load settings from a stream:       config.Read(stream);
+ * load settings from a file:         config.Read(filename);
+ * save settings to a stream:         config.Write(stream);
+ * save settings to a file:           config.Write(filename);
+ * generate a query string:           config.WriteUrlQueryString(stream);
+ *
+ * write settings macros to a stream: config.WriteMacros(stream);
+ * write settings macros to a file:   config.WriteMacros(filename);
  *
  *
- *  The configuration files generated can use the following keywords in order to
- *  configure this object:
- *   include OTHER_FILENAME         -- Load in all data from another file.
- *   set SETTING_NAME VALUE         -- Set a basic configuration setting.
- *   new OBJECT_TYPE OBJECT_NAME    -- Create a new config object of a managed class.
- *   use OBJECT_TYPE OBJECT_NAME    -- Use a previouly created configuration object.
+ * The configuration files generated can use the following keywords in order to
+ * configure this object:
+ *  include OTHER_FILENAME         -- Load in all data from another file.
+ *  set SETTING_NAME VALUE         -- Set a basic configuration setting.
+ *  new OBJECT_TYPE OBJECT_NAME    -- Create a new config object of a managed class.
+ *  use OBJECT_TYPE OBJECT_NAME    -- Use a previously created configuration object.
  */
 
-#ifndef EMP_CONFIG_CONFIG_HPP_INCLUDE
-#define EMP_CONFIG_CONFIG_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_CONFIG_CONFIG_HPP_GUARD
+#define INCLUDE_EMP_CONFIG_CONFIG_HPP_GUARD
 
 #include <fstream>
 #include <functional>
@@ -70,24 +71,49 @@ namespace emp {
     std::unordered_set<std::string> alias_set;
 
   public:
-    ConfigEntry(const std::string _name, const std::string _type,
-                 const std::string _d_val, const std::string _desc)
-      : name(_name), type(_type), default_val(_d_val), desc(_desc), alias_set()
-    { ; }
+    ConfigEntry(const std::string _name,
+                const std::string _type,
+                const std::string _d_val,
+                const std::string _desc)
+      : name(_name), type(_type), default_val(_d_val), desc(_desc), alias_set() {
+      ;
+    }
+
     virtual ~ConfigEntry() { ; }
 
     const std::string & GetName() const { return name; }
+
     const std::string & GetType() const { return type; }
+
     const std::string & GetDefault() const { return default_val; }
+
     const std::string & GetDescription() const { return desc; }
 
-    ConfigEntry & SetName(const std::string & _in) { name = _in; return *this; }
-    ConfigEntry & SetType(const std::string & _in) { type = _in; return *this; }
-    ConfigEntry & SetDefault(const std::string & _in) { default_val = _in; return *this; }
-    ConfigEntry & SetDescription(const std::string & _in) { desc = _in; return *this; }
+    ConfigEntry & SetName(const std::string & _in) {
+      name = _in;
+      return *this;
+    }
+
+    ConfigEntry & SetType(const std::string & _in) {
+      type = _in;
+      return *this;
+    }
+
+    ConfigEntry & SetDefault(const std::string & _in) {
+      default_val = _in;
+      return *this;
+    }
+
+    ConfigEntry & SetDescription(const std::string & _in) {
+      desc = _in;
+      return *this;
+    }
 
     /// Alert this setting that it is aliased to alternate possible names.
-    ConfigEntry & AddAlias(const std::string & _in) { alias_set.insert(_in); return *this; }
+    ConfigEntry & AddAlias(const std::string & _in) {
+      alias_set.insert(_in);
+      return *this;
+    }
 
     /// Are there any alternate names for this setting?
     bool HasAlias(const std::string & _in) { return alias_set.find(_in) != alias_set.end(); }
@@ -101,7 +127,7 @@ namespace emp {
     /// Retrieve the value of this setting as a string.
     virtual std::string GetValue() const = 0;
 
-    /// Conver the value of this setting into a literal that C++ would recognize as its current value.
+    /// Convert the value of this setting into a literal that C++ would recognize as its current value.
     virtual std::string GetLiteralValue() const = 0;
 
     /// Use a string to set the value of this setting.
@@ -114,76 +140,102 @@ namespace emp {
   /// Master configuration class that manages all of the settings.
   class Config {
   protected:
-
     /// Type-specific versions of ConfigEntry class to manage settings.
-    template <class VAR_TYPE> class tConfigEntry : public ConfigEntry {
+    template <class VAR_TYPE>
+    class tConfigEntry : public ConfigEntry {
     protected:
       VAR_TYPE & entry_ref;
     public:
-      tConfigEntry(const std::string _name, const std::string _type,
-                   const std::string _d_val, const std::string _desc,
+      tConfigEntry(const std::string _name,
+                   const std::string _type,
+                   const std::string _d_val,
+                   const std::string _desc,
                    VAR_TYPE & _ref)
-        : ConfigEntry(_name, _type, _d_val, _desc), entry_ref(_ref) { ; }
+        : ConfigEntry(_name, _type, _d_val, _desc), entry_ref(_ref) {
+        ;
+      }
+
       ~tConfigEntry() { ; }
 
       std::string GetValue() const { return emp::to_string(entry_ref); }
+
       std::string GetLiteralValue() const { return to_literal(entry_ref); }
+
       ConfigEntry & SetValue(const std::string & in_val, std::stringstream & /* warnings */) {
         if constexpr (std::is_same<VAR_TYPE, std::string>::value) {
           // Using a stringstream on a string with whitespace will only get
           // first word, so only right trim for extra white space
           size_t end = in_val.find_last_not_of(" \n\r\t\f\v");
-          entry_ref = (end == std::string::npos) ? "" : in_val.substr(0, end+1);
+          entry_ref  = (end == std::string::npos) ? "" : in_val.substr(0, end + 1);
         } else {
           // For other values, use the power of a stringstream to do a quick
           // conversion
-          std::stringstream ss; ss << in_val; ss >> entry_ref;
+          std::stringstream ss;
+          ss << in_val;
+          ss >> entry_ref;
         }
         return *this;
       }
+
       bool IsConst() const { return false; }
     };
 
     /// Type-specific and CONST versions of ConfigEntry class to manage fixed settings.
-    template <class VAR_TYPE> class tConfigConstEntry : public ConfigEntry {
+    template <class VAR_TYPE>
+    class tConfigConstEntry : public ConfigEntry {
     protected:
       const VAR_TYPE literal_val;
     public:
-      tConfigConstEntry(const std::string _name, const std::string _type,
-                        const std::string _d_val, const std::string _desc,
+      tConfigConstEntry(const std::string _name,
+                        const std::string _type,
+                        const std::string _d_val,
+                        const std::string _desc,
                         const VAR_TYPE & _literal_val)
-        : ConfigEntry(_name, _type, _d_val, _desc), literal_val(_literal_val) { ; }
+        : ConfigEntry(_name, _type, _d_val, _desc), literal_val(_literal_val) {
+        ;
+      }
+
       ~tConfigConstEntry() { ; }
 
       std::string GetValue() const { return default_val; }
+
       std::string GetLiteralValue() const { return to_literal(literal_val); }
+
       ConfigEntry & SetValue(const std::string & in_val, std::stringstream & warnings) {
         // This is a constant setting.  If we are actually trying to change it, give a warning.
         if (in_val != GetValue()) {
-          warnings << "Trying to adjust locked setting '"
-                   << name << "' from '" << GetValue()
+          warnings << "Trying to adjust locked setting '" << name << "' from '" << GetValue()
                    << "' to '" << in_val << "'. Ignoring." << std::endl;
         }
         return *this;
       }
+
       bool IsConst() const { return true; }
     };
 
-    /// Special settings entry for settings created during the run (only accissibly dynamically)
+    /// Special settings entry for settings created during the run (only accessible dynamically)
     class ConfigLiveEntry : public ConfigEntry {
     public:
-      ConfigLiveEntry(const std::string _name, const std::string _type,
-                       const std::string _d_val, const std::string _desc)
-        : ConfigEntry(_name, _type, _d_val, _desc) { ; }
+      ConfigLiveEntry(const std::string _name,
+                      const std::string _type,
+                      const std::string _d_val,
+                      const std::string _desc)
+        : ConfigEntry(_name, _type, _d_val, _desc) {
+        ;
+      }
+
       ~ConfigLiveEntry() { ; }
 
       std::string GetValue() const { return default_val; }
+
       std::string GetLiteralValue() const { return to_literal(default_val); }
+
       ConfigEntry & SetValue(const std::string & in_val, std::stringstream & warnings) {
         (void) warnings;
         default_val = in_val;
         return *this;
       }
+
       bool IsConst() const { return false; }
     };
 
@@ -195,17 +247,24 @@ namespace emp {
       emp::vector<ConfigEntry *> entry_set;
     public:
       ConfigGroup(const std::string & _name, const std::string & _desc)
-        : name(_name), desc(_desc), entry_set()
-      { ; }
+        : name(_name), desc(_desc), entry_set() {
+        ;
+      }
+
       ~ConfigGroup() { ; }
 
       size_t GetSize() const { return entry_set.size(); }
 
       std::string GetName() const { return name; }
+
       std::string GetDesc() const { return desc; }
 
       ConfigEntry * GetEntry(size_t id) { return entry_set[id]; }
-      ConfigEntry * GetLastEntry() { emp_assert(GetSize() > 0); return entry_set.back(); }
+
+      ConfigEntry * GetLastEntry() {
+        emp_assert(GetSize() > 0);
+        return entry_set.back();
+      }
 
       void Add(ConfigEntry * new_entry) { entry_set.push_back(new_entry); }
 
@@ -229,7 +288,7 @@ namespace emp {
           setting_info[i] += entry_set[i]->GetName();
           setting_info[i] += " ";
           setting_info[i] += entry_set[i]->GetValue();
-          if (max_length < setting_info[i].size()) max_length = setting_info[i].size();
+          if (max_length < setting_info[i].size()) { max_length = setting_info[i].size(); }
         }
 
         // Loop through a second time to actually do the printing with properly spaced comments.
@@ -242,13 +301,13 @@ namespace emp {
 
           size_t start_col = setting_info[i].size();
           for (size_t comment_line = 0; comment_line < desc_lines.size(); comment_line++) {
-            for (size_t ws = start_col; ws < max_length; ws++) out << ' ';
+            for (size_t ws = start_col; ws < max_length; ws++) { out << ' '; }
             out << "# " << desc_lines[comment_line] << std::endl;
             start_col = 0;
           }
         }
 
-        out << std::endl; // Skip a line after each group.
+        out << std::endl;  // Skip a line after each group.
       }
 
       void WriteUrlQueryString(std::ostream & out) const {
@@ -266,13 +325,14 @@ namespace emp {
 
         // Loop through once to figure out non-comment output
         for (ConfigEntry * cur_entry : entry_set) {
-          if (as_const || cur_entry->IsConst()) { out << "    CONST("; }
-          else { out << "    VALUE("; }
+          if (as_const || cur_entry->IsConst()) {
+            out << "    CONST(";
+          } else {
+            out << "    VALUE(";
+          }
 
-          out << cur_entry->GetName() << ", "
-              << cur_entry->GetType() << ", "
-              << cur_entry->GetLiteralValue() << ", "
-              << to_literal( cur_entry->GetDescription() )
+          out << cur_entry->GetName() << ", " << cur_entry->GetType() << ", "
+              << cur_entry->GetLiteralValue() << ", " << to_literal(cur_entry->GetDescription())
               << "),\n";
 
           // Output aliases.
@@ -282,7 +342,7 @@ namespace emp {
           }
         }
 
-        out << std::endl; // Skip a line after each group.
+        out << std::endl;  // Skip a line after each group.
       }
     };
 
@@ -302,10 +362,10 @@ namespace emp {
 
     // Which characters can legally be part of a variable identifier?
     bool IsVarChar(const char c) {
-      if (c >= 'a' && c <= 'z') return true;
-      if (c >= 'A' && c <= 'Z') return true;
-      if (c >= '0' && c <= '9') return true;
-      if (c == '_') return true;
+      if (c >= 'a' && c <= 'z') { return true; }
+      if (c >= 'A' && c <= 'Z') { return true; }
+      if (c >= '0' && c <= '9') { return true; }
+      if (c == '_') { return true; }
       return false;
     }
 
@@ -314,29 +374,29 @@ namespace emp {
     // * Expand all variables beginning with a $ in config line.
     // * If wrap-around, move line to extras
     void ProcessLine(std::string & cur_line, std::string & extras) {
-      size_t start_pos = extras.size();          // If there were extras last time, skip them.
-      if (extras.size()) cur_line.insert(0, extras);
+      size_t start_pos = extras.size();  // If there were extras last time, skip them.
+      if (extras.size()) { cur_line.insert(0, extras); }
       extras.resize(0);
-      emp::left_justify(cur_line);               // Clear out leading whitespace.
+      emp::left_justify(cur_line);  // Clear out leading whitespace.
 
       for (size_t pos = start_pos; pos < cur_line.size(); pos++) {
         const char cur_char = cur_line[pos];
         // Check for escape characters and convert them appropriately.
         if (cur_char == '\\') {
-          if (pos+1 == cur_line.size()) {                    // If backslash is at end of line...
-            extras = cur_line.substr(0, cur_line.size()-1);  // ...move string to extras
-            cur_line.resize(0);                              // ...don't process current line
-            return;                                          // ...since this is the line end, stop
+          if (pos + 1 == cur_line.size()) {                    // If backslash is at end of line...
+            extras = cur_line.substr(0, cur_line.size() - 1);  // ...move string to extras
+            cur_line.resize(0);                                // ...don't process current line
+            return;  // ...since this is the line end, stop
           }
           // If we make it this far, we have a regular character being escaped.  Make the swap!
-          const char esc_char = cur_line[pos+1];
+          const char esc_char = cur_line[pos + 1];
           switch (esc_char) {
-            case '$': cur_line.replace(pos, 2, "$"); break;
-            case '#': cur_line.replace(pos, 2, "#"); break;
+            case '$':  cur_line.replace(pos, 2, "$"); break;
+            case '#':  cur_line.replace(pos, 2, "#"); break;
             case '\\': cur_line.replace(pos, 2, "\\"); break;
-            case 'n': cur_line.replace(pos, 2, "\n"); break;
-            case 'r': cur_line.replace(pos, 2, "\r"); break;
-            case 't': cur_line.replace(pos, 2, "\t"); break;
+            case 'n':  cur_line.replace(pos, 2, "\n"); break;
+            case 'r':  cur_line.replace(pos, 2, "\r"); break;
+            case 't':  cur_line.replace(pos, 2, "\t"); break;
           }
         }
         // A '#' indicates that a comment is starting that the rest of the line should be removed.
@@ -345,14 +405,14 @@ namespace emp {
         }
         // A '$' indicates that we should expand a variable in place.
         else if (cur_char == '$' && expand_ok) {
-          size_t end_pos = pos+1;
-          while (end_pos < cur_line.size() && IsVarChar(cur_line[end_pos])) end_pos++;
+          size_t end_pos = pos + 1;
+          while (end_pos < cur_line.size() && IsVarChar(cur_line[end_pos])) { end_pos++; }
           const size_t var_size = end_pos - pos - 1;
-          std::string var_name(cur_line, pos+1, var_size);
+          std::string var_name(cur_line, pos + 1, var_size);
 
           if (ResolveAlias(var_name)) {
             std::string new_val = var_map[var_name]->GetValue();  // Lookup variable value.
-            cur_line.replace(pos, var_size+1, new_val);           // Replace var name with value.
+            cur_line.replace(pos, var_size + 1, new_val);         // Replace var name with value.
             pos += new_val.size();                                // Skip new text.
           } else {
             std::stringstream ss;
@@ -362,17 +422,16 @@ namespace emp {
           // @CAO CONTINUE
         }
       }
-
     }
 
     // === Protected member variables ===
-    emp::vector<std::string> class_names;           // Names in class heiarchy.
-    emp::unordered_map<std::string, ConfigEntry *> var_map;   // All variables across groups.
-    std::string version_id;                         // Unique version ID to ensure synced config.
-    emp::vector<ConfigGroup *> group_set;           // All of the config groups.
-    std::stringstream warnings;                     // Aggregate warnings for combined display.
-    int delay_warnings;                             // Count of delays to collect warnings for printing.
-    emp::unordered_map<std::string, std::string> alias_map;   // Map all aliases to original name.
+    emp::vector<std::string> class_names;                    // Names in class hierarchy.
+    emp::unordered_map<std::string, ConfigEntry *> var_map;  // All variables across groups.
+    std::string version_id;                // Unique version ID to ensure synced config.
+    emp::vector<ConfigGroup *> group_set;  // All of the config groups.
+    std::stringstream warnings;            // Aggregate warnings for combined display.
+    int delay_warnings;                    // Count of delays to collect warnings for printing.
+    emp::unordered_map<std::string, std::string> alias_map;  // Map all aliases to original name.
 
     // Map namespaces to the appropriate config object.
     emp::unordered_map<std::string, Config *> namespace_map;
@@ -386,48 +445,65 @@ namespace emp {
     emp::unordered_map<std::string, std::function<bool(std::string)> > use_map;
 
     // Instructions on how config should behave.
-    bool expand_ok;          // Should we expand variables in the config file.
+    bool expand_ok;  // Should we expand variables in the config file.
 
   public:
     Config(const std::string & in_version = "")
-      : class_names(), var_map(), version_id(in_version), group_set(), warnings()
-      , delay_warnings(0), alias_map(), namespace_map(), type_manager_map(), command_map()
-      , new_map(), use_map(), expand_ok(true)
-    {
+      : class_names()
+      , var_map()
+      , version_id(in_version)
+      , group_set()
+      , warnings()
+      , delay_warnings(0)
+      , alias_map()
+      , namespace_map()
+      , type_manager_map()
+      , command_map()
+      , new_map()
+      , use_map()
+      , expand_ok(true) {
       class_names.push_back("emp::Config");
     }
 
     ~Config() {
-      // Delete all alocated memory!
-      for (auto & x : var_map) delete x.second;
-      for (auto & x : group_set) delete x;
-      for (auto & x : type_manager_map) delete x.second;
+      // Delete all allocated memory!
+      for (auto & x : var_map) { delete x.second; }
+      for (auto & x : group_set) { delete x; }
+      for (auto & x : type_manager_map) { delete x.second; }
     }
 
-    #ifndef DOXYGEN_SHOULD_SKIP_THIS
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
     friend class ConfigWebUI;
-    #endif /*DOXYGEN_SHOULD_SKIP_THIS*/
+#endif /*DOXYGEN_SHOULD_SKIP_THIS*/  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
     ConfigEntry * operator[](const std::string & name) { return var_map[name]; }
+
     auto begin() -> decltype(var_map.begin()) { return var_map.begin(); }
+
     auto end() -> decltype(var_map.end()) { return var_map.end(); }
 
     const ConfigEntry * operator[](const std::string & name) const { return var_map.at(name); }
+
     auto cbegin() -> decltype(var_map.cbegin()) { return var_map.cbegin(); }
+
     auto cend() -> decltype(var_map.cend()) { return var_map.cend(); }
 
     auto begin() const -> const decltype(var_map.begin()) { return var_map.begin(); }
+
     auto end() const -> const decltype(var_map.end()) { return var_map.end(); }
 
-    Config & SetExpandOK(bool ok=true) { expand_ok = ok; return *this; }
+    Config & SetExpandOK(bool ok = true) {
+      expand_ok = ok;
+      return *this;
+    }
 
     bool Has(const std::string & setting_name) const {
       return (var_map.find(setting_name) != var_map.end()) ||
-        (alias_map.find(setting_name) != alias_map.end());
+             (alias_map.find(setting_name) != alias_map.end());
     }
 
     bool ResolveAlias(std::string & setting_name) const {
-      if (var_map.find(setting_name) != var_map.end()) return true;
+      if (var_map.find(setting_name) != var_map.end()) { return true; }
       if (alias_map.find(setting_name) != alias_map.end()) {
         setting_name = alias_map.find(setting_name)->second;
         return true;
@@ -436,22 +512,26 @@ namespace emp {
     }
 
     std::string Get(std::string setting_name) {
-      if (!ResolveAlias(setting_name)) return "";  // @CAO Print warning?
+      if (!ResolveAlias(setting_name)) {
+        return "";  // @CAO Print warning?
+      }
       return var_map[setting_name]->GetValue();
     }
 
-    Config & Set(std::string setting_name, const std::string & new_value,
-                  const std::string & in_desc="") {
+    Config & Set(std::string setting_name,
+                 const std::string & new_value,
+                 const std::string & in_desc = "") {
       if (!ResolveAlias(setting_name)) {
         // This setting is not currently in the map!  We should put it in, but let user know.
         warnings << "Unknown setting '" << setting_name << "'.  Creating." << std::endl;
-        var_map[setting_name] = new ConfigLiveEntry(setting_name, "std::string", new_value, in_desc);
+        var_map[setting_name] =
+          new ConfigLiveEntry(setting_name, "std::string", new_value, in_desc);
         GetActiveGroup()->Add(var_map[setting_name]);
       }
       var_map[setting_name]->SetValue(new_value, warnings);
       if (!delay_warnings && warnings.rdbuf()->in_avail()) {
         emp::NotifyWarning(warnings.str());
-        warnings.str(std::string()); // Clear the warnings.
+        warnings.str(std::string());  // Clear the warnings.
       }
       return *this;
     }
@@ -463,8 +543,8 @@ namespace emp {
     }
 
     void AddAlias(const std::string & base_name, const std::string & alias_name) {
-      emp_assert( var_map.find(base_name) != var_map.end() );  // Make sure base exists.
-      emp_assert( !Has(alias_name) ); // Make sure alias does not!
+      emp_assert(var_map.find(base_name) != var_map.end());  // Make sure base exists.
+      emp_assert(!Has(alias_name));                          // Make sure alias does not!
       alias_map[alias_name] = base_name;
       var_map[base_name]->AddAlias(alias_name);
     }
@@ -474,9 +554,7 @@ namespace emp {
       // @CAO Start by printing some file header information?
 
       // Next print each group and its information.
-      for (auto it = group_set.begin(); it != group_set.end(); it++) {
-        (*it)->Write(out);
-      }
+      for (auto it = group_set.begin(); it != group_set.end(); it++) { (*it)->Write(out); }
 
       // Next, loop through all internal namespaces and print them out.
       for (auto & x : namespace_map) {
@@ -503,12 +581,12 @@ namespace emp {
       }
       std::string query(ss.str());
       // Erase the trailing & to prevent parsing as an illegal (empty) argument to query
-      query.erase(query.end()-1);
+      query.erase(query.end() - 1);
       out << query;
     }
 
     // Generate a text representation (typically a file) for the state of Config
-    void WriteMacros(std::ostream & out, bool as_const=false) const {
+    void WriteMacros(std::ostream & out, bool as_const = false) const {
       out << "/////////////////////////////////////////////////////////////////////////////////\n"
           << "//  This is an auto-generated file that defines a set of configuration options.\n"
           << "//\n"
@@ -535,8 +613,7 @@ namespace emp {
           << "//   Include an alias for the previous setting.  This command is useful to\n"
           << "//   maintain backward compatibility if names change in newer software versions.\n"
           << "\n"
-          << "EMP_BUILD_CONFIG(" << class_names.back() << ","
-          << std::endl;
+          << "EMP_BUILD_CONFIG(" << class_names.back() << "," << std::endl;
 
       // Next print each group and it's information.
       for (auto it = group_set.begin(); it != group_set.end(); it++) {
@@ -547,26 +624,27 @@ namespace emp {
     }
 
     // If a string is passed into Write, treat it as a filename.
-    void WriteMacros(std::string filename, bool as_const=false) const {
+    void WriteMacros(std::string filename, bool as_const = false) const {
       std::ofstream out(filename);
       WriteMacros(out, as_const);
       out.close();
     }
 
-
     /// Read in from a text representation (typically a file) to set the state of Config.
     /// Return success state.
-    bool Read(std::istream & input, const std::string & cur_namespace="") {
+    bool Read(std::istream & input, const std::string & cur_namespace = "") {
       // Load in the file one line at a time and process each line.
       std::string cur_line, extras;
       delay_warnings++;
 
       // Loop through the file until eof is hit (does this work for other streams?)
       while (!input.eof()) {
-        std::getline(input, cur_line);         // Get the current input line.
-        ProcessLine(cur_line, extras);         // Clean up line; act on aliases.
+        std::getline(input, cur_line);  // Get the current input line.
+        ProcessLine(cur_line, extras);  // Clean up line; act on aliases.
 
-        if (cur_line == "") continue;          // Skip empty lines.
+        if (cur_line == "") {
+          continue;  // Skip empty lines.
+        }
 
         std::string command = emp::string_pop_word(cur_line);
 
@@ -574,60 +652,57 @@ namespace emp {
           // Set a specific value.
           std::string setting_name = emp::string_pop_word(cur_line);
           Set(setting_name, cur_line);
-        }
-        else if (command == "include") {
+        } else if (command == "include") {
           // Determine the filename to include.
           std::string filename = emp::string_pop_word(cur_line);
 
           // Process the new file (before automatically coming back to this one)
           Read(filename);
-        }
-        else if (command == "namespace") {
+        } else if (command == "namespace") {
           std::string namespace_name = emp::string_pop_word(cur_line);
           if (cur_line.size() > 0) {
             warnings << "namespace " << namespace_name
                      << " cannot have additional arguments.  Ignoring.\n";
           }
           if (emp::Has(namespace_map, namespace_name) == false) {
-            emp::NotifyError(emp::to_string("Unknown namespace '", namespace_name, "'.  Aborting."));
+            emp::NotifyError(
+              emp::to_string("Unknown namespace '", namespace_name, "'.  Aborting."));
             return false;
           }
           Config * ns_config = namespace_map[namespace_name];
           ns_config->Read(input, namespace_name);
-        }
-        else if (command == "end_namespace") {
+        } else if (command == "end_namespace") {
           std::string namespace_name = emp::string_pop_word(cur_line);
           if (cur_line.size() > 0) {
             warnings << "end_namespace " << namespace_name
                      << " cannot have additional arguments.  Ignoring.\n";
           }
           if (namespace_name != cur_namespace) {
-            emp::NotifyError(emp::to_string("Cannot end namespace '", namespace_name,
-                                            "' while in namespace '", cur_namespace, "'.  Aborting."));
+            emp::NotifyError(emp::to_string("Cannot end namespace '",
+                                            namespace_name,
+                                            "' while in namespace '",
+                                            cur_namespace,
+                                            "'.  Aborting."));
             return false;
           }
           return true;
-        }
-        else if (command == "new") {
+        } else if (command == "new") {
           std::string type_name = emp::string_pop_word(cur_line);
           if (emp::Has(new_map, type_name) == false) {
-            emp::NotifyError(emp::to_string("Command 'new' failede: Unknown type '",
-                                            type_name, "'.  Aborting."));
+            emp::NotifyError(
+              emp::to_string("Command 'new' failed: Unknown type '", type_name, "'.  Aborting."));
             return false;
           }
           // @CAO Make sure remainder of line is a single identifier?
           new_map[type_name](cur_line);
-        }
-        else if (command == "use") {
+        } else if (command == "use") {
           std::string type_name = emp::string_pop_word(cur_line);
           // @CAO Make sure type exists!
           use_map[type_name](cur_line);
-        }
-        else if (command_map.find(command) != command_map.end()) {
+        } else if (command_map.find(command) != command_map.end()) {
           // Run this custom command.
           command_map[command](cur_line);
-        }
-        else {
+        } else {
           // We don't know this command... give an error and move on.
           std::stringstream ss;
           ss << "Unknown configuration command '" << command << "'. Ignoring." << std::endl;
@@ -638,19 +713,19 @@ namespace emp {
       // Print out all accumulated warnings (if any).
       if (warnings.rdbuf()->in_avail()) {
         emp::NotifyWarning(warnings.str());
-        warnings.str(std::string()); // Clear the warnings.
+        warnings.str(std::string());  // Clear the warnings.
       }
       delay_warnings--;
 
       return true;
     }
 
-    bool Read(std::string filename, bool error_on_missing_file=true) {
+    bool Read(std::string filename, bool error_on_missing_file = true) {
       std::ifstream in_file(filename);
       if (in_file.fail()) {
         std::stringstream ss;
         ss << "Unable to open config file '" << filename << "'. Ignoring." << std::endl;
-        if (error_on_missing_file) emp::NotifyError(ss.str());
+        if (error_on_missing_file) { emp::NotifyError(ss.str()); }
         return false;
       }
       bool success = Read(in_file);
@@ -662,13 +737,14 @@ namespace emp {
       namespace_map[namespace_name] = &config;
     }
 
-    void AddCommand(const std::string & command_name, std::function<bool(std::string)> command_fun) {
+    void AddCommand(const std::string & command_name,
+                    std::function<bool(std::string)> command_fun) {
       // Give a warning if we are re-defining an existing command.
       if (command_map.find(command_name) != command_map.end()) {
         warnings << "Re-defining command '" << command_name << "'. Allowing." << std::endl;
         if (!delay_warnings) {
           emp::NotifyWarning(warnings.str());
-          warnings.str(std::string()); // Clear the warnings.
+          warnings.str(std::string());  // Clear the warnings.
         }
       }
       command_map[command_name] = command_fun;
@@ -680,7 +756,7 @@ namespace emp {
         warnings << "Re-defining config type '" << type_name << "'. Allowing." << std::endl;
         if (!delay_warnings) {
           emp::NotifyWarning(warnings.str());
-          warnings.str(std::string()); // Clear the warnings.
+          warnings.str(std::string());  // Clear the warnings.
         }
       }
       new_map[type_name] = new_fun;
@@ -692,41 +768,38 @@ namespace emp {
         warnings << "Re-defining config type '" << type_name << "'. Allowing." << std::endl;
         if (!delay_warnings) {
           emp::NotifyWarning(warnings.str());
-          warnings.str(std::string()); // Clear the warnings.
+          warnings.str(std::string());  // Clear the warnings.
         }
       }
       use_map[type_name] = use_fun;
     }
 
-
     template <class MANAGED_TYPE>
-    void AddManagedType(const std::string & type_keyword, const std::string & command_keyword,
-                        std::function<bool(MANAGED_TYPE &, std::string)> fun_callback)
-    {
-      ConfigManager<MANAGED_TYPE> * new_manager = new ConfigManager<MANAGED_TYPE>(type_keyword, command_keyword, fun_callback);
+    void AddManagedType(const std::string & type_keyword,
+                        const std::string & command_keyword,
+                        std::function<bool(MANAGED_TYPE &, std::string)> fun_callback) {
+      ConfigManager<MANAGED_TYPE> * new_manager =
+        new ConfigManager<MANAGED_TYPE>(type_keyword, command_keyword, fun_callback);
       type_manager_map[type_keyword] = new_manager;
 
       AddCommand(command_keyword,
-                 std::bind(&ConfigManager<MANAGED_TYPE>::CommandCallback, new_manager, _1) );
+                 std::bind(&ConfigManager<MANAGED_TYPE>::CommandCallback, new_manager, _1));
       AddNewCallback(type_keyword,
-                     std::bind(&ConfigManager<MANAGED_TYPE>::NewObject, new_manager, _1) );
+                     std::bind(&ConfigManager<MANAGED_TYPE>::NewObject, new_manager, _1));
       AddUseCallback(type_keyword,
-                     std::bind(&ConfigManager<MANAGED_TYPE>::UseObject, new_manager, _1) );
+                     std::bind(&ConfigManager<MANAGED_TYPE>::UseObject, new_manager, _1));
     }
 
     /// Access group_set using this method since it is protected
-    emp::vector<ConfigGroup *> GetGroupSet(){
-      return group_set;
-    }
-
+    emp::vector<ConfigGroup *> GetGroupSet() { return group_set; }
   };
 
-}
+}  // namespace emp
 
 // Below are macros that help build the config classes.
 
 // Check that all of the commands are legal so that sensible errors can be produced.
-// (legal commands convert to two arguments; illeagal ones stay as one, so second arg is error!)
+// (legal commands convert to two arguments; illegal ones stay as one, so second arg is error!)
 #define EMP_CONFIG__ERROR_CHECK(CMD) EMP_GET_ARG(2, EMP_CONFIG__ARG_OKAY_ ## CMD, \
                                      static_assert(false, "Unknown Config option: " #CMD);, ~)
 #define EMP_CONFIG__ARG_OKAY_VALUE(...) ~,
@@ -811,4 +884,4 @@ namespace emp {
     EMP_WRAP_EACH(EMP_CONFIG__ACCESS, __VA_ARGS__)        \
   };
 
-#endif // #ifndef EMP_CONFIG_CONFIG_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_CONFIG_CONFIG_HPP_GUARD

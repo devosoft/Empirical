@@ -274,7 +274,7 @@ TEST_CASE("Test DataStats", "[data]") {
   // allow fallback to less precise constexpr Pow
   const bool skew_res{ data3.GetSkew() == Approx(-0.150986) || data3.GetSkew() == Approx(-0.151045) };
   REQUIRE( skew_res );
-  // kurtosis calculateion
+  // kurtosis calculation
   // - https://www.wolframalpha.com/input/?i=N%5BKurtosis%5B%7B1%2C+2%2C+3%2C+4%2C+5%2C+6%2C+7%2C+8%2C+8%7D%5D%5D+-+3
   // - https://www.itl.nist.gov/div898/handbook/eda/section3/eda35b.htm
   // allow fallback to less precise constexpr Pow
@@ -306,3 +306,6 @@ TEST_CASE("Test histogram", "[data]") {
   data.PrintDebug(result);
   REQUIRE(result.str() == "Main DataNode.\nDataNodeModule for data::Pull. (level 8)\nDataNodeModule for data::Histogram. (level 5)\nDataNodeModule for data::Range. (level 4)\nDataNodeModule for data::Log. (level 2)\nDataNodeModule for data::Current. (level 0)\nBASE DataNodeModule.\n");
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: eda itl

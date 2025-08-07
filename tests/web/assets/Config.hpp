@@ -33,3 +33,6 @@ EMP_BUILD_CONFIG( Config,
 );
 
 #endif // #ifndef TESTS_WEB_ASSETS_CONFIG_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: stemness

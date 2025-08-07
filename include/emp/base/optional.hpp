@@ -1,19 +1,20 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2020.
-*/
 /**
- *  @file
- *  @brief Audited implementation of std::optional.
- *  Status: RELEASE
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2020 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  Drop-in replacements for std::optional.
- *  In debug mode, operator * and operator-> value accesses are checked for undefined behavior.
+ * @file include/emp/base/optional.hpp
+ * @brief Audited implementation of std::optional.
+ * Status: RELEASE
+ *
+ * Drop-in replacements for std::optional.
+ * In debug mode, operator * and operator-> value accesses are checked for undefined behavior.
  */
 
-#ifndef EMP_BASE_OPTIONAL_HPP_INCLUDE
-#define EMP_BASE_OPTIONAL_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_BASE_OPTIONAL_HPP_GUARD
+#define INCLUDE_EMP_BASE_OPTIONAL_HPP_GUARD
 
 #include <optional>
 #include <stddef.h>
@@ -25,94 +26,79 @@
 #ifdef EMP_NDEBUG
 
 namespace emp {
-  template <typename T> using optional = std::optional<T>;
+  template <typename T>
+  using optional = std::optional<T>;
 
   template <class T>
-  inline auto make_optional(T&& val) {
+  inline auto make_optional(T && val) {
     return std::make_optional<T>(std::forward<T>(val));
   }
 
   template <class T, class... Args>
-  inline auto make_optional(Args&&... args) {
-    return std::make_optional<T>(std::forward<Args>(args)... );
+  inline auto make_optional(Args &&... args) {
+    return std::make_optional<T>(std::forward<Args>(args)...);
   }
 
-}
+}  // namespace emp
 
-#else // #EMP_NDEBUG *not* set
+#else  // #ifdef EMP_NDEBUG
 
 namespace emp {
 
-  template<class T>
+  template <class T>
   class optional : public std::optional<T> {
-
     using parent_t = std::optional<T>;
 
   public:
-
     // inherit parent's constructors
     // adapted from https://stackoverflow.com/a/434784
     using parent_t::parent_t;
 
-    constexpr const T* operator->() const { return &parent_t::value(); }
+    constexpr const T * operator->() const { return &parent_t::value(); }
 
-    constexpr T* operator->() { return &parent_t::value(); }
+    constexpr T * operator->() { return &parent_t::value(); }
 
-    constexpr const T& operator*() const& { return parent_t::value(); }
+    constexpr const T & operator*() const & { return parent_t::value(); }
 
-    constexpr T& operator*() & { return parent_t::value(); }
+    constexpr T & operator*() & { return parent_t::value(); }
 
-    constexpr T&& operator*() && { return std::move( parent_t::value() ); }
+    constexpr T && operator*() && { return std::move(parent_t::value()); }
 
-    constexpr const T&& operator*() const&& {
-      return std::move( parent_t::value() );
-    }
-
+    constexpr const T && operator*() const && { return std::move(parent_t::value()); }
   };
 
   template <class T>
-  constexpr emp::optional<std::decay_t<T>>
-  make_optional(T&& value) {
-    return emp::optional<std::decay_t<T>>{
-      std::forward<T>(value)
-    };
+  constexpr emp::optional<std::decay_t<T> > make_optional(T && value) {
+    return emp::optional<std::decay_t<T> >{std::forward<T>(value)};
   }
 
   template <class T, class... Args>
-  constexpr emp::optional<T>
-  make_optional(Args&&... args) {
-    return emp::optional<T>{
-      std::in_place,
-      std::forward<Args>(args)...
-    };
+  constexpr emp::optional<T> make_optional(Args &&... args) {
+    return emp::optional<T>{std::in_place, std::forward<Args>(args)...};
   }
 
   template <class T, class Elem, class... Args>
-  constexpr emp::optional<T> make_optional(
-    std::initializer_list<Elem> il,
-    Args&&... args
-  ) {
-    return emp::optional<T>{
-      std::in_place,
-      il,
-      std::forward<Args>(args)...
-    };
+  constexpr emp::optional<T> make_optional(std::initializer_list<Elem> il, Args &&... args) {
+    return emp::optional<T>{std::in_place, il, std::forward<Args>(args)...};
   }
 
-} // namespace emp
+}  // namespace emp
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 namespace std {
 
   template <typename T>
-  struct hash<emp::optional<T>> {
-    size_t operator()( const emp::optional<T>& opt ) const {
-      return std::hash<std::optional<T>>{}( opt );
+  struct hash<emp::optional<T> > {
+    size_t operator()(const emp::optional<T> & opt) const {
+      return std::hash<std::optional<T> >{}(opt);
     }
   };
 
-} // namespace std
-#endif // DOXYGEN_SHOULD_SKIP_THIS
-#endif
+}  // namespace std
+#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
+#endif  // #ifdef EMP_NDEBUG : #else
 
-#endif // #ifndef EMP_BASE_OPTIONAL_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_BASE_OPTIONAL_HPP_GUARD
+
+// Local settings for Empecable file checker.
+// empecable_words: elem

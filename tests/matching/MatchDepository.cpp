@@ -167,3 +167,6 @@ TEST_CASE("MatchDepository MatchRegulated", "[tools]") {
   }
 
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: depo

@@ -1,24 +1,25 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2017
-*/
 /**
- *  @file
- *  @brief This file contains macros used to build Empirical's C++ wrapper for D3.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2015-2017 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/web/d3/utils.hpp
+ * @brief This file contains macros used to build Empirical's C++ wrapper for D3.
  */
 
-#ifndef EMP_WEB_D3_UTILS_HPP_INCLUDE
-#define EMP_WEB_D3_UTILS_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_WEB_D3_UTILS_HPP_GUARD
+#define INCLUDE_EMP_WEB_D3_UTILS_HPP_GUARD
 
 #include <cstdint>
 #include <map>
 #include <string>
 
+#include "../../meta/macros.hpp"
 #include "../init.hpp"
 #include "../js_utils.hpp"
 #include "../JSWrap.hpp"
-#include "../../meta/macros.hpp"
 
 // Helper macros
 
@@ -35,18 +36,18 @@
     }                                                          \
   } while (0);
 
-//Check if func_string is in a single namespace
+// Check if func_string is in a single namespace
 #define CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_1(A1)   \
   if IS_JS_FUNCTION(window[A1][func_string]){                  \
     func_string = window[A1][func_string];                     \
   }
 
-//Check 2 namespaces
+// Check 2 namespaces
 #define CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_2(A1, A2) \
   CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_1(A1)           \
   else CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_1(A2)
 
-//Check 3 namespaces
+// Check 3 namespaces
 #define CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_3(A1, A2, A3)   \
   CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_2(A1, A2)             \
   else CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_1(A3)
@@ -67,7 +68,7 @@
   CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE( __VA_ARGS__)         \
   CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_WINDOW()
 
-//Functions that accept callback functions
+// Functions that accept callback functions
 
 /// Call a Javascript function that accepts either a string indicating the name of a
 /// callback function or a normal string
@@ -88,9 +89,9 @@
       emp.__new_object = FUNC(arg1, func_string);                              \
     }, ARG1, CALLBACK);
 
-//Methods that accept callback functions (intended to be used within methods for d3 objects)
+// Methods that accept callback functions (intended to be used within methods for d3 objects)
 
-//Layer of indirection so macro gets expanded
+// Layer of indirection so macro gets expanded
 #define D3_CALLBACK_METHOD_2_ARGS_IMPL(MACRO, FUNC, ARG1, ARG2)     \
   MAIN_THREAD_EM_ASM({                                                     \
       var arg1 = UTF8ToString($1);                             \
@@ -99,14 +100,14 @@
       emp.__new_object = js.objects[$0].FUNC(arg1, func_string);    \
   }, this->id, ARG1, ARG2);
 
-//This macro finds a function specified by ARG2 in either the d3, emp, or
-//window namespace and feeds it to FUNC, which is called on the current
-//d3 object. ARG1 is the first argument to FUNC. If ARG2 is not found to
-//be a function, it will be passed to FUNC as a string.
+// This macro finds a function specified by ARG2 in either the d3, emp, or
+// window namespace and feeds it to FUNC, which is called on the current
+// d3 object. ARG1 is the first argument to FUNC. If ARG2 is not found to
+// be a function, it will be passed to FUNC as a string.
 #define D3_CALLBACK_METHOD_2_ARGS(FUNC, ARG1, ARG2)          \
   D3_CALLBACK_METHOD_2_ARGS_IMPL(CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_OR_WINDOW("d3", "emp"), FUNC, ARG1, ARG2);
 
-//Layer of indirection so macro gets expanded
+// Layer of indirection so macro gets expanded
 #define D3_CALLBACK_METHOD_1_ARG_IMPL(MACRO, FUNC, ARG1)    \
 MAIN_THREAD_EM_ASM({                                               \
     var func_string = UTF8ToString($1);                \
@@ -120,8 +121,8 @@ MAIN_THREAD_EM_ASM({                                               \
 #define D3_CALLBACK_METHOD_1_ARG(FUNC, ARG1)          \
 D3_CALLBACK_METHOD_1_ARG_IMPL(CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_OR_WINDOW("d3", "emp"), FUNC, ARG1);
 
-//Wraps CPP_FUN (a C++ function pointer, std::function object, or lambda) with
-//JSWrap and passes it to the FUNC method of the current d3 object, along with an argument
+// Wraps CPP_FUN (a C++ function pointer, std::function object, or lambda) with
+// JSWrap and passes it to the FUNC method of the current d3 object, along with an argument
 #define D3_CALLBACK_METHOD_CPP_FUNCTION_2_ARGS(FUNC, ARG1, CPP_FUN)        \
   uint32_t fun_id = emp::JSWrap(CPP_FUN, "", false);                       \
   MAIN_THREAD_EM_ASM({                                                            \
@@ -132,9 +133,9 @@ D3_CALLBACK_METHOD_1_ARG_IMPL(CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_OR_
   }, this->id, ARG1, fun_id);                                              \
   emp::JSDelete(fun_id);
 
-  //Wraps CPP_FUN (a C++ function pointer, std::function object, or lambda) with
-  //JSWrap and passes it to the FUNC method of the current d3 object, along with an argument
-  #define D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG(FUNC, CPP_FUN)               \
+// Wraps CPP_FUN (a C++ function pointer, std::function object, or lambda) with
+// JSWrap and passes it to the FUNC method of the current d3 object, along with an argument
+#define D3_CALLBACK_METHOD_CPP_FUNCTION_1_ARG(FUNC, CPP_FUN)               \
     uint32_t fun_id = emp::JSWrap(CPP_FUN, "", false);                       \
     MAIN_THREAD_EM_ASM({                                                            \
       emp.__new_object = js.objects[$0].FUNC(function(d, i, j) {             \
@@ -143,13 +144,10 @@ D3_CALLBACK_METHOD_1_ARG_IMPL(CONVERT_FUNCSTRING_TO_FUNCTION_IF_IN_NAMESPACE_OR_
     }, this->id, fun_id);                                                    \
     emp::JSDelete(fun_id);
 
-//Store return of one of the above functions in js.objects
-void StoreNewObject(int id){
-    MAIN_THREAD_EM_ASM({
-        js.objects[$0] = emp.__new_object;
-
-    }, id);
+// Store return of one of the above functions in js.objects
+void StoreNewObject(int id) {
+  MAIN_THREAD_EM_ASM({ js.objects[$0] = emp.__new_object; }, id);
 }
 
 
-#endif // #ifndef EMP_WEB_D3_UTILS_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_WEB_D3_UTILS_HPP_GUARD

@@ -59,3 +59,6 @@ TEST_CASE("Test config", "[config]"){
   }
 
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: sodd soit soit'sodd andonemore ghi

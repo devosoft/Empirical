@@ -120,3 +120,6 @@ int main()
   str_ptr.Delete();
   double_ptr.Delete();
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: tval

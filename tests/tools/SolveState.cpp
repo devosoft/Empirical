@@ -87,3 +87,6 @@ TEST_CASE("Test SolveState", "[tools]")
   REQUIRE(ss2.GetInVector() == inc);
   REQUIRE(ss2.GetOutVector() == exc);
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: exc

@@ -1,23 +1,23 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2017
-*/
 /**
- *  @file
- *  @brief A set of command-defining classes that can be fed into widgets using the << operator.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2015-2017 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/web/commands.hpp
+ * @brief A set of command-defining classes that can be fed into widgets using the << operator.
  */
 
-#ifndef EMP_WEB_COMMANDS_HPP_INCLUDE
-#define EMP_WEB_COMMANDS_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_WEB_COMMANDS_HPP_GUARD
+#define INCLUDE_EMP_WEB_COMMANDS_HPP_GUARD
 
 #include "Widget.hpp"
 
-namespace emp {
-namespace web {
+namespace emp { namespace web {
 
   /// The Close command will prevent the specified widget from accepting further appends
-  /// (and instead revert to trying parents)
+  /// (and instead revert to trying parent widgets)
   class Close : public internal::WidgetCommand {
   private:
     std::string close_id;
@@ -50,12 +50,11 @@ namespace web {
     const std::string & GetStr() const { return str; }
   };
 
-  #ifndef DOXYGEN_SHOULD_SKIP_THIS
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
   /// Pre-define emp::endl to insert a "<br>" and thus acting like a newline.
   static const PrintStr endl("<br>");
-  #endif // DOXYGEN_SHOULD_SKIP_THIS
+#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-}
-}
+}}  // namespace emp::web
 
-#endif // #ifndef EMP_WEB_COMMANDS_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_WEB_COMMANDS_HPP_GUARD

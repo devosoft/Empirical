@@ -1,16 +1,17 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2019
-*/
 /**
- *  @file
- *  @brief Get an unordered_map containing url query key/value parameters.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2019 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/web/UrlParams.hpp
+ * @brief Get an unordered_map containing url query key/value parameters.
  *
  */
 
-#ifndef EMP_WEB_URLPARAMS_HPP_INCLUDE
-#define EMP_WEB_URLPARAMS_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_WEB_URL_PARAMS_HPP_GUARD
+#define INCLUDE_EMP_WEB_URL_PARAMS_HPP_GUARD
 
 #include <map>
 #include <string>
@@ -18,8 +19,7 @@
 #include "js_utils.hpp"
 #include "JSWrap.hpp"
 
-namespace emp {
-namespace web {
+namespace emp { namespace web {
   /**
    * Extracts the query portion of a url and parses for key value pairs.
    *
@@ -35,29 +35,21 @@ namespace web {
    * [["test", ""]].
    */
   std::multimap<std::string, emp::vector<std::string>> GetUrlParams() {
-
-    emp::vector<emp::vector<std::string>> incoming;
+    emp::vector < emp::vector < std::string >> incoming;
 
     MAIN_THREAD_EM_ASM({
-      emp_i.__outgoing_array = location.search.includes('?')
-      ? location.search.substring(1).split('&'
-        ).map(
-          expr => expr.split("=")
-        ).map(
-          (list) => [list[0].split("+").join(" ")].concat(
-            list[1] && list[1].split('+')
-          ).filter(
-            item => item !== undefined
-          )
-        ).map(
-          list => list.map(decodeURIComponent)
-        ).map(
-          p => p[0].split(" ").join("").length == 0
-            ?  ["_illegal", "_empty=" + p[1]] : p
-        ).map(
-          p => p[0].includes(" ") ? ["_illegal", p[0] + "=" + p[1]] : p
-        )
-      : [];
+      emp_i.__outgoing_array =
+        location.search.includes('?')
+          ? location.search.substring(1)
+              .split('&')
+              .map(expr => expr.split("="))
+              .map((list) => [list[0].split("+").join(" ")]
+                                .concat(list[1] && list[1].split('+'))
+                                .filter(item => item !== undefined))
+              .map(list => list.map(decodeURIComponent))
+              .map(p => p[0].split(" ").join("").length == 0 ? ["_illegal", "_empty=" + p[1]] : p)
+              .map(p => p[0].includes(" ") ? ["_illegal", p[0] + "=" + p[1]] : p)
+          : [];
     });
 
     emp::pass_vector_to_cpp(incoming);
@@ -65,20 +57,13 @@ namespace web {
     std::multimap<std::string, emp::vector<std::string>> res;
 
     for (const auto & pack : incoming) {
-      res.insert({
-        pack.front(),
-        emp::vector<std::string>(
-          std::next(std::begin(pack)),
-          std::end(pack)
-        )
-      });
+      res.insert(
+        {pack.front(), emp::vector<std::string>(std::next(std::begin(pack)), std::end(pack))});
     }
 
     return res;
-
   }
 
-}
-}
+}}  // namespace emp::web
 
-#endif // #ifndef EMP_WEB_URLPARAMS_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_WEB_URL_PARAMS_HPP_GUARD

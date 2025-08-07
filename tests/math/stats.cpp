@@ -1,7 +1,7 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2021
+ *  date: 2021-2025
 */
 /**
  *  @file
@@ -27,39 +27,39 @@ TEST_CASE("Test stats", "[math]") {
 
   std::deque<double> deque1({5,4,3,5,4,6});
 
-  REQUIRE(emp::ShannonEntropy(vec1) == Approx(1.459324));
-  REQUIRE(emp::ShannonEntropy(vec2) == Approx(0.81128));
-  REQUIRE(emp::ShannonEntropy(deque1) == Approx(1.918648));
+  CHECK(emp::ShannonEntropy(vec1) == Approx(1.459158));
+  CHECK(emp::ShannonEntropy(vec2) == Approx(0.81128));
+  CHECK(emp::ShannonEntropy(deque1) == Approx(1.918296));
 
-  REQUIRE(emp::Variance(vec1) == Approx(0.66666).epsilon(0.001));
-  REQUIRE(emp::Variance(vec2) == Approx(0.25).epsilon(0.001));
-  REQUIRE(emp::Variance(deque1) == Approx(1.1).epsilon(0.001));
+  CHECK(emp::Variance(vec1) == Approx(0.66666).epsilon(0.001));
+  CHECK(emp::Variance(vec2) == Approx(0.25).epsilon(0.001));
+  CHECK(emp::Variance(deque1) == Approx(1.1).epsilon(0.001));
 
-  REQUIRE(emp::StandardDeviation(vec1) == Approx(0.81649).epsilon(0.001));
-  REQUIRE(emp::StandardDeviation(vec2) == Approx(0.5).epsilon(0.001));
-  REQUIRE(emp::StandardDeviation(deque1) == Approx(1.0488).epsilon(0.001));
+  CHECK(emp::StandardDeviation(vec1) == Approx(0.81649).epsilon(0.001));
+  CHECK(emp::StandardDeviation(vec2) == Approx(0.5).epsilon(0.001));
+  CHECK(emp::StandardDeviation(deque1) == Approx(1.0488).epsilon(0.001));
 
-  REQUIRE(emp::StandardError(vec1) == Approx(0.3333).epsilon(0.001));
-  REQUIRE(emp::StandardError(vec2) == Approx(0.25).epsilon(0.001));
-  REQUIRE(emp::StandardError(deque1) == Approx(0.4281).epsilon(0.001));
+  CHECK(emp::StandardError(vec1) == Approx(0.3333).epsilon(0.001));
+  CHECK(emp::StandardError(vec2) == Approx(0.25).epsilon(0.001));
+  CHECK(emp::StandardError(deque1) == Approx(0.4281).epsilon(0.001));
 
-  REQUIRE(emp::Sum(vec1) == 10);
-  REQUIRE(emp::Sum(vec2) == 5);
-  REQUIRE(emp::Sum(deque1) == 27);
+  CHECK(emp::Sum(vec1) == 10);
+  CHECK(emp::Sum(vec2) == 5);
+  CHECK(emp::Sum(deque1) == 27);
 
-  REQUIRE(emp::UniqueCount(vec1) == 3);
-  REQUIRE(emp::UniqueCount(vec2) == 2);
-  REQUIRE(emp::UniqueCount(deque1) == 4);
+  CHECK(emp::UniqueCount(vec1) == 3);
+  CHECK(emp::UniqueCount(vec2) == 2);
+  CHECK(emp::UniqueCount(deque1) == 4);
 
-  REQUIRE(emp::Mean(vec1) == Approx(1.6666666666667));
-  REQUIRE(emp::Mean(vec2) == Approx(1.25));
-  REQUIRE(emp::Mean(deque1) == 4.5);
+  CHECK(emp::Mean(vec1) == Approx(1.6666666666667));
+  CHECK(emp::Mean(vec2) == Approx(1.25));
+  CHECK(emp::Mean(deque1) == 4.5);
 
   std::function<int(int)> invert = [](int i){return i*-1;};
 
-  REQUIRE(emp::MaxResult(invert, vec1) == -1);
-  REQUIRE(emp::MinResult(invert, vec1) == -3);
-  REQUIRE(emp::MeanResult(invert, vec1) == Approx(-1.666666667));
-  REQUIRE(emp::ApplyFunction(invert, vec1) == emp::vector<int>({-1,-2,-1,-1,-2,-3}));
+  CHECK(emp::MaxResult(invert, vec1) == -1);
+  CHECK(emp::MinResult(invert, vec1) == -3);
+  CHECK(emp::MeanResult(invert, vec1) == Approx(-1.666666667));
+  CHECK(emp::ApplyFunction(invert, vec1) == emp::vector<int>({-1,-2,-1,-1,-2,-3}));
 
 }

@@ -34,3 +34,6 @@ int main()
   std::tuple<int,int,int> mult_tup(3,4,5);
   emp::TupleIterate(tup, mult_tup, PrintProduct);
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: tup

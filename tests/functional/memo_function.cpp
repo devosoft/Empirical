@@ -178,3 +178,6 @@ TEST_CASE("Test emp::memo_function", "[functional]")
 
   REQUIRE( test_fun(80) == 0x533163ef0321e5 );
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: xxxxx stdf empf mingw

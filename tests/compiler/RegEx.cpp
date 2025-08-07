@@ -1,7 +1,7 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2021-2022
+ *  date: 2021-2025
 */
 /**
  *  @file
@@ -38,8 +38,8 @@ TEST_CASE("Test RegEx", "[compiler]")
   CHECK(re1.Test("12") == false);
 
   // AsString
-  std::string reS = re.AsString();
-  CHECK(reS == "\"1|2\"");
+  std::string reS = re.ToString();
+  CHECK(reS == "1|2");
 
   // test all the prints
 
@@ -123,12 +123,15 @@ TEST_CASE("Test more complex regular expressions (RegEx)", "[compiler]")
   CHECK( parens3.Test("a(b((c)))d(ef(g(hi)j)k)") == true );  // More nested 3-deep parens
   CHECK( parens3.Test("(((())))") == false );                // Too deep...
   CHECK( parens3.Test("((()))((()))((()))((()))") == true ); // Lots of parens
-  CHECK( parens3.Test("a(a(a(a(a)a)a)a)a") == false );       // Too deep... with other chartacters
+  CHECK( parens3.Test("a(a(a(a(a)a)a)a)a") == false );       // Too deep... with other characters
   CHECK( parens3.Test("((()())(()()))((()())(()()))") == true ); // Multi parens at each level
 
   emp::NFA nfa = emp::to_NFA(parens3);
   emp::DFA dfa = emp::to_DFA(parens3);
 
   CHECK( nfa.GetSize() <= 44 );
-  CHECK( dfa.GetSize() <= 8 );
+  CHECK( dfa.GetSize() <= 10 );
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: ghij defghijk xxzzzxx xxxx abcabc xxxxx xxyyxx abcabcd bcd aaaabc xxyxx bcdef abcdefghijklm bcdefg

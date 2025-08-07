@@ -3,19 +3,21 @@ PROJECT := MAP-Elites-Arm
 EMP_DIR := ../../include
 
 # Flags to use regardless of compiler
-CFLAGS_all := -Wall -Wno-unused-function -std=c++20 -I$(EMP_DIR)/
+CFLAGS_all := -Wall -Wextra -Wno-unused-function -std=c++20 -I$(EMP_DIR)/
 
 # Native compiler information
-CXX_nat := g++
+CXX_nat := c++
 CFLAGS_nat := -O3 -DNDEBUG $(CFLAGS_all)
-CFLAGS_nat_debug := -g -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -Wconversion -Weffc++ $(CFLAGS_all)
+CFLAGS_nat_debug := -g -DEMP_TRACK_MEM -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -Wconversion $(CFLAGS_all)
 
 # Emscripten compiler information
 CXX_web := emcc
-OFLAGS_web_all := -s "EXPORTED_RUNTIME_METHODS=['ccall', 'cwrap']" -s TOTAL_MEMORY=67108864 --js-library $(EMP_DIR)/emp/web/library_emp.js -s EXPORTED_FUNCTIONS="['_main', '_empCppCallback']" -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1 #--embed-file configs
+EMP_METHODS = EXPORTED_RUNTIME_METHODS="['ccall', 'cwrap', 'UTF8ToString', 'stringToUTF8', 'lengthBytesUTF8']"
+EMP_FUNCTIONS = EXPORTED_FUNCTIONS="['_main', "_malloc", "_free", '_empCppCallback']"
+JS_LIB = --js-library $(EMP_DIR)/emp/web/library_emp.js
+OFLAGS_web_all := -s $(EMP_METHODS) -s TOTAL_MEMORY=67108864 $(JS_LIB) -s $(EMP_FUNCTIONS) -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
 OFLAGS_web := -Oz -DNDEBUG
-# OFLAGS_web_debug := -g4 -Oz -pedantic -Wno-dollar-in-identifier-extension -s ASSERTIONS=2
-OFLAGS_web_debug := -g4 -pedantic -Wno-dollar-in-identifier-extension -s ASSERTIONS=2
+OFLAGS_web_debug := -g4 -pedantic -Wno-dollar-in-identifier-extension
 
 CFLAGS_web := $(CFLAGS_all) $(OFLAGS_web) $(OFLAGS_web_all)
 CFLAGS_web_debug := $(CFLAGS_all) $(OFLAGS_web_debug) $(OFLAGS_web_all)
@@ -42,7 +44,7 @@ $(PROJECT).js: source/web/$(PROJECT)-web.cpp
 	$(CXX_web) $(CFLAGS_web) source/web/$(PROJECT)-web.cpp -o web/$(PROJECT).js
 
 clean:
-	rm -f $(PROJECT) web/$(PROJECT).js web/*.js.map web/*.js.map *~ source/*.o
+	rm -f $(PROJECT) web/$(PROJECT).js web/*.js.map web/*.wasm web/*.wasm.map *~ source/*.o
 
 # Debugging information
 print-%: ; @echo '$(subst ','\'',$*=$($*))'

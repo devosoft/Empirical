@@ -52,3 +52,6 @@ TEST_CASE("Test Author", "[scholar]")
   REQUIRE(auth1 <= auth4);
   REQUIRE(auth1 <= auth5);
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: aad bbd ccd ccc aaa bbb auth middiff fml

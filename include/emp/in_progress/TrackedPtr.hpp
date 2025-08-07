@@ -1,19 +1,20 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2022
-*/
 /**
- *  @file
- *  @brief Similar to Ptr, but memory is tracked and managed elsewhere, such as smart pointers.
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2022 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/in_progress/TrackedPtr.hpp
+ * @brief Similar to Ptr, but memory is tracked and managed elsewhere, such as smart pointers.
+ * @note Status: ALPHA
  *
  */
 
-#ifndef EMP_IN_PROGRESS_TRACKEDPTR_HPP_INCLUDE
-#define EMP_IN_PROGRESS_TRACKEDPTR_HPP_INCLUDE
+#pragma once
 
-#include "Ptr.hpp"
+#ifndef INCLUDE_EMP_IN_PROGRESS_TRACKED_PTR_HPP_GUARD
+#define INCLUDE_EMP_IN_PROGRESS_TRACKED_PTR_HPP_GUARD
+
+#include "../base/Ptr.hpp"
 
 namespace emp {
 
@@ -37,21 +38,22 @@ namespace emp {
     TrackedPtr(const TrackedPtr<TYPE> & _in) : Ptr<TYPE>(_in) {}
 
     /// Construct from raw ptr
-    template <typename T2> Ptr(T2 * in_ptr, bool=false) : BasePtr<TYPE>(in_ptr) {}
+    template <typename T2>
+    Ptr(T2 * in_ptr, bool = false) : BasePtr<TYPE>(in_ptr) {}
 
     /// Construct from array
-    template <typename T2> Ptr(T2 * _ptr, size_t, bool) : BasePtr<TYPE>(_ptr) {}
+    template <typename T2>
+    Ptr(T2 * _ptr, size_t, bool) : BasePtr<TYPE>(_ptr) {}
 
     /// From compatible Ptr
-    template <typename T2> Ptr(Ptr<T2> _in) : BasePtr<TYPE>(_in.Raw()) {}
+    template <typename T2>
+    Ptr(Ptr<T2> _in) : BasePtr<TYPE>(_in.Raw()) {}
 
     /// From nullptr
     Ptr(std::nullptr_t) : Ptr() {}
 
     /// Destructor
     ~Ptr() { ; }
+  }
 
-
-}
-
-#endif // #ifndef EMP_IN_PROGRESS_TRACKEDPTR_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_IN_PROGRESS_TRACKED_PTR_HPP_GUARD

@@ -20,3 +20,6 @@ int main()
        .AddAuthor(aut1).AddAuthor("Me", "Myself", "I");
   cite1.Print();
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: aut

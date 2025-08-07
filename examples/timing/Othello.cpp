@@ -143,3 +143,6 @@ int main()
             << ";  time = " << 1000.0 * ((double) base_tot_time) / (double) CLOCKS_PER_SEC
             << " ms." << std::endl;
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: ack

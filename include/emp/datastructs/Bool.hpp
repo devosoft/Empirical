@@ -1,17 +1,18 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2020
-*/
 /**
- *  @file
- *  @brief A bool representation that doesn't trip up std::vector
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2020 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/datastructs/Bool.hpp
+ * @brief A bool representation that doesn't trip up std::vector
+ * @note Status: ALPHA
  *
  */
 
-#ifndef EMP_DATASTRUCTS_BOOL_HPP_INCLUDE
-#define EMP_DATASTRUCTS_BOOL_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_DATASTRUCTS_BOOL_HPP_GUARD
+#define INCLUDE_EMP_DATASTRUCTS_BOOL_HPP_GUARD
 
 
 #include <iostream>
@@ -27,28 +28,60 @@ namespace emp {
     bool value;
 
   public:
-      // Bool(const Bool & b) : value(b.value) { }
-      Bool(bool b=false) : value(b) { }
-      Bool & operator=(bool b) { value = b; return *this; }
+    // Bool(const Bool & b) : value(b.value) { }
+    Bool(bool b = false) : value(b) {}
 
-      /// Conversion of this proxy to Boolean (as an rvalue)
-      operator bool() const { return value; }
+    Bool & operator=(bool b) {
+      value = b;
+      return *this;
+    }
 
-      // Conversion to a bool reference.
-      bool & Value() { return value; }
-      bool Value() const { return value; }
+    /// Conversion of this proxy to Boolean (as an rvalue)
+    operator bool() const { return value; }
 
-      /// Compound assignement operators using Bool as lvalue.
-      Bool & operator &=(bool b) { value &= b; return *this; }
-      Bool & operator |=(bool b) { value |= b; return *this; }
-      Bool & operator ^=(bool b) { value ^= b; return *this; }
-      Bool & operator +=(bool b) { value += b; return *this; }
-      Bool & operator -=(bool b) { value -= b; return *this; }
-      Bool & operator *=(bool b) { value = value && b; return *this; }
-      Bool & operator /=(bool b) { emp_assert(b == true); return *this; }
-    };
+    // Conversion to a bool reference.
+    bool & Value() { return value; }
 
-}
+    bool Value() const { return value; }
+
+    /// Compound assignment operators using Bool as lvalue.
+    Bool & operator&=(bool b) {
+      value &= b;
+      return *this;
+    }
+
+    Bool & operator|=(bool b) {
+      value |= b;
+      return *this;
+    }
+
+    Bool & operator^=(bool b) {
+      value ^= b;
+      return *this;
+    }
+
+    Bool & operator+=(bool b) {
+      value += b;
+      return *this;
+    }
+
+    Bool & operator-=(bool b) {
+      value -= b;
+      return *this;
+    }
+
+    Bool & operator*=(bool b) {
+      value = value && b;
+      return *this;
+    }
+
+    Bool & operator/=(bool b) {
+      emp_assert(b == true);
+      return *this;
+    }
+  };
+
+}  // namespace emp
 
 namespace std {
 
@@ -64,6 +97,6 @@ namespace std {
     return out;
   }
 
-}
+}  // namespace std
 
-#endif // #ifndef EMP_DATASTRUCTS_BOOL_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_DATASTRUCTS_BOOL_HPP_GUARD

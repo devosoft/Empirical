@@ -1,16 +1,17 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2021.
-*/
 /**
- *  @file
- *  @brief Macros for simplifying to serialization of objects.
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2015-2021 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/io/serialize_macros.hpp
+ * @brief Macros for simplifying to serialization of objects.
+ * @note Status: ALPHA
  */
 
-#ifndef EMP_IO_SERIALIZE_MACROS_HPP_INCLUDE
-#define EMP_IO_SERIALIZE_MACROS_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_IO_SERIALIZE_MACROS_HPP_GUARD
+#define INCLUDE_EMP_IO_SERIALIZE_MACROS_HPP_GUARD
 
 
 #include "../meta/macros.hpp"
@@ -52,4 +53,4 @@
 #define EMP_CALL_BASE_1(BASE1) BASE1(pod),
 #define EMP_CALL_BASE_2(BASE1, BASE2) BASE1(pod), BASE2(pod),
 
-#endif // #ifndef EMP_IO_SERIALIZE_MACROS_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_IO_SERIALIZE_MACROS_HPP_GUARD

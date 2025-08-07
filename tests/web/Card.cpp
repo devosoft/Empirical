@@ -59,7 +59,7 @@ struct Test_Card_STATIC_HTMLLayout : public emp::web::BaseTest {
     EM_ASM({
       describe("emp::prefab::Card STATIC HTML Layout Scenario", function() {
 
-        // test that everything got layed out correctly in the HTML document
+        // test that everything got laid out correctly in the HTML document
         describe("div#emp_test_container", function() {
           it('should exist', function() {
             chai.assert.equal($( "div#emp_test_container" ).length, 1);
@@ -222,7 +222,7 @@ struct Test_Card_INIT_OPEN_HTMLLayout : public emp::web::BaseTest {
     emp::web::Div header("div_header");
     open_card.AddHeaderContent(header);
     open_card.AddBodyContent("<p>collapsible card body</p>");
-    open_card << "<p>alternatively insterted text</p>";
+    open_card << "<p>alternatively inserted text</p>";
     header << "<h3>init open title</h3>";
 
   }
@@ -232,7 +232,7 @@ struct Test_Card_INIT_OPEN_HTMLLayout : public emp::web::BaseTest {
     EM_ASM({
       describe("emp::prefab::Card INIT_OPEN HTML Layout Scenario", function() {
 
-        // test that everything got layed out correctly in the HTML document
+        // test that everything got laid out correctly in the HTML document
         describe("div#emp_test_container", function() {
           it('should exist', function() {
             chai.assert.equal($( "div#emp_test_container" ).length, 1);
@@ -297,7 +297,7 @@ struct Test_Card_INIT_OPEN_HTMLLayout : public emp::web::BaseTest {
             chai.assert.equal(header.getAttribute("aria-controls"), ".open_card_collapse");
           });
 
-          it('should have aria-expaned set to true', function() {
+          it('should have aria-expanded set to true', function() {
             chai.assert.equal(header.getAttribute("aria-expanded"), "true");
           });
 
@@ -566,7 +566,7 @@ struct Test_Card_INIT_CLOSED_HTMLLayout : public emp::web::BaseTest {
     EM_ASM({
       describe("emp::prefab::Card INIT_CLOSED HTML Layout Scenario", function() {
 
-        // test that everything got layed out correctly in the HTML document
+        // test that everything got laid out correctly in the HTML document
         describe("div#emp_test_container", function() {
           it('should exist', function() {
             chai.assert.equal($( "div#emp_test_container" ).length, 1);
@@ -631,7 +631,7 @@ struct Test_Card_INIT_CLOSED_HTMLLayout : public emp::web::BaseTest {
             chai.assert.equal(header.getAttribute("aria-controls"), ".closed_card_collapse");
           });
 
-          it('should have aria-expaned set to false', function() {
+          it('should have aria-expanded set to false', function() {
             chai.assert.equal(header.getAttribute("aria-expanded"), "false");
           });
 
@@ -769,3 +769,6 @@ int main() {
 
   test_runner.Run();
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: btn

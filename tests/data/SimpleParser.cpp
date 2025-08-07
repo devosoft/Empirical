@@ -1,13 +1,11 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2022
+ *  date: 2022-2025
 */
 /**
  *  @file
  */
-
-#define CATCH_CONFIG_MAIN
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
@@ -77,7 +75,7 @@ TEST_CASE("Test DataMap in SimpleParser", "[data]")
   CHECK( fun(dmA) == 9.5 );
   CHECK( fun(dmB) == 72.375 );
 
-  std::set<std::string> names_used = parser.GetNamesUsed();
+  auto names_used = parser.GetNamesUsed();
   CHECK( names_used.size() == 3 );
   CHECK( emp::Has(names_used, "val1") );
   CHECK( emp::Has(names_used, "val2") );
@@ -286,7 +284,7 @@ TEST_CASE("Test DataMap in SimpleParser", "[data]")
 
 TEST_CASE("Test std::map in SimpleParser", "[data]")
 {
-  std::map<std::string, double> var_map;
+  std::map<emp::String, double> var_map;
   var_map["x"] = 5;
   var_map["y"] = 10;
 
@@ -303,7 +301,7 @@ TEST_CASE("Test std::map in SimpleParser", "[data]")
 
 TEST_CASE("Test emp::ra_map in SimpleParser", "[data]")
 {
-  emp::ra_map<std::string, double> var_map;
+  emp::ra_map<emp::String, double> var_map;
   var_map["x"] = 5;
   var_map["y"] = 10;
 

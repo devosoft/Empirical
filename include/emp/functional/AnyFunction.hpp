@@ -1,18 +1,19 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2019
-*/
 /**
- *  @file
- *  @brief Based on std::function, but with a generic base class.
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2019 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  (Built from GenericFunction.h)
+ * @file include/emp/functional/AnyFunction.hpp
+ * @brief Based on std::function, but with a generic base class.
+ * @note Status: ALPHA
+ *
+ * (Built from GenericFunction.h)
  */
 
-#ifndef EMP_FUNCTIONAL_ANYFUNCTION_HPP_INCLUDE
-#define EMP_FUNCTIONAL_ANYFUNCTION_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_FUNCTIONAL_ANY_FUNCTION_HPP_GUARD
+#define INCLUDE_EMP_FUNCTIONAL_ANY_FUNCTION_HPP_GUARD
 
 #include <functional>
 #include <stddef.h>
@@ -34,31 +35,38 @@ namespace emp {
     virtual size_t NumArgs() const = 0;
 
     /// A generic form of the function call operator; use arg types to determine derived form.
-    template <typename RETURN, typename... Ts> auto Call(Ts &&... args);
+    template <typename RETURN, typename... Ts>
+    auto Call(Ts &&... args);
 
     /// Test if a function call will succeed before trying it.
-    template <typename RETURN, typename... Ts> bool CallOK(Ts &&...);
+    template <typename RETURN, typename... Ts>
+    bool CallOK(Ts &&...);
 
     /// Test if a function call will succeed before trying it, based only on types.
-    template <typename RETURN, typename... Ts> bool CallTypeOK();
+    template <typename RETURN, typename... Ts>
+    bool CallTypeOK();
 
     /// A generic form of the function call operator; use arg types to determine derived form.
-    template <typename RETURN, typename... Ts> auto operator()(Ts &&... args) {
-      return Call<RETURN, Ts...>( std::forward<Ts>(args)... );
+    template <typename RETURN, typename... Ts>
+    auto operator()(Ts &&... args) {
+      return Call<RETURN, Ts...>(std::forward<Ts>(args)...);
     }
 
     /// Convert this BaseFunction into a derived emp::Function
-    template <typename T> auto Convert();
+    template <typename T>
+    auto Convert();
 
     /// Determine if this BaseFunction can be converted into a derived emp::Function
-    template <typename T> bool ConvertOK();
+    template <typename T>
+    bool ConvertOK();
 
     virtual emp::Ptr<BaseFunction> Clone() = 0;
   };
 
 
   /// Undefined base type for DerivedFunction, to create an error if a function type is not passed in.
-  template <typename... Ts> class DerivedFunction;
+  template <typename... Ts>
+  class DerivedFunction;
 
   /// Specialized form for proper function types.
   template <typename RETURN, typename... PARAMS>
@@ -69,27 +77,32 @@ namespace emp {
   public:
     /// Forward all args to std::function constructor...
     template <typename T>
-    DerivedFunction(T in_fun) : fun(in_fun) { ; }
+    DerivedFunction(T in_fun) : fun(in_fun) {
+      ;
+    }
 
     // How many arguments does this function have?
     size_t NumArgs() const override { return sizeof...(PARAMS); }
 
     /// Forward all args to std::function call.
     template <typename... Ts>
-    RETURN Call(Ts &&... args) { return fun(std::forward<Ts>(args)...); }
+    RETURN Call(Ts &&... args) {
+      return fun(std::forward<Ts>(args)...);
+    }
 
     /// Forward all args to std::function call.
     template <typename... Ts>
-    RETURN operator()(Ts &&... args) { return fun(std::forward<Ts>(args)...); }
+    RETURN operator()(Ts &&... args) {
+      return fun(std::forward<Ts>(args)...);
+    }
 
     /// Get the std::function to be called.
     const fun_t & GetFunction() const { return fun; }
 
-    emp::Ptr<BaseFunction> Clone() override{
+    emp::Ptr<BaseFunction> Clone() override {
       return emp::NewPtr<DerivedFunction<RETURN(PARAMS...)>>(fun);
     }
   };
-
 
   /// AnyFunction manages the function pointers to be dynamically handled.
   class AnyFunction {
@@ -99,34 +112,34 @@ namespace emp {
   private:
     /// Helper to build a proper derived function.
     template <typename T>
-    auto MakePtr( T in_fun ) {
+    auto MakePtr(T in_fun) {
       // We are going to wrap type in std::function later; remove it for now.
       using fun_t = remove_std_function_t<T>;
 
       // Build the derived function to hold here.
-      fun = emp::NewPtr<DerivedFunction<fun_t>>( in_fun );
+      fun = emp::NewPtr<DerivedFunction<fun_t>>(in_fun);
     }
   public:
     // By default, build an empty function.
     AnyFunction() { ; }
 
-    AnyFunction(const AnyFunction& other){ // copy constructor
+    AnyFunction(const AnyFunction & other) {  // copy constructor
       fun = other.CloneFunc();
     }
 
-    AnyFunction(AnyFunction&& other) noexcept{ // move constructor
+    AnyFunction(AnyFunction && other) noexcept {  // move constructor
       fun = other.CloneFunc();
       other.fun.Delete();
       other.fun = nullptr;
     }
 
-    AnyFunction& operator=(const AnyFunction& other){ // copy assignment
+    AnyFunction & operator=(const AnyFunction & other) {  // copy assignment
       Clear();
       fun = other.CloneFunc();
       return *this;
     }
 
-    AnyFunction& operator=(AnyFunction&& other) noexcept{ // move assignment
+    AnyFunction & operator=(AnyFunction && other) noexcept {  // move assignment
       Clear();
       fun = other.CloneFunc();
       other.Clear();
@@ -136,52 +149,59 @@ namespace emp {
     /// If an argument is provided, set the function.
     template <typename T>
     AnyFunction(T in_fun) {
-      MakePtr<T>( in_fun );
+      MakePtr<T>(in_fun);
     }
 
-    ~AnyFunction() { if (fun) fun.Delete(); }
+    ~AnyFunction() {
+      if (fun) { fun.Delete(); }
+    }
 
-    void Clear() { if (fun) fun.Delete(); fun = nullptr; }
+    void Clear() {
+      if (fun) { fun.Delete(); }
+      fun = nullptr;
+    }
+
     size_t NumArgs() const { return fun ? fun->NumArgs() : 0; }
-    emp::Ptr<BaseFunction> CloneFunc() const{
-      if(fun == nullptr) return nullptr;
+
+    emp::Ptr<BaseFunction> CloneFunc() const {
+      if (fun == nullptr) { return nullptr; }
       return fun->Clone();
     }
 
     operator bool() { return (bool) fun; }
 
     template <typename T>
-    void Set( std::function<T> in_fun ) {
-      if (fun) fun.Delete();
-      MakePtr<std::function<T>>( in_fun );
+    void Set(std::function<T> in_fun) {
+      if (fun) { fun.Delete(); }
+      MakePtr<std::function<T>>(in_fun);
     }
 
     /// Call this function with specific types; must be correct!
-    template <typename RETURN=void, typename... Ts>
+    template <typename RETURN = void, typename... Ts>
     auto Call(Ts &&... args) {
       emp_assert(fun);
-      return fun->Call<RETURN, Ts...>( std::forward<Ts>(args)... );
+      return fun->Call<RETURN, Ts...>(std::forward<Ts>(args)...);
     }
 
     /// Test if a function call will succeed before trying it.
     template <typename RETURN, typename... Ts>
     bool CallOK(Ts &&... args) {
-      if (!fun) return false;
-      return fun->CallOK<RETURN, Ts...>( std::forward<Ts>(args)... );
+      if (!fun) { return false; }
+      return fun->CallOK<RETURN, Ts...>(std::forward<Ts>(args)...);
     }
 
     /// Test if a function call will succeed before trying it, based only on types.
     template <typename RETURN, typename... Ts>
     bool CallTypeOK() {
-      if (!fun) return false;
-      return fun->CallTypeOK<RETURN, Ts...>( );
+      if (!fun) { return false; }
+      return fun->CallTypeOK<RETURN, Ts...>();
     }
 
     /// A generic form of the function call operator; use arg types to determine derived form.
-    template <typename RETURN=void, typename... Ts>
+    template <typename RETURN = void, typename... Ts>
     auto operator()(Ts &&... args) {
       emp_assert(fun);
-      return fun->Call<RETURN, Ts...>( std::forward<Ts>(args)... );
+      return fun->Call<RETURN, Ts...>(std::forward<Ts>(args)...);
     }
 
     /// Convert this BaseFunction into a derived emp::Function
@@ -194,14 +214,14 @@ namespace emp {
     /// Determine if this BaseFunction can be converted into a derived emp::Function
     template <typename T>
     bool ConvertOK() {
-      if (!fun) return false;
+      if (!fun) { return false; }
       return fun->ConvertOK<T>();
     }
   };
 
-  #ifndef DOXYGEN_SHOULD_SKIP_THIS
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
   /////////////////////////////////////
-  //  Member function implementaions.
+  //  Member function implementations.
 
   template <typename RETURN, typename... Ts>
   auto BaseFunction::Call(Ts &&... args) {
@@ -210,7 +230,7 @@ namespace emp {
     emp_assert(dynamic_cast<fun_t *>(this));  // Make sure this Call cast is legal.
 
     fun_t * fun = (fun_t *) this;
-    return fun->Call( std::forward<Ts>(args)... );
+    return fun->Call(std::forward<Ts>(args)...);
   }
 
   template <typename RETURN, typename... Ts>
@@ -225,16 +245,18 @@ namespace emp {
     return dynamic_cast<fun_t *>(this);
   }
 
-  template <typename T> auto BaseFunction::Convert() {
+  template <typename T>
+  auto BaseFunction::Convert() {
     emp_assert(dynamic_cast<DerivedFunction<T> *>(this));
     return (DerivedFunction<T> *) this;
   }
 
-  template <typename T> bool BaseFunction::ConvertOK() {
+  template <typename T>
+  bool BaseFunction::ConvertOK() {
     return dynamic_cast<DerivedFunction<T> *>(this);
   }
-  #endif // DOXYGEN_SHOULD_SKIP_THIS
+#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_FUNCTIONAL_ANYFUNCTION_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_FUNCTIONAL_ANY_FUNCTION_HPP_GUARD

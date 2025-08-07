@@ -115,7 +115,7 @@ TEST_CASE("Test TypePack", "[meta]")
   REQUIRE(union_t::GetSize() == 5);
   REQUIRE(intersect_t::GetSize() == 1);
 
-  // Test some manipulators on an empty typepack.
+  // Test some manipulators on an empty TypePack.
   using empty_t = emp::TypePack<>;
   REQUIRE(empty_t::GetSize() == 0);
   REQUIRE(empty_t::Count<int>() == 0);

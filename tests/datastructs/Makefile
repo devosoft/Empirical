@@ -1,4 +1,4 @@
-TEST_NAMES = BloomFilter Bool Cache DynamicString Graph graph_utils hash_utils IndexMap map_utils QueueCache ra_map ra_set reference_vector set_utils SmallFifoMap SmallVector StringMap TimeQueue tuple_struct tuple_utils TypeMap UnorderedIndexMap valsort_map vector_utils
+TEST_NAMES = BloomFilter Bool Cache DynamicString Graph graph_utils hash_utils IndexMap map_utils QueueCache ra_map ra_set reference_vector set_utils SmallFifoMap SmallVector StaticVector StringMap TimeQueue tuple_struct tuple_utils TypeMap UnorderedIndexMap valsort_map Vector vector_utils
 
 # -O3	  -Wl,--stack,8388608 -ftrack-macro-expansion=0
 FLAGS = -std=c++20 -g -pthread -Wall -Wno-unused-function -Wno-unused-private-field -I../../include/ -I../../ -I../../third-party/cereal/include/ -DCATCH_CONFIG_MAIN

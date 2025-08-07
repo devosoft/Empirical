@@ -1,60 +1,62 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2022-2023
-*/
 /**
- *  @file
- *  @brief Plugs into emp::Text, setting up inputs and output to be HTML encoded.
- *  @note Status: ALPHA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2022-2024 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/text/HTMLEncoding.hpp
+ * @brief Plugs into emp::Text, setting up inputs and output to be HTML encoded.
+ * @note Status: ALPHA
  *
  */
 
-#ifndef EMP_TEXT_HTMLENCODING_HPP_INCLUDE
-#define EMP_TEXT_HTMLENCODING_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_TEXT_HTMLENCODING_HPP_GUARD
+#define INCLUDE_EMP_TEXT_HTMLENCODING_HPP_GUARD
 
 #include <set>
 #include <string>
 #include <unordered_map>
 
-#include "TextEncoding.hpp"
 #include "Text.hpp"
+#include "Text_utils.hpp"
+#include "TextEncoding.hpp"
 
 namespace emp {
 
   class HTMLEncoding : public emp::TextEncoding {
   private:
-
     void SetupTags() {
-      SetupStyleTags("bold", "<b>", "</b>");
-      SetupStyleTags("code", "<code>", "</code>");
-      SetupStyleTags("italic", "<i>", "</i>");
-      SetupStyleTags("strike", "<del>", "</del>");
-      SetupStyleTags("subscript", "<sub>", "</sub>");
-      SetupStyleTags("superscript", "<sup>", "</sup>");
-      SetupStyleTags("underline", "<u>", "</u>");
-      SetupStyleTags("header1", "<h1>", "</h1>");
-      SetupStyleTags("header2", "<h2>", "</h2>");
-      SetupStyleTags("header3", "<h3>", "</h3>");
-      SetupStyleTags("header4", "<h4>", "</h4>");
-      SetupStyleTags("header5", "<h5>", "</h5>");
-      SetupStyleTags("header6", "<h6>", "</h6>");
+      const auto & code_map = GetTextStyleMap_FromHTML();
+      for (auto & [html_tag, style] : code_map) {
+        AddStyleTags(style, MakeString("<", html_tag, ">"), MakeString("</", html_tag, ">"));
+      }
 
-      SetupReplaceTag("&amp;", '&');
-      SetupReplaceTag("&gt;", '>');
-      SetupReplaceTag("&lt;", '<');
-      SetupReplaceTag("&nbsp;", ' ', "no_break");
+      AddReplaceTag("&amp;", '&');
+      AddReplaceTag("&gt;", '>');
+      AddReplaceTag("&lt;", '<');
+      AddReplaceTag("&tab;", '\t');
+      AddReplaceTag("&nbsp;", ' ', "no_break");
+
+      // For generic symbols
+      AddReplaceControl("&", ';', ' ', "symbol");
+
+
+      AddReplaceTag("<br>", '\n');  // A line break
+      // AddReplaceTag("\\b",  ' ', "page_break");       // A page break
+      AddReplaceTag("<p>", ' ', "para_break");        // A paragraph break
+      AddReplaceTag("<hr>", '-', "horizontal_rule");  // A horizontal rule
     }
 
 
   public:
     HTMLEncoding() { SetupTags(); }
+
     ~HTMLEncoding() = default;
 
     String GetName() const override { return "html"; }
-    emp::Ptr<TextEncoding_Interface> Clone() const override {
-      return emp::NewPtr<HTMLEncoding>();
-    }
+
+    emp::Ptr<TextEncoding_Interface> Clone() const override { return emp::NewPtr<HTMLEncoding>(); }
   };
 
   using HTMLText = EncodedText<HTMLEncoding>;
@@ -63,6 +65,6 @@ namespace emp {
   emp::Text MakeHTMLText(Ts &&... args) {
     return MakeEncodedText<HTMLEncoding>(std::forward<Ts>(args)...);
   }
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_TEXT_HTMLENCODING_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_TEXT_HTMLENCODING_HPP_GUARD

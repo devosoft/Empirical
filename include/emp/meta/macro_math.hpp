@@ -1,52 +1,53 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2018
-*/
 /**
- *  @file
- *  @brief Macros to build a pre-processor calculator system.
- *  Status: RELEASE
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  Working macros include:
- *   EMP_INC(A)    : converts to result of A+1
- *   EMP_DEC(A)    : converts to result of A-1
- *   EMP_SHIFTL(A) : converts to result of A*2
- *   EMP_SHIFTR(A) : converts to result of A/2
+ * @file include/emp/meta/macro_math.hpp
+ * @brief Macros to build a pre-processor calculator system.
+ * Status: RELEASE
  *
- *   EMP_ADD(A,B)  : converts to result of A+B
- *   EMP_SUB(A,B)  : converts to result of A-B
- *   EMP_MULT(A,B) : converts to result of A*B
- *   EMP_DIV(A,B)  : converts to result of A/B
- *   EMP_MOD(A,B)  : converts to result of A%B
- *   EMP_LOG2(A)   : converts to (int) log2(A)
+ * Working macros include:
+ *  EMP_INC(A)    : converts to result of A+1
+ *  EMP_DEC(A)    : converts to result of A-1
+ *  EMP_SHIFTL(A) : converts to result of A*2
+ *  EMP_SHIFTR(A) : converts to result of A/2
  *
- *   EMP_NOT(X)     : Logical NOT
- *   EMP_AND(X, Y)  : Logical AND
- *   EMP_OR(X, Y)   : Logical OR
- *   EMP_NAND(X, Y) : Logical NAND
- *   EMP_NOR(X, Y)  : Logical NOR
- *   EMP_XOR(X, Y)  : Logical XOR
+ *  EMP_ADD(A,B)  : converts to result of A+B
+ *  EMP_SUB(A,B)  : converts to result of A-B
+ *  EMP_MULT(A,B) : converts to result of A*B
+ *  EMP_DIV(A,B)  : converts to result of A/B
+ *  EMP_MOD(A,B)  : converts to result of A%B
+ *  EMP_LOG2(A)   : converts to (int) log2(A)
  *
- *   EMP_COUNT_ONES(A) : count the number of ones in the binary representation of A
+ *  EMP_NOT(X)     : Logical NOT
+ *  EMP_AND(X, Y)  : Logical AND
+ *  EMP_OR(X, Y)   : Logical OR
+ *  EMP_NAND(X, Y) : Logical NAND
+ *  EMP_NOR(X, Y)  : Logical NOR
+ *  EMP_XOR(X, Y)  : Logical XOR
  *
- *   EMP_IF(TEST, T, F) examines the first argument; if it's 0, it resolves to the third
- *   argument, otherwise it resolves to the second argument.
+ *  EMP_COUNT_ONES(A) : count the number of ones in the binary representation of A
  *
- *  The core idea behind these macros is that we can use brute-force to convert numbers
- *  to binary, but once there we can easily perform math on them, or convert them to
- *  yet other forms.
+ *  EMP_IF(TEST, T, F) examines the first argument; if it's 0, it resolves to the third
+ *  argument, otherwise it resolves to the second argument.
  *
- *  Representations include:
- *   DEC - Standard decimal values (e.g., 91)
- *   BIN - Binary numbers, with bits separated by commas (e.g.  0, 0, 0,  1, 0,  1, 1, 0, 1, 1 )
- *   SUM - Like BIN, but stored as zero or magnitude.    (e.g., 0, 0, 0, 64, 0, 16, 8, 0, 2, 1 )
- *   PACK - Like SUM, but without zeros and in parens    (e.g., (64,16,8,2,1) )
- *   HEX - Hexidecimal representation (e.g., 0x5B)  [todo]
+ * The core idea behind these macros is that we can use brute-force to convert numbers
+ * to binary, but once there we can easily perform math on them, or convert them to
+ * yet other forms.
+ *
+ * Representations include:
+ *  DEC - Standard decimal values (e.g., 91)
+ *  BIN - Binary numbers, with bits separated by commas (e.g.  0, 0, 0,  1, 0,  1, 1, 0, 1, 1 )
+ *  SUM - Like BIN, but stored as zero or magnitude.    (e.g., 0, 0, 0, 64, 0, 16, 8, 0, 2, 1 )
+ *  PACK - Like SUM, but without zeros and in parens    (e.g., (64,16,8,2,1) )
+ *  HEX - Hexadecimal representation (e.g., 0x5B)  [todo]
  */
 
-#ifndef EMP_META_MACRO_MATH_HPP_INCLUDE
-#define EMP_META_MACRO_MATH_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_META_MACRO_MATH_HPP_GUARD
+#define INCLUDE_EMP_META_MACRO_MATH_HPP_GUARD
 
 /// @cond MACROS
 
@@ -1125,7 +1126,7 @@
 
 /// @cond MACROS
 
-#define EMP_BIN_TO_DEC_IMPL(B0,B1,B2,B3,B4,B5,B6,B7,B8,B9)              \
+#define EMP_BIN_TO_DEC_IMPL(B0, B1, B2, B3, B4, B5, B6, B7, B8, B9)              \
   EMP_BIN_TO_DEC_ ## B0 ## B1 ## B2 ## B3 ## B4 ## B5 ## B6 ## B7 ## B8 ## B9
 
 #define EMP_BIN_TO_DEC_0000000000  0
@@ -2161,8 +2162,8 @@
 #define EMP_ADD_ARG_IF_VAL_0(A)
 #define EMP_ADD_ARG_IF_VAL_1(A) , A
 
-#define EMP_MATH_BIN_TIMES_0(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-#define EMP_MATH_BIN_TIMES_1(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) A0, A1, A2, A3, A4, A5, A6, A7, A8, A9
+#define EMP_MATH_BIN_TIMES_0(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9) 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+#define EMP_MATH_BIN_TIMES_1(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9) A0, A1, A2, A3, A4, A5, A6, A7, A8, A9
 
 
 // Now, convert to SUM format.
@@ -2184,7 +2185,7 @@
 #define EMP_DEC_TO_PACK(A) EMP_BIN_TO_PACK EMP_EMPTY() ( EMP_DEC_TO_BIN(A) )
 
 
-// Pre-define simple comparisons & boolean logic
+// Pre-define simple comparisons & Boolean logic
 #define EMP_MATH_BIT_EQU_00 1
 #define EMP_MATH_BIT_EQU_01 0
 #define EMP_MATH_BIT_EQU_10 0
@@ -2258,8 +2259,26 @@
 #define EMP_COMPARE_IMPL(...) EMP_COMPARE_BIN_IMPL( __VA_ARGS__ )
 
 #define EMP_COMPARE_BIN(...) EMP_COMPARE_BIN_IMPL EMP_EMPTY() (__VA_ARGS__)
-#define EMP_COMPARE_BIN_IMPL(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9,    \
-                             B0, B1, B2, B3, B4, B5, B6, B7, B8, B9)    \
+#define EMP_COMPARE_BIN_IMPL(A0, \
+                             A1, \
+                             A2, \
+                             A3, \
+                             A4, \
+                             A5, \
+                             A6, \
+                             A7, \
+                             A8, \
+                             A9, \
+                             B0, \
+                             B1, \
+                             B2, \
+                             B3, \
+                             B4, \
+                             B5, \
+                             B6, \
+                             B7, \
+                             B8, \
+                             B9)    \
   EMP_COMPARE_get_first( EMP_COMPARE_BITS(A0,B0) EMP_COMPARE_BITS(A1,B1) EMP_COMPARE_BITS(A2,B2) EMP_COMPARE_BITS(A3,B3) EMP_COMPARE_BITS(A4,B4) EMP_COMPARE_BITS(A5,B5) EMP_COMPARE_BITS(A6,B6) EMP_COMPARE_BITS(A7,B7) EMP_COMPARE_BITS(A8,B8) EMP_COMPARE_BITS(A9,B9) X, ~ )
 
 #define EMP_COMPARE_get_first(...) EMP_COMPARE_get_first_IMPL(__VA_ARGS__)
@@ -2284,12 +2303,12 @@
 #define EMP_COMPARE_FUN_impl_B(OUT_A, OUT_B, OUT_X) OUT_B
 #define EMP_COMPARE_FUN_impl_X(OUT_A, OUT_B, OUT_X) OUT_X
 
-#define EMP_EQU(A,B) EMP_COMPARE_FUN(A,B,0,0,1)
-#define EMP_LESS(A,B) EMP_COMPARE_FUN(A,B,0,1,0)
-#define EMP_LESS_EQU(A,B) EMP_COMPARE_FUN(A,B,0,1,1)
-#define EMP_GTR(A,B) EMP_COMPARE_FUN(A,B,1,0,0)
-#define EMP_GTR_EQU(A,B) EMP_COMPARE_FUN(A,B,1,0,1)
-#define EMP_NEQU(A,B) EMP_COMPARE_FUN(A,B,1,1,0)
+#define EMP_EQU(A, B) EMP_COMPARE_FUN(A,B,0,0,1)
+#define EMP_LESS(A, B) EMP_COMPARE_FUN(A,B,0,1,0)
+#define EMP_LESS_EQU(A, B) EMP_COMPARE_FUN(A,B,0,1,1)
+#define EMP_GTR(A, B) EMP_COMPARE_FUN(A,B,1,0,0)
+#define EMP_GTR_EQU(A, B) EMP_COMPARE_FUN(A,B,1,0,1)
+#define EMP_NEQU(A, B) EMP_COMPARE_FUN(A,B,1,1,0)
 
 // Possible bit values during computation are:
 // 0 or 1 (normal bits)
@@ -2297,8 +2316,8 @@
 // N (for -1; after a SUB)
 
 
-#define EMP_MATH_COUNT_BITS(A,B) EMP_MATH_COUNT_BITS_IMPL(A,B)
-#define EMP_MATH_COUNT_BITS_IMPL(A,B) EMP_MATH_COUNT_BITS_ ## A ## B
+#define EMP_MATH_COUNT_BITS(A, B) EMP_MATH_COUNT_BITS_IMPL(A,B)
+#define EMP_MATH_COUNT_BITS_IMPL(A, B) EMP_MATH_COUNT_BITS_ ## A ## B
 #define EMP_MATH_COUNT_BITS_00 0
 #define EMP_MATH_COUNT_BITS_01 1
 #define EMP_MATH_COUNT_BITS_10 1
@@ -2306,8 +2325,8 @@
 #define EMP_MATH_COUNT_BITS_0N N
 #define EMP_MATH_COUNT_BITS_1N 0
 
-#define EMP_MATH_DIFF_BITS(A,B) EMP_MATH_DIFF_BITS_IMPL(A,B)
-#define EMP_MATH_DIFF_BITS_IMPL(A,B) EMP_MATH_DIFF_BITS_ ## A ## B
+#define EMP_MATH_DIFF_BITS(A, B) EMP_MATH_DIFF_BITS_IMPL(A,B)
+#define EMP_MATH_DIFF_BITS_IMPL(A, B) EMP_MATH_DIFF_BITS_ ## A ## B
 #define EMP_MATH_DIFF_BITS_00 0
 #define EMP_MATH_DIFF_BITS_01 N
 #define EMP_MATH_DIFF_BITS_10 1
@@ -2327,7 +2346,7 @@
 #define EMP_MATH_CLEAR_CARRY_2 0
 #define EMP_MATH_CLEAR_CARRY_N 1
 
-// In order to handle carrys, we need to run RESTORE_BIN once per bit (-1)
+// In order to handle carries, we need to run RESTORE_BIN once per bit (-1)
 
 #define EMP_MATH_RESTORE_BIN(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9)  \
   EMP_MATH_RESTORE_BIN_1(                                             \
@@ -2476,41 +2495,41 @@
 
 // --- Shifting ---
 /// @cond MACROS
-#define EMP_SHIFTL_BIN(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) A1, A2, A3, A4, A5, A6, A7, A8, A9, 0
-#define EMP_SHIFTR_BIN(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) 0, A0, A1, A2, A3, A4, A5, A6, A7, A8
+#define EMP_SHIFTL_BIN(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9) A1, A2, A3, A4, A5, A6, A7, A8, A9, 0
+#define EMP_SHIFTR_BIN(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9) 0, A0, A1, A2, A3, A4, A5, A6, A7, A8
 
-#define EMP_SHIFTL_BIN_0(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) A0, A1, A2, A3, A4, A5, A6, A7, A8, A9
-#define EMP_SHIFTR_BIN_0(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) A0, A1, A2, A3, A4, A5, A6, A7, A8, A9
+#define EMP_SHIFTL_BIN_0(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9) A0, A1, A2, A3, A4, A5, A6, A7, A8, A9
+#define EMP_SHIFTR_BIN_0(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9) A0, A1, A2, A3, A4, A5, A6, A7, A8, A9
 
-#define EMP_SHIFTL_BIN_1(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) A1, A2, A3, A4, A5, A6, A7, A8, A9, 0
-#define EMP_SHIFTR_BIN_1(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) 0, A0, A1, A2, A3, A4, A5, A6, A7, A8
+#define EMP_SHIFTL_BIN_1(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9) A1, A2, A3, A4, A5, A6, A7, A8, A9, 0
+#define EMP_SHIFTR_BIN_1(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9) 0, A0, A1, A2, A3, A4, A5, A6, A7, A8
 
-#define EMP_SHIFTL_BIN_2(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) A2, A3, A4, A5, A6, A7, A8, A9, 0, 0
-#define EMP_SHIFTR_BIN_2(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) 0, 0, A0, A1, A2, A3, A4, A5, A6, A7
+#define EMP_SHIFTL_BIN_2(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9) A2, A3, A4, A5, A6, A7, A8, A9, 0, 0
+#define EMP_SHIFTR_BIN_2(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9) 0, 0, A0, A1, A2, A3, A4, A5, A6, A7
 
-#define EMP_SHIFTL_BIN_3(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) A3, A4, A5, A6, A7, A8, A9, 0, 0, 0
-#define EMP_SHIFTR_BIN_3(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) 0, 0, 0, A0, A1, A2, A3, A4, A5, A6
+#define EMP_SHIFTL_BIN_3(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9) A3, A4, A5, A6, A7, A8, A9, 0, 0, 0
+#define EMP_SHIFTR_BIN_3(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9) 0, 0, 0, A0, A1, A2, A3, A4, A5, A6
 
-#define EMP_SHIFTL_BIN_4(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) A4, A5, A6, A7, A8, A9, 0, 0, 0, 0
-#define EMP_SHIFTR_BIN_4(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) 0, 0, 0, 0, A0, A1, A2, A3, A4, A5
+#define EMP_SHIFTL_BIN_4(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9) A4, A5, A6, A7, A8, A9, 0, 0, 0, 0
+#define EMP_SHIFTR_BIN_4(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9) 0, 0, 0, 0, A0, A1, A2, A3, A4, A5
 
-#define EMP_SHIFTL_BIN_5(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) A5, A6, A7, A8, A9, 0, 0, 0, 0, 0
-#define EMP_SHIFTR_BIN_5(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) 0, 0, 0, 0, 0, A0, A1, A2, A3, A4
+#define EMP_SHIFTL_BIN_5(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9) A5, A6, A7, A8, A9, 0, 0, 0, 0, 0
+#define EMP_SHIFTR_BIN_5(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9) 0, 0, 0, 0, 0, A0, A1, A2, A3, A4
 
-#define EMP_SHIFTL_BIN_6(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) A6, A7, A8, A9, 0, 0, 0, 0, 0, 0
-#define EMP_SHIFTR_BIN_6(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) 0, 0, 0, 0, 0, 0, A0, A1, A2, A3
+#define EMP_SHIFTL_BIN_6(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9) A6, A7, A8, A9, 0, 0, 0, 0, 0, 0
+#define EMP_SHIFTR_BIN_6(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9) 0, 0, 0, 0, 0, 0, A0, A1, A2, A3
 
-#define EMP_SHIFTL_BIN_7(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) A7, A8, A9, 0, 0, 0, 0, 0, 0, 0
-#define EMP_SHIFTR_BIN_7(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) 0, 0, 0, 0, 0, 0, 0, A0, A1, A2
+#define EMP_SHIFTL_BIN_7(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9) A7, A8, A9, 0, 0, 0, 0, 0, 0, 0
+#define EMP_SHIFTR_BIN_7(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9) 0, 0, 0, 0, 0, 0, 0, A0, A1, A2
 
-#define EMP_SHIFTL_BIN_8(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) A8, A9, 0, 0, 0, 0, 0, 0, 0, 0
-#define EMP_SHIFTR_BIN_8(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) 0, 0, 0, 0, 0, 0, 0, 0, A0, A1
+#define EMP_SHIFTL_BIN_8(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9) A8, A9, 0, 0, 0, 0, 0, 0, 0, 0
+#define EMP_SHIFTR_BIN_8(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9) 0, 0, 0, 0, 0, 0, 0, 0, A0, A1
 
-#define EMP_SHIFTL_BIN_9(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) A9, 0, 0, 0, 0, 0, 0, 0, 0, 0
-#define EMP_SHIFTR_BIN_9(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) 0, 0, 0, 0, 0, 0, 0, 0, 0, A0
+#define EMP_SHIFTL_BIN_9(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9) A9, 0, 0, 0, 0, 0, 0, 0, 0, 0
+#define EMP_SHIFTR_BIN_9(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9) 0, 0, 0, 0, 0, 0, 0, 0, 0, A0
 
-#define EMP_SHIFTL_BIN_10(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-#define EMP_SHIFTR_BIN_10(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9) 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+#define EMP_SHIFTL_BIN_10(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9) 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+#define EMP_SHIFTR_BIN_10(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9) 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
 /// @endcond
 
@@ -2542,8 +2561,26 @@
 /// @cond MACROS
 #define EMP_ADD_BIN(...) EMP_ADD_BIN_IMPL EMP_EMPTY() (__VA_ARGS__)
 
-#define EMP_ADD_BIN_IMPL(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9,        \
-                         B0, B1, B2, B3, B4, B5, B6, B7, B8, B9)        \
+#define EMP_ADD_BIN_IMPL(A0, \
+                         A1, \
+                         A2, \
+                         A3, \
+                         A4, \
+                         A5, \
+                         A6, \
+                         A7, \
+                         A8, \
+                         A9, \
+                         B0, \
+                         B1, \
+                         B2, \
+                         B3, \
+                         B4, \
+                         B5, \
+                         B6, \
+                         B7, \
+                         B8, \
+                         B9)        \
   EMP_MATH_RESTORE_BIN( EMP_MATH_COUNT_BITS(A0, B0), EMP_MATH_COUNT_BITS(A1, B1), \
                         EMP_MATH_COUNT_BITS(A2, B2), EMP_MATH_COUNT_BITS(A3, B3), \
                         EMP_MATH_COUNT_BITS(A4, B4), EMP_MATH_COUNT_BITS(A5, B5), \
@@ -2551,21 +2588,96 @@
                         EMP_MATH_COUNT_BITS(A8, B8), EMP_MATH_COUNT_BITS(A9, B9)  \
                         )
 
-#define EMP_ADD_BIN_4(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9,        \
-                      B0, B1, B2, B3, B4, B5, B6, B7, B8, B9, ...)   \
+#define EMP_ADD_BIN_4(A0, \
+                      A1, \
+                      A2, \
+                      A3, \
+                      A4, \
+                      A5, \
+                      A6, \
+                      A7, \
+                      A8, \
+                      A9, \
+                      B0, \
+                      B1, \
+                      B2, \
+                      B3, \
+                      B4, \
+                      B5, \
+                      B6, \
+                      B7, \
+                      B8, \
+                      B9, \
+                      ...)   \
   EMP_ADD_BIN( EMP_ADD_BIN(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9,B0,B1,B2,B3,B4,B5,B6,B7,B8,B9), \
                EMP_ADD_BIN(__VA_ARGS__) )
 
-#define EMP_ADD_BIN_8(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9,        \
-                      B0, B1, B2, B3, B4, B5, B6, B7, B8, B9,        \
-                      C0, C1, C2, C3, C4, C5, C6, C7, C8, C9,        \
-                      D0, D1, D2, D3, D4, D5, D6, D7, D8, D9, ...)   \
+#define EMP_ADD_BIN_8(A0, \
+                      A1, \
+                      A2, \
+                      A3, \
+                      A4, \
+                      A5, \
+                      A6, \
+                      A7, \
+                      A8, \
+                      A9, \
+                      B0, \
+                      B1, \
+                      B2, \
+                      B3, \
+                      B4, \
+                      B5, \
+                      B6, \
+                      B7, \
+                      B8, \
+                      B9, \
+                      C0, \
+                      C1, \
+                      C2, \
+                      C3, \
+                      C4, \
+                      C5, \
+                      C6, \
+                      C7, \
+                      C8, \
+                      C9, \
+                      D0, \
+                      D1, \
+                      D2, \
+                      D3, \
+                      D4, \
+                      D5, \
+                      D6, \
+                      D7, \
+                      D8, \
+                      D9, \
+                      ...)   \
   EMP_ADD_BIN( EMP_ADD_BIN_4(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9,B0,B1,B2,B3,B4,B5,B6,B7,B8,B9,  \
                              C0,C1,C2,C3,C4,C5,C6,C7,C8,C9,D0,D1,D2,D3,D4,D5,D6,D7,D8,D9), \
                EMP_ADD_BIN_4(__VA_ARGS__) )
 
-#define EMP_ADD_BIN_10(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9,          \
-                       B0, B1, B2, B3, B4, B5, B6, B7, B8, B9, ...)     \
+#define EMP_ADD_BIN_10(A0, \
+                       A1, \
+                       A2, \
+                       A3, \
+                       A4, \
+                       A5, \
+                       A6, \
+                       A7, \
+                       A8, \
+                       A9, \
+                       B0, \
+                       B1, \
+                       B2, \
+                       B3, \
+                       B4, \
+                       B5, \
+                       B6, \
+                       B7, \
+                       B8, \
+                       B9, \
+                       ...)     \
   EMP_ADD_BIN( EMP_ADD_BIN(A0,A1,A2,A3,A4,A5,A6,A7,A8,A9,B0,B1,B2,B3,B4,B5,B6,B7,B8,B9), \
                EMP_ADD_BIN_8(__VA_ARGS__) )
 /// @endcond
@@ -2576,15 +2688,14 @@
 /// @cond MACROS
 #define EMP_ADD_IMPL(...) EMP_BIN_TO_DEC( EMP_ADD_BIN_IMPL( __VA_ARGS__ ) )
 
-#define EMP_ADD_10(A,B,C,D,E,F,G,H,I,J) EMP_EVAL( EMP_ADD_10_IMPL( EMP_DEC_TO_BIN(A), EMP_DEC_TO_BIN(B), EMP_DEC_TO_BIN(C), EMP_DEC_TO_BIN(D), EMP_DEC_TO_BIN(E), EMP_DEC_TO_BIN(F), EMP_DEC_TO_BIN(G), EMP_DEC_TO_BIN(H), EMP_DEC_TO_BIN(I), EMP_DEC_TO_BIN(J) ) )
+#define EMP_ADD_10(A, B, C, D, E, F, G, H, I, J) EMP_EVAL( EMP_ADD_10_IMPL( EMP_DEC_TO_BIN(A), EMP_DEC_TO_BIN(B), EMP_DEC_TO_BIN(C), EMP_DEC_TO_BIN(D), EMP_DEC_TO_BIN(E), EMP_DEC_TO_BIN(F), EMP_DEC_TO_BIN(G), EMP_DEC_TO_BIN(H), EMP_DEC_TO_BIN(I), EMP_DEC_TO_BIN(J) ) )
 #define EMP_ADD_10_IMPL(...) EMP_BIN_TO_DEC( EMP_ADD_BIN_10( __VA_ARGS__ ) )
 /// @endcond
 
 // --- Subtraction ---
 
 /// @cond MACROS
-#define EMP_SUB_BIN(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9,             \
-                    B0, B1, B2, B3, B4, B5, B6, B7, B8, B9)             \
+#define EMP_SUB_BIN(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9, B0, B1, B2, B3, B4, B5, B6, B7, B8, B9)             \
   EMP_MATH_RESTORE_BIN( EMP_MATH_DIFF_BITS(A0, B0), EMP_MATH_DIFF_BITS(A1, B1), \
                         EMP_MATH_DIFF_BITS(A2, B2), EMP_MATH_DIFF_BITS(A3, B3), \
                         EMP_MATH_DIFF_BITS(A4, B4), EMP_MATH_DIFF_BITS(A5, B5), \
@@ -2592,7 +2703,7 @@
                         EMP_MATH_DIFF_BITS(A8, B8), EMP_MATH_DIFF_BITS(A9, B9)  \
                         )
 /// @endcond
-/// Combute A - B
+/// Compute A - B
 #define EMP_SUB(A, B) EMP_EVAL( EMP_SUB_IMPL( EMP_DEC_TO_BIN(A), EMP_DEC_TO_BIN(B) ) )
 
 /// @cond MACROS
@@ -2610,8 +2721,7 @@
 
 // --- Multiply ---
 /// @cond MACROS
-#define EMP_MULT_BIN(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9,   \
-                     B0, B1, B2, B3, B4, B5, B6, B7, B8, B9)   \
+#define EMP_MULT_BIN(A0, A1, A2, A3, A4, A5, A6, A7, A8, A9, B0, B1, B2, B3, B4, B5, B6, B7, B8, B9)   \
   EMP_ADD_BIN_10 EMP_EMPTY() (                                          \
                  EMP_MATH_BIN_TIMES_ ## B9 (A0, A1, A2, A3, A4, A5, A6, A7, A8, A9), \
                  EMP_MATH_BIN_TIMES_ ## B8 (A1, A2, A3, A4, A5, A6, A7, A8, A9,  0), \
@@ -2703,4 +2813,4 @@
 
 /// @endcond
 
-#endif // #ifndef EMP_META_MACRO_MATH_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_META_MACRO_MATH_HPP_GUARD

@@ -212,3 +212,6 @@ TEST_CASE("Test ContiguousStreamBuf", "[io]")
   }
 
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: buf

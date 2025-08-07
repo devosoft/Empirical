@@ -178,7 +178,7 @@ private:
       return;
     }
 
-    // If we made it this far, we are tyring to finish an edge!
+    // If we made it this far, we are trying to finish an edge!
     AddEdge((size_t) edge_node, (size_t) active_node);
   }
 
@@ -332,3 +332,6 @@ GraphDriver driver;
 int main()
 {
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: adj

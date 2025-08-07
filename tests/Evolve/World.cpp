@@ -474,3 +474,6 @@ TEST_CASE("Test GetValidNeighborOrgIDs on Grid", "[Evolve]")
 
   std::cout << std::endl;
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: oir oso mutfun ood obr sglc rnd

@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
   specs["no_row_headings"] = emp::ArgSpec(0, "Turn off headings on each row.");
   specs["no_col_headings"] = emp::ArgSpec(0, "Turn off headings on each column.");
   specs["no_headings"] = emp::ArgSpec(0, "Turn off all headings.");
-  specs["sample"] = emp::ArgSpec(3, "Sample reduced orgs & criteria.  Args: [num_orgs] [num_critera] [num_trials]");
+  specs["sample"] = emp::ArgSpec(3, "Sample reduced orgs & criteria.  Args: [num_orgs] [num_criteria] [num_trials]");
   specs["sort"] = emp::ArgSpec(0, "Sort the output data (rather than keeping org position)");
   specs["verbose"] = emp::ArgSpec(0, "Print out lots of extra details about process.");
   specs["roulette"] = emp::ArgSpec(0, "Determine probabilities with roulette selection.");

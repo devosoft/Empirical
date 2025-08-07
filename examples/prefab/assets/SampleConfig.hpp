@@ -31,7 +31,7 @@ EMP_BUILD_CONFIG( Config,
   VALUE(NEUTRAL_MUTATION_RATE, double, .05, "Probability of a neutral mutation (only relevant for phylogenetic signature)"),
   VALUE(ASYMMETRIC_DIVISION_PROB, double, 0, "Probability of a change in stemness"),
   VALUE(MITOSIS_PROB, double, .5, "Probability of mitosis"),
-  VALUE(HYPOXIA_DEATH_PROB, double, .25, "Probability of dieing, given hypoxic conditions"),
+  VALUE(HYPOXIA_DEATH_PROB, double, .25, "Probability of dying, given hypoxic conditions"),
   VALUE(AGE_LIMIT, int, 100, "Age over which non-stem cells die"),
   VALUE(BASAL_OXYGEN_CONSUMPTION, double, .00075, "Base oxygen consumption rate"),
   VALUE(OXYGEN_CONSUMPTION_DIVISION, double, .00075*5, "Amount of oxygen a cell consumes on division"),
@@ -54,3 +54,6 @@ EMP_BUILD_CONFIG( Config,
 );
 
 #endif // #ifndef EXAMPLES_PREFAB_ASSETS_SAMPLECONFIG_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: Menten Emily's stemness memic Michaelis emilydolson

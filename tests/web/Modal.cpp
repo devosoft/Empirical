@@ -25,7 +25,7 @@ struct Test_Modal : emp::web::BaseTest {
    * <span id="switch_on" style="clear: none; display: inline;" class="custom-control custom-switch">
    *  <input type="checkbox" onchange="emp.Callback(32, ['checkbox', 'radio'].includes(this.type) ? this.checked.toString() : this.value);" checked="checked" class="custom-control-input">
    *  <label class="custom-control-label" for="[input_id]">
-   *    <span>Switch Defult On</span>
+   *    <span>Switch Default On</span>
    *  </label>
    * </span>
    */
@@ -391,3 +391,6 @@ int main() {
   test_runner.Run();
 
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: ele tabindex btn

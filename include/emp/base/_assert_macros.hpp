@@ -1,25 +1,26 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2021.
-*/
 /**
- *  @file
- *  @brief Helper macros for building proper assert commands.
- *  Status: RELEASE
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2021 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/base/_assert_macros.hpp
+ * @brief Helper macros for building proper assert commands.
+ * Status: RELEASE
  *
  */
 
-#ifndef EMP_BASE__ASSERT_MACROS_HPP_INCLUDE
-#define EMP_BASE__ASSERT_MACROS_HPP_INCLUDE
+#pragma once
 
-/// Basic elper macros...
+#ifndef INCLUDE_EMP_BASE_ASSERT_MACROS_HPP_impl_GUARD
+#define INCLUDE_EMP_BASE_ASSERT_MACROS_HPP_impl_GUARD
+
+/// Basic helper macros...
 #define emp_assert_STRINGIFY(...) emp_assert_STRINGIFY_IMPL(__VA_ARGS__)
 #define emp_assert_STRINGIFY_IMPL(...) #__VA_ARGS__
 #define emp_assert_TO_PAIR(X) emp_assert_STRINGIFY(X) , X
 #define emp_assert_GET_ARG_1(a, ...) a
-#define emp_assert_GET_ARG_2(a,b, ...) b
-#define emp_assert_GET_ARG_21(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t, u, ...) u
+#define emp_assert_GET_ARG_2(a, b, ...) b
+#define emp_assert_GET_ARG_21(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, ...) u
 #define emp_assert_MERGE(A, B) A ## B
 #define emp_assert_ASSEMBLE(BASE, ARG_COUNT, ...) emp_assert_MERGE(BASE, ARG_COUNT) (__VA_ARGS__)
 
@@ -51,4 +52,4 @@
 #define emp_assert_TO_PAIRS19(X, ...) emp_assert_TO_PAIR(X) , emp_assert_TO_PAIRS18(__VA_ARGS__)
 #define emp_assert_TO_PAIRS20(X, ...) emp_assert_TO_PAIR(X) , emp_assert_TO_PAIRS19(__VA_ARGS__)
 
-#endif // #ifndef EMP_BASE__ASSERT_MACROS_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_BASE_ASSERT_MACROS_HPP_impl_GUARD

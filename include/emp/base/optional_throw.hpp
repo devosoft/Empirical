@@ -1,70 +1,54 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2024
-*/
 /**
- *  @file
- *  @brief A version of emp_assert that throws a runtime error if compiled with -DEMP_OPTIONAL_THROW_ON.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2024 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  This is useful if you want the option to throw a runtime error outside of debug mode. A common use
- *  case is wrapping C++ code in Python, since segfaults kill the entire Python interpreter.
+ * @file include/emp/base/optional_throw.hpp
+ * @brief Like emp_assert, but throws a runtime error if compiled with -DEMP_OPTIONAL_THROW_ON.
+ *
+ * Useful if you want the option to throw a runtime error outside of debug mode. A common use
+ * case is wrapping C++ code in Python, since segfaults kill the entire Python interpreter.
  */
 
-#ifndef EMP_BASE_OPTIONAL_THROW_HPP_INCLUDE
-#define EMP_BASE_OPTIONAL_THROW_HPP_INCLUDE
+#pragma once
 
+#ifndef INCLUDE_EMP_BASE_OPTIONAL_THROW_HPP_GUARD
+#define INCLUDE_EMP_BASE_OPTIONAL_THROW_HPP_GUARD
+
+#include "_optional_throw.hpp"
 #include "assert.hpp"
 
 /// NDEBUG should trigger its EMP equivalent.
 #ifdef NDEBUG
 #define EMP_NDEBUG
-#endif
+#endif  // #ifdef NDEBUG
 
 
-#if defined( EMP_OPTIONAL_THROW_ON )
+#if defined(EMP_OPTIONAL_THROW_ON)
 
-  // #if defined (_MSC_VER )
-
-  #define emp_optional_throw(TEST, MESSAGE)                                     \
+#define emp_optional_throw(TEST, MESSAGE)                                 \
     do {                                                                  \
       if (!(TEST)) {                                                      \
-        emp::assert_throw_opt(__FILE__, __LINE__, #TEST, MESSAGE, 0);                \
+        emp::assert_throw_opt(__FILE__, __LINE__, #TEST, MESSAGE, 0);     \
       }                                                                   \
     } while(0)
 
-  /* #define emp_optional_throw_impl(TEST, MESSAGE) emp_optional_throw_mscv_impl(TEST, MESSAGE)
+#elif defined(EMP_NDEBUG)  // #if defined(EMP_OPTIONAL_THROW_ON)
 
-  / #else
+#define emp_optional_throw(...)
 
-  / #define emp_optional_throw_impl(...)                                     \
-  /   do {                                                                  \
-  /     if (!(emp_assert_GET_ARG_1(__VA_ARGS__, ~))) {                      \
-  /       emp::assert_throw(                                             \
-  /       __FILE__, __LINE__,                                               \
-  /       emp_assert_STRINGIFY( emp_assert_GET_ARG_1(__VA_ARGS__, ~),  ),   \
-  /       emp_assert_STRINGIFY( emp_assert_GET_ARG_2(__VA_ARGS__, ~),  ),   \
-  /       emp_assert_TO_PAIRS(__VA_ARGS__));                                       \
-  /     }                                                                   \
-  /   } while(0)
+#else  // #if defined(EMP_OPTIONAL_THROW_ON) : #elif defined(EMP_NDEBUG)
+/// Require a specified condition to be true. If it is false, immediately
+/// halt execution. Print also extra information on any variables or
+/// expressions provided as variadic args. Note: If NDEBUG is defined,
+/// emp_assert() will not do anything. Due to macro parsing limitations, extra
+/// information will not be printed when compiling with MSVC.
+#define emp_optional_throw(...) emp_assert(__VA_ARGS__)
 
-  /   #endif
-
-    / #define emp_optional_throw(...) emp_optional_throw_impl(__VA_ARGS__)
-  */
-#elif defined( EMP_NDEBUG )
-
-  #define emp_optional_throw(...)
-
-#else
-  /// Require a specified condition to be true. If it is false, immediately
-  /// halt execution. Print also extra information on any variables or
-  /// expressions provided as variadic args. Note: If NDEBUG is defined,
-  /// emp_assert() will not do anything. Due to macro parsing limitations, extra
-  /// information will not be printed when compiling with MSVC.
-  #define emp_optional_throw(...) emp_assert(__VA_ARGS__)
-
-#endif
+#endif  // #if defined(EMP_OPTIONAL_THROW_ON) : #elif defined(EMP_NDEBUG) : #else
 
 
-#endif // #ifndef EMP_BASE_OPTIONAL_THROW_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_BASE_OPTIONAL_THROW_HPP_GUARD
+
+// Local settings for Empecable file checker.
+// empecable_words: mscv

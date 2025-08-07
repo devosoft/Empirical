@@ -11,7 +11,7 @@ CFLAGS_all := -std=c++20 -Wall -Wno-unused-function -I../../include/
 
 # Emscripten compiler information
 CXX_web := emcc
-CXX_native := g++
+CXX_native := c++
 
 OFLAGS_native_debug := -g -DEMP_TRACK_MEM  -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -Wconversion -Weffc++
 OFLAGS_native_opt := -O3 -DNDEBUG

@@ -96,7 +96,7 @@ void TogglePlay()
 
 int main()
 {
-  doc << "<h2>Spatial Prisoner's Dilema</h2>";
+  doc << "<h2>Spatial Prisoner's Dilemma</h2>";
   auto canvas = doc.AddCanvas(world_size, world_size, "canvas");
   // canvas.On("click", CanvasClick);
   auto & anim = doc.AddAnimation("anim_world", [](){

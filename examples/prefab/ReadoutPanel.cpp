@@ -36,3 +36,6 @@ int main() {
   adder.SetAttr("class", "btn btn-primary");
   doc << adder;
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: btn

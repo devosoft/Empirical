@@ -1,19 +1,20 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2017-2018
-*/
 /**
- *  @file
- *  @brief Handle reflection on organisms to setup reasonable defaults in World.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2017-2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  @note None of the functions defined here should be called from outside the world object;
- *        as such the comments below are not in Doxygen format and should only be used by
- *        LIBRARY developers working on World.
+ * @file include/emp/Evolve/World_reflect.hpp
+ * @brief Handle reflection on organisms to setup reasonable defaults in World.
+ *
+ * @note None of the functions defined here should be called from outside the world object;
+ *       as such the comments below are not in Doxygen format and should only be used by
+ *       LIBRARY developers working on World.
  */
 
-#ifndef EMP_EVOLVE_WORLD_REFLECT_HPP_INCLUDE
-#define EMP_EVOLVE_WORLD_REFLECT_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_EVOLVE_WORLD_REFLECT_HPP_GUARD
+#define INCLUDE_EMP_EVOLVE_WORLD_REFLECT_HPP_GUARD
 
 #include <functional>
 #include <type_traits>
@@ -29,33 +30,35 @@ namespace emp {
     // Setup Fitness reflection.
     // 0. A manually set fitness function will override any of the options below.
     // 1. If an organism has a "GetFitness()" member function, use it!
-    // 2. If an organim can be cast to double, use it!
+    // 2. If an organism can be cast to double, use it!
     // 3. Start with a fitness function that throws an assert indicating function must be set.
 
     using std::declval;
 
     template <typename WORLD, typename ORG>
-    void SetDefaultFitFun_impl(WORLD & world, bool_decoy<decltype( declval<ORG>().GetFitness() )>) {
-      world.SetFitFun( [](ORG & org){ return (double) org.GetFitness(); } );
+    void SetDefaultFitFun_impl(WORLD & world, bool_decoy<decltype(declval<ORG>().GetFitness())>) {
+      world.SetFitFun([](ORG & org) { return (double) org.GetFitness(); });
     }
 
     template <typename WORLD, typename ORG>
-    void SetDefaultFitFun_impl(WORLD & world, int_decoy<decltype( (double) declval<ORG>() )>) {
-      world.SetFitFun( [](ORG & org){ return (double) org; } );
+    void SetDefaultFitFun_impl(WORLD & world, int_decoy<decltype((double) declval<ORG>())>) {
+      world.SetFitFun([](ORG & org) { return (double) org; });
     }
 
     template <typename WORLD, typename ORG>
-    void SetDefaultFitFun_impl(WORLD & world, ... ) {
-      world.SetFitFun( [](ORG & /* org */){
+    void SetDefaultFitFun_impl(WORLD & world, ...) {
+      world.SetFitFun([](ORG & /* org */) {
         emp_assert(false, "No default fitness function available");
         return 0.0;
-      } );
+      });
     }
 
-  }
+  }  // namespace
 
   template <typename WORLD, typename ORG>
-  void SetDefaultFitFun(WORLD & world) { SetDefaultFitFun_impl<WORLD, ORG>(world, true); }
+  void SetDefaultFitFun(WORLD & world) {
+    SetDefaultFitFun_impl<WORLD, ORG>(world, true);
+  }
 
   namespace {
     // Setup Mutation function
@@ -64,25 +67,26 @@ namespace emp {
     // 2. Empty, with assert.
 
     template <typename WORLD, typename ORG>
-    void SetDefaultMutFun_impl(WORLD & world, bool_decoy<decltype( declval<ORG>().DoMutations( *((Random*)nullptr) ) )>) {
-      world.SetMutFun( [](ORG & org, Random & random) {
-        return (double) org.DoMutations(random);
-      } );
+    void SetDefaultMutFun_impl(
+      WORLD & world,
+      bool_decoy<decltype(declval<ORG>().DoMutations(*((Random *) nullptr)))>) {
+      world.SetMutFun([](ORG & org, Random & random) { return (double) org.DoMutations(random); });
     }
 
     template <typename WORLD, typename ORG>
-    void SetDefaultMutFun_impl(WORLD & world, ... ) {
-      world.SetMutFun( [](ORG & /* org */, Random & /* random */ ) {
+    void SetDefaultMutFun_impl(WORLD & world, ...) {
+      world.SetMutFun([](ORG & /* org */, Random & /* random */) {
         emp_assert(false, "No default DoMutations available");
         return 0;
-      } );
+      });
     }
 
-  }
+  }  // namespace
 
   template <typename WORLD, typename ORG>
-  void SetDefaultMutFun(WORLD & world) { SetDefaultMutFun_impl<WORLD, ORG>(world, true); }
-
+  void SetDefaultMutFun(WORLD & world) {
+    SetDefaultMutFun_impl<WORLD, ORG>(world, true);
+  }
 
   namespace {
     // Setup Print function
@@ -93,41 +97,44 @@ namespace emp {
     // @CAO: Also try emp::to_string ??
 
     template <typename WORLD, typename ORG>
-    void SetDefaultPrintFun_impl(WORLD & world, bool_decoy<decltype( std::declval<ORG>().Print(std::cout) )>) {
-      world.SetPrintFun( [](ORG & org, std::ostream & os){ org.Print(os); } );
+    void SetDefaultPrintFun_impl(WORLD & world,
+                                 bool_decoy<decltype(std::declval<ORG>().Print(std::cout))>) {
+      world.SetPrintFun([](ORG & org, std::ostream & os) { org.Print(os); });
     }
 
     template <typename WORLD, typename ORG>
-    void SetDefaultPrintFun_impl(WORLD & world, int_decoy<decltype( std::declval<std::ostream&>() << std::declval<const ORG &>() )>) {
-      world.SetPrintFun( [](ORG & org, std::ostream & os){ os << org; } );
+    void SetDefaultPrintFun_impl(
+      WORLD & world,
+      int_decoy<decltype(std::declval<std::ostream &>() << std::declval<const ORG &>())>) {
+      world.SetPrintFun([](ORG & org, std::ostream & os) { os << org; });
     }
 
     template <typename WORLD, typename ORG>
-    void SetDefaultPrintFun_impl(WORLD & world, ... ) {
-      world.SetPrintFun( [](ORG & /* org */, std::ostream & /* os */){
+    void SetDefaultPrintFun_impl(WORLD & world, ...) {
+      world.SetPrintFun([](ORG & /* org */, std::ostream & /* os */) {
         emp_assert(false, "No default Print function available");
-      } );
+      });
     }
 
-  }
+  }  // namespace
 
   template <typename WORLD, typename ORG>
-  void SetDefaultPrintFun(WORLD & world) { SetDefaultPrintFun_impl<WORLD, ORG>(world, true); }
-
+  void SetDefaultPrintFun(WORLD & world) {
+    SetDefaultPrintFun_impl<WORLD, ORG>(world, true);
+  }
 
   namespace {
     // Setup genome type identification
     template <typename ORG>
-    auto Org2Genome( bool_decoy< decltype( declval<ORG>().GetGenome() ) >)
-      -> std::decay_t< decltype( declval<ORG>().GetGenome() ) >;
+    auto Org2Genome(bool_decoy<decltype(declval<ORG>().GetGenome())>)
+      -> std::decay_t<decltype(declval<ORG>().GetGenome())>;
 
     template <typename ORG>
-    ORG Org2Genome( ... );
-  }
+    ORG Org2Genome(...);
+  }  // namespace
 
   template <typename ORG>
-  using find_genome_t = decltype( Org2Genome<ORG>(true) );
-
+  using find_genome_t = decltype(Org2Genome<ORG>(true));
 
   namespace {
     // Setup Org -> Genome function
@@ -135,20 +142,22 @@ namespace emp {
     // 2. Return org AS genome.
 
     template <typename WORLD, typename ORG>
-    void SetOrgGetGenome_impl(WORLD & world, bool_decoy<decltype( declval<ORG>().GetGenome() )>) {
-      world.SetGetGenomeFun( [](ORG & org) -> const auto & { return org.GetGenome(); } );
+    void SetOrgGetGenome_impl(WORLD & world, bool_decoy<decltype(declval<ORG>().GetGenome())>) {
+      world.SetGetGenomeFun([](ORG & org) -> const auto & { return org.GetGenome(); });
     }
 
     template <typename WORLD, typename ORG>
-    void SetOrgGetGenome_impl(WORLD & world, ... ) {
-      world.SetGetGenomeFun( [](ORG & org) -> const ORG & { return org; } );
+    void SetOrgGetGenome_impl(WORLD & world, ...) {
+      world.SetGetGenomeFun([](ORG & org) -> const ORG & { return org; });
     }
 
-  }
+  }  // namespace
 
   template <typename WORLD, typename ORG>
-  void SetDefaultGetGenomeFun(WORLD & world) { SetOrgGetGenome_impl<WORLD, ORG>(world, true); }
+  void SetDefaultGetGenomeFun(WORLD & world) {
+    SetOrgGetGenome_impl<WORLD, ORG>(world, true);
+  }
 
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_EVOLVE_WORLD_REFLECT_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_EVOLVE_WORLD_REFLECT_HPP_GUARD

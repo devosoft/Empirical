@@ -177,3 +177,6 @@ TEST_CASE("Test graph", "[datastructs]")
   graph.AddEdgePair(0, 3);
 
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: printsym wgraph

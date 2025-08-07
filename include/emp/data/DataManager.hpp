@@ -1,15 +1,16 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2017-2018
-*/
 /**
- *  @file
- *  @brief DataManager handles a set of DataNode objects with the same tracking settings.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2017-2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/data/DataManager.hpp
+ * @brief DataManager handles a set of DataNode objects with the same tracking settings.
  */
 
-#ifndef EMP_DATA_DATAMANAGER_HPP_INCLUDE
-#define EMP_DATA_DATAMANAGER_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_DATA_DATA_MANAGER_HPP_GUARD
+#define INCLUDE_EMP_DATA_DATA_MANAGER_HPP_GUARD
 
 #include <map>
 #include <stddef.h>
@@ -33,30 +34,30 @@ namespace emp {
 
   public:
     DataManager() : node_map() { ; }
+
     ~DataManager() {
-      for (auto & x : node_map) delete x.second;
+      for (auto & x : node_map) { delete x.second; }
     }
 
     // so we can use range-based for loops
     auto begin() { return std::begin(node_map); }
+
     auto end() { return std::end(node_map); }
 
     // so we can use range-based for loops with const
     auto begin() const { return std::begin(node_map); }
+
     auto end() const { return std::end(node_map); }
 
     /// @returns the number of DataNodes in this DataManager
     size_t GetSize() const { return node_map.size(); }
+
     /// @returns the std::map mapping node names (strings) to DataNodes
     auto & GetNodes() const { return node_map; }
 
-    bool HasNode(const std::string & name) {
-      return Has(node_map, name);
-    }
+    bool HasNode(const std::string & name) { return Has(node_map, name); }
 
-    bool HasNoNode(const std::string & name) {
-      return !Has(node_map, name);
-    }
+    bool HasNoNode(const std::string & name) { return !Has(node_map, name); }
 
     /// Creates and adds a new DataNode
     /// @param name the name of the DataNode
@@ -114,10 +115,10 @@ namespace emp {
      *  the data::Archive attribute, this creates a new vector to start storing
      *  data, retaining the old one in the archive. */
     void ResetAll() {
-      for (auto & x : node_map) x.second->Reset();
+      for (auto & x : node_map) { x.second->Reset(); }
     }
   };
 
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_DATA_DATAMANAGER_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_DATA_DATA_MANAGER_HPP_GUARD

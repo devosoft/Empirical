@@ -23,7 +23,7 @@
 EMP_BUILD_CONFIG( EcoConfig,
   GROUP(DEFAULT, "Default settings for NK model"),
   VALUE(SEED, int, 0, "Random number seed (0 for based on time)"),
-  VALUE(POP_SIZE, uint32_t, 200, "Number of organisms in the popoulation."),
+  VALUE(POP_SIZE, uint32_t, 200, "Number of organisms in the population."),
   VALUE(GENOME_SIZE, uint32_t, 100, "Length of genome."),
   VALUE(UPDATES, uint32_t, 100, "How many generations should we process?"),
   VALUE(EVAL_TIME, uint32_t, 500, "How many bit positions should be randomized?"),
@@ -170,7 +170,7 @@ int main(int argc, char* argv[])
   const size_t UPDATES = config.UPDATES();
   const size_t TOURNY_SIZE = config.TOURNY_SIZE();
 
-  // Build a random initial popoulation.
+  // Build a random initial population.
   for (size_t i = 0; i < POP_SIZE; i++) {
     emp::AvidaGP cpu;
     cpu.PushRandom(random, GENOME_SIZE);
@@ -551,3 +551,6 @@ int main(int argc, char* argv[])
 
   return 0;
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: funcs randomw ecogradient

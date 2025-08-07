@@ -1,0 +1,38 @@
+Checks: |
+  bugprone-*,
+   -bugprone-easily-swappable-parameters,
+  cert-*,
+  clang-analyzer-*
+  misc-*
+   -misc-no-recursion
+  modernize-*
+   -modernize-use-trailing-return-type
+  performance-*
+   -performance-avoid-endl
+  portability-*
+  readability-*
+   -readability-identifier-length
+  cppcoreguidelines-*
+   -cppcoreguidelines-avoid-do-while
+   -cppcoreguidelines-pro-bounds-array-to-pointer-decay
+   -cppcoreguidelines-pro-bounds-pointer-arithmetic
+#  -cppcoreguidelines-pro-type-vararg
+#  -cppcoreguidelines-owning-memory
+#  -readability-magic-numbers
+
+WarningsAsErrors: '*'
+
+# CheckOptions:
+#   - key:             modernize-use-nullptr.NullMacros
+#     value:           'NULL'
+#   - key:             modernize-use-using.CheckAliasTemplates
+#     value:           true
+#   - key:             readability-identifier-naming.VariableCase
+#     value:           lower_case  # You can customize to match your naming rules
+#   - key:             readability-identifier-naming.ClassCase
+#     value:           CamelCase
+#   - key:             readability-identifier-naming.FunctionCase
+#     value:           camelBack
+
+HeaderFilterRegex: '^(include/|demos/|examples/|tests/)'  # Ignore third party, etc.
+FormatStyle: file  # Use .clang-format

@@ -571,3 +571,6 @@ int main() {
 
   test_runner.Run();
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: sooo cassert javascript

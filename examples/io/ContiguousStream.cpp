@@ -44,3 +44,6 @@ int main() {
   return 0;
 
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: verflow lkdfja kfjsa ksdjfksajdkjfjjjjasdf jsad callo

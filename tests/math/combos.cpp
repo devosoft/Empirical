@@ -63,3 +63,6 @@ TEST_CASE("Test combos", "[math]")
     REQUIRE(cid.GetInverseCombo()[i] == first_inverse + i);
   }
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: cid

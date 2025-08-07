@@ -24,7 +24,7 @@
 #define TRIPLE_INPUT(VAL) VAL+VAL+VAL
 
 // Define the main function like the one below.  You do NOT create main(); that will be done
-// for you and cammand-line arguments will be handled automatically.
+// for you and command-line arguments will be handled automatically.
 
 void emp_test_main()
 {

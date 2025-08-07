@@ -67,3 +67,6 @@ int main()
   std::cout << "Next position found: " << found_pos << std::endl;
 
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: wxy qrstuv hij klm cde

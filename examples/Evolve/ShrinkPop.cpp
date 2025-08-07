@@ -69,7 +69,7 @@ int main()
   for (size_t i = 0; i < POP_SIZE; i++) grid_world.InjectAt((int)i%10,i);
 
   // What does the grid look like after inject?
-  std::cout << "Mass action, BEFORE Bottlneck(20):" << std::endl;
+  std::cout << "Mass action, BEFORE Bottleneck(20):" << std::endl;
   grid_world.PrintOrgCounts();
 
   grid_world.DoBottleneck(20);

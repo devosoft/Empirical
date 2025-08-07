@@ -1,7 +1,7 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2021
+ *  date: 2024-2025
 */
 /**
  *  @file
@@ -13,4 +13,36 @@
 
 TEST_CASE("Test debug", "[debug]")
 {
+  EMP_TRACK_LINE("Test1");
+  EMP_TRACK_LINE("Test2");
+  EMP_TRACK_LINE("Test3");
+
+#ifdef NDEBUG
+  // In release mode, the above tracking lines should not have done anything.
+  CHECK(emp::HasDebugLine("Test1") == false);
+  CHECK(emp::HasDebugLine("Test2") == false);
+  CHECK(emp::HasDebugLine("Test3") == false);
+#else
+  // In DEBUG mode, we should be able to recover the lines from the above tags.
+  CHECK(emp::GetDebugLine("Test1") == "debug.cpp:16");
+  CHECK(emp::GetDebugLine("Test2") == "debug.cpp:17");
+  CHECK(emp::GetDebugLine("Test3") == "debug.cpp:18");
+#endif
+
+  EMP_TRACK_LINE("Test4");
+
+  // Make sure they all work a second time and test the new one...
+#ifdef NDEBUG
+  // In release mode, the above tracking lines should not have done anything.
+  CHECK(emp::HasDebugLine("Test1") == false);
+  CHECK(emp::HasDebugLine("Test2") == false);
+  CHECK(emp::HasDebugLine("Test3") == false);
+  CHECK(emp::HasDebugLine("Test4") == false);
+#else
+  // In DEBUG mode, we should be able to recover the lines from the above tags.
+  CHECK(emp::GetDebugLine("Test1") == "debug.cpp:16");
+  CHECK(emp::GetDebugLine("Test2") == "debug.cpp:17");
+  CHECK(emp::GetDebugLine("Test3") == "debug.cpp:18");
+  CHECK(emp::GetDebugLine("Test4") == "debug.cpp:32");
+#endif
 }

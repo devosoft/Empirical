@@ -265,3 +265,6 @@ int main()
   EM_ASM({ $('#(x)'); });  // <-- What is this needed for?  Clicking on the canvas doesn't work without it.
 
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: inv vis

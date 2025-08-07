@@ -1,15 +1,16 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2021-2022
-*/
 /**
- *  @file
- *  @brief UI framework for live statistic readouts.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2021-2022 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/prefab/ReadoutPanel.hpp
+ * @brief UI framework for live statistic readouts.
  */
 
-#ifndef EMP_PREFAB_READOUTPANEL_HPP_INCLUDE
-#define EMP_PREFAB_READOUTPANEL_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_PREFAB_READOUT_PANEL_HPP_GUARD
+#define INCLUDE_EMP_PREFAB_READOUT_PANEL_HPP_GUARD
 
 #include "../tools/string_utils.hpp"
 #include "../web/Animate.hpp"
@@ -20,7 +21,7 @@
 
 namespace emp::prefab {
 
-  #ifndef DOXYGEN_SHOULD_SKIP_THIS
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
     /**
      * Shared pointer held by instances of ReadoutPanel class representing
@@ -37,26 +38,21 @@ namespace emp::prefab {
        * Construct a shared pointer to manage ReadoutPanel state.
        * @param in_id HTML ID of ReadoutPanel div
        */
-      ReadoutPanelInfo(const std::string & in_id="") : CardInfo(in_id) { ; }
+      ReadoutPanelInfo(const std::string & in_id = "") : CardInfo(in_id) { ; }
 
       /**
        * Add a div to the list of divs redrawn every refresh period.
        * @param liv a div (probably containing some Live value)
        */
-      void AddLiveDiv(emp::web::Div & liv) {
-        live_divs.push_back(liv);
-      }
+      void AddLiveDiv(emp::web::Div & liv) { live_divs.push_back(liv); }
 
       /**
        * @return a vector of divs redrawn every refresh period.
        */
-      emp::vector<emp::web::Div> & GetLiveDivs() {
-        return live_divs;
-      }
-
+      emp::vector<emp::web::Div> & GetLiveDivs() { return live_divs; }
     };
-  }
-  #endif // DOXYGEN_SHOULD_SKIP_THIS
+  }  // namespace internal
+#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
   /**
    * Use a ReadoutPanel to display a collection of related live values
@@ -70,9 +66,7 @@ namespace emp::prefab {
      *
      * @return cast pointer
      */
-    internal::ReadoutPanelInfo * Info() {
-      return dynamic_cast<internal::ReadoutPanelInfo *>(info);
-    }
+    internal::ReadoutPanelInfo * Info() { return dynamic_cast<internal::ReadoutPanelInfo *>(info); }
 
     /**
      * Get shared info pointer, cast to const ReadoutPanel-specific type.
@@ -92,17 +86,17 @@ namespace emp::prefab {
      * @param id a user defined ID for ReadoutPanel div (default is emscripten generated)
      */
     ReadoutPanel(const std::string & group_name,
-      const double refresh_milliseconds=250,
-      const std::string & state="INIT_OPEN",
-      const bool & show_glyphs=true,
-      const std::string & id=""
-    ) : ReadoutPanel(
-      group_name,
-      refresh_milliseconds,
-      state,
-      show_glyphs,
-      new internal::ReadoutPanelInfo(id)
-    ) { ; }
+                 const double refresh_milliseconds = 250,
+                 const std::string & state         = "INIT_OPEN",
+                 const bool & show_glyphs          = true,
+                 const std::string & id            = "")
+      : ReadoutPanel(group_name,
+                     refresh_milliseconds,
+                     state,
+                     show_glyphs,
+                     new internal::ReadoutPanelInfo(id)) {
+      ;
+    }
 
   protected:
     // The div to hold the LiveValueDisplays for when content is added.
@@ -125,12 +119,11 @@ namespace emp::prefab {
      * this ReadoutPanel or a pointer to a derived info object (simulating inheritance)
      */
     ReadoutPanel(const std::string & group_name,
-      double refresh_milliseconds,
-      const std::string & state,
-      const bool & show_glyphs,
-      internal::ReadoutPanelInfo * in_info
-    ) : Card(state, show_glyphs, in_info) {
-
+                 double refresh_milliseconds,
+                 const std::string & state,
+                 const bool & show_glyphs,
+                 internal::ReadoutPanelInfo * in_info)
+      : Card(state, show_glyphs, in_info) {
       // Best to cast to Card in case we decide to overload the stream
       // operator to do something special for this class later
       static_cast<Card>(*this) << values;
@@ -139,44 +132,36 @@ namespace emp::prefab {
 
       auto & live_divs = Info()->GetLiveDivs();
       // Animation is referenced by this component's ID
-      AddAnimation(GetID(), [
-        elapsed_milliseconds = 0.0, refresh_milliseconds, &live_divs
-      ](double stepTime) mutable {
-        // Accumulate steps, then redraw after enough time has elapsed
-        elapsed_milliseconds += stepTime;
-        if (elapsed_milliseconds > refresh_milliseconds) {
-          elapsed_milliseconds -= refresh_milliseconds;
-          for(emp::web::Div & div : live_divs) {
-            div.Redraw();
-          }
-        }
-        // Might not be necessary, but if elapsed time got to 2x
-        // the refresh period, redraws are being severely delayed by
-        // something. Setting to zero in this case has the effect of
-        // dropping frames to prevent choking execution with redraws.
-        if (elapsed_milliseconds > refresh_milliseconds) {
-          elapsed_milliseconds = 0;
-        }
-      });
+      AddAnimation(GetID(),
+                   [elapsed_milliseconds = 0.0, refresh_milliseconds, &live_divs](
+                     double stepTime) mutable {
+                     // Accumulate steps, then redraw after enough time has elapsed
+                     elapsed_milliseconds += stepTime;
+                     if (elapsed_milliseconds > refresh_milliseconds) {
+                       elapsed_milliseconds -= refresh_milliseconds;
+                       for (emp::web::Div & div : live_divs) { div.Redraw(); }
+                     }
+                     // Might not be necessary, but if elapsed time got to 2x
+                     // the refresh period, redraws are being severely delayed by
+                     // something. Setting to zero in this case has the effect of
+                     // dropping frames to prevent choking execution with redraws.
+                     if (elapsed_milliseconds > refresh_milliseconds) { elapsed_milliseconds = 0; }
+                   });
 
-      auto * main = & this->Animate(GetID());
-      main->Start(); // Start the animation
+      auto * main = &this->Animate(GetID());
+      main->Start();  // Start the animation
       if (state != "STATIC") {
         // TODO: make this double-click safe
-        SetOnToggle([main](){
-          main->ToggleActive();
-        });
+        SetOnToggle([main]() { main->ToggleActive(); });
       }
-
     }
 
-    /// A helper function to formate IDs generated for sub-components
+    /// A helper function to format IDs generated for sub-components
     inline static std::string FormatName(const std::string & name) {
       return to_lower(join(slice(name, ' '), "_"));
     }
 
   public:
-
     /**
      * Adds a LiveValueDisplay to this component and adds the value's
      * parent div to a list of divs to be redrawn at the refresh rate.
@@ -186,12 +171,10 @@ namespace emp::prefab {
      *
      * @return the readout panel for chaining calls
      */
-    template<typename VALUE_TYPE>
-    ReadoutPanel & AddValue(
-      const std::string & name,
-      const std::string & desc,
-      VALUE_TYPE && value
-    ) {
+    template <typename VALUE_TYPE>
+    ReadoutPanel & AddValue(const std::string & name,
+                            const std::string & desc,
+                            VALUE_TYPE && value) {
       const std::string vd_name(emp::to_string(GetID(), "_", FormatName(name)));
       LiveValueDisplay lvd(name, desc, std::forward<VALUE_TYPE>(value), false, vd_name);
       values << lvd;
@@ -199,26 +182,25 @@ namespace emp::prefab {
       Info()->AddLiveDiv(view);
       return (*this);
     }
+
     /**
      * A version of AddValue that can take multiple name, description, value tuples
      * for ease of use when adding lots of values.
      */
-    template<typename VALUE_TYPE, typename... OTHER_VALUES>
-    ReadoutPanel & AddValues(
-      const std::string & name,
-      const std::string & desc,
-      VALUE_TYPE && value,
-      OTHER_VALUES && ... others
-    ) {
+    template <typename VALUE_TYPE, typename... OTHER_VALUES>
+    ReadoutPanel & AddValues(const std::string & name,
+                             const std::string & desc,
+                             VALUE_TYPE && value,
+                             OTHER_VALUES &&... others) {
       AddValue(name, desc, std::forward<VALUE_TYPE>(value));
       return AddValues(std::forward<OTHER_VALUES>(others)...);
     }
-    ReadoutPanel & AddValues() {
-      return (*this);
-    }
 
-
+    ReadoutPanel & AddValues() { return (*this); }
   };
-}
+}  // namespace emp::prefab
 
-#endif // #ifndef EMP_PREFAB_READOUTPANEL_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_PREFAB_READOUT_PANEL_HPP_GUARD
+
+// Local settings for Empecable file checker.
+// empecable_words: lvd liv

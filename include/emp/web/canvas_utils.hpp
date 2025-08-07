@@ -1,18 +1,19 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2018
-*/
 /**
- *  @file
- *  @brief Various versions of the Draw() function to draw images onto a canvas.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2015-2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  Each version of Draw() takes a canvas widget and some form of data to be drawn on the widget,
- *  such as a circle, a bit matrix, or a geometric surface.
+ * @file include/emp/web/canvas_utils.hpp
+ * @brief Various versions of the Draw() function to draw images onto a canvas.
+ *
+ * Each version of Draw() takes a canvas widget and some form of data to be drawn on the widget,
+ * such as a circle, a bit matrix, or a geometric surface.
  */
 
-#ifndef EMP_WEB_CANVAS_UTILS_HPP_INCLUDE
-#define EMP_WEB_CANVAS_UTILS_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_WEB_CANVAS_UTILS_HPP_GUARD
+#define INCLUDE_EMP_WEB_CANVAS_UTILS_HPP_GUARD
 
 #include <stddef.h>
 
@@ -20,14 +21,13 @@
 #include "../bits/BitMatrix.hpp"
 #include "../Evolve/StateGrid.hpp"
 #include "../geometry/Circle2D.hpp"
-#include "../geometry/Surface2D.hpp"
 #include "../geometry/Surface.hpp"
+#include "../geometry/Surface2D.hpp"
 
 #include "Canvas.hpp"
 #include "color_map.hpp"
 
-namespace emp {
-namespace web {
+namespace emp { namespace web {
 
 
   /// Draw a Circle onto the canvas.
@@ -35,10 +35,10 @@ namespace web {
   /// @param circle The circle to draw
   /// @param fill The color to fill the circle with
   /// @param line The color of the circle's outline
-  void Draw(Canvas canvas, const emp::Circle & circle,
-            const std::string & fill="",
-            const std::string & line="")
-  {
+  void Draw(Canvas canvas,
+            const emp::Circle & circle,
+            const std::string & fill = "",
+            const std::string & line = "") {
     canvas.Clear();
     canvas.Draw(circle, fill, line);
   }
@@ -50,8 +50,7 @@ namespace web {
   /// @param w The width of the matrix (number of columns)
   /// @param h The height of the matrix (number of rows)
   template <size_t COLS, size_t ROWS>
-  void Draw(Canvas canvas, const BitMatrix<COLS,ROWS> & matrix, double w, double h)
-  {
+  void Draw(Canvas canvas, const BitMatrix<COLS, ROWS> & matrix, double w, double h) {
     canvas.Clear();
 
     double cell_w = w / (double) COLS;
@@ -59,9 +58,7 @@ namespace web {
 
     for (size_t x = 0; x < COLS; x++) {
       for (size_t y = 0; y < ROWS; y++) {
-        if (matrix.Get(x,y)) {
-          canvas.Rect({x*cell_w, y*cell_h}, cell_w, cell_h, "black");
-        }
+        if (matrix.Get(x, y)) { canvas.Rect({x * cell_w, y * cell_h}, cell_w, cell_h, "black"); }
       }
     }
   }
@@ -74,15 +71,14 @@ namespace web {
   template <typename... BODY_TYPES>
   void Draw(Canvas canvas,
             const Surface<BODY_TYPES...> & surface,
-            const emp::vector<std::string> & color_map)
-  {
+            const emp::vector<std::string> & color_map) {
     canvas.Clear();
 
     const double w = surface.GetWidth();
     const double h = surface.GetHeight();
 
     // Setup a black background for the surface
-    canvas.Rect({0,0}, w, h, "black");
+    canvas.Rect({0, 0}, w, h, "black");
 
     // Draw the circles.
     const auto & body_set = surface.GetBodySet();
@@ -101,8 +97,7 @@ namespace web {
   /// @param surface A surface containing a set of shapes to draw.
   /// @param num_colors The number of distinct colors to use in visualization.
   template <typename... BODY_TYPES>
-  void Draw(Canvas canvas, const Surface<BODY_TYPES...> & surface, size_t num_colors)
-  {
+  void Draw(Canvas canvas, const Surface<BODY_TYPES...> & surface, size_t num_colors) {
     Draw(canvas, surface, GetHueMap(num_colors));
   }
 
@@ -116,15 +111,14 @@ namespace web {
   template <typename BODY_TYPE>
   void Draw(Canvas canvas,
             const Surface2D<BODY_TYPE> & surface,
-            const emp::vector<std::string> & color_map)
-  {
+            const emp::vector<std::string> & color_map) {
     canvas.Clear();
 
     const double w = surface.GetWidth();
     const double h = surface.GetHeight();
 
     // Setup a black background for the surface
-    canvas.Rect({0,0}, w, h, "black");
+    canvas.Rect({0, 0}, w, h, "black");
 
     // Draw the circles.
     const auto & body_set = surface.GetConstBodySet();
@@ -143,11 +137,9 @@ namespace web {
   /// @param surface A surface containing a set of shapes to draw.
   /// @param num_colors The number of distinct colors to use in visualization.
   template <typename BODY_TYPE>
-  void Draw(Canvas canvas, const Surface2D<BODY_TYPE> & surface, size_t num_colors)
-  {
+  void Draw(Canvas canvas, const Surface2D<BODY_TYPE> & surface, size_t num_colors) {
     Draw(canvas, surface, GetHueMap(num_colors));
   }
-
 
   /// Draw a grid onto a canvas.
   /// @param canvas The Canvas to draw on.
@@ -159,26 +151,27 @@ namespace web {
   /// @param offset_x How far should we shift the grid relative to the left side of the canvas?
   /// @param offset_y How far should we shift the grid relative to the top of the canvas?
   void Draw(Canvas canvas,
-            const emp::vector<emp::vector<size_t>> & grid,
+            const emp::vector < emp::vector < size_t >> &grid,
             const emp::vector<std::string> & color_map,
             std::string line_color,
-            double cell_width, double cell_height,
-            double offset_x, double offset_y)
-  {
+            double cell_width,
+            double cell_height,
+            double offset_x,
+            double offset_y) {
     canvas.Clear();
 
     // Setup a black background for the grid.
-    canvas.Rect({0,0}, canvas.GetWidth(), canvas.GetHeight(), "black");
+    canvas.Rect({0, 0}, canvas.GetWidth(), canvas.GetHeight(), "black");
 
     // Fill out the grid!
     const size_t grid_rows = grid.size();
     const size_t grid_cols = grid[0].size();
     for (size_t row = 0; row < grid_rows; row++) {
-      const double cur_y = offset_y + row*cell_height;
+      const double cur_y = offset_y + row * cell_height;
       for (size_t col = 0; col < grid_cols; col++) {
-        const double cur_x = offset_x + col*cell_width;
+        const double cur_x            = offset_x + col * cell_width;
         const std::string & cur_color = color_map[grid[row][col]];
-        canvas.Rect({cur_x,cur_y}, cell_width, cell_height, cur_color, line_color);
+        canvas.Rect({cur_x, cur_y}, cell_width, cell_height, cur_color, line_color);
       }
     }
   }
@@ -191,15 +184,15 @@ namespace web {
   /// @param cell_w How many pixels wide is each cell to draw?
   /// @param cell_h How many pixels tall is each cell to draw?
   void Draw(Canvas canvas,
-            const emp::vector<emp::vector<size_t>> & grid,
+            const emp::vector < emp::vector < size_t >> &grid,
             const emp::vector<std::string> & color_map,
             std::string line_color,
-            double cell_w, double cell_h)
-  {
+            double cell_w,
+            double cell_h) {
     const double canvas_w = canvas.GetWidth();
     const double canvas_h = canvas.GetHeight();
-    const double grid_w = cell_w * grid[0].size();
-    const double grid_h = cell_h * grid.size();
+    const double grid_w   = cell_w * grid[0].size();
+    const double grid_h   = cell_h * grid.size();
 
     // Center the grid on the canvas if there's extra room.
     const double offset_x = (canvas_w <= grid_w) ? 0 : (canvas_w - grid_w) / 2;
@@ -215,10 +208,9 @@ namespace web {
   /// @param color_map Mapping of values to the colors with which they should be associated.
   /// @param line_color The background line color for the grid.
   void Draw(Canvas canvas,
-            const emp::vector<emp::vector<size_t>> & grid,
+            const emp::vector < emp::vector < size_t >> &grid,
             const emp::vector<std::string> & color_map,
-            std::string line_color="black")
-  {
+            std::string line_color = "black") {
     // Determine the cell width & height
     const double cell_w = canvas.GetWidth() / grid[0].size();
     const double cell_h = canvas.GetHeight() / grid.size();
@@ -241,23 +233,24 @@ namespace web {
             size_t grid_cols,
             const emp::vector<std::string> & color_map,
             std::string line_color,
-            double cell_width, double cell_height,
-            double offset_x, double offset_y)
-  {
+            double cell_width,
+            double cell_height,
+            double offset_x,
+            double offset_y) {
     canvas.Clear();
 
     // Setup a black background for the grid.
-    canvas.Rect({0,0}, canvas.GetWidth(), canvas.GetHeight(), "black");
+    canvas.Rect({0, 0}, canvas.GetWidth(), canvas.GetHeight(), "black");
 
     // Fill out the grid!
     const size_t grid_rows = grid.size() / grid_cols;
-    size_t id = 0;
+    size_t id              = 0;
     for (size_t row = 0; row < grid_rows; row++) {
-      const double cur_y = offset_y + row*cell_height;
+      const double cur_y = offset_y + row * cell_height;
       for (size_t col = 0; col < grid_cols; col++) {
-        const double cur_x = offset_x + col*cell_width;
+        const double cur_x            = offset_x + col * cell_width;
         const std::string & cur_color = color_map[grid[id++]];
-        canvas.Rect({cur_x,cur_y}, cell_width, cell_height, cur_color, line_color);
+        canvas.Rect({cur_x, cur_y}, cell_width, cell_height, cur_color, line_color);
       }
     }
   }
@@ -270,8 +263,7 @@ namespace web {
   void Draw(Canvas canvas,
             const StateGrid & state_grid,
             const emp::vector<std::string> & color_map,
-            std::string line_color="black")
-  {
+            std::string line_color = "black") {
     // Determine the canvas info.
     const double canvas_w = canvas.GetWidth();
     const double canvas_h = canvas.GetHeight();
@@ -291,18 +283,20 @@ namespace web {
     canvas.Clear();
 
     // Setup a black background for the grid.
-    canvas.Rect({0,0}, canvas.GetWidth(), canvas.GetHeight(), line_color);
+    canvas.Rect({0, 0}, canvas.GetWidth(), canvas.GetHeight(), line_color);
 
     // Fill out the grid!
     size_t id = 0;
     for (size_t row = 0; row < state_grid.GetHeight(); row++) {
-      const double cur_y = offset_y + row*cell_h;
+      const double cur_y = offset_y + row * cell_h;
       for (size_t col = 0; col < state_grid.GetWidth(); col++) {
-        const double cur_x = offset_x + col*cell_w;
-        const int state = state_grid.GetStates()[id++];
-        if (state < 0) continue; // leave negative-number squares blank...
+        const double cur_x = offset_x + col * cell_w;
+        const int state    = state_grid.GetStates()[id++];
+        if (state < 0) {
+          continue;  // leave negative-number squares blank...
+        }
         const std::string & cur_color = color_map[(size_t) state];
-        canvas.Rect({cur_x,cur_y}, cell_w, cell_h, cur_color, line_color);
+        canvas.Rect({cur_x, cur_y}, cell_w, cell_h, cur_color, line_color);
       }
     }
   }
@@ -314,41 +308,44 @@ namespace web {
   /// @param cols Number of columns to draw in the grid.
   /// @param bg_color The background color for the grid.
   /// @param line_color The color of the liens on the grid.
-  void DrawGridBG(Canvas canvas, size_t rows, size_t cols,
-                  const std::string & bg_color, const std::string & line_color) {
-
+  void DrawGridBG(Canvas canvas,
+                  size_t rows,
+                  size_t cols,
+                  const std::string & bg_color,
+                  const std::string & line_color) {
     canvas.Clear(bg_color);
 
-    const double canvas_x = (double) canvas.GetWidth();
-    const double canvas_y = (double) canvas.GetHeight();
-    const double cell_width = canvas_x / cols;
+    const double canvas_x    = (double) canvas.GetWidth();
+    const double canvas_y    = (double) canvas.GetHeight();
+    const double cell_width  = canvas_x / cols;
     const double cell_height = canvas_y / rows;
 
     for (size_t i = 0; i <= cols; i++) {
       double x = cell_width * i;
-      canvas.Line( {x,0}, {x,canvas_y}, line_color);
+      canvas.Line({x, 0}, {x, canvas_y}, line_color);
     }
     for (size_t i = 0; i <= rows; i++) {
       double y = cell_height * i;
-      canvas.Line( {0,y}, {canvas_x,y}, line_color);
+      canvas.Line({0, y}, {canvas_x, y}, line_color);
     }
   }
 
   template <typename CONTAINER_T, typename POINT_FUN_T, typename COLOR_FUN_T>
-  void DrawPoints(Canvas canvas, CONTAINER_T && container, double radius,
-                  POINT_FUN_T && point_fun, COLOR_FUN_T && color_fun,
-                  const std::string & line_color="black")
-  {
+  void DrawPoints(Canvas canvas,
+                  CONTAINER_T && container,
+                  double radius,
+                  POINT_FUN_T && point_fun,
+                  COLOR_FUN_T && color_fun,
+                  const std::string & line_color = "black") {
     // Draw all of the organisms
     for (auto obj : container) {
-      const auto pos = point_fun(obj);
+      const auto pos   = point_fun(obj);
       const auto color = color_fun(obj);
       canvas.Circle(pos, radius, color, line_color);
     }
   }
 
 
-}
-}
+}}  // namespace emp::web
 
-#endif // #ifndef EMP_WEB_CANVAS_UTILS_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_WEB_CANVAS_UTILS_HPP_GUARD

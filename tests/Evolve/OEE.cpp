@@ -151,3 +151,6 @@ TEST_CASE("OEE", "[evo]") {
 
 
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: oee

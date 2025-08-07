@@ -15,8 +15,7 @@
 
 #include "emp/base/array.hpp"
 #include "emp/base/vector.hpp"
-#include "emp/bits/BitSet.hpp"
-#include "emp/bits/BitVector.hpp"
+#include "emp/bits/Bits.hpp"
 #include "emp/math/Random.hpp"
 
 #define TEST_SIZES 1, 8, 31, 32, 50, 63, 64, 100, 1000, 10000, 100000, 1000000
@@ -62,8 +61,8 @@ struct SpeedTester_impl<SIZE1, OTHER_SIZES...> : public SpeedTester_impl<OTHER_S
   // How many objects should we use?
   static constexpr size_t OBJ_COUNT = TEST_BITS / OBJ_BITS;
 
-  emp::array< emp::old::BitSet<SIZE1>, OBJ_COUNT > bs_objs;
-  emp::array< emp::old::BitVector, OBJ_COUNT > bv_objs;
+  emp::array< emp::BitSet<SIZE1>, OBJ_COUNT > bs_objs;
+  emp::array< emp::BitVector, OBJ_COUNT > bv_objs;
 
   using base_t = SpeedTester_impl<OTHER_SIZES...>;
 

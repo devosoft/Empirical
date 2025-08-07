@@ -59,3 +59,6 @@ int main()
   state2.Next("aaaa");
   state2.Print();
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: aaaa

@@ -99,7 +99,7 @@ SCENARIO("Queue Caches can be sized and resized", "[datastructs]") {
       }
 
       AND_THEN("elements past its new capacity are removed")  {
-        // make sure the cache shrunk appropiately.
+        // make sure the cache shrunk appropriately.
         REQUIRE(qch.Size() == 2);
         REQUIRE(qch.Get('a') == 0);
         REQUIRE(qch.Get('b') == 1);
@@ -203,7 +203,7 @@ SCENARIO("Queue Caches can be subscripted", "[datastructs]") {
         REQUIRE(qch.Get('z') == 3);
       }
       AND_THEN("no iterator is invalidated") {
-        // Make sure iterators weren't invalidated.
+        // Make sure iterators were not invalidated.
         REQUIRE(qch['x'] == it_x->second);
         REQUIRE(qch['y'] == it_y->second);
         REQUIRE(qch['z'] == it_z->second);
@@ -240,7 +240,7 @@ SCENARIO("Queue Caches can be iterated on", "[datastructs]") {
         CHECK(result == expected);
       }
     }
-    WHEN("we apply std::algoritms using begin() and end() iterators") {
+    WHEN("we apply std::algorithms using begin() and end() iterators") {
       emp::vector<int> result;
       const size_t distance = std::distance(
         qch.begin(),
@@ -296,3 +296,6 @@ SCENARIO("Queue Caches can contain non default-constructible values"){
     }
   }
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: qch

@@ -1,22 +1,22 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2017
-*/
 /**
- *  @file
- *  @brief An interface between an organism and the outside world.
- *  @note Status: PLANNING
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2017 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/Evolve/OrgInterface.hpp
+ * @brief An interface between an organism and the outside world.
+ * @note Status: PLANNING
  */
 
-#ifndef EMP_EVOLVE_ORGINTERFACE_HPP_INCLUDE
-#define EMP_EVOLVE_ORGINTERFACE_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_EVOLVE_ORG_INTERFACE_HPP_GUARD
+#define INCLUDE_EMP_EVOLVE_ORG_INTERFACE_HPP_GUARD
 
 namespace emp {
 
-  class OrgInterface {
-  };
+  class OrgInterface {};
 
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_EVOLVE_ORGINTERFACE_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_EVOLVE_ORG_INTERFACE_HPP_GUARD

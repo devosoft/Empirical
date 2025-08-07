@@ -1,17 +1,18 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2017
-*/
 /**
- *  @file
- *  @brief A tool to control a series of runs and keep them updated.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2017 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
  *
- *  Development notes: currently doesn't compile because of last line.
+ * @file include/emp/in_progress/BatchConfig.hpp
+ * @brief A tool to control a series of runs and keep them updated.
+ *
+ * Development notes: currently doesn't compile because of last line.
  */
 
-#ifndef EMP_IN_PROGRESS_BATCHCONFIG_HPP_INCLUDE
-#define EMP_IN_PROGRESS_BATCHCONFIG_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_IN_PROGRESS_BATCH_CONFIG_HPP_GUARD
+#define INCLUDE_EMP_IN_PROGRESS_BATCH_CONFIG_HPP_GUARD
 
 #include <functional>
 #include <stddef.h>
@@ -20,7 +21,7 @@
 
 namespace emp {
 
-  /// Class to managae a set of runs:
+  /// Class to manage a set of runs:
   /// RUN_T is the type of the object that contains the run info.
   /// CONFIG_T is the config object being used.
 
@@ -44,16 +45,17 @@ namespace emp {
     BatchConfig(const start_fun_t & f) : cur_run(0), start_fun(f) { ; }
 
     size_t GetSize() const { return runs.size(); }
-    size_t GetCurRun() const { return cur_run; }
-    CONFIG_T & GetConfig(size_t id) { return runs[id].config; }
-    const CONFIG_T & GetConfig(size_t id) const  { return runs[id].config; }
 
-    void AddRun(const CONFIG_T & in_config) {
-      runs.emplace_back(runs.size(), in_config);
-    }
+    size_t GetCurRun() const { return cur_run; }
+
+    CONFIG_T & GetConfig(size_t id) { return runs[id].config; }
+
+    const CONFIG_T & GetConfig(size_t id) const { return runs[id].config; }
+
+    void AddRun(const CONFIG_T & in_config) { runs.emplace_back(runs.size(), in_config); }
 
     bool Start() {
-      if (cur_run >= runs.size()) return false;
+      if (cur_run >= runs.size()) { return false; }
       start_fun(runs[cur_run].config);
       cur_run++;
       return true;
@@ -61,7 +63,8 @@ namespace emp {
   };
 
   // If no config type is explicitly provided, pull it from the run type.
-  template <typename RUN_T> using BatchConfig = BatchConfig<RUN_T, typename RUN_T::config_t>;
-}
+  template <typename RUN_T>
+  using BatchConfig = BatchConfig<RUN_T, typename RUN_T::config_t>;
+}  // namespace emp
 
-#endif // #ifndef EMP_IN_PROGRESS_BATCHCONFIG_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_IN_PROGRESS_BATCH_CONFIG_HPP_GUARD

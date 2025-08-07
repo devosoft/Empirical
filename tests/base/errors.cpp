@@ -50,15 +50,18 @@ TEST_CASE("Test errors", "[base]")
 TEST_CASE("Another test errors", "[tools]")
 {
   emp::TriggerExcept("test_fail", "The test failed.  *sob*");
-  emp::TriggerExcept("test_fail2", "The second test failed too.  But it's not quite as aweful.", false);
+  emp::TriggerExcept("test_fail2", "The second test failed too.  But it's not quite as awful.", false);
   emp::TriggerExcept("test_fail2", "The third test is just test 2 again, but worse", true);
 
   REQUIRE( emp::CountExcepts() == 3 );
   auto except = emp::PopExcept("test_fail2");
   REQUIRE( emp::CountExcepts() == 2 );
-  REQUIRE( except.desc == "The second test failed too.  But it's not quite as aweful." );
+  REQUIRE( except.desc == "The second test failed too.  But it's not quite as awful." );
   REQUIRE( emp::HasExcept("test_fail2") == true );
   REQUIRE( emp::HasExcept("test_fail3") == false );
   emp::ClearExcepts();
   REQUIRE( emp::CountExcepts() == 0 );
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: exc

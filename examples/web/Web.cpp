@@ -7,7 +7,6 @@
  *  @file
  */
 
-#include "emp/debug/alert.hpp"
 #include "emp/web/web.hpp"
 
 namespace UI = emp::web;
@@ -57,3 +56,6 @@ int main()
 
   motiv.SetSize(100,100);
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: sel motiv

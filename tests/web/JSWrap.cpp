@@ -316,3 +316,6 @@ int main() {
   test_runner.AddTest<TestJSWrap>("TestJSWrap");
   test_runner.Run();
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: yay ret

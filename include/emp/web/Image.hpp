@@ -1,21 +1,21 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015-2018
-*/
 /**
- *  @file
- *  @brief Easily load an image and place it in a document.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2015-2018 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/web/Image.hpp
+ * @brief Easily load an image and place it in a document.
  */
 
-#ifndef EMP_WEB_IMAGE_HPP_INCLUDE
-#define EMP_WEB_IMAGE_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_WEB_IMAGE_HPP_GUARD
+#define INCLUDE_EMP_WEB_IMAGE_HPP_GUARD
 
 
 #include "Widget.hpp"
 
-namespace emp {
-namespace web {
+namespace emp { namespace web {
 
   ///  The Image widget will load an image from a specified URL.  For example, you can use
   ///  emp::web::Image("http://kripken.github.io/emscripten-site/_static/Emscripten_logo_full.png")
@@ -27,7 +27,7 @@ namespace web {
   class Image : public internal::WidgetFacet<Image> {
     friend class ImageInfo;
   protected:
-    #ifndef DOXYGEN_SHOULD_SKIP_THIS
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
     class ImageInfo : public internal::WidgetInfo {
       friend Image;
 
@@ -35,15 +35,17 @@ namespace web {
       std::string url;
       std::string alt_text;
 
-      ImageInfo(const std::string & in_id="") : internal::WidgetInfo(in_id) { ; }
-      ImageInfo(const ImageInfo &) = delete;               // No copies of INFO allowed
-      ImageInfo & operator=(const ImageInfo &) = delete;   // No copies of INFO allowed
+      ImageInfo(const std::string & in_id = "") : internal::WidgetInfo(in_id) { ; }
+
+      ImageInfo(const ImageInfo &)             = delete;  // No copies of INFO allowed
+      ImageInfo & operator=(const ImageInfo &) = delete;  // No copies of INFO allowed
+
       virtual ~ImageInfo() { ; }
 
       std::string GetTypeName() const override { return "ImageInfo"; }
 
       virtual void GetHTML(std::stringstream & HTML) override {
-        HTML.str("");                                      // Clear the current text.
+        HTML.str("");  // Clear the current text.
         HTML << "<img src=\"" << url << "\""
              << " alt=\"" << alt_text << "\""
              << " id=\"" << id << "\">";
@@ -51,48 +53,58 @@ namespace web {
 
       void UpdateURL(const std::string & in_url) {
         url = in_url;
-        if (state == Widget::ACTIVE) ReplaceHTML();
+        if (state == Widget::ACTIVE) { ReplaceHTML(); }
       }
+
       void UpdateAlt(const std::string & in_alt) {
         alt_text = in_alt;
-        if (state == Widget::ACTIVE) ReplaceHTML();
+        if (state == Widget::ACTIVE) { ReplaceHTML(); }
       }
 
     public:
       virtual std::string GetType() override { return "web::ButtonInfo"; }
     };
-    #endif // DOXYGEN_SHOULD_SKIP_THIS
+#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-    // Get a properly cast version of indo.
+    // Get a properly cast version of info.
     ImageInfo * Info() { return (ImageInfo *) info; }
+
     const ImageInfo * Info() const { return (ImageInfo *) info; }
 
     Image(ImageInfo * in_info) : WidgetFacet(in_info) { ; }
 
   public:
     /// Create a new image, indicating the URL to load from.
-    Image(const std::string & in_url, const std::string & in_id="")
-      : WidgetFacet(in_id)
-    {
-      info = new ImageInfo(in_id);
+    Image(const std::string & in_url, const std::string & in_id = "") : WidgetFacet(in_id) {
+      info        = new ImageInfo(in_id);
       Info()->url = in_url;
     }
 
     /// Link to an existing Image widget.
     Image(const Image & in) : WidgetFacet(in) { ; }
+
     Image(const Widget & in) : WidgetFacet(in) { emp_assert(in.IsImage()); }
+
     virtual ~Image() { ; }
 
     using INFO_TYPE = ImageInfo;
 
     /// Update the URL for this image.
-    Image & URL(const std::string & in_url) { Info()->UpdateURL(in_url); return *this; }
+    Image & URL(const std::string & in_url) {
+      Info()->UpdateURL(in_url);
+      return *this;
+    }
 
     /// Add Alt-text for this image.
-    Image & Alt(const std::string & in_alt) { Info()->UpdateAlt(in_alt); return *this; }
+    Image & Alt(const std::string & in_alt) {
+      Info()->UpdateAlt(in_alt);
+      return *this;
+    }
   };
 
-}
-}
+}}  // namespace emp::web
 
-#endif // #ifndef EMP_WEB_IMAGE_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_WEB_IMAGE_HPP_GUARD
+
+// Local settings for Empecable file checker.
+// empecable_words: kripken

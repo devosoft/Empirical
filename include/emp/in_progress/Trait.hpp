@@ -1,19 +1,20 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016
-*/
 /**
- *  @file
- *  @brief The TraitDef class maintains a category of measuments about another class.
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/in_progress/Trait.hpp
+ * @brief The TraitDef class maintains a category of measurements about another class.
  *
  *  Each trait is associated with a name, a description, and a type.  Instance of that
  *  trait are of type TraitValue.  A TraitManager contains information about a group of
  * related traits, and a TraitSet is a set of TraitValues.
  */
 
-#ifndef EMP_IN_PROGRESS_TRAIT_HPP_INCLUDE
-#define EMP_IN_PROGRESS_TRAIT_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_IN_PROGRESS_TRAIT_HPP_GUARD
+#define INCLUDE_EMP_IN_PROGRESS_TRAIT_HPP_GUARD
 
 #include <string>
 #include <tuple>
@@ -25,8 +26,10 @@
 
 namespace emp {
 
-  template <typename TRAIT_TYPE> struct TraitKey {
+  template <typename TRAIT_TYPE>
+  struct TraitKey {
     int index;
+
     TraitKey(int _index) : index(_index) { ; }
   };
 
@@ -39,26 +42,35 @@ namespace emp {
     const int index;
 
   public:
-    TraitDef(const std::string & _name, const std::string & _desc, const TRAIT_TYPE & _default_val,
+    TraitDef(const std::string & _name,
+             const std::string & _desc,
+             const TRAIT_TYPE & _default_val,
              int _index)
-      : name(_name), desc(_desc), default_val(_default_val), index(_index)
-    { ; }
+      : name(_name), desc(_desc), default_val(_default_val), index(_index) {
+      ;
+    }
+
     ~TraitDef() { ; }
 
     const std::string & GetName() const { return name; }
+
     const std::string & GetDesc() const { return desc; }
+
     const TRAIT_TYPE & GetDefault() const { return default_val; }
+
     int GetIndex() const { return index; }
+
     TraitKey<TRAIT_TYPE> GetKey() const { return index; }
   };
 
-  template <typename... TRAIT_TYPES> class TraitManager;
+  template <typename... TRAIT_TYPES>
+  class TraitManager;
 
   template <typename... TRAIT_TYPES>
   class TraitSet {
     friend class TraitManager<TRAIT_TYPES...>;
   private:
-    std::tuple< std::vector<TRAIT_TYPES>... > type_sets;
+    std::tuple<std::vector<TRAIT_TYPES>...> type_sets;
 
     // Add in a new trait (with value) to the appropriate type set.
     template <typename IN_TYPE>
@@ -73,11 +85,11 @@ namespace emp {
     std::vector<IN_TYPE> & GetTypeSet() {
       constexpr int type_id = emp::get_type_index<IN_TYPE, TRAIT_TYPES...>();
       static_assert(type_id >= 0, "Unknown type provided to TraitSet::GetTypeSet()");
-      return std::get< type_id >(type_sets);
+      return std::get<type_id>(type_sets);
     }
 
   public:
-    TraitSet(const TraitManager<TRAIT_TYPES...> & tm); // Defined after TraitManager.
+    TraitSet(const TraitManager<TRAIT_TYPES...> & tm);  // Defined after TraitManager.
 
     // Access a specific trait value by passing in its definition.
     template <typename IN_TYPE>
@@ -100,7 +112,7 @@ namespace emp {
     friend class TraitSet<TRAIT_TYPES...>;
   private:
     // A group of trait definitions must be created for each type handled.
-    std::tuple< std::vector< TraitDef<TRAIT_TYPES> >... > trait_groups;
+    std::tuple<std::vector<TraitDef < TRAIT_TYPES> >... > trait_groups;
     int num_traits;
     TraitSet<TRAIT_TYPES...> default_trait_set;
 
@@ -116,25 +128,25 @@ namespace emp {
 
     // Return the vector of traits for the given type (const version).
     template <typename IN_TYPE>
-    const std::vector< TraitDef<IN_TYPE> > & GetTraitGroup() const {
+      const std::vector<TraitDef < IN_TYPE> > &GetTraitGroup() const {
       static_assert(GetTraitID<IN_TYPE>() >= 0,
                     "Unknown type provided to TraitManager::GetTraitGroup() const");
-      return std::get< GetTraitID<IN_TYPE>() >(trait_groups);
+      return std::get<GetTraitID<IN_TYPE>()>(trait_groups);
     }
 
     // Return the vector of traits for the given type.
     template <typename IN_TYPE>
-    std::vector< TraitDef<IN_TYPE> > & GetTraitGroup() {
+      std::vector<TraitDef < IN_TYPE> > &GetTraitGroup() {
       static_assert(GetTraitID<IN_TYPE>() >= 0,
                     "Unknown type provided to TraitManager::GetTraitGroup()");
-      return std::get< GetTraitID<IN_TYPE>() >(trait_groups);
+      return std::get<GetTraitID<IN_TYPE>()>(trait_groups);
     }
 
     // Base Case...
     template <typename CUR_TYPE>
     void SetDefaultsByType(TraitSet<TRAIT_TYPES...> & trait_set) const {
       // Get the relevant vectors for the current type.
-      const std::vector< TraitDef<CUR_TYPE> > & cur_group = GetTraitGroup<CUR_TYPE>();
+      const std::vector<TraitDef < CUR_TYPE> > & cur_group = GetTraitGroup<CUR_TYPE>();
       std::vector<CUR_TYPE> & type_set = trait_set.template GetTypeSet<CUR_TYPE>();
 
       // Set all of the values in type_set
@@ -154,19 +166,22 @@ namespace emp {
 
   public:
     TraitManager() : num_traits(0), default_trait_set(*this) { ; }
+
     ~TraitManager() { ; }
 
     static int GetNumTypes() { return num_types; }
 
     int GetNumTraits() const { return num_traits; }
-    template <typename IN_TYPE> int GetNumTraitsOfType() const {
+
+    template <typename IN_TYPE>
+    int GetNumTraitsOfType() const {
       return (int) GetTraitGroup<IN_TYPE>().size();
     }
 
     // Lookup a trait by its type and index.
     template <typename IN_TYPE>
     const TraitDef<IN_TYPE> & GetTraitDef(int index) {
-      std::vector< TraitDef<IN_TYPE> > & cur_group = GetTraitGroup<IN_TYPE>();
+      std::vector<TraitDef < IN_TYPE> > & cur_group = GetTraitGroup<IN_TYPE>();
       emp_assert(index >= 0 && index < (int) cur_group.size());
       return cur_group[index];
     }
@@ -174,16 +189,17 @@ namespace emp {
     // Lookup a trait by its type and index.
     template <typename IN_TYPE>
     const TraitDef<IN_TYPE> & GetTraitDef(TraitKey<IN_TYPE> key) {
-      std::vector< TraitDef<IN_TYPE> > & cur_group = GetTraitGroup<IN_TYPE>();
+      std::vector<TraitDef < IN_TYPE> > & cur_group = GetTraitGroup<IN_TYPE>();
       return cur_group[key.GetIndex()];
     }
 
     template <typename IN_TYPE>
-    const TraitDef<IN_TYPE> & AddTrait(const std::string & _name, const std::string & _desc,
-                              const IN_TYPE & _default_val) {
-      std::vector< TraitDef<IN_TYPE> > & cur_group = GetTraitGroup<IN_TYPE>();
-      const int trait_index = (int) cur_group.size();
-      cur_group.push_back( TraitDef<IN_TYPE>(_name, _desc, _default_val, trait_index) );
+    const TraitDef<IN_TYPE> & AddTrait(const std::string & _name,
+                                       const std::string & _desc,
+                                       const IN_TYPE & _default_val) {
+      std::vector<TraitDef < IN_TYPE> > & cur_group = GetTraitGroup<IN_TYPE>();
+      const int trait_index                         = (int) cur_group.size();
+      cur_group.push_back(TraitDef<IN_TYPE>(_name, _desc, _default_val, trait_index));
       num_traits++;
       return cur_group[trait_index];
     }
@@ -193,12 +209,11 @@ namespace emp {
     }
   };
 
-
   template <typename... TRAIT_TYPES>
   TraitSet<TRAIT_TYPES...>::TraitSet(const TraitManager<TRAIT_TYPES...> & tm) {
     tm.SetDefaults(*this);
   }
 
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_IN_PROGRESS_TRAIT_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_IN_PROGRESS_TRAIT_HPP_GUARD

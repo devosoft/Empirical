@@ -712,7 +712,7 @@ TEST_CASE("Test SignalGP ('EventDrivenGP.h') utility: GenRandSignalGPFunction", 
   inst_lib.AddInst("Fork", hardware_t::Inst_Fork, 0, "Fork a new thread. Local memory contents of callee are loaded into forked thread's input memory.");
 
   // Generate a bunch of random functions.
-  // Check that constraints weren't violated.
+  // Check that constraints were not violated.
   for (size_t f = 0; f < 10000; ++f) {
     fun_t fun(emp::GenRandSignalGPFunction(random, inst_lib, MIN_INST_CNT, MAX_INST_CNT, MIN_ARG_VAL, MAX_ARG_VAL));
     REQUIRE(fun.GetSize() >= MIN_INST_CNT);
@@ -777,7 +777,7 @@ TEST_CASE("Test SignalGP ('EventDrivenGP.h') utility: GenRandSignalGPProgram", "
   hw.SetMaxCallDepth(HW_MAX_CALL_DEPTH);
 
   // Generate a bunch of random programs.
-  // Check that constraints weren't violated.
+  // Check that constraints were not violated.
   for (size_t p = 0; p < 1000; ++p) {
     program_t program(emp::GenRandSignalGPProgram(random, inst_lib, MIN_FUN_CNT, MAX_FUN_CNT, MIN_INST_CNT, MAX_INST_CNT, MIN_ARG_VAL, MAX_ARG_VAL));
     REQUIRE(program.GetSize() >= MIN_FUN_CNT);
@@ -1024,3 +1024,6 @@ TEST_CASE("Test SignalGP ('EventDrivenGP.h') utility: SignalGP MatchBin Cache", 
   REQUIRE(hw1.GetMatchBin().Size() == 2);
 
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: icnt fcnt cnt prgm uset aff rndp rnd

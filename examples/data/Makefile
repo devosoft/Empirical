@@ -4,7 +4,7 @@ CFLAGS_version := -std=c++20
 
 # Emscripten compiler information
 CXX_web := emcc
-CXX_native := g++
+CXX_native := c++
 #CXX_native := clang++
 
 OFLAGS_native_debug := -g -pedantic -DEMP_TRACK_MEM  -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -Wconversion

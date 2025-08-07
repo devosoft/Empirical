@@ -101,7 +101,7 @@ TEST_CASE("Another Test Ptr", "[base]")
   REQUIRE(base_val == 25);    // ...make sure the original variable changed.
 
   // -- Test count tracking on emp::Ptr --
-  // A bit of an odd set of test... we need to create and destory pointers to make sure
+  // A bit of an odd set of test... we need to create and destroy pointers to make sure
   // that all of the counts are correct, so we're going to use arrays of pointers to them.
 
   emp::vector<emp::Ptr<char> *> ptr_set(10);
@@ -122,7 +122,7 @@ TEST_CASE("Another Test Ptr", "[base]")
   ptr_set[1]->Delete();
   #endif
 
-  // Make sure that we are properly handling temporary pointers moved to uninitialized pointes.
+  // Make sure that we are properly handling temporary pointers moved to uninitialized pointers.
   // (Previously breaking, now fixed.)
   int a = 9;
   emp::Ptr<int> ptr_a;
@@ -252,3 +252,6 @@ TEST_CASE("Tests for Ptr<void> specialization.", "[base]")
 
 
 //#endif // EMP_TRACK_MEM
+
+// Local settings for Empecable file checker.
+// empecable_words: sptr vptr

@@ -23,14 +23,14 @@ struct Org {
   emp::vector<size_t> neighbors;
 };
 
-// Create a class to maintain a simple Prisoner's Dilema world.
+// Create a class to maintain a simple Prisoner's Dilemma world.
 class SimplePDWorld {
 public:
   // Parameters
   double r;            // Neighborhood radius
   double u;            // cost / benefit ratio
   size_t N;            // Population size
-  size_t E;            // How many epochs should a popuilation run for?
+  size_t E;            // How many epochs should a population run for?
   size_t num_runs;     // How many runs should we do?
   bool use_ave;        // Use the average payoff for fitness instead if the total.
 
@@ -41,7 +41,7 @@ public:
   double r_sqr;          // r squared (for comparisons)
   emp::vector<Org> pop;
 
-  // Prisoner's Dilema payout table...
+  // Prisoner's Dilemma payout table...
   double payoff_CC;
   double payoff_CD;
   double payoff_DC;
@@ -82,7 +82,7 @@ public:
     r_sqr = r * r;  // r squared (for comparisons)
     pop.resize(N);
 
-    // Setup the payout matric.
+    // Setup the payout matrix.
     payoff_CC = 1.0;
     payoff_CD = 0.0;
     payoff_DC = 1.0 + u;
@@ -244,3 +244,6 @@ void SimplePDWorld::PrintNeighborInfo(std::ostream & os) {
 }
 
 #endif // #ifndef DEMOS_SPATIALCOOP2017_SOURCE_SIMPLEPDWORLD_HPP_INCLUDE
+
+// Local settings for Empecable file checker.
+// empecable_words: avg

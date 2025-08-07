@@ -32,3 +32,6 @@ TEST_CASE("Test nout", "[io]")
   emp::nout << 123.456;
   emp::nout.flush();
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: nout abcdefg

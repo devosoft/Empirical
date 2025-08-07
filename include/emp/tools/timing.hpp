@@ -1,16 +1,17 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2020.
-*/
 /**
- *  @file
- *  @brief A collection of tools to help measure timing of code.
- *  @note Status: BETA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2020 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/tools/timing.hpp
+ * @brief A collection of tools to help measure timing of code.
+ * @note Status: BETA
  */
 
-#ifndef EMP_TOOLS_TIMING_HPP_INCLUDE
-#define EMP_TOOLS_TIMING_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_TOOLS_TIMING_HPP_GUARD
+#define INCLUDE_EMP_TOOLS_TIMING_HPP_GUARD
 
 #include <ctime>
 #include <functional>
@@ -18,7 +19,6 @@
 #include <type_traits>
 
 #include "../base/assert.hpp"
-
 #include "../math/constants.hpp"
 
 /// A simple macro to time how long it takes for a function to complete.
@@ -33,7 +33,7 @@
   }
 
 /// A simple macro to time how long it takes for a function to complete.
-  #define EMP_VOID_FUNCTION_TIMER(TEST_FUN) {                                \
+#define EMP_VOID_FUNCTION_TIMER(TEST_FUN) {                                \
     std::clock_t emp_start_time = std::clock();                              \
     TEST_FUN;                                                                \
     std::clock_t emp_tot_time = std::clock() - emp_start_time;               \
@@ -52,6 +52,6 @@ namespace emp {
     return 1000.0 * ((double) tot_time) / (double) CLOCKS_PER_SEC;
   }
 
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_TOOLS_TIMING_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_TOOLS_TIMING_HPP_GUARD

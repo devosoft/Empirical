@@ -1,24 +1,25 @@
-/*
- *  This file is part of Empirical, https://github.com/devosoft/Empirical
- *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2016-2023.
-*/
 /**
- *  @file
- *  @brief A set of simple functions to manipulate bitsets.
- *  @note Status: BETA
+ * This file is part of Empirical, https://github.com/devosoft/Empirical
+ * Copyright (C) 2016-2023 Michigan State University
+ * MIT Software license; see doc/LICENSE.md
+ *
+ * @file include/emp/bits/bitset_utils.hpp
+ * @brief A set of simple functions to manipulate bitsets.
+ * @note Status: BETA
  */
 
-#ifndef EMP_BITS_BITSET_UTILS_HPP_INCLUDE
-#define EMP_BITS_BITSET_UTILS_HPP_INCLUDE
+#pragma once
+
+#ifndef INCLUDE_EMP_BITS_BITSET_UTILS_HPP_GUARD
+#define INCLUDE_EMP_BITS_BITSET_UTILS_HPP_GUARD
 
 #include <algorithm>
-#include <cstdint>       // uint8_t, uint16_t, etc.
+#include <cstdint>  // uint8_t, uint16_t, etc.
 #include <sstream>
 #include <stddef.h>
 #include <string>
 
-#include "../base/Ptr.hpp"
+#include "../base/assert.hpp"
 
 namespace emp {
 
@@ -26,16 +27,16 @@ namespace emp {
   using bits_field_t = size_t;
 
   /// @brief Track the number of bits in a single bit field.
-  static constexpr size_t NUM_FIELD_BITS = sizeof(bits_field_t)*8;
+  static constexpr size_t NUM_FIELD_BITS = sizeof(bits_field_t) * 8;
 
   /// @brief Convert a bit count to the number of fields needed to store them.
-  [[nodiscard]] static constexpr size_t NumBitFields(size_t num_bits) noexcept {
+  [[nodiscard]] inline constexpr size_t NumBitFields(size_t num_bits) noexcept {
     return num_bits ? (1 + ((num_bits - 1) / NUM_FIELD_BITS)) : 0;
   }
 
   /// @brief Convert a single bit field to a string.
   /// @param field A single bit field to convert to a string.
-  [[nodiscard]] static std::string BitFieldToString(bits_field_t field) {
+  [[maybe_unused]] [[nodiscard]] std::string BitFieldToString(bits_field_t field) {
     std::stringstream ss;
     ss << '[' << std::hex << field << ']';
     return ss.str();
@@ -43,10 +44,10 @@ namespace emp {
 
   /// @brief Convert a series of bit fields to a string.
   /// @param field A single bit field to convert to a string.
-  [[nodiscard]] static std::string BitFieldsToString(emp::Ptr<bits_field_t> bits, size_t count) {
+  [[maybe_unused]] [[nodiscard]] std::string BitFieldsToString(bits_field_t * bits, size_t count) {
     std::stringstream ss;
     for (size_t i = 0; i < count; ++i) {
-      if (i) ss << ' ';
+      if (i) { ss << ' '; }
       ss << BitFieldToString(bits[i]);
     }
     return ss.str();
@@ -54,102 +55,103 @@ namespace emp {
 
   /// Create a series of a specified number of ones (at compile time) in a uint.
   template <int NUM_BITS>
-  constexpr uint32_t UIntMaskFirst() { return (UIntMaskFirst<NUM_BITS-1>() << 1) | 1; }
+  constexpr uint32_t UIntMaskFirst() {
+    return (UIntMaskFirst<NUM_BITS - 1>() << 1) | 1;
+  }
 
   /// Create an empty bit mask (all zeros)
   template <>
-  constexpr uint32_t UIntMaskFirst<0>() { return 0; }
+  constexpr uint32_t UIntMaskFirst<0>() {
+    return 0;
+  }
 
   /// How many bits are set to one in each possible byte?
-  constexpr size_t ByteCount[256] = {
-    0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
-    1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
-    1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
-    2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
-    1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
-    2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
-    2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
-    3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8
-  };
+  constexpr size_t ByteCount[256] = {0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3,
+                                     2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 1, 2, 2, 3, 2, 3, 3, 4,
+                                     2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5,
+                                     4, 5, 5, 6, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
+                                     2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 2, 3, 3, 4,
+                                     3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6,
+                                     4, 5, 5, 6, 5, 6, 6, 7, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4,
+                                     3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
+                                     2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5,
+                                     4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 2, 3, 3, 4, 3, 4, 4, 5,
+                                     3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6,
+                                     5, 6, 6, 7, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7,
+                                     4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8};
 
   /// Count the number of bits in an unsigned integer.
   template <typename T>
   [[nodiscard]] inline constexpr size_t count_bits(T val) {
-    static_assert( std::is_unsigned_v<T>, "Bit manipulation requires unsigned values." );
+    static_assert(std::is_unsigned_v<T>, "Bit manipulation requires unsigned values.");
     constexpr size_t num_bytes = sizeof(T);
     static_assert(num_bytes <= 8, "count_bits() requires 8 or fewer bytes.");
 
-    size_t out_ones = ByteCount[ val & 0xFF ];
-    if constexpr (num_bytes > 1) {
-      out_ones += ByteCount[ (val >>  8) & 0xFF ];
-    }
+    size_t out_ones = ByteCount[val & 0xFF];
+    if constexpr (num_bytes > 1) { out_ones += ByteCount[(val >> 8) & 0xFF]; }
     if constexpr (num_bytes > 2) {
-      out_ones += ByteCount[ (val >> 24) & 0xFF ] +
-                  ByteCount[ (val >> 16) & 0xFF ];
+      out_ones += ByteCount[(val >> 24) & 0xFF] + ByteCount[(val >> 16) & 0xFF];
     }
     if constexpr (num_bytes > 4) {
-      out_ones += ByteCount[  val >> 56         ] +
-                  ByteCount[ (val >> 48) & 0xFF ] +
-                  ByteCount[ (val >> 40) & 0xFF ] +
-                  ByteCount[ (val >> 32) & 0xFF ];
+      out_ones += ByteCount[val >> 56] + ByteCount[(val >> 48) & 0xFF] +
+                  ByteCount[(val >> 40) & 0xFF] + ByteCount[(val >> 32) & 0xFF];
     }
     return out_ones;
   }
 
-
   /// Return the position of the first one bit
   template <typename T>
   [[nodiscard]] inline constexpr size_t find_bit(const T val) {
-    static_assert( std::is_unsigned_v<T>, "Bit manipulation requires unsigned values." );
-    return count_bits( (~val) & (val-1) );
+    static_assert(std::is_unsigned_v<T>, "Bit manipulation requires unsigned values.");
+    return count_bits((~val) & (val - 1));
   }
 
   /// Return the position of the first one bit
   template <typename T>
   [[nodiscard]] inline constexpr size_t find_last_bit(T val) {
-    static_assert( std::is_unsigned_v<T>, "Bit manipulation requires unsigned values." );
+    static_assert(std::is_unsigned_v<T>, "Bit manipulation requires unsigned values.");
     val |= val >> 1;
     val |= val >> 2;
     val |= val >> 4;
-    if constexpr (sizeof(T) > 1) val |= val >> 8;
-    if constexpr (sizeof(T) > 2) val |= val >> 16;
-    if constexpr (sizeof(T) > 4) val |= val >> 32;
+    if constexpr (sizeof(T) > 1) { val |= val >> 8; }
+    if constexpr (sizeof(T) > 2) { val |= val >> 16; }
+    if constexpr (sizeof(T) > 4) { val |= val >> 32; }
     return count_bits(val) - 1;
   }
 
   /// Return the position of the first one bit AND REMOVE IT.
   template <typename T>
   inline size_t pop_bit(T & val) {
-    static_assert( std::is_unsigned_v<T>, "Bit manipulation requires unsigned values." );
+    static_assert(std::is_unsigned_v<T>, "Bit manipulation requires unsigned values.");
     const size_t pos = find_bit(val);
     val &= ~(1 << pos);
     return pos;
   }
 
   /// Quick bit-mask generator for low bits.
-  template <typename TYPE=size_t>
-  [[nodiscard]] static constexpr TYPE MaskLow(std::size_t num_bits) {
-    static_assert( std::is_unsigned_v<TYPE>, "Bit manipulation requires unsigned values." );
-    return (num_bits == 8*sizeof(TYPE)) ? ((TYPE)-1) : ((((TYPE)1) << num_bits) - 1);
+  template <typename TYPE = size_t>
+  [[nodiscard]] inline constexpr TYPE MaskLow(std::size_t num_bits) {
+    static_assert(std::is_unsigned_v<TYPE>, "Bit manipulation requires unsigned values.");
+    return (num_bits == 8 * sizeof(TYPE)) ? ((TYPE) -1) : ((((TYPE) 1) << num_bits) - 1);
   }
 
   /// Quick bit-mask generator for high bits.
-  template <typename TYPE=size_t>
-  [[nodiscard]] static constexpr TYPE MaskHigh(std::size_t num_bits) {
-    static_assert( std::is_unsigned_v<TYPE>, "Bit manipulation requires unsigned values." );
-    return MaskLow<TYPE>(num_bits) << (8*sizeof(TYPE)-num_bits);
+  template <typename TYPE = size_t>
+  [[nodiscard]] inline constexpr TYPE MaskHigh(std::size_t num_bits) {
+    static_assert(std::is_unsigned_v<TYPE>, "Bit manipulation requires unsigned values.");
+    return MaskLow<TYPE>(num_bits) << (8 * sizeof(TYPE) - num_bits);
   }
 
-  template <typename TYPE=size_t>
-  [[nodiscard]] static constexpr TYPE MaskUsed(TYPE val) {
-    static_assert( std::is_unsigned_v<TYPE>, "Bit manipulation requires unsigned values." );
+  template <typename TYPE = size_t>
+  [[nodiscard]] inline constexpr TYPE MaskUsed(TYPE val) {
+    static_assert(std::is_unsigned_v<TYPE>, "Bit manipulation requires unsigned values.");
     size_t shift = 1;
-    TYPE last = 0;
+    TYPE last    = 0;
     while (val != last) {     // While the shift is making progress...
       last = val;             // Backup current value as 'last'
       val |= (val >> shift);  // Copy 1's over to the shifted position of val.
       shift <<= 1;            // Double the size of the shift for the next loop.
-      if (shift == 0) return 0;
+      if (shift == 0) { return 0; }
     }
     return val;
   }
@@ -158,35 +160,32 @@ namespace emp {
   [[nodiscard]] constexpr T ReverseBits(T in) {
     constexpr size_t num_bytes = sizeof(T);
 
-    static_assert( std::is_unsigned_v<T>, "Bit manipulation requires unsigned values." );
-    static_assert( num_bytes == 1 || num_bytes == 2 || num_bytes == 4 || num_bytes == 8,
-                   "ReverseBits() currently requires 1, 2, 4, or 8-byte values." );
+    static_assert(std::is_unsigned_v<T>, "Bit manipulation requires unsigned values.");
+    static_assert(num_bytes == 1 || num_bytes == 2 || num_bytes == 4 || num_bytes == 8,
+                  "ReverseBits() currently requires 1, 2, 4, or 8-byte values.");
 
     if constexpr (num_bytes == 1) {
-      in = static_cast<T>( (in & 0xF0) >> 4 | (in & 0x0F) << 4 );
-      in = static_cast<T>( (in & 0xCC) >> 2 | (in & 0x33) << 2 );
-      in = static_cast<T>( (in & 0xAA) >> 1 | (in & 0x55) << 1 );
-    }
-    else if constexpr (num_bytes == 2) {
-      in = static_cast<T>( (in & 0xFF00) >> 8 | (in & 0x00FF) << 8 );
-      in = static_cast<T>( (in & 0xF0F0) >> 4 | (in & 0x0F0F) << 4 );
-      in = static_cast<T>( (in & 0xCCCC) >> 2 | (in & 0x3333) << 2 );
-      in = static_cast<T>( (in & 0xAAAA) >> 1 | (in & 0x5555) << 1 );
-    }
-    else if constexpr (num_bytes == 4) {
-      in = static_cast<T>( (in & 0xFFFF0000) >> 16 | (in & 0x0000FFFF) << 16 );
-      in = static_cast<T>( (in & 0xFF00FF00) >> 8  | (in & 0x00FF00FF) << 8 );
-      in = static_cast<T>( (in & 0xF0F0F0F0) >> 4  | (in & 0x0F0F0F0F) << 4 );
-      in = static_cast<T>( (in & 0xCCCCCCCC) >> 2  | (in & 0x33333333) << 2 );
-      in = static_cast<T>( (in & 0xAAAAAAAA) >> 1  | (in & 0x55555555) << 1 );
-    }
-    else /* if constexpr (num_bytes == 8) */ {
-      in = static_cast<T>( (in & 0xFFFFFFFF00000000) >> 32 | (in & 0x00000000FFFFFFFF) << 32 );
-      in = static_cast<T>( (in & 0xFFFF0000FFFF0000) >> 16 | (in & 0x0000FFFF0000FFFF) << 16 );
-      in = static_cast<T>( (in & 0xFF00FF00FF00FF00) >> 8  | (in & 0x00FF00FF00FF00FF) << 8 );
-      in = static_cast<T>( (in & 0xF0F0F0F0F0F0F0F0) >> 4  | (in & 0x0F0F0F0F0F0F0F0F) << 4 );
-      in = static_cast<T>( (in & 0xCCCCCCCCCCCCCCCC) >> 2  | (in & 0x3333333333333333) << 2 );
-      in = static_cast<T>( (in & 0xAAAAAAAAAAAAAAAA) >> 1  | (in & 0x5555555555555555) << 1 );
+      in = static_cast<T>((in & 0xF0) >> 4 | (in & 0x0F) << 4);
+      in = static_cast<T>((in & 0xCC) >> 2 | (in & 0x33) << 2);
+      in = static_cast<T>((in & 0xAA) >> 1 | (in & 0x55) << 1);
+    } else if constexpr (num_bytes == 2) {
+      in = static_cast<T>((in & 0xFF00) >> 8 | (in & 0x00FF) << 8);
+      in = static_cast<T>((in & 0xF0F0) >> 4 | (in & 0x0F0F) << 4);
+      in = static_cast<T>((in & 0xCCCC) >> 2 | (in & 0x3333) << 2);
+      in = static_cast<T>((in & 0xAAAA) >> 1 | (in & 0x5555) << 1);
+    } else if constexpr (num_bytes == 4) {
+      in = static_cast<T>((in & 0xFFFF0000) >> 16 | (in & 0x0000FFFF) << 16);
+      in = static_cast<T>((in & 0xFF00FF00) >> 8 | (in & 0x00FF00FF) << 8);
+      in = static_cast<T>((in & 0xF0F0F0F0) >> 4 | (in & 0x0F0F0F0F) << 4);
+      in = static_cast<T>((in & 0xCCCCCCCC) >> 2 | (in & 0x33333333) << 2);
+      in = static_cast<T>((in & 0xAAAAAAAA) >> 1 | (in & 0x55555555) << 1);
+    } else /* if constexpr (num_bytes == 8) */ {
+      in = static_cast<T>((in & 0xFFFF'FFFF'0000'0000) >> 32 | (in & 0x0000'0000'FFFF'FFFF) << 32);
+      in = static_cast<T>((in & 0xFFFF'0000'FFFF'0000) >> 16 | (in & 0x0000'FFFF'0000'FFFF) << 16);
+      in = static_cast<T>((in & 0xFF00'FF00'FF00'FF00) >> 8 | (in & 0x00FF'00FF'00FF'00FF) << 8);
+      in = static_cast<T>((in & 0xF0F0'F0F0'F0F0'F0F0) >> 4 | (in & 0x0F0F'0F0F'0F0F'0F0F) << 4);
+      in = static_cast<T>((in & 0xCCCC'CCCC'CCCC'CCCC) >> 2 | (in & 0x3333'3333'3333'3333) << 2);
+      in = static_cast<T>((in & 0xAAAA'AAAA'AAAA'AAAA) >> 1 | (in & 0x5555'5555'5555'5555) << 1);
     }
 
     return in;
@@ -194,69 +193,49 @@ namespace emp {
 
   // Rotate all bits to the left (looping around) in a provided field.
   template <typename T>
-  [[nodiscard]] constexpr T RotateBitsLeft(
-    T in,
-    size_t rotate_size = 1
-  ) {
-    static_assert( std::is_unsigned_v<T>, "Bit manipulation requires unsigned values." );
+  [[nodiscard]] constexpr T RotateBitsLeft(T in, size_t rotate_size = 1) {
+    static_assert(std::is_unsigned_v<T>, "Bit manipulation requires unsigned values.");
     constexpr size_t FIELD_BITS = sizeof(T) * 8;
-    rotate_size %= FIELD_BITS;       // Make sure rotate is in range.
-    return (in << rotate_size) |
-           (in >> (FIELD_BITS - rotate_size));
+    rotate_size %= FIELD_BITS;  // Make sure rotate is in range.
+    return (in << rotate_size) | (in >> (FIELD_BITS - rotate_size));
   }
 
   // Rotate lowest "bit_count" bits to the left (looping around) in a provided field.
   template <typename T>
-  [[nodiscard]] constexpr T RotateBitsLeft(
-    T in,
-    size_t rotate_size,
-    size_t bit_count
-  ) {
-    static_assert( std::is_unsigned_v<T>, "Bit manipulation requires unsigned values." );
+  [[nodiscard]] constexpr T RotateBitsLeft(T in, size_t rotate_size, size_t bit_count) {
+    static_assert(std::is_unsigned_v<T>, "Bit manipulation requires unsigned values.");
     [[maybe_unused]] constexpr size_t FIELD_BITS = sizeof(T) * 8;
     emp_assert(bit_count <= FIELD_BITS, "Cannot have more bits than can fit in field.");
-    rotate_size %= bit_count; // Make sure rotate is in range.
+    rotate_size %= bit_count;  // Make sure rotate is in range.
     const T out = (in << rotate_size) | (in >> (bit_count - rotate_size));
     return out & MaskLow<T>(bit_count);  // Zero out excess bits.
   }
 
   // Rotate all bits to the left (looping around) in a provided field.
   template <typename T>
-  [[nodiscard]] constexpr T RotateBitsRight(
-    T in,
-    size_t rotate_size = 1
-  ) {
-    static_assert( std::is_unsigned_v<T>, "Bit manipulation requires unsigned values." );
+  [[nodiscard]] constexpr T RotateBitsRight(T in, size_t rotate_size = 1) {
+    static_assert(std::is_unsigned_v<T>, "Bit manipulation requires unsigned values.");
     constexpr size_t FIELD_BITS = sizeof(T) * 8;
-    rotate_size %= FIELD_BITS;       // Make sure rotate is in range.
-    return (in >> rotate_size) |
-           (in << (FIELD_BITS - rotate_size));
+    rotate_size %= FIELD_BITS;  // Make sure rotate is in range.
+    return (in >> rotate_size) | (in << (FIELD_BITS - rotate_size));
   }
 
   // Rotate lowest "bit_count" bits to the left (looping around) in a provided field.
   template <typename T>
-  [[nodiscard]] constexpr T RotateBitsRight(
-    T in,
-    size_t rotate_size,
-    size_t bit_count
-  ) {
-    static_assert( std::is_unsigned_v<T>, "Bit manipulation requires unsigned values." );
+  [[nodiscard]] constexpr T RotateBitsRight(T in, size_t rotate_size, size_t bit_count) {
+    static_assert(std::is_unsigned_v<T>, "Bit manipulation requires unsigned values.");
     [[maybe_unused]] constexpr size_t FIELD_BITS = sizeof(T) * 8;
     emp_assert(bit_count <= FIELD_BITS, "Cannot have more bits than can fit in field.");
-    rotate_size %= bit_count; // Make sure rotate is in range.
+    rotate_size %= bit_count;  // Make sure rotate is in range.
     const T out = (in >> rotate_size) | (in << (bit_count - rotate_size));
     return out & MaskLow<T>(bit_count);  // Zero out excess bits.
   }
 
   /// Count the number of bits ('0' or '1') found in a string.
-  static size_t CountBits(const std::string & bitstring) {
-    return static_cast<size_t>(
-      std::count_if(
-        bitstring.begin(),
-        bitstring.end(),
-        [](char i) { return i == '0' || i == '1'; }
-      )
-    );
+  inline size_t CountBits(const std::string & bitstring) {
+    return static_cast<size_t>(std::count_if(bitstring.begin(), bitstring.end(), [](char i) {
+      return i == '0' || i == '1';
+    }));
   }
 
   /*
@@ -302,6 +281,6 @@ namespace emp {
     return 0;
   }
   */
-}
+}  // namespace emp
 
-#endif // #ifndef EMP_BITS_BITSET_UTILS_HPP_INCLUDE
+#endif  // #ifndef INCLUDE_EMP_BITS_BITSET_UTILS_HPP_GUARD

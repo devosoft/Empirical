@@ -226,3 +226,6 @@ int main() {
   doc.Update();
 
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: bffff eeff bfc ffc ffbf ffbfbf fffa ffee ffcc ccff ffa

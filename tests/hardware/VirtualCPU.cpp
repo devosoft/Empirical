@@ -501,7 +501,7 @@ TEST_CASE("VirtualCPU_Genome_and_Instructions", "[Hardware]") {
       [X] Update labels?
     [X] GetRandomInst returns a random instruction within the instruction library
     [X] SetInst overwrites an instruction in the genome/working genome
-      [X] Recalcuates labels/nops?
+      [X] Recalculates labels/nops?
     [X] RandomizeInst calls SetInst on the genome position, but with a random instruction
     [X] Load
       [X] Loads genome from a stream
@@ -738,9 +738,9 @@ TEST_CASE("VirtualCPU_Hardware_Manipulation", "[Hardware]") {
     [X] CurateNops
       [X] Counts nops if needed
       [X] Finds all labels
-      [X] Add nops to preceeding instructions nop_vec
+      [X] Add nops to preceding instructions nop_vec
       [X] Wraps?
-      [X] Sets boolean flag to false
+      [X] Sets Boolean flag to false
     [X] CountNops
       [X] Calculates the number of nops
       [X] Maps nop ids to indices
@@ -1599,3 +1599,6 @@ TEST_CASE("VirtualCPU_String_Methods", "[Hardware]") {
     [X] Print details dumps registers and such to the stream
   */
 }
+
+// Local settings for Empecable file checker.
+// empecable_words: ostr fab fabfbdfabfbdcfddeab sstr
