@@ -1,7 +1,7 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2018
+ *  date: 2018-2025
 */
 /**
  *  @file
@@ -41,34 +41,36 @@ void LayoutDivs() {
 
 void DrawWorldCanvas_Grid() {
   UI::Canvas canvas = doc.Canvas("world_canvas");
-  canvas.Clear("gray");
+  canvas.Clear(emp::Palette::GRAY);
 
   const size_t world_x = world.GetWidth();
   const size_t world_y = world.GetHeight();
-  const double canvas_x = (double) canvas.GetWidth();
-  const double canvas_y = (double) canvas.GetHeight();
+  const double canvas_x = canvas.GetWidth();
+  const double canvas_y = canvas.GetHeight();
 
-  const double org_x = canvas_x / (double) world_x;
-  const double org_y = canvas_y / (double) world_y;
-  const double org_r = emp::Min(org_x, org_y) / 2.0;
+  const double org_width = canvas_x / static_cast<double>(world_x);
+  const double org_height = canvas_y / static_cast<double>(world_y);
+  const double org_radius = emp::Min(org_width, org_height) / 2.0;
 
   // Draw all of the organisms
+  emp::Circle org_circle{org_radius};
   for (size_t y = 0; y < world_y; y++) {
+    org_circle.SetCenterY(org_height * (0.5 + static_cast<double>(y)));
     for (size_t x = 0; x < world_x; x++) {
       const size_t org_id = y * world_x + x;
-      const size_t cur_x = org_x * (0.5 + (double) x);
-      const size_t cur_y = org_y * (0.5 + (double) y);
+      org_circle.SetCenterX(org_width * (0.5 + static_cast<double>(x)));
       const double fitness = world.CalcFitnessID(org_id);
 
-      std::string circle_color;
-      if (fitness == 0.0) { circle_color = "#444444"; }          // Dark Gray
-      else if (fitness < 0.6) { circle_color = "#FFC0CB"; }      // Pink
-      else if (fitness < 0.8) { circle_color = "#FFD899"; }      // Pale Orange
-      else if (fitness < 0.95) { circle_color = "#EEEE33"; }     // Pale Yellow
-      else if (fitness < 0.98) { circle_color = "#88FF88"; }     // Pale green
-      else if (fitness < 0.995) { circle_color = "#00CC00"; }    // Mid green
-      else { circle_color = "green"; }                           // Full green
-      canvas.Circle(cur_x, cur_y, org_r, circle_color, "black");
+      emp::Color org_color;
+      if (fitness == 0.0) { org_color = "#444444"; }          // Dark Gray
+      else if (fitness < 0.6) { org_color = "#FFC0CB"; }      // Pink
+      else if (fitness < 0.8) { org_color = "#FFD899"; }      // Pale Orange
+      else if (fitness < 0.95) { org_color = "#EEEE33"; }     // Pale Yellow
+      else if (fitness < 0.98) { org_color = "#88FF88"; }     // Pale green
+      else if (fitness < 0.995) { org_color = "#00CC00"; }    // Mid green
+      else { org_color = emp::Palette::GREEN; }               // Full green
+
+      canvas.Draw(org_circle, org_color, emp::Palette::BLACK);
 
       if (!target_id && fitness > 0.0) {
         target_id = org_id;
@@ -78,24 +80,25 @@ void DrawWorldCanvas_Grid() {
   }
 
   // Add a plus sign in the middle.
-  const double mid_x = org_x * world_x / 2.0;
-  const double mid_y = org_y * world_y / 2.0;
-  const double plus_bar = org_r * world_x;
-  canvas.Line(mid_x, mid_y-plus_bar, mid_x, mid_y+plus_bar, "#8888FF");
-  canvas.Line(mid_x-plus_bar, mid_y, mid_x+plus_bar, mid_y, "#8888FF");
+  const double mid_x = org_width * world_x / 2.0;
+  const double mid_y = org_height * world_y / 2.0;
+  const double plus_bar = org_radius * world_x;
+  const emp::Color plus_color("#8888FF");
+  canvas.Draw(emp::Point{mid_x, mid_y-plus_bar}, emp::Point{mid_x, mid_y+plus_bar}, plus_color);
+  canvas.Draw(emp::Point{mid_x-plus_bar, mid_y}, emp::Point{mid_x+plus_bar, mid_y}, plus_color);
 
   // Setup the arm.
-  const std::string arm_color = "white";
+  const emp::Color arm_color = emp::Palette::WHITE;
   const double total_length = world.CalcTotalLength();
   const double dilation = canvas_x / (total_length * 2.0);
   emp::Point start_point(mid_x, mid_y);
   emp::vector<emp::Point> draw_points = world.CalcPoints(target_arm, start_point, dilation);
-  canvas.MultiLine(start_point, draw_points, arm_color, 3.0);
+  canvas.Draw(start_point, draw_points, arm_color, 3.0);
 
   // Add joints along arm.
-  canvas.Circle(start_point, 5, "blue", "black");
+  canvas.Draw(emp::Circle{start_point, 5}, emp::Palette::BLUE, emp::Palette::BLACK, 1.0);
   for (emp::Point p : draw_points) {
-    canvas.Circle(p, 3, "blue", "black");
+    canvas.Draw(emp::Circle{p, 3}, emp::Palette::BLUE, emp::Palette::BLACK, 1.0);
   }
 
 }
@@ -108,15 +111,15 @@ void DrawWorldCanvas_Scatter() {
   const size_t world_size = world.GetSize();
   const double total_length = world.CalcTotalLength();
 
-  const double canvas_x = (double) canvas.GetWidth();
-  const double canvas_y = (double) canvas.GetHeight();
+  const emp::Size2D canvas_size = canvas.GetSize();
 
-  const double org_r = emp::Min(canvas_x, canvas_y) / 120.0;
-  const emp::Point middle(canvas_x / 2.0, canvas_y / 2.0);
-  const double arm_scale = (canvas_x / total_length) / 2.0;
+  const double org_radius = emp::Min(canvas_size.X(), canvas_size.Y()) / 120.0;
+  const emp::Point middle = canvas_size / 2.0;
+  const double arm_scale = middle.X() / total_length;
 
   // Draw the background grid.
-  UI::DrawGridBG(canvas, 40, 40, "#202020", "#606060");
+  UI::DrawGridBG(canvas, {40, 40}, emp::Color("#202020"), emp::Color("#606060"));
+  // UI::DrawGridBG(canvas, 40, 40, emp::Palette::BLUE, emp::Palette::YELLOW);
 
   // Draw all of the organisms
   for (size_t org_id = 0; org_id < world_size; org_id++) {
@@ -124,19 +127,19 @@ void DrawWorldCanvas_Scatter() {
 
     const double fitness = world.CalcFitnessID(org_id);
 
-    std::string circle_color;
-    if (fitness == 0.0) { circle_color = "#444444"; }          // Dark Gray
-    else if (fitness < 0.6) { circle_color = "#FFC0CB"; }      // Pink
-    else if (fitness < 0.8) { circle_color = "#FFD899"; }      // Pale Orange
-    else if (fitness < 0.95) { circle_color = "#EEEE33"; }     // Pale Yellow
-    else if (fitness < 0.98) { circle_color = "#88FF88"; }     // Pale green
-    else if (fitness < 0.995) { circle_color = "#00CC00"; }    // Mid green
-    else { circle_color = "green"; }                           // Full green
+    emp::Color org_color;
+    if (fitness == 0.0) { org_color = "#444444"; }          // Dark Gray
+    else if (fitness < 0.6) { org_color = "#FFC0CB"; }      // Pink
+    else if (fitness < 0.8) { org_color = "#FFD899"; }      // Pale Orange
+    else if (fitness < 0.95) { org_color = "#EEEE33"; }     // Pale Yellow
+    else if (fitness < 0.98) { org_color = "#88FF88"; }     // Pale green
+    else if (fitness < 0.995) { org_color = "#00CC00"; }    // Mid green
+    else { org_color = emp::Palette::GREEN; }                           // Full green
 
     emp::Point org_pos = world.CalcEndPoint(org_id);
-    org_pos.Scale(arm_scale) += middle;
+    org_pos = org_pos * arm_scale + middle;
 
-    canvas.Circle(org_pos, org_r, circle_color, "black");
+    canvas.Draw(emp::Circle{org_pos, org_radius}, org_color, emp::Palette::BLACK, 1.0);
 
     if (!target_id && fitness > 0.0) {
       target_id = org_id;
@@ -145,20 +148,21 @@ void DrawWorldCanvas_Scatter() {
   }
 
   // Add a plus sign in the middle.
-  const double plus_bar = org_r * 3;
-  canvas.Line(middle.GetX(), middle.GetY()-plus_bar, middle.GetX(), middle.GetY()+plus_bar, "#8888FF");
-  canvas.Line(middle.GetX()-plus_bar, middle.GetY(), middle.GetX()+plus_bar, middle.GetY(), "#8888FF");
+  const emp::Color plus_color("#8888FF");
+  const emp::Point plus_x{org_radius * 3, 0.0};
+  const emp::Point plus_y{0.0, org_radius * 3};
+  canvas.Draw(middle - plus_x, middle + plus_x, plus_color);
+  canvas.Draw(middle - plus_y, middle + plus_y, plus_color);
 
   // Setup the arm.
-  const std::string arm_color = "white";
-  const double dilation = canvas_x / (total_length * 2.0);
-  emp::vector<emp::Point> draw_points = world.CalcPoints(target_arm, middle, dilation);
-  canvas.MultiLine(middle, draw_points, arm_color, 3.0);
+  const emp::Color arm_color = emp::Palette::WHITE;
+  emp::vector<emp::Point> draw_points = world.CalcPoints(target_arm, middle, arm_scale);
+  canvas.Draw(middle, draw_points, arm_color, 3.0);
 
   // Add joints along arm.
-  canvas.Circle(middle, 5, "blue", "black");
+  canvas.Draw(emp::Circle{middle, 5}, emp::Palette::BLUE, emp::Palette::BLACK, 1.0);
   for (emp::Point p : draw_points) {
-    canvas.Circle(p, 3, "blue", "black");
+    canvas.Draw(emp::Circle{p, 3}, emp::Palette::BLUE, emp::Palette::BLACK, 1.0);
   }
 
 }
@@ -203,7 +207,7 @@ void CanvasClick2(int x, int y) {
 
   emp::Point target(x,y);
   target -= middle;
-  target.Scale(inv_arm_scale);
+  target *= inv_arm_scale;
 
   // Determine which organism is closest to the click.
   for (size_t org_id = 0; org_id < world_size; org_id++) {
