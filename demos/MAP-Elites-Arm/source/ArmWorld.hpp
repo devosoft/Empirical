@@ -12,7 +12,7 @@
 
 #include "emp/base/vector.hpp"
 #include "emp/Evolve/World.hpp"
-#include "emp/geometry/Angle2D.hpp"
+#include "emp/geometry/Angle.hpp"
 #include "emp/geometry/Point2D.hpp"
 #include "emp/math/Random.hpp"
 
@@ -47,7 +47,7 @@ struct ArmOrg {
     if (random.P(1.0)) {
       size_t pos = random.GetUInt(angles.size());
       angles[pos].SetPortion(random.GetDouble());
-      end_point.ToOrigin();
+      end_point.Set(0.0,0.0);
       return 1;
     }
     return 0;
@@ -60,7 +60,7 @@ struct ArmOrg {
       end_point = facing.GetPoint(segments[0]);
       for (size_t i = 1; i < segments.size(); i++) {
         facing += angles[i];
-        end_point = facing.GetPoint(end_point, segments[i]);
+        end_point = end_point + facing.GetPoint(segments[i]);
       }
     }
 
@@ -100,7 +100,7 @@ public:
     NewRandom(1);
 
     SetupFitnessFile().SetTimingRepeat(10);
-    SetupSystematicsFile().SetTimingRepeat(10);
+    // SetupSystematicsFile().SetTimingRepeat(10);
     SetupPopulationFile().SetTimingRepeat(10);
 
     std::function<double(ArmOrg &)> traitX_fun = [this](ArmOrg & org){ return org.CalcEndPoint(segments).GetX(); };
@@ -150,7 +150,7 @@ public:
     emp::vector<emp::Point> points(segments.size());
     for (size_t i = 0; i < segments.size(); i++) {
       facing += org.angles[i];
-      position = facing.GetPoint(position, segments[i]*dilation);
+      position = position + facing.GetPoint(segments[i]*dilation);
       points[i] = position;
     }
     return points;
