@@ -18,24 +18,24 @@ const double world_size = 600;
 UI::Document doc("emp_base");
 SimplePDWorld world;
 
-int cur_x = -1;
-int cur_y = -1;
+emp::Point cur_pos{2000.0, 2000.0};
 
 void DrawCanvas() {
   UI::Canvas canvas = doc.Canvas("canvas");
-  canvas.Clear("black");
+  canvas.Clear(emp::Palette::BLACK);
 
   const emp::vector<Org> & pop = world.GetPop();
 
-  if (cur_x >= 0) {
-    canvas.Circle(cur_x, cur_y, world_size*world.GetR(), "pink");
+  if (canvas.GetSize().Contains(cur_pos)) {
+    canvas.Draw(emp::Circle{cur_pos, world_size*world.GetR()}, emp::Palette::PINK);
   }
 
   for (const Org & org : pop) {
+    emp::Circle body{org.pos * world_size, 2};
     if (org.coop) {
-      canvas.Circle(org.x*world_size, org.y*world_size, 2, "blue", "#8888FF");
+      canvas.Draw(body, emp::Palette::BLUE, emp::Color("#8888FF"));
     } else {
-      canvas.Circle(org.x*world_size, org.y*world_size, 2, "#FF8888", "red");
+      canvas.Draw(body, emp::Color("#FF8888"), emp::Palette::RED);
     }
   }
 
@@ -43,8 +43,7 @@ void DrawCanvas() {
 }
 
 void CanvasClick(int x, int y) {
-  cur_x = x;
-  cur_y = y;
+  cur_pos.Set(x,y);
   DrawCanvas();
 }
 
