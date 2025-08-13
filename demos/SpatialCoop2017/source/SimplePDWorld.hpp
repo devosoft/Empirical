@@ -15,8 +15,7 @@
 #include "emp/math/Random.hpp"
 
 struct Org {
-  double x;
-  double y;
+  emp::Point(pos);
   bool coop;
   double fitness;
 
@@ -90,23 +89,18 @@ public:
 
     // Initialize each organism
     for (Org & org : pop) {
-      org.x = random.GetDouble(1.0);
-      org.y = random.GetDouble(1.0);
+      org.pos.Set(random.GetDouble(1.0), random.GetDouble(1.0));
       org.coop = random.P(0.5);
       org.neighbors.resize(0);
     }
 
     // Determine if pairs of organisms are neighbors;
-    // @CAO: Can speed up by using Surface2D.
+    // @CAO: Can speed up by using Surface.
     for (size_t i = 1; i < N; i++) {
       for (size_t j = 0; j < i; j++) {
         Org & org1 = pop[i];
         Org & org2 = pop[j];
-        double x_dist = abs(org1.x - org2.x);
-        if (x_dist > (1.0 - x_dist)) x_dist = 1.0 - x_dist;
-        double y_dist = abs(org1.y - org2.y);
-        if (x_dist > (1.0 - x_dist)) x_dist = 1.0 - x_dist;
-        double dist_sqr = x_dist * x_dist + y_dist * y_dist;
+        double dist_sqr = org1.pos.SquareDistance(org2.pos);
 
         // Test if this pair are within neighbor radius...
         if (dist_sqr < r_sqr) {
