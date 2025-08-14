@@ -58,7 +58,7 @@ namespace emp::web {
   template <typename BODY_T>
   void Draw(Canvas canvas, const Surface<BODY_T> & surface) {
     canvas.Clear();
-    DrawGridBG(canvas, surface.GetGridSize(), Palette::BLACK, Palette::GRAY);
+    // DrawGridBG(canvas, surface.GetGridSize(), Palette::BLACK, Palette::GRAY);
 
     // // Setup a black background for the surface
     // Box2D box{{0.0, 0.0}, surface.GetSize()};

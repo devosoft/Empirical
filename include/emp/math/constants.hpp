@@ -14,6 +14,7 @@
 #define INCLUDE_EMP_MATH_CONSTANTS_HPP_GUARD
 
 #include <cstdint>
+#include <stddef.h>
 
 namespace emp {
 

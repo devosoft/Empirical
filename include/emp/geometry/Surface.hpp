@@ -109,7 +109,7 @@ namespace emp {
   protected:
     const Size2D surface_size;          ///< Lower-left corner of the surface.
     emp::vector<BODY_T> body_set;       ///< Set of all bodies on surface
-    EMP_DEBUG(int body_version = 1000); // Changes to body_set may invalidate body references.
+    EMP_DEBUG(int body_version = 1000;) // Changes to body_set may invalidate body references.
 
     emp::vector<size_t> open_ids;  ///< Set of body_set IDs ready for re-use.
 

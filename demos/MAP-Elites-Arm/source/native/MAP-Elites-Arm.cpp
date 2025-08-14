@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
   world.ResetDiverse();
 
   // Setup the print function to indicate if a function exists.
-  std::function<void(ArmOrg&,std::ostream &)> print_fun = [](ArmOrg & val, std::ostream & os) {
+  std::function<void(ArmOrg&,std::ostream &)> print_fun = [](ArmOrg & /* val */, std::ostream & os) {
     std::string out_str = "!"; // emp::to_string(val);
     // while (out_str.size() < 4) out_str = emp::to_string('!');
     os << out_str;
