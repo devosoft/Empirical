@@ -20,6 +20,7 @@
 #define INCLUDE_EMP_CONFIG_SETTINGS_MANAGER_HPP_GUARD
 
 #include <fstream>
+#include <functional>
 #include <map>
 #include <sstream>
 #include <stddef.h>
@@ -27,14 +28,18 @@
 #include <variant>
 
 #include "../base/notify.hpp"
+#include "../base/vector.hpp"
 #include "../compiler/Lexer.hpp"
+#include "../io/io_utils.hpp"
 #include "../tools/String.hpp"
 
 namespace emp {
 
   class SettingsManager {
   private:
-    using val_t = std::variant<emp::String, bool, int, double>;
+    using val_t = std::variant<emp::String, bool, int, size_t, double>;
+    using keyword_fun_arg_t = emp::vector<emp::String>;
+    using keyword_fun_t = std::function<void(keyword_fun_arg_t)>;
 
     /// Class to manage a single setting.
     class SettingInfo {
@@ -49,17 +54,15 @@ namespace emp {
       // Helper: convert from string to val_t of current type.
       val_t ParseFromString(emp::String str) const {
         if (IsString()) {
-          if (str.size() && str[0] == '\"') {
-            return emp::MakeStringFromLiteral(str);
-          } else {
-            return str;
-          }
+          if (str.size() && str[0] == '\"') { return emp::MakeStringFromLiteral(str); }
+          else { return str; }
         }
         if (IsBool()) {
           str.SetLower();
           return str == "on" || str == "true" || str == "1";
         }
         if (IsInt()) { return std::stoi(str); }
+        if (IsULL()) { return static_cast<size_t>(std::stoull(str)); }
         if (IsDouble()) { return std::stod(str); }
         emp_assert(false, "Invalid type in Setting Info", name);
         return 0.0;
@@ -75,11 +78,7 @@ namespace emp {
                   emp::String desc,
                   char flag          = '\0',
                   emp::String option = "")
-        : name(name)
-        , value(var)
-        , desc(desc)
-        , flag(flag)
-        , option(option)
+        : name(name), value(var), desc(desc), flag(flag), option(option)
         , action([&var](const SettingInfo & info) { var = info.GetValue<emp::String>(); }) {}
 
       SettingInfo(emp::String name,
@@ -87,11 +86,7 @@ namespace emp {
                   emp::String desc,
                   char flag          = '\0',
                   emp::String option = "")
-        : name(name)
-        , value(var)
-        , desc(desc)
-        , flag(flag)
-        , option(option)
+        : name(name), value(var), desc(desc), flag(flag), option(option)
         , action([&var](const SettingInfo & info) { var = info.GetValue<bool>(); }) {}
 
       SettingInfo(emp::String name,
@@ -99,23 +94,23 @@ namespace emp {
                   emp::String desc,
                   char flag          = '\0',
                   emp::String option = "")
-        : name(name)
-        , value(var)
-        , desc(desc)
-        , flag(flag)
-        , option(option)
+        : name(name), value(var), desc(desc), flag(flag), option(option)
         , action([&var](const SettingInfo & info) { var = info.GetValue<int>(); }) {}
+
+      SettingInfo(emp::String name,
+                  size_t & var,
+                  emp::String desc,
+                  char flag          = '\0',
+                  emp::String option = "")
+        : name(name), value(var), desc(desc), flag(flag), option(option)
+        , action([&var](const SettingInfo & info) { var = info.GetValue<size_t>(); }) {}
 
       SettingInfo(emp::String name,
                   double & var,
                   emp::String desc,
                   char flag          = '\0',
                   emp::String option = "")
-        : name(name)
-        , value(var)
-        , desc(desc)
-        , flag(flag)
-        , option(option)
+        : name(name), value(var), desc(desc), flag(flag), option(option)
         , action([&var](const SettingInfo & info) { var = info.GetValue<double>(); }) {}
 
       template <typename T>
@@ -124,19 +119,14 @@ namespace emp {
       }
 
       [[nodiscard]] bool IsString() const { return IsType<emp::String>(); }
-
       [[nodiscard]] bool IsBool() const { return IsType<bool>(); }
-
       [[nodiscard]] bool IsInt() const { return IsType<int>(); }
-
+      [[nodiscard]] bool IsULL() const { return IsType<size_t>(); }
       [[nodiscard]] bool IsDouble() const { return IsType<double>(); }
 
       [[nodiscard]] const emp::String & GetName() const { return name; }
-
       [[nodiscard]] const emp::String & GetDescription() const { return desc; }
-
       [[nodiscard]] char GetFlag() const { return flag; }
-
       [[nodiscard]] const emp::String & GetOption() const { return option; }
 
       template <typename T>
@@ -163,6 +153,7 @@ namespace emp {
         if (IsString()) { return std::get<emp::String>(value); }
         if (IsBool()) { return std::get<bool>(value) ? "1" : "0"; }
         if (IsInt()) { return emp::MakeString(std::get<int>(value)); }
+        if (IsULL()) { return emp::MakeString(std::get<size_t>(value)); }
         if (IsDouble()) { return emp::MakeString(std::get<double>(value)); }
         emp_assert(false, "Invalid type in Setting Info", name);
         return "";
@@ -172,6 +163,7 @@ namespace emp {
         if (IsString()) { return std::get<emp::String>(value).AsLiteral(); }
         if (IsBool()) { return std::get<bool>(value) ? "On" : "Off"; }
         if (IsInt()) { return emp::MakeString(std::get<int>(value)); }
+        if (IsULL()) { return emp::MakeString(std::get<size_t>(value)); }
         if (IsDouble()) { return emp::MakeString(std::get<double>(value)); }
         emp_assert(false, "Invalid type in Setting Info", name);
         return "";
@@ -182,49 +174,73 @@ namespace emp {
         if (IsString()) { return "emp::String"; }
         if (IsBool()) { return "bool"; }
         if (IsInt()) { return "int"; }
+        if (IsULL()) { return "size_t"; }
         if (IsDouble()) { return "double"; }
         return "error";
       }
+    }; // END OF SettingInfo definition
+
+    struct KeywordInfo {
+      emp::String name;           ///< Label for this setting in config files
+      keyword_fun_t fun;          ///< Function to call when keyword is triggered
+      emp::String desc   = "";    ///< Description of setting
     };
 
     // === MEMBER VARIABLES ===
 
     std::map<emp::String, SettingInfo> setting_map;
-    emp::String assign_op = ":";
+    std::map<emp::String, KeywordInfo> keyword_map;
+    emp::String assign_op = "=";
     emp::String error_note;
+    bool verbose = false;
 
     // === HELPER FUNCTIONS ===
 
-    SettingInfo & GetInfo(const emp::String & name) {
-      emp_assert(Has(name), "Invalid setting name", name);
-      return setting_map.find(name)->second;
+    template<typename THIS_T>
+    auto & GetSettingInfo(this THIS_T & self, const emp::String & name) {
+      emp_assert(self.HasSetting(name), "Invalid setting name", name);
+      return self.setting_map.find(name)->second;
     }
 
-    const SettingInfo & GetInfo(const emp::String & name) const {
-      emp_assert(Has(name), "Invalid setting name", name);
-      return setting_map.find(name)->second;
+    template<typename THIS_T>
+    auto & GetKeywordInfo(this THIS_T & self, const emp::String & name) {
+      emp_assert(self.HasKeyword(name), "Invalid setting name", name);
+      return self.keyword_map.find(name)->second;
     }
+
   public:
-    [[nodiscard]] bool Has(const emp::String & name) const { return setting_map.contains(name); }
+    void SetVerbose(bool in=true) { verbose = in; }
+
+    [[nodiscard]] bool HasSetting(const emp::String & name) const {
+      return setting_map.contains(name);
+    }
+
+    [[nodiscard]] bool HasKeyword(const emp::String & name) const {
+      return keyword_map.contains(name);
+    }
+
+    [[nodiscard]] bool HasIdentifier(const emp::String & name) const {
+      return HasSetting(name) || HasKeyword(name);
+    }
 
     template <typename T>
     [[nodiscard]] T Get(const emp::String & name) const {
-      return GetInfo(name).GetValue<T>();
+      return GetSettingInfo(name).GetValue<T>();
     }
 
     [[nodiscard]] const emp::String & GetDesc(const emp::String & name) const {
-      return GetInfo(name).GetDescription();
+      return GetSettingInfo(name).GetDescription();
     }
 
-    [[nodiscard]] char GetFlag(const emp::String & name) const { return GetInfo(name).GetFlag(); }
+    [[nodiscard]] char GetFlag(const emp::String & name) const { return GetSettingInfo(name).GetFlag(); }
 
     [[nodiscard]] const emp::String & GetOption(const emp::String & name) const {
-      return GetInfo(name).GetOption();
+      return GetSettingInfo(name).GetOption();
     }
 
     template <typename T>
     void Set(const emp::String & name, T && value) {
-      GetInfo(name).SetValue(std::forward<T>(value));
+      GetSettingInfo(name).SetValue(std::forward<T>(value));
     }
 
     [[nodiscard]] bool HasError() const { return error_note.size(); }
@@ -237,8 +253,18 @@ namespace emp {
                                  emp::String desc,
                                  char flag          = '\0',
                                  emp::String option = "") {
-      emp_assert(!Has(name), "Trying to add a SettingsManager setting that already exists", name);
+      emp_assert(!HasSetting(name), "Trying to add a SettingsManager setting that already exists", name);
       setting_map.emplace(name, SettingInfo{name, value, desc, flag, option});
+      return *this;
+    }
+
+    /// A specified keyword can be added to the settings; it will call a provided
+    /// function with the remaining tokens before the next semicolon.
+    SettingsManager & AddKeyword(const emp::String & keyword,
+                                 keyword_fun_t fun,
+                                 emp::String desc) {
+      emp_assert(!HasKeyword(keyword), "Trying to add a keyword that already exists", keyword);
+      keyword_map.emplace(keyword, KeywordInfo{keyword, fun, desc});
       return *this;
     }
 
@@ -258,6 +284,7 @@ namespace emp {
 
     // Load a specified file; return success.
     bool Load(const std::string & filename) {
+      // Build the lexer to load the file.
       Lexer lexer;
       const int bool_on_ID  = lexer.AddToken("bool_on", "[Oo][Nn]|[Tt][Rr][Uu][Ee]");
       const int bool_off_ID = lexer.AddToken("bool_off", "[Oo][Ff][Ff]|[Ff][Aa][Ll][Ss][Ee]");
@@ -266,51 +293,93 @@ namespace emp {
       const int double_ID   = lexer.AddToken("double", "[0-9]+\\.[0-9]+");
       const int string_ID   = lexer.AddToken("string", "(\\\"([^\"\\\\]|(\\\\.))*\\\")");
       const int assign_ID   = lexer.AddToken("assign", assign_op.AsLiteral());
-      lexer.IgnoreToken("whitespace", "[ \\t\\r\\n]+");
+      const int endline_ID  = lexer.AddToken("endline", "[;\n]");
+      lexer.IgnoreToken("whitespace", "[ \\t\\r]+");
       lexer.IgnoreToken("comment", "#.+");
-      lexer.IgnoreToken("spacing", "\";\"");
       // const int error_ID = lexer.AddToken("error", ".");
 
+      // Load in the tokens from the provided file.
       auto tokens = lexer.TokenizeFile(filename);
       auto it     = tokens.begin();
       error_note.clear();
+
+      // Loop line-by-line processing the input file.
       while (it.Any()) {
+        // Skip any extra lines.
+        if (it.Is(endline_ID)) { ++it; continue; }
+
         const Token name_token = it.Use();
+        if (verbose) emp::PrintLn("Found initial line token '", name_token.lexeme, "'.");
+
         if (name_token != ident_ID) {
-          error_note = "UnexpectedToken '" + name_token.lexeme + "'; expected parameter name.";
+        if (verbose) emp::PrintLn("Error: Not identifier.");
+          error_note = "UnexpectedToken '" + name_token.lexeme
+                     + "'; expected keyword or parameter name.";
           return false;
         }
         const emp::String name = name_token.lexeme;
-        if (!setting_map.contains(name)) {
-          error_note = "Unknown configuration setting, '" + name + "'.";
-          return false;
+
+        // If this line triggering a KEYWORD ?
+        if (HasKeyword(name)) {
+          if (verbose) emp::PrintLn("...identified as keyword!");
+          // Grab the rest of the line.
+          emp::vector<emp::String> keyword_vars;
+          while (it.IsValid() && !it.Is(endline_ID)) {
+            keyword_vars.push_back(it.Use().lexeme);
+          }
+          GetKeywordInfo(name).fun(keyword_vars);
         }
 
-        const Token op_token = it.Use();
-        if (op_token != assign_ID) {
-          error_note = "UnexpectedToken '" + op_token.lexeme + "'; expected '" + assign_op + "'.";
-          return false;
-        }
+        // Is this line configuring a SETTING ?
+        else if (HasSetting(name)) {
+          if (verbose) emp::PrintLn("...identified as setting!");
 
-        const Token value_token = it.Use();
-        if (value_token == ident_ID) {
-          // Set equal to another identifier.
-          if (!setting_map.contains(value_token.lexeme)) {
-            error_note = "Setting to unknown configuration variable, '" + value_token.lexeme + "'.";
+          const Token op_token = it.Use();
+
+          // setting name must be followed by an '='
+          if (op_token != assign_ID) {
+            if (verbose) emp::PrintLn("...expected assignment, but found '", op_token.lexeme, "'.");
+            error_note = "UnexpectedToken '" + op_token.lexeme + "'; expected '" + assign_op + "'.";
             return false;
           }
-          GetInfo(name).SetFromString(GetInfo(value_token.lexeme).AsLiteral());
-          continue;
+
+          // Next, we must have the value for that setting.
+          const Token value_token = it.Use();
+          if (value_token == ident_ID) {
+            if (verbose) emp::PrintLn("...being set to identifier '", value_token.lexeme, "'.");
+            // Set equal to another identifier.
+            if (!setting_map.contains(value_token.lexeme)) {
+              if (verbose) emp::PrintLn("Identifier '", value_token.lexeme, "' UNKNOWN!");
+              error_note = "Setting to unknown configuration variable, '" + value_token.lexeme + "'.";
+              return false;
+            }
+            GetSettingInfo(name).SetFromString(GetSettingInfo(value_token.lexeme).AsLiteral());
+          }
+          else if (value_token.IsOneOf(bool_on_ID, bool_off_ID, int_ID, double_ID, string_ID)) {
+            if (verbose) emp::PrintLn("...being set from literal '", value_token.lexeme, "'.");
+            GetSettingInfo(name).SetFromString(value_token.lexeme);
+            continue;
+          }
+          else {
+            // If we made it this far, we don't know how to do the assignment.
+            if (verbose) emp::PrintLn("...being set to something unknown '", value_token.lexeme, "'.");
+            error_note = "UnexpectedToken '" + value_token.lexeme + "'; expected assignment value.";
+            return false;
+          }
+        }
+        else {
+          if (verbose) emp::PrintLn("...unknown!");
+          error_note = "Unknown keyword or configuration setting, '" + name + "'.";
+          return false;
         }
 
-        if (value_token.IsOneOf(bool_on_ID, bool_off_ID, int_ID, double_ID, string_ID)) {
-          GetInfo(name).SetFromString(value_token.lexeme);
-          continue;
+        // Each line must end in a newline.
+        const Token el_token = it.Use();
+        if (el_token != endline_ID) {
+          if (verbose) emp::PrintLn("...does not terminate in an endline!");
+          error_note = "UnexpectedToken '" + el_token.lexeme + "'; expected end of line.";
+          return false;
         }
-
-        // If we made it this far, we don't know how to do the assignment.
-        error_note = "UnexpectedToken '" + value_token.lexeme + "'; expected assignment value.";
-        return false;
       }
 
       return true;
