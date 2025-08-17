@@ -313,6 +313,8 @@ namespace emp {
     // operator stdv_t &() { return v; }
     // operator const stdv_t &() const { return v; }
 
+    constexpr void clear() { stdv_t::clear(); revision++; }
+
     constexpr void resize(size_t new_size) {
       emp_assert(new_size < MAX_SIZE, new_size);
       stdv_t::resize(new_size);
