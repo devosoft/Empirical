@@ -418,7 +418,7 @@ namespace emp {
 
         base_t::SetSize(new_size);
 
-        if (preserve_data) {
+        if (new_size && preserve_data) {
           // Clear any new (or previously unused) fields.
           for (size_t i = num_old_fields; i < num_new_fields; ++i) { bits[i] = 0; }
 
