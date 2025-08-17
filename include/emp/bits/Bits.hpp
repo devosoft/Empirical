@@ -1601,7 +1601,10 @@ namespace emp {
   ///  2: a string of indexes between braces, e.g.: "{12,19,25,32,33,91}" (does not change size)
   template <typename DATA_T, bool ZERO_LEFT>
   Bits<DATA_T, ZERO_LEFT> & Bits<DATA_T, ZERO_LEFT>::Set(emp::String str) {
-    if (str.size() == 0) { return Resize(0); }
+    if (str.size() == 0) {
+      _data.RawResize(0);
+      return *this;
+    }
 
     Clear();
     if (str.PopIf('{')) {
