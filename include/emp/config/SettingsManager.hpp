@@ -196,16 +196,36 @@ namespace emp {
 
     // === HELPER FUNCTIONS ===
 
-    template<typename THIS_T>
-    auto & GetSettingInfo(this THIS_T & self, const emp::String & name) {
-      emp_assert(self.HasSetting(name), "Invalid setting name", name);
-      return self.setting_map.find(name)->second;
+    // template<typename THIS_T>
+    // auto & GetSettingInfo(this THIS_T & self, const emp::String & name) {
+    //   emp_assert(self.HasSetting(name), "Invalid setting name", name);
+    //   return self.setting_map.find(name)->second;
+    // }
+
+    // template<typename THIS_T>
+    // auto & GetKeywordInfo(this THIS_T & self, const emp::String & name) {
+    //   emp_assert(self.HasKeyword(name), "Invalid setting name", name);
+    //   return self.keyword_map.find(name)->second;
+    // }
+
+    auto & GetSettingInfo(const emp::String & name) {
+      emp_assert(HasSetting(name), "Invalid setting name", name);
+      return setting_map.find(name)->second;
     }
 
-    template<typename THIS_T>
-    auto & GetKeywordInfo(this THIS_T & self, const emp::String & name) {
-      emp_assert(self.HasKeyword(name), "Invalid setting name", name);
-      return self.keyword_map.find(name)->second;
+    auto & GetKeywordInfo(const emp::String & name) {
+      emp_assert(HasKeyword(name), "Invalid setting name", name);
+      return keyword_map.find(name)->second;
+    }
+
+    const auto & GetSettingInfo(const emp::String & name) const {
+      emp_assert(HasSetting(name), "Invalid setting name", name);
+      return setting_map.find(name)->second;
+    }
+
+    const auto & GetKeywordInfo(const emp::String & name) const {
+      emp_assert(HasKeyword(name), "Invalid setting name", name);
+      return keyword_map.find(name)->second;
     }
 
   public:
@@ -373,12 +393,14 @@ namespace emp {
           return false;
         }
 
-        // Each line must end in a newline.
-        const Token el_token = it.Use();
-        if (el_token != endline_ID) {
-          if (verbose) emp::PrintLn("...does not terminate in an endline!");
-          error_note = "UnexpectedToken '" + el_token.lexeme + "'; expected end of line.";
-          return false;
+        // Each line must end in a newline (or end of file)
+        if (it.Any()) {
+          const Token el_token = it.Use();
+          if (el_token != endline_ID) {
+            if (verbose) emp::PrintLn("...does not terminate in an endline!");
+            error_note = "UnexpectedToken '" + el_token.lexeme + "'; expected end of line.";
+            return false;
+          }
         }
       }
 
