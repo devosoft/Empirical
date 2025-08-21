@@ -14,10 +14,10 @@
  * If you want to prevent pointers to pointers (a common source of errors, but MAY be done
  * intentionally) you can define EMP_NO_PTR_TO_PTR
  *
- * If you trip an assert, you can re-do the run a track a specific pointer by defining
+ * If you trip an assert, you can re-do the run to track a specific pointer by defining
  * EMP_ABORT_PTR_NEW or EMP_ABORT_PTR_DELETE to the ID of the pointer in question.
  *
- * For example: -DEMP_ABORT_PTR_NEW=1691
+ * For example, compile with: -DEMP_ABORT_PTR_NEW=1691
  *
  * This will allow you to track the pointer more easily in a debugger.
  *
