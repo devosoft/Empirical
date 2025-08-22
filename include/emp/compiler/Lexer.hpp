@@ -557,7 +557,7 @@ namespace emp {
                       "  // -- Process State --",
                       "  std::vector<${token_name}> tokens{}; // Set of tokens loaded so far.",
                       "  size_t token_id = 0;                 // Next token to process.",
-                      "  const ${token_name} eof_token{0");
+                      "  ${token_name} eof_token{0");
     if (save_lexeme) { file.AppendCode(", \"_EOF_\""); }
     if (save_line_id) { file.AppendCode(", 0"); }
     if (save_col_id) { file.AppendCode(", 0"); }
@@ -683,6 +683,7 @@ namespace emp {
       "    while (${token_name} token = NextToken(in)) {",
       "      if (!IgnoreToken(token.id)) tokens.push_back(token);",
       "    }",
+      "    eof_token.line_id = cur_line;",
       "    return tokens;",
       "  }",
       "",
@@ -723,7 +724,7 @@ namespace emp {
       "  // Get the current (or upcoming) token, but don't remove it from the queue.",
       "  const ${token_name} & Peek(size_t skip_count=0) const {",
       "    if (token_id + skip_count >= tokens.size()) return eof_token;",
-      "    return tokens[token_id];",
+      "    return tokens[token_id + skip_count];",
       "  }",
       "",
       "  // Get the current token, removing it from the queue.",
