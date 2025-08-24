@@ -21,6 +21,7 @@
 
 #include "TokenInput.hpp"
 
+namespace Palette = emp::Palette;
 namespace UI = emp::web;
 
 class Emplex {
@@ -71,7 +72,7 @@ private:
   emp::vector<emp::String> sandbox_colors; // Foreground colors to use for tokens
   emp::vector<emp::String> sandbox_bgs;    // Background colors to use for tokens
 
-  std::string highlight_color = "#ddddff";
+  emp::Color highlight_color{"#ddddff"};
 
   UI::Style button_style {
     "padding", "10px 15px",
@@ -117,10 +118,14 @@ private:
     if (errors.size()) {
       output_text.Clear();
       output_div.Redraw();
-      doc.Button("download_but").SetBackground("#606060").SetDisabled().SetTitle("Generate code to activate this button.");
+      doc.Button("download_but")
+         .SetBackground(emp::Color("#606060"))
+         .SetDisabled()
+         .SetTitle("Generate code to activate this button.");
     }
 
     error_div.Clear();
+    error_div.SetCSS("color", "red");
     for (emp::String & error : errors)  {
       error_div << emp::MakeWebSafe(error) << "<br>\n";
     }
@@ -130,8 +135,8 @@ private:
   // Highlight a specified table row.
   void ActivateTableRow(size_t row_id) {
     if (active_token < token_info.size()) {
-      token_info[active_token].GetNameWidget().SetBackground("white");
-      token_info[active_token].GetRegexWidget().SetBackground("white");
+      token_info[active_token].GetNameWidget().SetBackground(Palette::WHITE);
+      token_info[active_token].GetRegexWidget().SetBackground(Palette::WHITE);
     }
     token_info[row_id].GetNameWidget().SetBackground(highlight_color);
     token_info[row_id].GetRegexWidget().SetBackground(highlight_color);
@@ -377,7 +382,10 @@ private:
     doc.Button("copy_icon").Hide(false);
     doc.Button("close_icon").Hide(false);
 
-    doc.Button("download_but").SetDisabled(false).SetBackground("#330066").SetTitle("Click to download the generated code.");
+    doc.Button("download_but")
+       .SetDisabled(false)
+       .SetBackground(emp::Color{"#330066"})
+       .SetTitle("Click to download the generated code.");
 
     return true;
   }
@@ -408,7 +416,11 @@ private:
 
   void ToggleSandbox() {
     sandbox_div.ToggleActive();
-    if (sandbox_div.IsInactive()) return;
+    if (sandbox_div.IsInactive()) {
+      doc.Button("sandbox_but").SetLabel("Open Sandbox");
+    } else {
+      doc.Button("sandbox_but").SetLabel("Close Sandbox");
+    }
   }
 
   emp::String HeadingName(emp::String name) {
@@ -730,7 +742,7 @@ private:
   void InitializeButtonDiv() {
     button_div << UI::Button([this](){
       UpdateIntro("home"); intro_div.Redraw();
-    }, "Home", "home_but").SetCSS(button_style).SetBackground("#0000AA").SetCSS("width", "159px");
+    }, "Home", "home_but").SetCSS(button_style).SetBackground(emp::Color("#0000AA")).SetCSS("width", "159px");
     button_div << UI::Button([this](){
       UpdateIntro("cpp"); intro_div.Redraw();
     }, "User Guide", "cpp_but").SetCSS(button_style).SetCSS("width", "159px");
@@ -747,10 +759,15 @@ private:
 
   void InitializeTokenDiv() {
     // token_table.SetCSS("border-collapse", "collapse");
-    token_div.SetBackground("lightgrey").SetCSS("margin-top", "10pt", "border-radius", "10px", "border", "1px solid black", "padding", "15px", "width", "800px");
+    token_div.SetBackground(emp::Color{"lightgrey"})
+             .SetCSS("margin-top", "10pt")
+             .SetCSS("border-radius", "10px")
+             .SetCSS("border", "1px solid black")
+             .SetCSS("padding", "15px")
+             .SetCSS("width", "800px");
     token_div << HeadingName("Token Types");
 
-    token_table.SetColor("#000044");
+    token_table.SetColor(emp::Color{"#000044"});
     token_table.GetCell(0,0).SetHeader() << "Token Name";
     token_table.GetCell(0,1).SetHeader() << "Regular Expression";
     token_table.GetCell(0,2).SetHeader() << "Ignore?";
@@ -831,14 +848,14 @@ private:
 
     token_div << UI::Button([this](){
       GenerateCPP();
-    }, "Generate C++ Code", "generate_but").SetCSS(button_style).SetBackground("#330066")
+    }, "Generate C++ Code", "generate_but").SetCSS(button_style).SetBackground(emp::Color{"#330066"})
     .SetTitle("Generate a lexer using the token types defined above.");
 
-    token_div << UI::Button([this](){
+    token_div << UI::Button([this](){      
       ToggleSandbox();
       GenerateLexer();
       UpdateSandbox();
-    }, "Open Sandbox", "sandbox_but").SetCSS(button_style).SetBackground("#330066")
+    }, "Open Sandbox", "sandbox_but").SetCSS(button_style).SetBackground(emp::Color{"#330066"})
     .SetTitle("Try out the current set of tokens live");
 
     token_div << UI::Button([this](){
@@ -849,19 +866,19 @@ private:
   }
 
   void InitializeSettingsDiv() {
-    settings_div.SetBackground("tan").SetCSS(div_style);
+    settings_div.SetBackground(Palette::TAN).SetCSS(div_style);
     settings_div << HeadingName("Advanced Options");
 
     size_t row_id = 0;
     settings_table[row_id][0] << "&nbsp;";
-    settings_table[row_id][1].SetCSS("font-weight", "bold").SetBackground("tan") << "Generated Filename:";
+    settings_table[row_id][1].SetCSS("font-weight", "bold").SetBackground(Palette::TAN) << "Generated Filename:";
     settings_table[row_id][2] << UI::TextArea([this](const std::string & str) {
       out_filename = str;
     }, "set_filename").SetText(out_filename).SetWidth(250)
       .SetTitle("Filename to use if you download the generated lexer.");
     ++row_id;
 
-    settings_table[row_id][0].SetColSpan(3).SetColor("darkblue")
+    settings_table[row_id][0].SetColSpan(3).SetColor(emp::Color{"darkblue"})
       << "<big><b>Token Data to Store</b></big>";
     ++row_id;
 
@@ -884,7 +901,7 @@ private:
     ++row_id;
 
 
-    settings_table[row_id][0].SetColSpan(3).SetColor("darkblue")
+    settings_table[row_id][0].SetColSpan(3).SetColor(emp::Color{"darkblue"})
       << "<big><b>Names to use in the generated C++ code</b></big>";
     ++row_id;
 
@@ -936,7 +953,7 @@ private:
                           "}\n"
                           "print(\"Boom!\");\n");
 
-    sandbox_div.SetBackground("black").SetColor("white").SetCSS(div_style);
+    sandbox_div.SetBackground(Palette::BLACK).SetColor(Palette::WHITE).SetCSS(div_style);
     sandbox_div << UI::Button([this](){
       GenerateLexer();
       UpdateSandbox();
@@ -945,14 +962,14 @@ private:
       sandbox_show_token_info = !sandbox_show_token_info;
       if (sandbox_show_token_info) {
         doc.Button("sandbox_token_info_but").SetLabel("Token Info: ON");
-        doc.Button("sandbox_types_but").SetBackground("#220022").SetDisabled(false);
-        doc.Button("sandbox_lines_but").SetBackground("#220022").SetDisabled(false);
-        doc.Button("sandbox_ignore_but").SetBackground("#220022").SetDisabled(false);
+        doc.Button("sandbox_types_but").SetBackground(emp::Color{"#220022"}).SetDisabled(false);
+        doc.Button("sandbox_lines_but").SetBackground(emp::Color{"#220022"}).SetDisabled(false);
+        doc.Button("sandbox_ignore_but").SetBackground(emp::Color{"#220022"}).SetDisabled(false);
       } else {
         doc.Button("sandbox_token_info_but").SetLabel("Token Info: OFF");
-        doc.Button("sandbox_types_but").SetBackground("#606060").SetDisabled(true);
-        doc.Button("sandbox_lines_but").SetBackground("#606060").SetDisabled(true);
-        doc.Button("sandbox_ignore_but").SetBackground("#606060").SetDisabled(true);
+        doc.Button("sandbox_types_but").SetBackground(emp::Color{"#606060"}).SetDisabled(true);
+        doc.Button("sandbox_lines_but").SetBackground(emp::Color{"#606060"}).SetDisabled(true);
+        doc.Button("sandbox_ignore_but").SetBackground(emp::Color{"#606060"}).SetDisabled(true);
       }
       UpdateSandbox();
     }, "Token Info: OFF", "sandbox_token_info_but").SetCSS(sandbox_but_style);
@@ -961,23 +978,23 @@ private:
       if (sandbox_show_types) doc.Button("sandbox_types_but").SetLabel("Types: ON");
       else doc.Button("sandbox_types_but").SetLabel("Types: OFF");
       UpdateSandbox();
-    }, "Types: OFF", "sandbox_types_but").SetCSS(sandbox_but_style).SetBackground("#606060").SetDisabled(true);
+    }, "Types: OFF", "sandbox_types_but").SetCSS(sandbox_but_style).SetBackground(emp::Color{"#606060"}).SetDisabled(true);
     sandbox_div << UI::Button([this](){
       sandbox_show_lines = !sandbox_show_lines;
       if (sandbox_show_lines) doc.Button("sandbox_lines_but").SetLabel("Line Nums: ON");
       else doc.Button("sandbox_lines_but").SetLabel("Line Nums: OFF");
       UpdateSandbox();
-    }, "Line Nums: OFF", "sandbox_lines_but").SetCSS(sandbox_but_style).SetBackground("#606060").SetDisabled(true);
+    }, "Line Nums: OFF", "sandbox_lines_but").SetCSS(sandbox_but_style).SetBackground(emp::Color{"#606060"}).SetDisabled(true);
     sandbox_div << UI::Button([this](){
       sandbox_show_ignore = !sandbox_show_ignore;
       if (sandbox_show_ignore) doc.Button("sandbox_ignore_but").SetLabel("Ignored: VISIBLE");
       else doc.Button("sandbox_ignore_but").SetLabel("Ignored: HIDDEN");
       GenerateLexer();
       UpdateSandbox();
-    }, "Ignored: HIDDEN", "sandbox_ignore_but").SetCSS(sandbox_but_style).SetBackground("#606060").SetDisabled(true);
+    }, "Ignored: HIDDEN", "sandbox_ignore_but").SetCSS(sandbox_but_style).SetBackground(emp::Color{"#606060"}).SetDisabled(true);
     sandbox_div << sandbox_input.SetSize(750, 115);
     sandbox_div << "<p>";
-    sandbox_div << sandbox_text.SetWidth(750).SetBackground("black").SetColor("white");
+    sandbox_div << sandbox_text.SetWidth(750).SetBackground(Palette::BLACK).SetColor(Palette::WHITE);
     sandbox_div << "</p>";
 
     sandbox_input.SetCallback([this](std::string){ UpdateSandbox(); });
@@ -1077,7 +1094,7 @@ private:
    };
 
     output_div.SetCSS("width", "830px", "position", "relative");
-    output_div.SetBackground("black").SetColor("white");
+    output_div.SetBackground(Palette::BLACK).SetColor(Palette::WHITE);
     output_div.SetBorder("20px").SetCSS("border-radius", "10px");
     output_div << UI::Button([this](){ DownloadCode(); },
       "<img src=\"Icons/ICON-Save.png\" width=\"40px\">", "download_icon")
@@ -1092,7 +1109,7 @@ private:
   }
 
   void InitializeFooterDiv() {
-    footer_div.SetBackground("#000044").SetColor("white").SetCSS(div_style);
+    footer_div.SetBackground(emp::Color{"#000044"}).SetColor(Palette::WHITE).SetCSS(div_style);
     footer_div <<
       "Emplex was developed by Dr. Charles Ofria at Michigan State University, 2024-2025. "
       "See \"About\" for more information.";
@@ -1103,7 +1120,7 @@ public:
     InitializeButtonDiv();
     InitializeTokenDiv();
     InitializeSettingsDiv();
-    error_div.SetBackground("white").SetColor("red");
+    error_div.SetBackground(Palette::WHITE).SetColor(Palette::RED);
     InitializeSandboxDiv();
     InitializeOutputDiv();
     InitializeFooterDiv();
