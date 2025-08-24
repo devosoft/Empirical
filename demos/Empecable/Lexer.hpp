@@ -539,7 +539,7 @@ namespace emplex {
     // Get the current (or upcoming) token, but don't remove it from the queue.
     const Token & Peek(size_t skip_count=0) const {
       if (token_id + skip_count >= tokens.size()) return eof_token;
-      return tokens[token_id];
+      return tokens[token_id + skip_count];
     }
 
     // Get the current token, removing it from the queue.
