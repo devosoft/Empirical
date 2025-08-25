@@ -1,7 +1,7 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2024
+ *  date: 2024-2025
 */
 
 #pragma once
@@ -28,7 +28,7 @@ public:
     regex_text.SetText(regex).SetCSS("width", "525px", "font-size", "14px");
     ignore_toggle.SetChecked(ignore);
 
-    remove_but.SetColor("red").SetTitle("Click to remove this row.");
+    remove_but.SetColor(emp::Palette::RED).SetTitle("Click to remove this row.");
   }
 
   UI::TextArea GetNameWidget() { return name_text; }
