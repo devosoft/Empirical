@@ -2,6 +2,17 @@
 #include "../../../include/emp/math/Random.hpp"
 #include "../../../include/emp/tools/String.hpp"
 
+class RandUtil {
+private:
+  emp::Random random;
+
+public:
+  double Generate(emp::String in) {
+    if (in.IsNumber()) return random.GetDouble(in.AsDouble());
+    return 0.0;
+  }
+};
+
 int main(int argc, char * argv[]) {
   if (argc == 1){
     emp::PrintLn("Format: ", argv[0], " [range]");
@@ -12,5 +23,10 @@ int main(int argc, char * argv[]) {
     emp::PrintLn("  dX    -> generate a uniform random integer from 1 to X (roll a die)");
     emp::PrintLn("  XdY   -> roll X Y-sided dice and sum the result.");
     exit(1);
+  }
+
+  RandUtil ru;
+  for (size_t i = 1; i < argc; ++i) {
+    emp::PrintLn(ru.Generate(argv[i]));
   }
 }
