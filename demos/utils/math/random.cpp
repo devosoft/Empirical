@@ -13,19 +13,18 @@ private:
   enum class Type {
     NONE=0, RANGE, DICE
   };
+  emp::vector<double> vals;
+  Type type = Type::NONE;
 
   const int NUM_id;
 public:
   RandUtil() : NUM_id(lexer.AddToken("NUM", "[0-9]+(\\.[0-0]*)?")) { }
 
-  double Generate(emp::String in) {
-    if (in.IsNumber()) return random.GetDouble(in.AsDouble());
-
+  double Parse(emp::String in) {
     emp::TokenStream ts = lexer.Tokenize(in);
 
-    emp::vector<double> vals;
-    Type type = Type::NONE;
-
+    vals.clear();
+    type = Type::NONE;
     for (emp::Token token : ts) {
       if (token == NUM_id) { vals.push_back(token.lexeme.AsDouble()); }
       else if (token == ':') {
@@ -40,6 +39,8 @@ public:
           PrintLn("Cannot mix types or have multiple d's for a dice generator");
           exit(1);
         }
+        // If we start with a 'd', it means 1 die.
+        if (vals.size() == 0) vals.push_back(1.0);
         type = Type::DICE;
       }
     else {
@@ -50,7 +51,26 @@ public:
 
     return 0.0;
   }
-};
+
+  double Generate(emp::String in) {
+    if (in.IsNumber()) return random.GetDouble(in.AsDouble());
+
+    Parse(in);
+    switch (type) {
+    case Type::DICE: {
+      emp_assert(vals.size() == 2);
+      size_t total = 0;
+      for (int i = 0; i < vals[0]; ++i) {
+        total += random.GetUInt32(static_cast<uint32_t>(vals[1])) + 1;
+      }
+      return total;
+      break;
+    }
+    }
+
+    return -1;
+  }
+  };
 
 int main(int argc, char * argv[]) {
   if (argc == 1){
