@@ -66,6 +66,18 @@ public:
       return total;
       break;
     }
+    case Type::RANGE: {
+      emp_assert(vals.size() >= 2);
+      if (vals[0] >= vals[1]) {
+        PrintLn("Invalid Range; min must be less than max.");
+        exit(1);
+      }
+      // if (vals.size() > 2) {
+      //   double step_size = vals[1];
+      //   int steps = static_cast<int>(range / step_size);
+      // }
+      return random.GetDouble(vals[0], vals[1]);
+    }
     }
 
     return -1;
