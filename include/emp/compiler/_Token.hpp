@@ -1,6 +1,6 @@
 /**
  * This file is part of Empirical, https://github.com/devosoft/Empirical
- * Copyright (C) 2024 Michigan State University
+ * Copyright (C) 2024-2025 Michigan State University
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/compiler/_Token.hpp
@@ -26,9 +26,7 @@ namespace emp {
     size_t line_id;  ///< Which line did this token start on?
 
     Token(int _id, const String & str = "", size_t _line = 0)
-      : id(_id), lexeme(str), line_id(_line) {
-      ;
-    }
+      : id(_id), lexeme(str), line_id(_line) { }
 
     Token(const Token &)             = default;
     Token(Token &&)                  = default;
@@ -39,14 +37,11 @@ namespace emp {
 
     operator const std::string &() const { return lexeme; }  // Convert to lexeme if used as string.
 
+    [[nodiscard]] bool IsOneOf(int test_id) const { return (id == test_id); }
+
     template <std::same_as<int>... Ts>
-    [[nodiscard]] bool IsOneOf(int test_id, Ts... args) const {
-      if (id == test_id) { return true; }
-      if constexpr (sizeof...(args) > 0) {
-        return IsOneOf(args...);
-      } else {
-        return false;
-      }
+    [[nodiscard]] bool IsOneOf(int test_id, int test2, Ts... args) const {
+      return (id == test_id) || IsOneOf(test2, args...);
     }
   };
 
