@@ -1,6 +1,6 @@
 /**
  * This file is part of Empirical, https://github.com/devosoft/Empirical
- * Copyright (C) 2016-2024 Michigan State University
+ * Copyright (C) 2016-2025 Michigan State University
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/compiler/Lexer.hpp
@@ -58,17 +58,17 @@ namespace emp {
   template <int MAX_ID>
   class Lexer_Base {
   private:
+    emp::vector<TokenType> token_set{};   ///< List of all active tokens types.
+    std::map<String, int> token_map{};    ///< Map of token names to id.
+    int cur_token_id = MAX_ID;            ///< ID for next new token (higher has priority)
+    mutable bool generate_lexer = false;  ///< Do we need to regenerate the lexer?
+    mutable DFA lexer_dfa{};              ///< Table driven lexer implementation.
+    mutable String lexeme{};              ///< Current state of lexeme being generated.
+
     static constexpr int ERROR_ID = -1;  ///< Code for unknown token ID.
 
-    emp::vector<TokenType> token_set{};    ///< List of all active tokens types.
-    std::map<String, int> token_map{};     ///< Map of token names to id.
-    int cur_token_id            = MAX_ID;  ///< ID for next new token (higher has priority)
-    mutable bool generate_lexer = false;   ///< Do we need to regenerate the lexer?
-    mutable DFA lexer_dfa{};               ///< Table driven lexer implementation.
-    mutable String lexeme{};               ///< Current state of lexeme being generated.
-
     static const TokenType & ERROR_TOKEN() {
-      static const TokenType token{"ERROR", "", -1};
+      static const TokenType token{"ERROR", "", ERROR_ID};
       return token;
     }
 
