@@ -164,13 +164,23 @@ namespace emp {
 
     void DebugToken(int token_id) const;
 
+    /// Generate a C++ lexer file.
+    /// @param file The C++ file to write to.
+    /// @param object_name Class name to use for the lexer object itself. (Default: "Lexer")
+    /// @param DFA_name Class name to use for the DFA powering the Lexer. (Default: "DFA")
+    /// @param token_name Class name to use for the individual tokens. (Default: "Token")
+    /// @param save_lexeme Should lexemes be saved in tokens by default? (Default: true)
+    /// @param save_line_id Should we save the line number for each token? (Default: true)
+    /// @param save_col_id Should we save the column the token was found on? (Default: true)
+    /// @param use_emp Should we use Empirical classes? (Default: false) (Default: true)
     void WriteCPP(emp::CPPFile & file,
                   emp::String object_name = "Lexer",
                   emp::String DFA_name    = "DFA",
                   emp::String token_name  = "Token",
                   bool save_lexeme        = true,
                   bool save_line_id       = true,
-                  bool save_col_id        = true) const;
+                  bool save_col_id        = true,
+                  bool use_emp            = false) const;
   };
 
   using Lexer = Lexer_Base<255>;
@@ -501,29 +511,49 @@ namespace emp {
   }
 
   template <int MAX_ID>
-  void Lexer_Base<MAX_ID>::WriteCPP(emp::CPPFile & file,
-                                    emp::String object_name,
-                                    emp::String DFA_name,
-                                    emp::String token_name,
-                                    bool save_lexeme,
-                                    bool save_line_id,
-                                    bool save_col_id) const {
+  void Lexer_Base<MAX_ID>::WriteCPP(
+    emp::CPPFile & file,
+    emp::String object_name,
+    emp::String DFA_name,
+    emp::String token_name,
+    bool save_lexeme,
+    bool save_line_id,
+    bool save_col_id,
+    bool use_emp
+  ) const {
     // If we still need to generate the DFA for the lexer, do so.
     if (generate_lexer) { Generate(); }
 
-    file.Include("<algorithm>")
-      .Include("<array>")
-      .Include("<cctype>")
-      .Include("<iostream>")
-      .Include("<string>")
-      .Include("<unordered_map>")
-      .Include("<vector>");
+    file.AddVarSetting("object_name", object_name);
+    file.AddVarSetting("token_set_size", token_set.size());
+    file.AddVarSetting("token_name", token_name);
+    file.AddVarSetting("DFA_name", DFA_name);
+    if (use_emp) {
+      file.AddVarSetting("str_type", "emp::String");
+      file.AddVarSetting("vec_type", "emp::vector");
+    } else {
+      file.AddVarSetting("str_type", "std::string");
+      file.AddVarSetting("vec_type", "std::vector");
+    }
+
+    file.Include("<algorithm>");
+    file.Include("<array>");
+    file.Include("<cctype>");
+    file.Include("<iostream>");
+    if (!use_emp) file.Include("<string>");
+    file.Include("<unordered_map>");
+    if (!use_emp) file.Include("<vector>");
+
+    if (use_emp) {
+      file.Include("emp/base/vector.hpp")
+      file.Include("emp/tools/String.hpp")
+    }
 
     file.AddCode("// Struct to store information about a found Token")
       .AddCode("struct ", token_name, " {")
       .AddCode("  int id;                             // Type ID for token");
     if (save_lexeme) {
-      file.AddCode("  std::string lexeme;                 // Sequence matched by token");
+      file.AddCode("  ${str_type} lexeme;                 // Sequence matched by token");
     }
     if (save_line_id) {
       file.AddCode("  size_t line_id;                     // Line token started on");
@@ -539,25 +569,21 @@ namespace emp {
     lexer_dfa.WriteCPP(file, DFA_name);
     file.AddCode("");
 
-    file.AddVarSetting("object_name", object_name);
-    file.AddVarSetting("token_set_size", token_set.size());
-    file.AddVarSetting("token_name", token_name);
-    file.AddVarSetting("DFA_name", DFA_name);
-
-    file.AddCodeBlock("class ${object_name} {",
-                      "private:",
-                      "  static constexpr int NUM_TOKENS=${token_set_size};",
-                      "",
-                      "  // -- Load State --",
-                      "  size_t cur_line = 1;   // Track LINE we are reading in the input.",
-                      "  size_t cur_col = 0;    // Track COLUMN we are reading in the input.",
-                      "  int start_pos = 0;     // Track INDEX for the start of current lexeme.",
-                      "  std::string lexeme{};  // Lexeme found for the current token",
-                      "",
-                      "  // -- Process State --",
-                      "  std::vector<${token_name}> tokens{}; // Set of tokens loaded so far.",
-                      "  size_t token_id = 0;                 // Next token to process.",
-                      "  ${token_name} eof_token{0");
+    file.AddCodeBlock(
+      "class ${object_name} {",
+      "private:",
+      "  static constexpr int NUM_TOKENS=${token_set_size};",
+      "",
+      "  // -- Load State --",
+      "  size_t cur_line = 1;   // Track LINE we are reading in the input.",
+      "  size_t cur_col = 0;    // Track COLUMN we are reading in the input.",
+      "  int start_pos = 0;     // Track INDEX for the start of current lexeme.",
+      "  ${str_type} lexeme{};  // Lexeme found for the current token",
+      "",
+      "  // -- Process State --",
+      "  ${vec_type}<${token_name}> tokens{}; // Set of tokens loaded so far.",
+      "  size_t token_id = 0;                 // Next token to process.",
+      "  ${token_name} eof_token{0");
     if (save_lexeme) { file.AppendCode(", \"_EOF_\""); }
     if (save_line_id) { file.AppendCode(", 0"); }
     if (save_col_id) { file.AppendCode(", 0"); }
@@ -571,7 +597,7 @@ namespace emp {
     }
     file.AddCodeBlock("",
                       "  // Return the name of a token given its ID.",
-                      "  static std::string TokenName(int id) {",
+                      "  static ${str_type} TokenName(int id) {",
                       "    switch (id) {",
                       "    case -1: return \"_ERROR_\";",
                       "    case 0: return \"_EOF_\";");
@@ -582,13 +608,13 @@ namespace emp {
     file.AddCodeBlock("    default:",
                       "      // If ID is a visible character print it, otherwise provide ID.",
                       "      if (id > 0 && id < 128 && std::isprint(id)) {",
-                      "        return std::string(\"'\") + static_cast<char>(id) + \"'\";",
+                      "        return ${str_type}(\"'\") + static_cast<char>(id) + \"'\";",
                       "      }",
                       "      if (id == '\\n') return \"'\\\\n'\";",
                       "      if (id == '\\r') return \"'\\\\r'\";",
                       "      if (id == '\\t') return \"'\\\\t'\";",
                       "      if (id == '\\\\') return \"'\\\\n'\";",
-                      "      return std::string(\"Token ID: \") + std::to_string(id);",
+                      "      return ${str_type}(\"Token ID: \") + std::to_string(id);",
                       "    }; // End switch.",
                       "  }",
                       "",
@@ -657,7 +683,7 @@ namespace emp {
       "    // Update the line number we are on.",
       "    const size_t out_line = cur_line;",
       "    const size_t out_col = cur_col;",
-      "    if ((cur_col = lexeme.rfind('\\n')) == std::string::npos) { // No newlines",
+      "    if ((cur_col = lexeme.rfind('\\n')) == ${str_type}::npos) { // No newlines",
       "      cur_col = out_col + lexeme.size();",
       "    } else {",
       "      cur_col = lexeme.size() - cur_col - 1;",
@@ -674,7 +700,7 @@ namespace emp {
       "  }",
       "",
       "  // Convert an input string into a vector of tokens.",
-      "  const std::vector<${token_name}> & Tokenize(std::string_view in) {",
+      "  const ${vec_type}<${token_name}> & Tokenize(std::string_view in) {",
       "    start_pos = 0; // Start processing at beginning of string.",
       "    cur_line = 1;  // Start processing at the first line of the input.",
       "    cur_col = 0;   // Start processing at the first position of the input.",
@@ -688,9 +714,9 @@ namespace emp {
       "  }",
       "",
       "  // Convert an input stream to a string, then tokenize.",
-      "  const std::vector<${token_name}> & Tokenize(std::istream & is) {",
+      "  const ${vec_type}<${token_name}> & Tokenize(std::istream & is) {",
       "    return Tokenize(",
-      "      std::string(std::istreambuf_iterator<char>(is), std::istreambuf_iterator<char>())",
+      "      ${str_type}(std::istreambuf_iterator<char>(is), std::istreambuf_iterator<char>())",
       "    );",
       "  }",
       "",
