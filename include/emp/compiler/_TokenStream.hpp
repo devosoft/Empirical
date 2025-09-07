@@ -1,6 +1,6 @@
 /**
  * This file is part of Empirical, https://github.com/devosoft/Empirical
- * Copyright (C) 2024 Michigan State University
+ * Copyright (C) 2024-2025 Michigan State University
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/compiler/_TokenStream.hpp
@@ -175,7 +175,7 @@ namespace emp {
     void push_back(const Token & in) { tokens.push_back(in); }
 
     void Print(std::ostream & os = std::cout) const {
-      for (auto x : tokens) { os << " [" << x.lexeme << "]"; }
+      for (const auto & x : tokens) { os << " [" << x.lexeme << "]"; }
       os << std::endl;
     }
   };
