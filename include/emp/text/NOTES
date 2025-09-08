@@ -7,7 +7,7 @@ Supported text formats:
  MARKDOWN (need to be careful that C++, for example, doesn't grab the '++')
  RTF
  XML
- MarkBack (custom markup language; simple tags working)
+ Markback (custom markup language; simple tags working)
 
 Internal encoding (Emphatic)
  The Emphatic encoding maintains a string of characters, each associated with any number of styles.  The standard styles are:
@@ -37,7 +37,7 @@ Internal encoding (Emphatic)
 ---------------------------------------
 
 
-MarkBack notes:
+Markback notes:
   New format is .mback, which is inspired by markdown, but uses just two types of special characters for formatting control:
      Backquotes (`) indicate a change in text STYLE
      Backslashes (\) indicate an insertion (e.g., an emoji or a bullet)
@@ -57,11 +57,11 @@ MarkBack notes:
    `(bold)
    `(italic)
 
-  You can use a ! to explicitly turn off a format by name, or last named format:
+  You can use a ! to explicitly turn off a format by name; (!) alone ends last named format:
    `(bold)This text is bold, `(!bold)but this is not.
    `(underlined)This text is underlined. `(!)but this is not
 
-  If you put a literal string in the parens, it will be treated as a color:
+  If you put a quoted string in the parens, it will be treated as a color:
 
    `("blue")This text would be blue
    `("#FF00FF")This text would be magenta
@@ -70,22 +70,22 @@ MarkBack notes:
   Beginning and end of links are specified with `[ and `] with the URL in parens following the close.
    `[Linked-text goes here`](URL)
 
-  You can create custom formatting using `'format_name'.
+  You can create custom formatting using single quotes: `'format_name'.
    `*`/`("red")`'error'Error: Bold, italics, and red since something went wrong!`*`/`("")
    `(error)Error: something else went wrong, with some formatting.`(!)
 
-  You can end ALL special formatting with `!
+  You can end ALL special formatting (not just most recent) with `!
 
   Code -- see more below.
    `{var name="XYZ"; count = count + 1;}
-   `?{TEST}{Optional formatting} ... `?  -- e.g., ?{has_error}{[red]} or ?{important}{*}
+   `?{TEST}{Optional formatting} ... `?  -- e.g., ?{has_error}{("red")} or ?{important}{*}
 
   The following tags change the format for the rest of the line they are on.
    `% Comment that will be removed
    `- Ignore all special formatting (even escape characters) for the rest of the line
 
   These tags alter the whole line and must be the first non-whitespace character on their line.
-   `" Blockquote (Should be the first non-whitespace, or a preceding newline will be assumed)
+   `" Blockquote
    `# Heading format
    `## Heading level 2
    `### etc. deeper headings.
@@ -157,8 +157,8 @@ MarkBack notes:
    \?{TEST}{Optional text} - insert only if TEST is true.
 
 
-  Unused symbols for insertions: $~!@%;'",/ plus lots of letters
-  ALSO technically unused, but less useful: ]>})
+  Unused symbols for insertions: $~!@%;'",/> plus lots of letters
+  ALSO technically unused, but less useful: ]})
 
 
   Now for the crazy.  We can EMBED CODE as needed.
@@ -187,14 +187,14 @@ Some saved notes:
     //   HTML:      One word is <b>bold</b>.
     //   MarkDown:  One word is *bold*.
     //   LaTeX:     One word is \textbf{bold}.
-    //   MarkBack:  One word is `*bold`*
+    //   Markback:  One word is `*bold`*
     //
     // Some styles need to have arguments associated with them.  For example, a heading needs
     // to have a level.  A level 3 heading, for example, would be stored as style "heading:3".
     //   HTML:      <h3>A level 3 heading</h3>
     //   MarkDown:  ### A level 3 heading
     //   LaTeX:     \subsubsection{A level 3 heading}
-    //   MarkBack:  `### A level 3 heading
+    //   Markback:  `### A level 3 heading
     //
     // The patterns associated with these can either be broken up into multiple tags (for example,
     // in LaTeX it's easier to match a specific "\subsubsection{" open tag with "header:3" style),
@@ -206,7 +206,7 @@ Some saved notes:
     //   HTML:      This is <a href="http://www.exmaple.com/">linked</a> text.
     //   MarkDown:  This is [linked](http://www.exmaple.com/) text.
     //   LaTeX:     This is \href{http://www.exmaple.com/}{linked} text.
-    //   MarkBack:  This is `[linked](http://www.exmaple.com/) text.
+    //   Markback:  This is `[linked](http://www.exmaple.com/) text.
     //
     // For these patterns, HTML open would look like: <a href="%u">
     // And it would be set to the style: "link:$0".
