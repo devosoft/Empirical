@@ -95,6 +95,18 @@ Markback notes:
    `= Centered
    `: Continues the previous line for other tags in this group
 
+   `+ Bulleted list entry (Defaults to bullet, but will continue previous format if in a list.)
+   `++ Bulleted list entry (always bullet, even if in a list with other types.)
+   `+1 Numerical bullet, incrementing if in a list
+   `+a is a lowercase alphabetic bullet, incrementing if in a list
+   `+A is an uppercase alphabetic bullet, incrementing if in a list
+   `+o task-list bullet (i.e., a checkbox)
+   `+R is a roman numeral bullet, incrementing if in a list
+   `+{123} (or other numbers/letters) specifies value for bullet (subsequent `+ will continue from it)
+  Note that initial pluses can be repeated any number of times for deeper indentation and nested lists.
+  For example `+++, `++1, or `++++{123}
+
+
   Anything with three backticks (```) before and after will be treated as code blocks.
 
   A single or double backtick indicates that everything in between is going to be inline
@@ -113,51 +125,40 @@ Markback notes:
    CPPFunctionCall(x, y);
    ```
 
-  Unused symbols for style: @$&+;',
+  Unused symbols for style: @$&;,
   ALSO technically unused, but less useful: ]}
 
   The following tags handle special INSERTIONS:
 
-   \\ is a regular backslash ('\')
-   \` is a regular backtick ('`')
-   \_ is a non-breaking space.
-   \b is a page break
-   \n is a line break (newline)
-   \p is a paragraph break
-   \t is a tab
-
-  For inserting entries into bulleted lists you can use:
-   \* is a simple bullet for a list entry
-   \+ is a numerical bullet, incrementing if in a list
-   \a is a lowercase alphabetic bullet, incrementing if in a list
-   \A is an uppercase alphabetic bullet, incrementing if in a list
-   \o task-list bullet (i.e., a checkbox)
-   \R is a roman numeral bullet, incrementing if in a list
-   \={123} (or any other numbers or letters) is a specified value for a bullet (a subsequent \+, \a, or \R will continue from it)
-  Note that initial bullet symbols can be repeated any number of times for deeper indentation and nested lists.
-  For example \***, \++, or \===={123}
+   \\ inserts a regular backslash ('\')
+   \` inserts a regular backtick ('`')
+   \_ inserts a non-breaking space.
+   \b inserts a page break
+   \n inserts a line break (newline)
+   \p inserts a paragraph break
+   \t inserts a tab
 
   Other special insertions are also possible with backslash:
-   \#{hashtag}
-   \| is the beginning of a line for creating a table (rest of line is markdown format...?)
+   \#{hashtag} inserts an invisible tag for later referencing.
+   \| is the beginning of a line for creating a table (markdown format; counts as first |)
    \. is nothing. Use to separate other text (e.g., for unicode immediately followed by a number)
-   \- is a horizontal rule
+   \- inserts a horizontal rule
    \^{note} creates an footnote.  This is a superscript value with the contents included at the end of the page (or end of document if no page breaks)
-   \d{name} creates a division (div) with a specified name
-   \(URL) or \(#hashtag) will place a link this point WITH itself as the text
+   \d{name} creates a division (div) with a specified name; end it \d{!name}
+   \(URL) or \(#hashtag) will insert a link WITH itself as the text
    \[URL|width=100,height=200,alt="my image!"] will RESOLVE a URL to an image and place it here
-   \:name: or \:{name} will place the emoji associated with 'name' (or unicode character if a number is used)
+   \&{name} will place the emoji associated with 'name' (or unicode character if a number is used)
 
-  For easier HTML conversion, we also have the ability to simply escape existing HTML text:
+  For easier HTML conversion, we can also escape existing HTML text:
    \<tag> tries to match the associated HTML tag
-   \&name; or \&{name} insert a character by a given HTML name (unicode works same as HTML)
+   \&name; insert a character by a given HTML name (unicode works same as HTML); same as \&{name}
 
   For embedded code:
    \{var_value_printed_here} - see below
    \?{TEST}{Optional text} - insert only if TEST is true.
 
 
-  Unused symbols for insertions: $~!@%;'",/> plus lots of letters
+  Unused symbols for insertions: $~!@%;'",/>*+: plus lots of letters
   ALSO technically unused, but less useful: ]})
 
 
