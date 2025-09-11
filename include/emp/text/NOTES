@@ -70,7 +70,7 @@ Markback notes:
   Beginning and end of links are specified with `[ and `] with the URL in parens following the close.
    `[Linked-text goes here`](URL)
 
-  You can create custom formatting using single quotes: `'format_name'.
+  Create a custom formatting combo using single quotes: `'format_name'.
    `*`/`("red")`'error'Error: Bold, italics, and red since something went wrong!`*`/`("")
    `(error)Error: something else went wrong, with some formatting.`(!)
 
@@ -86,14 +86,16 @@ Markback notes:
 
   These tags alter the whole line and must be the first non-whitespace character on their line.
    `" Blockquote
+   `> Indented text
    `# Heading format
    `## Heading level 2
    `### etc. deeper headings.
-   `< Left Justified
-   `> Right Justified
-   `| Fully Justified
-   `= Centered
-   `: Continues the previous line for other tags in this group
+
+   `: or `:: Centered
+   `:< Left Justified (default)
+   `:> Right Justified
+   `:= Fully Justified
+   `< Continue the previous line for "whole line" tags.
 
    `+ Bulleted list entry (Defaults to bullet, but will continue previous format if in a list.)
    `++ Bulleted list entry (always bullet, even if in a list with other types.)
@@ -125,7 +127,7 @@ Markback notes:
    CPPFunctionCall(x, y);
    ```
 
-  Unused symbols for style: @$&;,
+  Unused symbols for style: @$&;,=|
   ALSO technically unused, but less useful: ]}
 
   The following tags handle special INSERTIONS:
@@ -139,15 +141,18 @@ Markback notes:
    \t inserts a tab
 
   Other special insertions are also possible with backslash:
+   \@{file.mback} insert the specified file into this position.
    \#{hashtag} inserts an invisible tag for later referencing.
    \| is the beginning of a line for creating a table (markdown format; counts as first |)
-   \. is nothing. Use to separate other text (e.g., for unicode immediately followed by a number)
    \- inserts a horizontal rule
    \^{note} creates an footnote.  This is a superscript value with the contents included at the end of the page (or end of document if no page breaks)
    \d{name} creates a division (div) with a specified name; end it \d{!name}
    \(URL) or \(#hashtag) will insert a link WITH itself as the text
    \[URL|width=100,height=200,alt="my image!"] will RESOLVE a URL to an image and place it here
    \&{name} will place the emoji associated with 'name' (or unicode character if a number is used)
+   \. is nothing. Use to separate other text (e.g., for unicode immediately followed by a number)
+   
+   If a backslash is the last non-whitespace character on a line, the next line is merged onto that one.
 
   For easier HTML conversion, we can also escape existing HTML text:
    \<tag> tries to match the associated HTML tag
@@ -158,7 +163,7 @@ Markback notes:
    \?{TEST}{Optional text} - insert only if TEST is true.
 
 
-  Unused symbols for insertions: $~!@%;'",/>*+: plus lots of letters
+  Unused symbols for insertions: $~!%;'",/>*+: plus lots of letters
   ALSO technically unused, but less useful: ]})
 
 
