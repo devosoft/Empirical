@@ -1,6 +1,6 @@
 /**
  * This file is part of Empirical, https://github.com/devosoft/Empirical
- * Copyright (C) 2022-2024 Michigan State University
+ * Copyright (C) 2022-2025 Michigan State University
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/text/Text.hpp
@@ -28,15 +28,28 @@
  *    "color:NAME"
  *    "font:NAME"
  *    "size:POINT_SIZE"
- *
- *   STRUCTURAL :
- *    "heading:1" through "heading:6" different levels of headings.
- *    "blockquote"
- *    "bullet:1" through "bullet:6" (only on character after bulleted; stops an newline)
- *    "indent:1" through "indent:6" (same as bullet, but no bullet)
- *    "ordered:1" through "ordered:6" (numbers; reset less-tabbed structure is used)
  *    "link:URL" (create a link to the specified URL)
+ *    "name:NAME" (names can be referred to from elsewhere)
+ *
+ *   WHOLE LINE FORMAT :
+ *    "heading:LEVEL" (starts at 1 for largest heading)
+ *    "blockquote"
+ *    "center", "left", "right", or "full" (justification)
+ *    "indent:0" through "indent:6" (simple indentation levels; continues to future lines until changed)
+ * 
+ *   INSERTION :
  *    "image:URL" (include in the specified image)
+ *    "symbol:name" (used for most insert types; emoji names or Unicode numbers)
+ *    "bullet" (often used with indent)
+ *    "bullet:symbol" (specified bullet symbol)
+ *    "ordered:type" (ordinal bullets; type can be "number", "upper", "lower", or "roman")
+ *    "footnote:"message""
+ *
+ *   META :
+ *    "hashtag:label"
+ * 
+ *   TO DO :
+ *    - How should tables work?
  */
 
 #pragma once
