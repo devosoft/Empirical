@@ -16,7 +16,6 @@
 #include <map>
 #include <stddef.h>
 
-#include "../base/map.hpp"
 #include "../base/vector.hpp"
 
 namespace emp {
@@ -30,7 +29,7 @@ namespace emp {
   template <typename T>
   class ra_set {
   private:
-    emp::map<T, size_t> id_map;  ///< A map of where to find values in vector.
+    std::map<T, size_t> id_map;  ///< A map of where to find values in vector.
     emp::vector<T> vals;         ///< A vector of all values contained.
 
   public:
