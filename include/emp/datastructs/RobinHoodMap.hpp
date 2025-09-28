@@ -89,7 +89,7 @@ namespace emp {
 
     [[nodiscard]] bool empty() const { return num_elements == 0; }
 
-    [[nodiscard]] bool contains(const T & key) const { return FindPtr(key) != nullptr; }
+    [[nodiscard]] bool contains(const Key & key) const { return FindPtr(key) != nullptr; }
 
     void insert(std::pair<Key, T> in) { Insert(in.first, in.second); }
 
