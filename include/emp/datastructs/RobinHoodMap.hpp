@@ -29,7 +29,7 @@ namespace emp {
 
     static constexpr double MAX_LOAD_FACTOR = 0.8;
     static constexpr size_t INIT_CAPACITY   = 15;
-    static constexpr double GROW_FACTOR     = 2.0;
+    static constexpr size_t GROW_FACTOR     = 2;
     static constexpr size_t GROW_OFFSET     = 1;
 
     emp::vector<Entry> table{INIT_CAPACITY};
@@ -77,11 +77,7 @@ namespace emp {
     }
 
   public:
-    RobinHoodMap()                            = default;
-    RobinHoodMap(RobinHoodMap &&)             = default;
-    RobinHoodMap & operator=(RobinHoodMap &&) = default;
-
-    ~RobinHoodMap() {}
+    // All constructors and destructor are implicitly created.
 
     [[nodiscard]] size_t size() const { return num_elements; }
 
@@ -91,9 +87,15 @@ namespace emp {
 
     [[nodiscard]] bool contains(const Key & key) const { return FindPtr(key) != nullptr; }
 
-    void insert(std::pair<Key, T> in) { Insert(in.first, in.second); }
+    // std::map-like insert interface (minimal version).
+    // std::map returns pair<iterator,bool>; we just return bool for now.
+    bool insert(const std::pair<Key, T> & in) {
+      return Insert(in.first, in.second);
+    }
 
-    void Insert(const Key & key, const T & value) {
+    /// Insert with "unique key" semantics.
+    /// @return true if a new element was inserted, false if key was already present.
+    bool Insert(const Key & key, const T & value) {
       // Test if we need to grow the table...
       if (num_elements / static_cast<double>(capacity()) >= MAX_LOAD_FACTOR) {
         Rehash(capacity() * GROW_FACTOR + GROW_OFFSET);
@@ -103,24 +105,48 @@ namespace emp {
       size_t pos              = hash_value % capacity();
       size_t dist             = 0;
 
+      // Search for an existing key; return false if we find one or break loop if there is not one.
+      while (true) {
+        // Stop loop if we found a gap.
+        if (!table[pos].occupied) break;
+ 
+        // If key is already in the table, return false.
+        if (table[pos].hash == hash_value && table[pos].key == key) { return false; }
+
+        const size_t existing_dist = CalcDist(pos);
+
+        // If current entry is "closer to home", start the Robin Hood swap-in from this position.
+        if (existing_dist < dist) break;
+
+        // Shift to considering the next position.
+        pos = (pos + 1) % capacity();
+        ++dist;
+      }
+
+      // Current key not in table; perform standard Robin Hood insertion from found position.
       Entry new_entry{key, value, hash_value, true};
 
       while (true) {
+        // If we found an empty position, insert new entry here and return true.
         if (!table[pos].occupied) {
           table[pos] = new_entry;
           ++num_elements;
-          return;
+          return true;
         }
 
+        // Otherwise see which entry needs to be bumped further.
         const size_t existing_dist = CalcDist(pos);
         if (existing_dist < dist) {
           std::swap(table[pos], new_entry);
           dist = existing_dist;
         }
 
+        // Move on to the next table position.
         pos = (pos + 1) % capacity();
         ++dist;
       }
+
+      // The previous loop is guaranteed to eventually find an empty position.
     }
 
     [[nodiscard]] const T * FindPtr(const Key & key) const { return FindPtr_impl(key); }
