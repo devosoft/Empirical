@@ -25,6 +25,8 @@ namespace emp {
       T value;
       size_t hash   = 0;      // Store hash to avoid recomputing
       bool occupied = false;  // @CAO Optimize away later
+
+      operator bool() const { return occupied; }
     };
 
     static constexpr double MAX_LOAD_FACTOR = 0.8;
@@ -86,6 +88,29 @@ namespace emp {
     [[nodiscard]] bool empty() const { return num_elements == 0; }
 
     [[nodiscard]] bool contains(const Key & key) const { return FindPtr(key) != nullptr; }
+
+    void clear() {
+      for (auto & entry : table) {
+        entry.occupied = false;
+        entry.hash     = 0;
+      }
+      num_elements = 0;
+    }
+
+    void reserve(size_t n) {
+      emp_assert(table.size() >= INIT_CAPACITY);
+
+      // If we already have enough room, do nothing.
+      if (n <= static_cast<size_t>(capacity() * MAX_LOAD_FACTOR)) return;
+
+      // Grow with the same rule used in Insert (GROW_FACTOR, GROW_OFFSET)
+      size_t new_cap = table.size();
+      while (static_cast<double>(new_cap) * MAX_LOAD_FACTOR < n) {
+        new_cap = static_cast<size_t>(new_cap * GROW_FACTOR + GROW_OFFSET);
+      }
+
+      Rehash(new_cap);
+    }
 
     // std::map-like insert interface (minimal version).
     // std::map returns pair<iterator,bool>; we just return bool for now.
