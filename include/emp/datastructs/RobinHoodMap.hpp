@@ -17,7 +17,7 @@
 
 namespace emp {
 
-  template <typename Key, typename T>
+  template <typename Key, typename T, bool IMPROVE_HASH=false>
   class RobinHoodMap {
   private:
     struct Entry {
@@ -39,8 +39,22 @@ namespace emp {
 
     // === HELPER FUNCTIONS ===
 
-    [[nodiscard]] size_t CalcHash(const Key & key) const {
-      return std::hash<Key>{}(key);
+    static size_t ImproveHash(size_t h) {
+      // SplitMix64 finalizer (good quality, cheap enough for a hash table)
+      h += 0x9e3779b97f4a7c15ull;
+      h = (h ^ (h >> 30)) * 0xbf58476d1ce4e5b9ull;
+      h = (h ^ (h >> 27)) * 0x94d049bb133111ebull;
+      h = h ^ (h >> 31);
+      return h;
+    }
+  
+    [[nodiscard]] static size_t CalcHash(const Key & key) {
+      const size_t hash_val = std::hash<Key>{}(key);
+      if constexpr (IMPROVE_HASH) {
+        return ImproveHash(hash_val);
+      } else {
+        return hash_val;
+      }
     }
 
     // Calculate how far off a current entry is from its ideal position.
