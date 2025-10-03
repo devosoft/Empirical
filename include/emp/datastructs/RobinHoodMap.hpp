@@ -39,6 +39,10 @@ namespace emp {
 
     // === HELPER FUNCTIONS ===
 
+    [[nodiscard]] size_t CalcHash(const Key & key) const {
+      return std::hash<Key>{}(key);
+    }
+
     // Calculate how far off a current entry is from its ideal position.
     [[nodiscard]] size_t CalcDist(size_t pos) const {
       emp_assert(table[pos].occupied, pos);
@@ -52,17 +56,17 @@ namespace emp {
 
       // Move all elements into the new hash table.
       for (const Entry & entry : old_table) {
-        if (entry.occupied) { Insert(entry.key, entry.value); }
+        if (entry) { Insert(entry.key, entry.value); }
       }
     }
 
     [[nodiscard]] const T * FindPtr_impl(const Key & key) const {
-      size_t hash_value = std::hash<Key>{}(key);
+      size_t hash_value = CalcHash(key);
       size_t pos        = hash_value % capacity();
       size_t dist       = 0;
 
       while (true) {
-        if (!table[pos].occupied) { return nullptr; }  // Not found.
+        if (!table[pos]) { return nullptr; }  // Not found.
 
         if (table[pos].hash == hash_value && table[pos].key == key) { return &table[pos].value; }
 
@@ -126,14 +130,13 @@ namespace emp {
         Rehash(capacity() * GROW_FACTOR + GROW_OFFSET);
       }
 
-      const size_t hash_value = std::hash<Key>{}(key);
+      const size_t hash_value = CalcHash(key);
       size_t pos              = hash_value % capacity();
       size_t dist             = 0;
 
       // Search for an existing key; return false if we find one or break loop if there is not one.
-      while (true) {
-        // Stop loop if we found a gap.
-        if (!table[pos].occupied) break;
+      while (true) {        
+        if (!table[pos]) break;  // Stop loop if we found a gap.
  
         // If key is already in the table, return false.
         if (table[pos].hash == hash_value && table[pos].key == key) { return false; }
@@ -153,7 +156,7 @@ namespace emp {
 
       while (true) {
         // If we found an empty position, insert new entry here and return true.
-        if (!table[pos].occupied) {
+        if (!table[pos]) {
           table[pos] = new_entry;
           ++num_elements;
           return true;
@@ -189,17 +192,17 @@ namespace emp {
     bool erase(const Key & key) {
       if (table.empty()) { return false; }  // Nothing to delete.
 
-      const size_t hash_value = std::hash<Key>{}(key);
+      const size_t hash_value = CalcHash(key);
       size_t pos              = hash_value % capacity();
       size_t dist             = 0;
 
       while (true) {
-        if (!table[pos].occupied) { return false; }  // Empty pos -> not in table.
+        if (!table[pos]) { return false; }  // Empty pos -> not in table.
 
         if (table[pos].hash == hash_value && table[pos].key == key) {
           // Found key; begin deletion and backshift
           size_t next = (pos + 1) % capacity();
-          while (table[next].occupied) {
+          while (table[next]) {
             const size_t probe_dist = CalcDist(next);
 
             if (probe_dist == 0) {
