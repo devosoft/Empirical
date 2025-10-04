@@ -39,13 +39,13 @@ namespace emp {
 
     // === HELPER FUNCTIONS ===
 
-    static size_t ImproveHash(size_t h) {
+    static size_t ImproveHash(size_t hash_value) {
       // SplitMix64 finalizer (good quality, cheap enough for a hash table)
-      h += 0x9e3779b97f4a7c15ull;
-      h = (h ^ (h >> 30)) * 0xbf58476d1ce4e5b9ull;
-      h = (h ^ (h >> 27)) * 0x94d049bb133111ebull;
-      h = h ^ (h >> 31);
-      return h;
+      hash_value += 0x9e3779b97f4a7c15ull;
+      hash_value = (hash_value ^ (hash_value >> 30)) * 0xbf58476d1ce4e5b9ull;
+      hash_value = (hash_value ^ (hash_value >> 27)) * 0x94d049bb133111ebull;
+      hash_value = (hash_value ^ (hash_value >> 31));
+      return hash_value;
     }
   
     [[nodiscard]] static size_t CalcHash(const Key & key) {
@@ -60,13 +60,14 @@ namespace emp {
     // Calculate how far off a current entry is from its ideal position.
     [[nodiscard]] size_t CalcDist(size_t pos) const {
       emp_assert(table[pos].occupied, pos);
-      return (pos + capacity() - (table[pos].hash % capacity())) % capacity();
+      const size_t ideal_pos = table[pos].hash % capacity();
+      return (pos + capacity() - ideal_pos) % capacity();
     }
 
     void Rehash(size_t new_capacity) {
       emp::vector<Entry> old_table = std::move(table);
-      table                        = emp::vector<Entry>(new_capacity);
-      num_elements                 = 0;
+      table = emp::vector<Entry>(new_capacity);
+      num_elements = 0;
 
       // Move all elements into the new hash table.
       for (const Entry & entry : old_table) {
@@ -74,30 +75,55 @@ namespace emp {
       }
     }
 
+    struct SearchPos {
+      size_t hash;
+      size_t pos;
+      size_t dist;
+
+      void Next(const size_t table_size) {
+        pos = (pos + 1) % table_size;
+        ++dist;
+      }
+      operator size_t() const { return pos; }
+    };
+
+    SearchPos MakeSearchPos(const Key & key) {
+      const size_t hash = CalcHash(key);
+      return SearchPos{hash, hash % capacity(), 0};
+    }
+
+    bool TestAt(const SearchPos & test_pos, const Key & key) {
+      return table[test_pos.pos].hash == test_pos.hash && table[test_pos.pos].key == key;
+    }
+
     [[nodiscard]] const T * FindPtr_impl(const Key & key) const {
-      size_t hash_value = CalcHash(key);
-      size_t pos        = hash_value % capacity();
-      size_t dist       = 0;
+      SearchPos test_pos{MakeSearchPos(key)};
 
       while (true) {
-        if (!table[pos]) { return nullptr; }  // Not found.
+        if (!table[test_pos]) { return nullptr; }                     // Empty; not found!
+        if (TestAt(test_pos, key)) { return &table[test_pos].value; } // Found!
+        if (test_pos.dist > CalcDist(test_pos)) { return nullptr; }   // Dist too high; not found!
 
-        if (table[pos].hash == hash_value && table[pos].key == key) { return &table[pos].value; }
-
-        size_t existing_dist = CalcDist(pos);
-
-        // If existing_dist has gotten too high, we would have swapped; stop here.
-        if (existing_dist < dist) {
-          return nullptr;  // Early exit: key not in table
-        }
-
-        pos = (pos + 1) % capacity();
-        ++dist;
+        test_pos.Next(capacity()); // Try the next position.
       }
     }
 
+    // Erase the element at a specified position in the table and do backshift
+    void EraseAt(size_t pos) {
+      size_t next = (pos + 1) % capacity();
+      while (table[next] && CalcDist(next) != 0) { // Test if next entry should move up.
+        table[pos] = std::move(table[next]);
+        pos        = next;
+        next       = (next + 1) % capacity();
+      }
+
+      // Clear final position
+      table[pos].occupied = false;
+      --num_elements;
+    }
+
   public:
-    // All constructors and destructor are implicitly created.
+    // Constructors and destructor are implicitly created.
 
     [[nodiscard]] size_t size() const { return num_elements; }
 
@@ -108,20 +134,17 @@ namespace emp {
     [[nodiscard]] bool contains(const Key & key) const { return FindPtr(key) != nullptr; }
 
     void clear() {
-      for (auto & entry : table) {
-        entry.occupied = false;
-        entry.hash     = 0;
-      }
+      for (auto & entry : table) entry.occupied = false;
       num_elements = 0;
     }
 
     void reserve(size_t n) {
       emp_assert(table.size() >= INIT_CAPACITY);
 
-      // If we already have enough room, do nothing.
+      // If we already have enough capacity, do nothing.
       if (n <= static_cast<size_t>(capacity() * MAX_LOAD_FACTOR)) return;
 
-      // Grow with the same rule used in Insert (GROW_FACTOR, GROW_OFFSET)
+      // Grow with the same rule used in Insert
       size_t new_cap = table.size();
       while (static_cast<double>(new_cap) * MAX_LOAD_FACTOR < n) {
         new_cap = static_cast<size_t>(new_cap * GROW_FACTOR + GROW_OFFSET);
@@ -144,56 +167,38 @@ namespace emp {
         Rehash(capacity() * GROW_FACTOR + GROW_OFFSET);
       }
 
-      const size_t hash_value = CalcHash(key);
-      size_t pos              = hash_value % capacity();
-      size_t dist             = 0;
+      // Search for an existing key. Return false if we find one; end loop if there is not one.
+      SearchPos test_pos{MakeSearchPos(key)};
+      while (table[test_pos]) {        
+        if (TestAt(test_pos, key)) return false;       // Key is already in the table.
+        if (test_pos.dist > CalcDist(test_pos)) break; // Current is "closer to home", start Robin Hood swap-in.
 
-      // Search for an existing key; return false if we find one or break loop if there is not one.
-      while (true) {        
-        if (!table[pos]) break;  // Stop loop if we found a gap.
- 
-        // If key is already in the table, return false.
-        if (table[pos].hash == hash_value && table[pos].key == key) { return false; }
-
-        const size_t existing_dist = CalcDist(pos);
-
-        // If current entry is "closer to home", start the Robin Hood swap-in from this position.
-        if (existing_dist < dist) break;
-
-        // Shift to considering the next position.
-        pos = (pos + 1) % capacity();
-        ++dist;
+        test_pos.Next(capacity()); // Keep searching at the next position.
       }
 
       // Current key not in table; perform standard Robin Hood insertion from found position.
-      Entry new_entry{key, value, hash_value, true};
+      Entry new_entry{key, value, test_pos.hash_value, true};
 
-      while (true) {
-        // If we found an empty position, insert new entry here and return true.
-        if (!table[pos]) {
-          table[pos] = new_entry;
-          ++num_elements;
-          return true;
+      // Search for an empty position, juggling entries as we go.
+      while (table[test_pos]) {
+        // Otherwise bump entry closer to home.
+        const size_t existing_dist = CalcDist(test_pos);
+        if (existing_dist < test_pos.dist) {
+          std::swap(table[test_pos], new_entry);
+          test_pos.dist = existing_dist;
         }
 
-        // Otherwise see which entry needs to be bumped further.
-        const size_t existing_dist = CalcDist(pos);
-        if (existing_dist < dist) {
-          std::swap(table[pos], new_entry);
-          dist = existing_dist;
-        }
-
-        // Move on to the next table position.
-        pos = (pos + 1) % capacity();
-        ++dist;
+        test_pos.Next(capacity());  // Move on to the next table position.
       }
 
-      // The previous loop is guaranteed to eventually find an empty position.
+      table[test_pos] = std::move(new_entry);
+      ++num_elements;
+      return true;
     }
 
     [[nodiscard]] const T * FindPtr(const Key & key) const { return FindPtr_impl(key); }
 
-    [[nodiscard]] T * FindPtr(const Key & key) { return const_cast<T *>(FindPtr_impl(key)); }
+    [[nodiscard]] T * FindPtr(const Key & key) { return const_cast<T*>(FindPtr_impl(key)); }
 
     T & operator[](const Key & key) {
       T * val = FindPtr(key);
@@ -206,40 +211,17 @@ namespace emp {
     bool erase(const Key & key) {
       if (table.empty()) { return false; }  // Nothing to delete.
 
-      const size_t hash_value = CalcHash(key);
-      size_t pos              = hash_value % capacity();
-      size_t dist             = 0;
-
-      while (true) {
-        if (!table[pos]) { return false; }  // Empty pos -> not in table.
-
-        if (table[pos].hash == hash_value && table[pos].key == key) {
-          // Found key; begin deletion and backshift
-          size_t next = (pos + 1) % capacity();
-          while (table[next]) {
-            const size_t probe_dist = CalcDist(next);
-
-            if (probe_dist == 0) {
-              break;  // Entry is already in ideal spot
-            }
-
-            table[pos] = std::move(table[next]);
-            pos        = next;
-            next       = (next + 1) % capacity();
-          }
-
-          // Clear final position
-          table[pos] = Entry{};
-          --num_elements;
+      SearchPos test_pos{MakeSearchPos(key)};
+      while (table[test_pos] && CalcDist(test_pos) >= test_pos.dist) {
+        if (TestAt(test_pos, key)) {  // If we found key, begin deletion and backshift
+          EraseAt(test_pos);
           return true;
         }
 
-        size_t existing_dist = CalcDist(pos);
-        if (existing_dist < dist) { return false; }
-
-        pos = (pos + 1) % capacity();
-        ++dist;
+        test_pos.Next(capacity());
       }
+
+      return false;  // Couldn't find in table.
     }
   };
 
