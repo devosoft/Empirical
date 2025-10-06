@@ -87,26 +87,24 @@ namespace emp {
       operator size_t() const { return pos; }
     };
 
-    SearchPos MakeSearchPos(const Key & key) {
+    SearchPos MakeSearchPos(const Key & key) const {
       const size_t hash = CalcHash(key);
       return SearchPos{hash, hash % capacity(), 0};
     }
 
-    bool TestAt(const SearchPos & test_pos, const Key & key) {
+    bool TestAt(const SearchPos & test_pos, const Key & key) const {
       return table[test_pos.pos].hash == test_pos.hash && table[test_pos.pos].key == key;
     }
 
     [[nodiscard]] const T * FindPtr_impl(const Key & key) const {
       SearchPos test_pos{MakeSearchPos(key)};
 
-      while (true) {
-        if (!table[test_pos]) { return nullptr; }                     // Empty; not found!
+      while (table[test_pos] && test_pos.dist <= CalcDist(test_pos)) {
         if (TestAt(test_pos, key)) { return &table[test_pos].value; } // Found!
-        if (test_pos.dist > CalcDist(test_pos)) { return nullptr; }   // Dist too high; not found!
-
         test_pos.Next(capacity()); // Try the next position.
       }
-    }
+      return nullptr; // Not found!
+   }
 
     // Erase the element at a specified position in the table and do backshift
     void EraseAt(size_t pos) {
@@ -138,9 +136,8 @@ namespace emp {
       num_elements = 0;
     }
 
+    // Make sure that we can store at least n elements without additional allocations.
     void reserve(size_t n) {
-      emp_assert(table.size() >= INIT_CAPACITY);
-
       // If we already have enough capacity, do nothing.
       if (n <= static_cast<size_t>(capacity() * MAX_LOAD_FACTOR)) return;
 
@@ -163,7 +160,7 @@ namespace emp {
     /// @return true if a new element was inserted, false if key was already present.
     bool Insert(const Key & key, const T & value) {
       // Test if we need to grow the table...
-      if (num_elements / static_cast<double>(capacity()) >= MAX_LOAD_FACTOR) {
+      if (num_elements >= MAX_LOAD_FACTOR * capacity()) {
         Rehash(capacity() * GROW_FACTOR + GROW_OFFSET);
       }
 
@@ -177,7 +174,7 @@ namespace emp {
       }
 
       // Current key not in table; perform standard Robin Hood insertion from found position.
-      Entry new_entry{key, value, test_pos.hash_value, true};
+      Entry new_entry{key, value, test_pos.hash, true};
 
       // Search for an empty position, juggling entries as we go.
       while (table[test_pos]) {
