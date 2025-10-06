@@ -60,13 +60,13 @@ namespace emp {
     // Calculate how far off a current entry is from its ideal position.
     [[nodiscard]] size_t CalcDist(size_t pos) const {
       emp_assert(table[pos].occupied, pos);
-      const size_t ideal_pos = table[pos].hash % capacity();
-      return (pos + capacity() - ideal_pos) % capacity();
+      const size_t ideal_pos = ToPos(table[pos].hash);
+      return ToPos(pos + table.size() - ideal_pos);
     }
 
-    void Rehash(size_t new_capacity) {
+    void Rehash(size_t new_table_size) {
       emp::vector<Entry> old_table = std::move(table);
-      table = emp::vector<Entry>(new_capacity);
+      table = emp::vector<Entry>(new_table_size);
       num_elements = 0;
 
       // Move all elements into the new hash table.
@@ -87,12 +87,14 @@ namespace emp {
       operator size_t() const { return pos; }
     };
 
-    SearchPos MakeSearchPos(const Key & key) const {
+    [[nodiscard]] size_t ToPos(size_t hash) const { return hash % table.size(); }
+
+    [[nodiscard]] SearchPos MakeSearchPos(const Key & key) const {
       const size_t hash = CalcHash(key);
-      return SearchPos{hash, hash % capacity(), 0};
+      return SearchPos{hash, ToPos(hash), 0};
     }
 
-    bool TestAt(const SearchPos & test_pos, const Key & key) const {
+    [[nodiscard]] bool TestAt(const SearchPos & test_pos, const Key & key) const {
       return table[test_pos.pos].hash == test_pos.hash && table[test_pos.pos].key == key;
     }
 
@@ -101,18 +103,18 @@ namespace emp {
 
       while (table[test_pos] && test_pos.dist <= CalcDist(test_pos)) {
         if (TestAt(test_pos, key)) { return &table[test_pos].value; } // Found!
-        test_pos.Next(capacity()); // Try the next position.
+        test_pos.Next(table.size()); // Try the next position.
       }
       return nullptr; // Not found!
-   }
+    }
 
     // Erase the element at a specified position in the table and do backshift
     void EraseAt(size_t pos) {
-      size_t next = (pos + 1) % capacity();
+      size_t next = ToPos(pos + 1);
       while (table[next] && CalcDist(next) != 0) { // Test if next entry should move up.
         table[pos] = std::move(table[next]);
-        pos        = next;
-        next       = (next + 1) % capacity();
+        pos = next;
+        next = ToPos(next + 1);
       }
 
       // Clear final position
@@ -125,7 +127,9 @@ namespace emp {
 
     [[nodiscard]] size_t size() const { return num_elements; }
 
-    [[nodiscard]] size_t capacity() const { return table.size(); }
+    [[nodiscard]] size_t bucket_count() const { return table.size(); }
+
+    [[nodiscard]] size_t max_load() const { return static_cast<size_t>(table.size() * MAX_LOAD_FACTOR) }
 
     [[nodiscard]] bool empty() const { return num_elements == 0; }
 
@@ -139,7 +143,7 @@ namespace emp {
     // Make sure that we can store at least n elements without additional allocations.
     void reserve(size_t n) {
       // If we already have enough capacity, do nothing.
-      if (n <= static_cast<size_t>(capacity() * MAX_LOAD_FACTOR)) return;
+      if (n <= max_load()) return;
 
       // Grow with the same rule used in Insert
       size_t new_cap = table.size();
@@ -160,8 +164,8 @@ namespace emp {
     /// @return true if a new element was inserted, false if key was already present.
     bool Insert(const Key & key, const T & value) {
       // Test if we need to grow the table...
-      if (num_elements >= MAX_LOAD_FACTOR * capacity()) {
-        Rehash(capacity() * GROW_FACTOR + GROW_OFFSET);
+      if (num_elements >= max_load()) {
+        Rehash(table.size() * GROW_FACTOR + GROW_OFFSET);
       }
 
       // Search for an existing key. Return false if we find one; end loop if there is not one.
@@ -170,7 +174,7 @@ namespace emp {
         if (TestAt(test_pos, key)) return false;       // Key is already in the table.
         if (test_pos.dist > CalcDist(test_pos)) break; // Current is "closer to home", start Robin Hood swap-in.
 
-        test_pos.Next(capacity()); // Keep searching at the next position.
+        test_pos.Next(table.size()); // Keep searching at the next position.
       }
 
       // Current key not in table; perform standard Robin Hood insertion from found position.
@@ -185,7 +189,7 @@ namespace emp {
           test_pos.dist = existing_dist;
         }
 
-        test_pos.Next(capacity());  // Move on to the next table position.
+        test_pos.Next(table.size());  // Move on to the next table position.
       }
 
       table[test_pos] = std::move(new_entry);
@@ -215,7 +219,7 @@ namespace emp {
           return true;
         }
 
-        test_pos.Next(capacity());
+        test_pos.Next(table.size());
       }
 
       return false;  // Couldn't find in table.
