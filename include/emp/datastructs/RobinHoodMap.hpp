@@ -23,16 +23,13 @@ namespace emp {
     struct Entry {
       Key key;
       T value;
-      size_t hash   = 0;      // Store hash to avoid recomputing
+      size_t hash = 0;        // Store hash to avoid recomputing
       bool occupied = false;  // @CAO Optimize away later
 
       operator bool() const { return occupied; }
     };
 
-    static constexpr double MAX_LOAD_FACTOR = 0.8;
-    static constexpr size_t INIT_CAPACITY   = 15;
-    static constexpr size_t GROW_FACTOR     = 2;
-    static constexpr size_t GROW_OFFSET     = 1;
+    static constexpr size_t INIT_CAPACITY   = 16;
 
     emp::vector<Entry> table{INIT_CAPACITY};
     size_t num_elements = 0;
@@ -81,13 +78,13 @@ namespace emp {
       size_t dist;
 
       void Next(const size_t table_size) {
-        pos = (pos + 1) % table_size;
+        pos = (pos + 1) & (table_size - 1);
         ++dist;
       }
       operator size_t() const { return pos; }
     };
 
-    [[nodiscard]] size_t ToPos(size_t hash) const { return hash % table.size(); }
+    [[nodiscard]] size_t ToPos(size_t hash) const { return hash & (table.size() - 1); }
 
     [[nodiscard]] SearchPos MakeSearchPos(const Key & key) const {
       const size_t hash = CalcHash(key);
@@ -129,7 +126,7 @@ namespace emp {
 
     [[nodiscard]] size_t bucket_count() const { return table.size(); }
 
-    [[nodiscard]] size_t max_load() const { return static_cast<size_t>(table.size() * MAX_LOAD_FACTOR) }
+    [[nodiscard]] size_t max_load() const { return table.size() >> 1; }
 
     [[nodiscard]] bool empty() const { return num_elements == 0; }
 
@@ -146,12 +143,10 @@ namespace emp {
       if (n <= max_load()) return;
 
       // Grow with the same rule used in Insert
-      size_t new_cap = table.size();
-      while (static_cast<double>(new_cap) * MAX_LOAD_FACTOR < n) {
-        new_cap = static_cast<size_t>(new_cap * GROW_FACTOR + GROW_OFFSET);
-      }
+      size_t new_load = std::max(table.size(), INIT_CAPACITY);
+      while (new_load < n) new_load *= 2;
 
-      Rehash(new_cap);
+      Rehash(new_load * 2);
     }
 
     // std::map-like insert interface (minimal version).
@@ -165,7 +160,7 @@ namespace emp {
     bool Insert(const Key & key, const T & value) {
       // Test if we need to grow the table...
       if (num_elements >= max_load()) {
-        Rehash(table.size() * GROW_FACTOR + GROW_OFFSET);
+        Rehash(table.size() << 1);
       }
 
       // Search for an existing key. Return false if we find one; end loop if there is not one.
