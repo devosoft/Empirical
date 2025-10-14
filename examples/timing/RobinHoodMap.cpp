@@ -21,6 +21,7 @@ emp::vector<size_t> keys(COUNT);
 emp::vector<double> values(COUNT);
 
 struct Results {
+  emp::String scope;
   emp::String name;
   double insert_time;
   double search_time;
@@ -32,9 +33,10 @@ struct Results {
 };
 
 template <typename MAP_T>
-Results Test(emp::String name) {
+Results Test(emp::String scope, emp::String name) {
   MAP_T test_map;
   Results results;
+  results.scope = scope;
   results.name = name;
 
   // Test inserts
@@ -49,7 +51,7 @@ Results Test(emp::String name) {
 // std::cout << "Test: " << name << "\n"
 //           << "  insert time = " << emp::MakeString(result, " seconds.").AsANSIBlue() << "\n"
 //           << "  start size = "  << test_map.size() << std::endl;
-//            << "  capacity = "    << test_map.capacity() << std::endl;
+//           << "  capacity = "    << test_map.capacity() << std::endl;
 
   // Test searching
   start_time = std::clock();
@@ -78,7 +80,7 @@ Results Test(emp::String name) {
   //           << "  erase_count = " << erase_count << "\n"
   //           << "  final size = " << test_map.size() << std::endl;
 
-  std::cout << "Finished calculating: " << name << std::endl;
+  std::cout << "Finished calculating: " << scope << name << std::endl;
 
   return results;
 }
@@ -89,7 +91,7 @@ void PrintRow(const emp::vector<Results> & result_vec, emp::String trait_name,
   std::cout << trait_name.AsANSIBold();
   for (Results result : result_vec) {
     emp::String out = emp::MakeString(fun(result));
-    size_t width = result.name.size() + 1;
+    size_t width = result.name.size() + 2;
     out.PadBack(' ', width);
     std::cout << color << out << emp::ANSI::DefaultColor;
   }
@@ -110,15 +112,17 @@ int main() {
   Results results;
   emp::vector<Results> result_vec;
 
-  results = Test<emp::RobinHoodMap<size_t, double>>("emp::RobinHoodMap");
+  results = Test<emp::RobinHoodMap<size_t, double>>("emp::", "RobinHoodMap");
   result_vec.push_back(results);
-  results = Test<std::unordered_map<size_t, double>>("std::unordered_map");
+  results = Test<std::unordered_map<size_t, double>>("std::", "unordered_map");
   result_vec.push_back(results);
-  results = Test<robin_hood::unordered_map<size_t, double>>("robin_hood::unordered_map");
+  results = Test<robin_hood::unordered_map<size_t, double>>("robin_hood::", "unordered_map");
   result_vec.push_back(results);
-  results = Test<std::map<size_t, double>>("std::map");
+  results = Test<std::map<size_t, double>>("std::", "map");
   result_vec.push_back(results);
 
+  PrintRow(result_vec, "scope       ",
+    [](const Results & result){ return result.scope; }, emp::ANSI::Yellow);
   PrintRow(result_vec, "name        ",
     [](const Results & result){ return result.name; }, emp::ANSI::Yellow);
   PrintRow(result_vec, "insert_time ",
