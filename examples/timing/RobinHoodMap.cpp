@@ -15,7 +15,6 @@
 
 static constexpr size_t COUNT = 10000000;
 static constexpr size_t MAX_STEP = 10;
-static constexpr size_t MULT = 1;
 
 emp::vector<size_t> keys(COUNT);
 emp::vector<double> values(COUNT);
@@ -118,7 +117,9 @@ int main() {
   result_vec.push_back(results);
   results = Test<robin_hood::unordered_map<size_t, double>>("robin_hood::", "unordered_map");
   result_vec.push_back(results);
-  results = Test<std::map<size_t, double>>("std::", "map");
+  results = Test<std::map<size_t, double>>("std::", "map          ");
+  result_vec.push_back(results);
+  results = Test<emp::RobinHoodMap<size_t, double, true>>("emp::", "RobinHoodMap<IMPROVE>");
   result_vec.push_back(results);
 
   PrintRow(result_vec, "scope       ",
