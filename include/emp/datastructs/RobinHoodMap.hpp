@@ -29,14 +29,16 @@ namespace emp {
       operator bool() const { return occupied; }
     };
 
-    static constexpr size_t INIT_CAPACITY   = 16;
+    static constexpr size_t INIT_CAPACITY = 16;
 
     emp::vector<Entry> table{INIT_CAPACITY};
     size_t num_elements = 0;
 
     // === HELPER FUNCTIONS ===
 
-    static size_t ImproveHash(size_t hash_value) {
+    [[nodiscard]] size_t ToPos(size_t hash) const { return hash & (table.size() - 1); }
+
+    [[nodiscard]] static size_t ImproveHash(size_t hash_value) {
       // SplitMix64 finalizer (good quality, cheap enough for a hash table)
       hash_value += 0x9e3779b97f4a7c15ull;
       hash_value = (hash_value ^ (hash_value >> 30)) * 0xbf58476d1ce4e5b9ull;
@@ -55,8 +57,8 @@ namespace emp {
     }
 
     // Calculate how far off a current entry is from its ideal position.
-    [[nodiscard]] size_t CalcDist(size_t pos) const {
-      emp_assert(table[pos].occupied, pos);
+    [[nodiscard]] size_t CalcOffset(size_t pos) const {
+      emp_assert(pos < table.size() && table[pos].occupied, pos, table.size());
       const size_t ideal_pos = ToPos(table[pos].hash);
       return ToPos(pos + table.size() - ideal_pos);
     }
@@ -84,8 +86,6 @@ namespace emp {
       operator size_t() const { return pos; }
     };
 
-    [[nodiscard]] size_t ToPos(size_t hash) const { return hash & (table.size() - 1); }
-
     [[nodiscard]] SearchPos MakeSearchPos(const Key & key) const {
       const size_t hash = CalcHash(key);
       return SearchPos{hash, ToPos(hash), 0};
@@ -96,9 +96,10 @@ namespace emp {
     }
 
     [[nodiscard]] const T * FindPtr_impl(const Key & key) const {
+      if (table.size() == 0) return nullptr;
       SearchPos test_pos{MakeSearchPos(key)};
 
-      while (table[test_pos] && test_pos.dist <= CalcDist(test_pos)) {
+      while (table[test_pos] && test_pos.dist <= CalcOffset(test_pos)) {
         if (TestAt(test_pos, key)) { return &table[test_pos].value; } // Found!
         test_pos.Next(table.size()); // Try the next position.
       }
@@ -107,8 +108,9 @@ namespace emp {
 
     // Erase the element at a specified position in the table and do backshift
     void EraseAt(size_t pos) {
+      emp_assert(pos < table.size());
       size_t next = ToPos(pos + 1);
-      while (table[next] && CalcDist(next) != 0) { // Test if next entry should move up.
+      while (table[next] && CalcOffset(next) != 0) { // Test if next entry should move up.
         table[pos] = std::move(table[next]);
         pos = next;
         next = ToPos(next + 1);
@@ -122,6 +124,92 @@ namespace emp {
   public:
     // Constructors and destructor are implicitly created.
 
+    // === ITERATOR TYPES ===
+
+    template <bool IS_CONST>
+    class iterator_base {
+    private:
+      friend class RobinHoodMap;
+
+      // Build types based on if this is a const iterator.
+      using MapType   = std::conditional_t<IS_CONST, const RobinHoodMap, RobinHoodMap>;
+      using EntryType = std::conditional_t<IS_CONST, const Entry, Entry>;
+      using MappedRef = std::conditional_t<IS_CONST, const T, T>;
+  
+      MapType * map_ptr = nullptr;  // Map that owns this iterator
+      size_t index      = 0;        // Current index in the table
+
+      // Proxy type used as iterator::reference; works with structured bindings.
+      struct Ref {
+        const Key & first;
+        MappedRef & second;
+
+        // Implicit conversion to std::pair for algorithms that expect value_type.
+        operator std::pair<const Key, T>() const { return { first, second }; }
+      };
+
+      bool MakeValid() {
+        if (!map_ptr || map_ptr->empty()) return false; // Cannot make valid.
+        const size_t table_size = map_ptr->table.size();
+        while (index < table_size && !map_ptr->table[index]) {
+          ++index;
+        }
+        return true;
+      }
+
+    public:
+      using iterator_category = std::forward_iterator_tag;
+      using value_type        = std::pair<const Key, T>;
+      using difference_type   = std::ptrdiff_t;
+      using reference         = Ref;
+      using pointer           = void;  // no real pointer type
+
+      iterator_base() = default;
+      iterator_base(MapType * map_ptr, size_t index=0) : map_ptr(map_ptr), index(index) {
+        MakeValid();
+      }
+      iterator_base(const iterator_base &) = default;
+      iterator_base & operator=(const iterator_base &) = default;
+      ~iterator_base() = default;
+
+      bool IsValid() const {
+        emp_assert(IsValid());
+        return map_ptr &&                        // Does map exist?
+               index < map_ptr->table.size() &&  // With the needed index?
+               map_ptr->table[index].occupied;   // And that index is occupied?
+      }
+
+      reference operator*() const {
+        auto & entry = map_ptr->table[index];
+        return Ref{ entry.key, entry.value };
+      }
+
+      // If you really want ->, you can return a by-value proxy; often not needed.
+      // pointer operator->() const = delete;
+
+      iterator_base & operator++() {
+        ++index;
+        MakeValid();
+        return *this;
+      }
+
+      iterator_base operator++(int) {
+        iterator_base tmp = *this;
+        ++(*this);
+        return tmp;
+      }
+
+      [[nodiscard]] constexpr auto operator<=>(const iterator_base &) const = default;
+    };
+
+    using iterator        = iterator_base<false>;
+    using const_iterator  = iterator_base<true>;
+    using key_type        = Key;
+    using mapped_type     = T;
+    using value_type      = std::pair<const Key, T>;
+    using size_type       = size_t;
+    using difference_type = std::ptrdiff_t;
+
     [[nodiscard]] size_t size() const { return num_elements; }
 
     [[nodiscard]] size_t bucket_count() const { return table.size(); }
@@ -131,6 +219,13 @@ namespace emp {
     [[nodiscard]] bool empty() const { return num_elements == 0; }
 
     [[nodiscard]] bool contains(const Key & key) const { return FindPtr(key) != nullptr; }
+
+    [[nodiscard]] iterator begin() { return iterator(this, 0); }
+    [[nodiscard]] iterator end() { return iterator(this, table.size()); }
+    [[nodiscard]] const_iterator begin() const { return const_iterator(this, 0); }
+    [[nodiscard]] const_iterator end() const { return const_iterator(this, table.size()); }
+    [[nodiscard]] const_iterator cbegin() const { return const_iterator(this, 0); }
+    [[nodiscard]] const_iterator cend() const { return const_iterator(this, table.size()); }
 
     void clear() {
       for (auto & entry : table) entry.occupied = false;
@@ -143,10 +238,10 @@ namespace emp {
       if (n <= max_load()) return;
 
       // Grow with the same rule used in Insert
-      size_t new_load = std::max(table.size(), INIT_CAPACITY);
-      while (new_load < n) new_load *= 2;
+      size_t new_max_load = std::max(table.size(), INIT_CAPACITY);
+      while (new_max_load < n) new_max_load *= 2;
 
-      Rehash(new_load * 2);
+      Rehash(new_max_load * 2);
     }
 
     // std::map-like insert interface (minimal version).
@@ -167,7 +262,7 @@ namespace emp {
       SearchPos test_pos{MakeSearchPos(key)};
       while (table[test_pos]) {        
         if (TestAt(test_pos, key)) return false;       // Key is already in the table.
-        if (test_pos.dist > CalcDist(test_pos)) break; // Current is "closer to home", start Robin Hood swap-in.
+        if (test_pos.dist > CalcOffset(test_pos)) break; // Current is "closer to home", start Robin Hood swap-in.
 
         test_pos.Next(table.size()); // Keep searching at the next position.
       }
@@ -178,7 +273,7 @@ namespace emp {
       // Search for an empty position, juggling entries as we go.
       while (table[test_pos]) {
         // Otherwise bump entry closer to home.
-        const size_t existing_dist = CalcDist(test_pos);
+        const size_t existing_dist = CalcOffset(test_pos);
         if (existing_dist < test_pos.dist) {
           std::swap(table[test_pos], new_entry);
           test_pos.dist = existing_dist;
@@ -208,7 +303,7 @@ namespace emp {
       if (table.empty()) { return false; }  // Nothing to delete.
 
       SearchPos test_pos{MakeSearchPos(key)};
-      while (table[test_pos] && CalcDist(test_pos) >= test_pos.dist) {
+      while (table[test_pos] && CalcOffset(test_pos) >= test_pos.dist) {
         if (TestAt(test_pos, key)) {  // If we found key, begin deletion and backshift
           EraseAt(test_pos);
           return true;
