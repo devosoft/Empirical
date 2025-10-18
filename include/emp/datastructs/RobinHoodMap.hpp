@@ -122,7 +122,27 @@ namespace emp {
     }
 
   public:
-    // Constructors and destructor are implicitly created.
+    RobinHoodMap() = default;
+    RobinHoodMap(const RobinHoodMap & other) = default;
+    RobinHoodMap(RobinHoodMap && other) noexcept
+      : table(std::move(other.table))
+      , num_elements(other.num_elements)
+    {
+      if (table.empty()) table.resize(INIT_CAPACITY);
+      other.num_elements = 0;
+    }
+
+    RobinHoodMap & operator=(const RobinHoodMap & other) = default;
+    RobinHoodMap & operator=(RobinHoodMap && other) noexcept {
+      if (this == &other) return *this;
+      table        = std::move(other.table);
+      num_elements = other.num_elements;
+      if (table.empty()) table.resize(INIT_CAPACITY);
+      other.num_elements = 0;
+      return *this;
+    }
+
+    ~RobinHoodMap() = default;
 
     // === ITERATOR TYPES ===
 
@@ -149,7 +169,7 @@ namespace emp {
       };
 
       bool MakeValid() {
-        if (!map_ptr || map_ptr->empty()) return false; // Cannot make valid.
+        if (!map_ptr) return false; // Cannot make valid.
         const size_t table_size = map_ptr->table.size();
         while (index < table_size && !map_ptr->table[index]) {
           ++index;
@@ -173,13 +193,13 @@ namespace emp {
       ~iterator_base() = default;
 
       bool IsValid() const {
-        emp_assert(IsValid());
         return map_ptr &&                        // Does map exist?
                index < map_ptr->table.size() &&  // With the needed index?
                map_ptr->table[index].occupied;   // And that index is occupied?
       }
 
       reference operator*() const {
+        emp_assert(IsValid());
         auto & entry = map_ptr->table[index];
         return Ref{ entry.key, entry.value };
       }
