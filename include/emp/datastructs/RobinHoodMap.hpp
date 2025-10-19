@@ -264,24 +264,22 @@ namespace emp {
       Rehash(new_max_load * 2);
     }
 
-    // std::map-like insert interface (minimal version).
-    // std::map returns pair<iterator,bool>; we just return bool for now.
-    bool insert(const std::pair<Key, T> & in) {
+    std::pair<iterator,bool> insert(const std::pair<const Key, T> & in) {
       return Insert(in.first, in.second);
     }
 
     /// Insert with "unique key" semantics.
-    /// @return true if a new element was inserted, false if key was already present.
-    bool Insert(const Key & key, const T & value) {
+    /// @return pair of iterator to key and bool to indicate if a new element was inserted.
+    std::pair<iterator,bool> Insert(const Key & key, const T & value) {
       // Test if we need to grow the table...
-      if (num_elements >= max_load()) {
-        Rehash(table.size() << 1);
-      }
+      if (num_elements >= max_load()) { Rehash(table.size() << 1); }
 
       // Search for an existing key. Return false if we find one; end loop if there is not one.
       SearchPos test_pos{MakeSearchPos(key)};
       while (table[test_pos]) {        
-        if (TestAt(test_pos, key)) return false;       // Key is already in the table.
+        if (TestAt(test_pos, key)) {
+          return { iterator{this, test_pos}, false };  // Key already in table.
+        }
         if (test_pos.dist > CalcOffset(test_pos)) break; // Current is "closer to home", start Robin Hood swap-in.
 
         test_pos.Next(table.size()); // Keep searching at the next position.
@@ -289,6 +287,7 @@ namespace emp {
 
       // Current key not in table; perform standard Robin Hood insertion from found position.
       Entry new_entry{key, value, test_pos.hash, true};
+      size_t found_pos = test_pos;
 
       // Search for an empty position, juggling entries as we go.
       while (table[test_pos]) {
@@ -304,7 +303,7 @@ namespace emp {
 
       table[test_pos] = std::move(new_entry);
       ++num_elements;
-      return true;
+      return { iterator{this, found_pos}, true };
     }
 
     [[nodiscard]] const T * FindPtr(const Key & key) const { return FindPtr_impl(key); }
@@ -317,6 +316,8 @@ namespace emp {
 
       Insert(key, T{});
       return *FindPtr(key);
+      // auto it = Insert(key, T{}).first;
+      // return (*it).second;
     }
 
     bool erase(const Key & key) {
