@@ -30,6 +30,8 @@ namespace emp {
     };
 
     static constexpr size_t INIT_CAPACITY = 16;
+    static constexpr size_t GROW_FACTOR = 2; // How much larger should table get on growth?
+    static constexpr size_t LOAD_FACTOR = 2; // Max factor for how much of table can be full.
 
     emp::vector<Entry> table{INIT_CAPACITY};
     size_t num_elements = 0;
@@ -234,7 +236,7 @@ namespace emp {
 
     [[nodiscard]] size_t bucket_count() const { return table.size(); }
 
-    [[nodiscard]] size_t max_load() const { return table.size() >> 1; }
+    [[nodiscard]] size_t max_load() const { return table.size() / LOAD_FACTOR; }
 
     [[nodiscard]] bool empty() const { return num_elements == 0; }
 
@@ -259,9 +261,9 @@ namespace emp {
 
       // Grow with the same rule used in Insert
       size_t new_max_load = std::max(table.size(), INIT_CAPACITY);
-      while (new_max_load < n) new_max_load *= 2;
+      while (new_max_load < n) new_max_load *= GROW_FACTOR;
 
-      Rehash(new_max_load * 2);
+      Rehash(new_max_load * LOAD_FACTOR);
     }
 
     std::pair<iterator,bool> insert(const std::pair<const Key, T> & in) {
@@ -272,7 +274,7 @@ namespace emp {
     /// @return pair of iterator to key and bool to indicate if a new element was inserted.
     std::pair<iterator,bool> Insert(const Key & key, const T & value) {
       // Test if we need to grow the table...
-      if (num_elements >= max_load()) { Rehash(table.size() << 1); }
+      if (num_elements >= max_load()) { Rehash(table.size() * GROW_FACTOR); }
 
       // Search for an existing key. Return false if we find one; end loop if there is not one.
       SearchPos test_pos{MakeSearchPos(key)};
