@@ -1,0 +1,65 @@
+STARTING: emp::RobinHoodMap MAX_LOAD of 0.8
+
+name        emp::RobinHoodMap std::unordered_map robin_hood::unordered_map std::map 
+insert_time 0.777915          2.20386            0.368936                  6.66707  
+search_time 0.137692          0.441099           0.165425                  1.15624  
+erase_time  0.080077          0.630622           0.099399                  0.496676 
+found_count 3999478           3999478            3999478                   3999478  
+erase_count 1999286           1999286            1999286                   1999286  
+start_size  10000000          10000000           10000000                  10000000 
+final_size  8000714           8000714            8000714                   8000714
+
+name        emp::RobinHoodMap std::unordered_map robin_hood::unordered_map std::map 
+insert_time 0.821975          2.4036             0.444379                  7.69957  
+search_time 0.153609          0.523997           0.166739                  1.17374  
+erase_time  0.081862          0.675382           0.096168                  0.471688 
+found_count 4001314           4001314            4001314                   4001314  
+erase_count 2000337           2000337            2000337                   2000337  
+start_size  10000000          10000000           10000000                  10000000 
+final_size  7999663           7999663            7999663                   7999663  
+
+
+====
+
+Changed RobinHoodMap to max load of 0.5
+
+name        emp::RobinHoodMap std::unordered_map robin_hood::unordered_map std::map 
+insert_time 0.733229          2.23755            0.37184                   7.26814  
+search_time 0.080374          0.423256           0.167058                  1.22849  
+erase_time  0.056599          0.572541           0.099347                  0.516499 
+found_count 3999271           3999271            3999271                   3999271  
+erase_count 2000237           2000237            2000237                   2000237  
+start_size  10000000          10000000           10000000                  10000000 
+final_size  7999763           7999763            7999763                   7999763
+
+name        emp::RobinHoodMap std::unordered_map robin_hood::unordered_map std::map 
+insert_time 0.798419          2.53078            0.366967                  8.34452  
+search_time 0.079463          0.444359           0.1665                    1.20005  
+erase_time  0.056446          0.662063           0.097565                  0.564959 
+found_count 4000828           4000828            4000828                   4000828  
+erase_count 2000705           2000705            2000705                   2000705  
+start_size  10000000          10000000           10000000                  10000000 
+final_size  7999295           7999295            7999295                   7999295
+
+
+===
+
+Shifted to using masking
+
+name        emp::RobinHoodMap std::unordered_map robin_hood::unordered_map std::map 
+insert_time 0.735481          2.19122            0.369284                  7.93196  
+search_time 0.061286          0.493689           0.178815                  1.23088  
+erase_time  0.044213          0.635733           0.103892                  0.521517 
+found_count 4000142           4000142            4000142                   4000142  
+erase_count 2000397           2000397            2000397                   2000397  
+start_size  10000000          10000000           10000000                  10000000 
+final_size  7999603           7999603            7999603                   7999603
+
+name        emp::RobinHoodMap std::unordered_map robin_hood::unordered_map std::map 
+insert_time 0.761963          2.15635            0.368835                  6.75476  
+search_time 0.061566          0.427563           0.162971                  1.14823  
+erase_time  0.043831          0.570599           0.096784                  0.4805   
+found_count 3999688           3999688            3999688                   3999688  
+erase_count 1999848           1999848            1999848                   1999848  
+start_size  10000000          10000000           10000000                  10000000 
+final_size  8000152           8000152            8000152                   8000152
