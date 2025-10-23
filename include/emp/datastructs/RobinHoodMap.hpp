@@ -24,7 +24,7 @@ namespace emp {
       Key key;
       T value;
       size_t hash = 0;        // Store hash to avoid recomputing
-      bool occupied = false;  // @CAO Optimize away later
+      bool occupied = false;
 
       operator bool() const { return occupied; }
     };
@@ -34,14 +34,16 @@ namespace emp {
     static constexpr size_t LOAD_FACTOR = 2; // Max factor for how much of table can be full.
 
     emp::vector<Entry> table{INIT_CAPACITY};
+    size_t table_mask = INIT_CAPACITY - 1;
+
     size_t num_elements = 0;
 
     // === HELPER FUNCTIONS ===
 
-    [[nodiscard]] size_t ToPos(size_t hash) const { return hash & (table.size() - 1); }
+    [[nodiscard]] size_t ToPos(size_t hash) const { return hash & table_mask; }
 
     [[nodiscard]] static size_t ImproveHash(size_t hash_value) {
-      // SplitMix64 finalizer (good quality, cheap enough for a hash table)
+      // SplitMix64 finalizer (good quality, cheap hash improver)
       hash_value += 0x9e3779b97f4a7c15ull;
       hash_value = (hash_value ^ (hash_value >> 30)) * 0xbf58476d1ce4e5b9ull;
       hash_value = (hash_value ^ (hash_value >> 27)) * 0x94d049bb133111ebull;
@@ -69,6 +71,7 @@ namespace emp {
       emp::vector<Entry> old_table = std::move(table);
       table = emp::vector<Entry>(new_table_size);
       num_elements = 0;
+      table_mask = new_table_size - 1;
 
       // Move all elements into the new hash table.
       for (const Entry & entry : old_table) {
@@ -81,8 +84,8 @@ namespace emp {
       size_t pos;
       size_t dist;
 
-      void Next(const size_t table_size) {
-        pos = (pos + 1) & (table_size - 1);
+      void Next(const size_t table_mask) {
+        pos = (pos + 1) & table_mask;
         ++dist;
       }
       operator size_t() const { return pos; }
@@ -103,7 +106,7 @@ namespace emp {
 
       while (table[test_pos] && test_pos.dist <= CalcOffset(test_pos)) {
         if (TestAt(test_pos, key)) { return &table[test_pos].value; } // Found!
-        test_pos.Next(table.size()); // Try the next position.
+        test_pos.Next(table_mask); // Try the next position.
       }
       return nullptr; // Not found!
     }
@@ -284,7 +287,7 @@ namespace emp {
         }
         if (test_pos.dist > CalcOffset(test_pos)) break; // Current is "closer to home", start Robin Hood swap-in.
 
-        test_pos.Next(table.size()); // Keep searching at the next position.
+        test_pos.Next(table_mask); // Keep searching at the next position.
       }
 
       // Current key not in table; perform standard Robin Hood insertion from found position.
@@ -293,14 +296,14 @@ namespace emp {
 
       // Search for an empty position, juggling entries as we go.
       while (table[test_pos]) {
-        // Otherwise bump entry closer to home.
+        // Bump entry closer to home.
         const size_t existing_dist = CalcOffset(test_pos);
         if (existing_dist < test_pos.dist) {
           std::swap(table[test_pos], new_entry);
           test_pos.dist = existing_dist;
         }
 
-        test_pos.Next(table.size());  // Move on to the next table position.
+        test_pos.Next(table_mask);  // Move on to the next table position.
       }
 
       table[test_pos] = std::move(new_entry);
@@ -332,7 +335,7 @@ namespace emp {
           return true;
         }
 
-        test_pos.Next(table.size());
+        test_pos.Next(table_mask);
       }
 
       return false;  // Couldn't find in table.
