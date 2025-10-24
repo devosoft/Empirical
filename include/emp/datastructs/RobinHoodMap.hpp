@@ -24,9 +24,6 @@ namespace emp {
       Key key;
       T value;
       size_t hash = 0;        // Store hash to avoid recomputing
-      bool occupied = false;
-
-      operator bool() const { return occupied; }
     };
 
     static constexpr size_t INIT_CAPACITY = 16;
@@ -36,6 +33,8 @@ namespace emp {
     emp::vector<Entry> table{INIT_CAPACITY};
     size_t table_mask = INIT_CAPACITY - 1;
 
+    // Track "distance from home" of each table entry; 0=no entry.  1=in place.
+    emp::vector<uint8_t> occupied{INIT_CAPACITY, 0};
     size_t num_elements = 0;
 
     // === HELPER FUNCTIONS ===
@@ -62,20 +61,22 @@ namespace emp {
 
     // Calculate how far off a current entry is from its ideal position.
     [[nodiscard]] size_t CalcOffset(size_t pos) const {
-      emp_assert(pos < table.size() && table[pos].occupied, pos, table.size());
+      emp_assert(pos < table.size() && occupied[pos], pos, table.size());
       const size_t ideal_pos = ToPos(table[pos].hash);
       return ToPos(pos + table.size() - ideal_pos);
     }
 
     void Rehash(size_t new_table_size) {
       emp::vector<Entry> old_table = std::move(table);
+      emp::vector<uint8_t> old_occupied = std::move(occupied);
       table = emp::vector<Entry>(new_table_size);
+      occupied = emp::vector<uint8_t>(new_table_size);
       num_elements = 0;
       table_mask = new_table_size - 1;
 
       // Move all elements into the new hash table.
-      for (const Entry & entry : old_table) {
-        if (entry) { Insert(entry.key, entry.value); }
+      for (size_t i = 0; i < old_occupied.size(); ++i) {
+        if (old_occupied[i]) { Insert(old_table[i].key, old_table[i].value); }
       }
     }
 
@@ -104,7 +105,7 @@ namespace emp {
       if (table.size() == 0) return nullptr;
       SearchPos test_pos{MakeSearchPos(key)};
 
-      while (table[test_pos] && test_pos.dist <= CalcOffset(test_pos)) {
+      while (occupied[test_pos] && test_pos.dist <= CalcOffset(test_pos)) {
         if (TestAt(test_pos, key)) { return &table[test_pos].value; } // Found!
         test_pos.Next(table_mask); // Try the next position.
       }
@@ -115,14 +116,14 @@ namespace emp {
     void EraseAt(size_t pos) {
       emp_assert(pos < table.size());
       size_t next = ToPos(pos + 1);
-      while (table[next] && CalcOffset(next) != 0) { // Test if next entry should move up.
+      while (occupied[next] && CalcOffset(next) != 0) { // Test if next entry should move up.
         table[pos] = std::move(table[next]);
         pos = next;
         next = ToPos(next + 1);
       }
 
       // Clear final position
-      table[pos].occupied = false;
+      occupied[pos] = 0;
       --num_elements;
     }
 
@@ -131,9 +132,15 @@ namespace emp {
     RobinHoodMap(const RobinHoodMap & other) = default;
     RobinHoodMap(RobinHoodMap && other) noexcept
       : table(std::move(other.table))
+      , table_mask(other.table_mask)
+      , occupied(std::move(other.occupied))
       , num_elements(other.num_elements)
     {
-      if (table.empty()) table.resize(INIT_CAPACITY);
+      if (table.empty()) {
+        table.resize(INIT_CAPACITY);
+        occupied.resize(INIT_CAPACITY, 0);
+        table_mask = INIT_CAPACITY-1;
+      }
       other.num_elements = 0;
     }
 
@@ -141,8 +148,14 @@ namespace emp {
     RobinHoodMap & operator=(RobinHoodMap && other) noexcept {
       if (this == &other) return *this;
       table        = std::move(other.table);
+      table_mask   = other.table_mask;
+      occupied       = std::move(other.occupied);
       num_elements = other.num_elements;
-      if (table.empty()) table.resize(INIT_CAPACITY);
+      if (table.empty()) {
+        table.resize(INIT_CAPACITY);
+        occupied.resize(INIT_CAPACITY, 0);
+        table_mask = INIT_CAPACITY-1;
+      }
       other.num_elements = 0;
       return *this;
     }
@@ -176,7 +189,7 @@ namespace emp {
       bool MakeValid() {
         if (!map_ptr) return false; // Cannot make valid.
         const size_t table_size = map_ptr->table.size();
-        while (index < table_size && !map_ptr->table[index]) {
+        while (index < table_size && !map_ptr->occupied[index]) {
           ++index;
         }
         return true;
@@ -200,7 +213,7 @@ namespace emp {
       bool IsValid() const {
         return map_ptr &&                        // Does map exist?
                index < map_ptr->table.size() &&  // With the needed index?
-               map_ptr->table[index].occupied;   // And that index is occupied?
+               map_ptr->occupied[index];           // And that index is occupied?
       }
 
       reference operator*() const {
@@ -253,7 +266,7 @@ namespace emp {
     [[nodiscard]] const_iterator cend() const { return const_iterator(this, table.size()); }
 
     void clear() {
-      for (auto & entry : table) entry.occupied = false;
+      for (auto & cur_occupied : occupied) cur_occupied = 0;
       num_elements = 0;
     }
 
@@ -281,7 +294,7 @@ namespace emp {
 
       // Search for an existing key. Return false if we find one; end loop if there is not one.
       SearchPos test_pos{MakeSearchPos(key)};
-      while (table[test_pos]) {        
+      while (occupied[test_pos]) {        
         if (TestAt(test_pos, key)) {
           return { iterator{this, test_pos}, false };  // Key already in table.
         }
@@ -291,11 +304,11 @@ namespace emp {
       }
 
       // Current key not in table; perform standard Robin Hood insertion from found position.
-      Entry new_entry{key, value, test_pos.hash, true};
+      Entry new_entry{key, value, test_pos.hash};
       size_t found_pos = test_pos;
 
       // Search for an empty position, juggling entries as we go.
-      while (table[test_pos]) {
+      while (occupied[test_pos]) {
         // Bump entry closer to home.
         const size_t existing_dist = CalcOffset(test_pos);
         if (existing_dist < test_pos.dist) {
@@ -307,6 +320,7 @@ namespace emp {
       }
 
       table[test_pos] = std::move(new_entry);
+      occupied[test_pos] = 1;
       ++num_elements;
       return { iterator{this, found_pos}, true };
     }
@@ -329,7 +343,7 @@ namespace emp {
       if (table.empty()) { return false; }  // Nothing to delete.
 
       SearchPos test_pos{MakeSearchPos(key)};
-      while (table[test_pos] && CalcOffset(test_pos) >= test_pos.dist) {
+      while (occupied[test_pos] && CalcOffset(test_pos) >= test_pos.dist) {
         if (TestAt(test_pos, key)) {  // If we found key, begin deletion and backshift
           EraseAt(test_pos);
           return true;
