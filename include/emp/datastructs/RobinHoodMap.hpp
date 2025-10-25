@@ -354,6 +354,31 @@ namespace emp {
 
       return false;  // Couldn't find in table.
     }
+
+    [[nodiscard]] bool OK() const {
+      const size_t N = table.size();
+
+      // Make sure the occupied size is the same as the table.
+      emp_assert(occupied.size() == N);
+
+      // Make sure the size is valid (at least minumum and a power of two.)
+      emp_assert((N >= INIT_CAPACITY) && ((N & (N - 1)) == 0));
+
+      // Make sure we have kept the mask up to date.
+      emp_assert(table_mask == N - 1, table_mask, table.size());
+
+      // Make sure we have the correct number of occupied bins.
+      size_t entry_count = 0;
+      for (uint8_t cur_oc : occupied) { if (cur_oc) ++entry_count; }
+      emp_assert(entry_count == num_elements, entry_count, num_elements);
+
+      // Make sure all hash values are correct
+      for (size_t id = 0; id < N; ++id) {
+        emp_assert(table[id].hash == CalcHash(table[id].key));
+      }
+
+      return true;
+    }
   };
 
 }  // namespace emp
