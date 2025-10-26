@@ -30,11 +30,11 @@ namespace emp {
     static constexpr size_t GROW_FACTOR = 2; // How much larger should table get on growth?
     static constexpr size_t LOAD_FACTOR = 2; // Max factor for how much of table can be full.
 
-    emp::vector<Entry> table{INIT_CAPACITY};
+    emp::vector<Entry> table = emp::vector<Entry>(INIT_CAPACITY);
     size_t table_mask = INIT_CAPACITY - 1;
 
     // Track "distance from home" of each table entry; 0=no entry.  1=in place.
-    emp::vector<uint8_t> occupied{INIT_CAPACITY, 0};
+    emp::vector<uint8_t> occupied = emp::vector<uint8_t>(INIT_CAPACITY, 0);
     size_t num_elements = 0;
 
     // === HELPER FUNCTIONS ===
@@ -67,6 +67,7 @@ namespace emp {
     }
 
     void Rehash(size_t new_table_size) {
+      emp_assert(OK());
       emp::vector<Entry> old_table = std::move(table);
       emp::vector<uint8_t> old_occupied = std::move(occupied);
       table = emp::vector<Entry>(new_table_size);
@@ -78,6 +79,7 @@ namespace emp {
       for (size_t i = 0; i < old_occupied.size(); ++i) {
         if (old_occupied[i]) { Insert(old_table[i].key, old_table[i].value); }
       }
+      emp_assert(OK());
     }
 
     struct SearchPos {
@@ -114,6 +116,7 @@ namespace emp {
 
     // Erase the element at a specified position in the table and do backshift
     void EraseAt(size_t pos) {
+      emp_assert(OK());
       emp_assert(pos < table.size());
       size_t next = ToPos(pos + 1);
       while (occupied[next] && CalcOffset(next) != 0) { // Test if next entry should move up.
@@ -125,6 +128,7 @@ namespace emp {
       // Clear final position
       occupied[pos] = 0;
       --num_elements;
+      emp_assert(OK());
     }
 
   public:
@@ -142,6 +146,7 @@ namespace emp {
         table_mask = INIT_CAPACITY-1;
       }
       other.num_elements = 0;
+      emp_assert(OK());
     }
 
     RobinHoodMap & operator=(const RobinHoodMap & other) = default;
@@ -157,6 +162,7 @@ namespace emp {
         table_mask = INIT_CAPACITY-1;
       }
       other.num_elements = 0;
+      emp_assert(OK());
       return *this;
     }
 
@@ -266,12 +272,15 @@ namespace emp {
     [[nodiscard]] const_iterator cend() const { return const_iterator(this, table.size()); }
 
     void clear() {
+      emp_assert(OK());
       for (auto & cur_occupied : occupied) cur_occupied = 0;
       num_elements = 0;
+      emp_assert(OK());
     }
 
     // Make sure that we can store at least n elements without additional allocations.
     void reserve(size_t n) {
+      emp_assert(OK());
       // If we already have enough capacity, do nothing.
       if (n <= max_load()) return;
 
@@ -280,6 +289,7 @@ namespace emp {
       while (new_max_load < n) new_max_load *= GROW_FACTOR;
 
       Rehash(new_max_load * LOAD_FACTOR);
+      emp_assert(OK());
     }
 
     std::pair<iterator,bool> insert(const std::pair<const Key, T> & in) {
@@ -289,6 +299,7 @@ namespace emp {
     /// Insert with "unique key" semantics.
     /// @return pair of iterator to key and bool to indicate if a new element was inserted.
     std::pair<iterator,bool> Insert(const Key & key, const T & value) {
+      emp_assert(OK());
       // Test if we need to grow the table...
       if (num_elements >= max_load()) { Rehash(table.size() * GROW_FACTOR); }
 
@@ -322,6 +333,8 @@ namespace emp {
       table[test_pos] = std::move(new_entry);
       occupied[test_pos] = 1;
       ++num_elements;
+
+      emp_assert(OK());
       return { iterator{this, found_pos}, true };
     }
 
@@ -340,6 +353,7 @@ namespace emp {
     }
 
     bool erase(const Key & key) {
+      emp_assert(OK());
       if (table.empty()) { return false; }  // Nothing to delete.
 
       SearchPos test_pos{MakeSearchPos(key)};
@@ -352,6 +366,7 @@ namespace emp {
         test_pos.Next(table_mask);
       }
 
+      emp_assert(OK());
       return false;  // Couldn't find in table.
     }
 
@@ -359,7 +374,7 @@ namespace emp {
       const size_t N = table.size();
 
       // Make sure the occupied size is the same as the table.
-      emp_assert(occupied.size() == N);
+      emp_assert(occupied.size() == N, occupied.size(), table.size());
 
       // Make sure the size is valid (at least minumum and a power of two.)
       emp_assert((N >= INIT_CAPACITY) && ((N & (N - 1)) == 0));
@@ -368,13 +383,28 @@ namespace emp {
       emp_assert(table_mask == N - 1, table_mask, table.size());
 
       // Make sure we have the correct number of occupied bins.
-      size_t entry_count = 0;
+      [[maybe_unused]] size_t entry_count = 0;
       for (uint8_t cur_oc : occupied) { if (cur_oc) ++entry_count; }
       emp_assert(entry_count == num_elements, entry_count, num_elements);
 
       // Make sure all hash values are correct
       for (size_t id = 0; id < N; ++id) {
+        if (!occupied[id]) continue;
         emp_assert(table[id].hash == CalcHash(table[id].key));
+      }
+
+      // Test that distances match expectations.
+      for (size_t i = 0; i < N; ++i) {
+        if (!occupied[i]) continue;
+
+        [[maybe_unused]] const size_t cur_dist = CalcOffset(i);
+
+        // Distance at next slot (if occupied) must be <= ours + 1 (or we should have swapped)
+        size_t j = (i + 1) & table_mask;
+        if (occupied[j]) {
+          [[maybe_unused]] const size_t next_dist = CalcOffset(j);
+          emp_assert(next_dist <= cur_dist + 1, i, cur_dist, j, next_dist);
+        }
       }
 
       return true;
