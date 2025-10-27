@@ -3,13 +3,14 @@
 #include <map>
 #include <unordered_map>
 
-#include "../../include/emp/base/vector.hpp"
-#include "../../include/emp/datastructs/RobinHoodMap.hpp"
-#include "../../include/emp/io/ANSI.hpp"
-#include "../../include/emp/math/Random.hpp"
-#include "../../include/emp/math/random_utils.hpp"
-#include "../../include/emp/tools/String.hpp"
-#include "../../include/emp/tools/string_utils.hpp"
+#include "emp/base/vector.hpp"
+#include "emp/config/command_line.hpp"
+#include "emp/datastructs/RobinHoodMap.hpp"
+#include "emp/io/ANSI.hpp"
+#include "emp/math/Random.hpp"
+#include "emp/math/random_utils.hpp"
+#include "emp/tools/String.hpp"
+#include "emp/tools/string_utils.hpp"
 
 #include "../../third-party/robin-hood-hashing/src/include/robin_hood.h"
 
@@ -97,7 +98,17 @@ void PrintRow(const emp::vector<Results> & result_vec, emp::String trait_name,
   std::cout << std::endl;
 }
 
-int main() {
+int main(int argc, char * argv[]) {
+  auto args = emp::ArgsToStrings(argc, argv);
+  bool print_extras = true;
+  if (argc > 1) {
+    if (args[1] == "--quick" || args[1] == "-q") print_extras = false;
+    else {
+      std::cerr << "ERROR: Unknown arg '" << args[1] << "'." << std::endl;
+      exit(1);
+    }
+  }
+
   emp::Random random;
   for (double & val : values) val = random.GetDouble(0.0, 1000000.0);
 
@@ -111,13 +122,15 @@ int main() {
   Results results;
   emp::vector<Results> result_vec;
 
+  if (print_extras) {
+    results = Test<std::unordered_map<size_t, double>>("std::", "unordered_map");
+    result_vec.push_back(results);
+    results = Test<std::map<size_t, double>>("std::", "map          ");
+    result_vec.push_back(results);
+    results = Test<robin_hood::unordered_map<size_t, double>>("robin_hood::", "unordered_map");
+    result_vec.push_back(results);
+  }
   results = Test<emp::RobinHoodMap<size_t, double>>("emp::", "RobinHoodMap");
-  result_vec.push_back(results);
-  results = Test<std::unordered_map<size_t, double>>("std::", "unordered_map");
-  result_vec.push_back(results);
-  results = Test<robin_hood::unordered_map<size_t, double>>("robin_hood::", "unordered_map");
-  result_vec.push_back(results);
-  results = Test<std::map<size_t, double>>("std::", "map          ");
   result_vec.push_back(results);
   results = Test<emp::RobinHoodMap<size_t, double, true>>("emp::", "RobinHoodMap<IMPROVE>");
   result_vec.push_back(results);
