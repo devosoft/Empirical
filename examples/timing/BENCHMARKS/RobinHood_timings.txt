@@ -63,3 +63,31 @@ found_count 3999688           3999688            3999688                   39996
 erase_count 1999848           1999848            1999848                   1999848  
 start_size  10000000          10000000           10000000                  10000000 
 final_size  8000152           8000152            8000152                   8000152
+
+===
+
+Added in complixifying hashes
+
+scope       std::          robin_hood::   std::          emp::         emp::                  
+name        unordered_map  unordered_map  map            RobinHoodMap  RobinHoodMap<IMPROVE>  
+insert_time 2.17958        0.373499       6.80388        0.677222      0.7248                 
+search_time 0.423161       0.160403       1.11529        0.061367      0.286903               
+erase_time  0.570929       0.094903       0.511135       0.038482      0.213267               
+found_count 4000563        4000563        4000563        4000563       4000563                
+erase_count 2000092        2000092        2000092        2000092       2000092                
+start_size  10000000       10000000       10000000       10000000      10000000               
+final_size  7999908        7999908        7999908        7999908       7999908
+
+===
+
+Separated occupied into its own vector.
+
+scope       std::          std::          robin_hood::   emp::         emp::                  
+name        unordered_map  map            unordered_map  RobinHoodMap  RobinHoodMap<IMPROVE>  
+insert_time 2.15322        6.82262        0.380389       0.619261      0.638649               
+search_time 0.423925       1.22118        0.165221       0.059625      0.330729               
+erase_time  0.627718       0.548916       0.09611        0.05025       0.237651               
+found_count 4000997        4000997        4000997        4000997       4000997                
+erase_count 2000646        2000646        2000646        2000646       2000646                
+start_size  10000000       10000000       10000000       10000000      10000000               
+final_size  7999354        7999354        7999354        7999354       7999354
