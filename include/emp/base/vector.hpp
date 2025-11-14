@@ -171,7 +171,7 @@ namespace emp {
         return wrapped_t::operator*();
       }
 
-      [[nodiscard]] constexpr const auto & operator*() const {
+      [[nodiscard]] constexpr auto & operator*() const {
         emp_assert(OK(true, false, "const dereference"), ErrorCode());
         return wrapped_t::operator*();
       }
