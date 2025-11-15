@@ -545,8 +545,8 @@ namespace emp {
     if (!use_emp) file.Include("<vector>");
 
     if (use_emp) {
-      file.Include("emp/base/vector.hpp")
-      file.Include("emp/tools/String.hpp")
+      file.Include("emp/base/vector.hpp");
+      file.Include("emp/tools/String.hpp");
     }
 
     file.AddCode("// Struct to store information about a found Token")
