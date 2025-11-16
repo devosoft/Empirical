@@ -166,14 +166,12 @@ namespace emp {
     [[nodiscard]] uint64_t GetUInt() noexcept { return Get64(); }
 
     /// @return A pseudo-random 64-bit unsigned int value between [0, max)
-    template <typename T>
-    [[nodiscard]] uint64_t GetUInt(const T max) noexcept {
+    [[nodiscard]] uint64_t GetUInt(const uint64_t max) noexcept {
       return static_cast<uint64_t>(GetDouble() * static_cast<double>(max));
     }
 
     /// @return A pseudo-random 64-bit unsigned int value between [min, max)
-    template <typename T1, typename T2>
-    [[nodiscard]] uint64_t GetUInt(const T1 min, const T2 max) noexcept {
+    [[nodiscard]] uint64_t GetUInt(const uint64_t min, const uint64_t max) noexcept {
       return GetUInt(max - min) + min;
     }
 
