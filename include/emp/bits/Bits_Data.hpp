@@ -166,6 +166,7 @@ namespace emp {
       }
 
       Bits_Data_Size_Fixed(const Bits_Data_Size_Fixed &) = default;
+      Bits_Data_Size_Fixed & operator=(const Bits_Data_Size_Fixed &) = default;
 
       template <class Archive>
       void serialize(Archive & /* ar */) { /* Nothing to do here. */ }
