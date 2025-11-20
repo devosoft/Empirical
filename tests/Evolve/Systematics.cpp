@@ -677,7 +677,7 @@ TEST_CASE("Test Data Struct", "[evo]") {
 
 TEST_CASE("World systematics integration", "[evo]") {
 
-  std::function<void(emp::Ptr<emp::Taxon<emp::vector<int>, emp::datastruct::mut_landscape_info<int>>>, emp::vector<int> &)> setup_phenotype = [](emp::Ptr<emp::Taxon<emp::vector<int>, emp::datastruct::mut_landscape_info<int>>> tax, emp::vector<int> & org){
+  std::function<void(emp::Ptr<emp::Taxon<emp::vector<int>, emp::datastruct::mut_landscape_info<int>>>, emp::vector<int> &)> setup_phenotype = [](emp::Ptr<emp::Taxon<emp::vector<int>, emp::datastruct::mut_landscape_info<int>>> tax, emp::vector<int> & /*org*/){
     tax->GetData().phenotype = emp::Sum(tax->GetInfo());
   };
 
@@ -692,7 +692,7 @@ TEST_CASE("World systematics integration", "[evo]") {
   sys.New([](const emp::vector<int> & v){return v;}, true, true, true);
   world.AddSystematics(sys);
 
-  world.SetMutFun([](emp::vector<int> & org, emp::Random & r){return 0;});
+  world.SetMutFun([](emp::vector<int> & /*org*/, emp::Random &){return 0;});
 
   sys->OnNew(setup_phenotype);
   world.InjectAt(emp::vector<int>({1,2,3}), 0);
@@ -819,7 +819,7 @@ TEST_CASE("Run world", "[evo]") {
   world.AddSystematics(gene_sys);
   world.AddSystematics(phen_sys);
 
-  std::function<void(emp::Ptr<gene_systematics_t::taxon_t>, emp::AvidaGP&)> check_update = [&gene_sys, &world](emp::Ptr<gene_systematics_t::taxon_t> tax, emp::AvidaGP & org){
+  std::function<void(emp::Ptr<gene_systematics_t::taxon_t>, emp::AvidaGP&)> check_update = [&gene_sys, &world](emp::Ptr<gene_systematics_t::taxon_t> tax, emp::AvidaGP & /*org*/){
     CHECK(tax->GetOriginationTime() == gene_sys->GetUpdate());
     CHECK(tax->GetOriginationTime() == world.GetUpdate());
     CHECK(tax->GetNumOff() == 0);
@@ -863,7 +863,7 @@ TEST_CASE("Run world", "[evo]") {
 
   emp::Ptr<emp::SystematicsBase<org_t>> sys0 = world.GetSystematics(0);
   emp::Ptr<gene_systematics_t> sys0_cast = sys0.DynamicCast<gene_systematics_t>();
-  std::function<void(emp::Ptr<gene_systematics_t::taxon_t>, emp::AvidaGP&)> capture_mut_fun = [&last_mutation](emp::Ptr<gene_systematics_t::taxon_t> tax, emp::AvidaGP & org){
+  std::function<void(emp::Ptr<gene_systematics_t::taxon_t>, emp::AvidaGP&)> capture_mut_fun = [&last_mutation](emp::Ptr<gene_systematics_t::taxon_t> tax, emp::AvidaGP & /*org*/){
     tax->GetData().RecordMutation(last_mutation);
   };
   sys0_cast->OnNew(capture_mut_fun);
@@ -1366,7 +1366,7 @@ TEST_CASE("Test Prune", "[Evolve]") {
   emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
 
   int prunes = 0;
-  std::function<void(emp::Ptr<emp::Taxon<int> >)> prune_fun = [&prunes](emp::Ptr<emp::Taxon<int>> tax){prunes++;};
+  std::function<void(emp::Ptr<emp::Taxon<int> >)> prune_fun = [&prunes](emp::Ptr<emp::Taxon<int>>){prunes++;};
   sys.OnPrune(prune_fun);
 
   sys.SetUpdate(0);
@@ -1726,7 +1726,7 @@ TEST_CASE("Collapse Unifurcations") {
   sys.SetCollapseUnifurcations(true);
   CHECK(sys.GetCollapseUnifurcations());  
   int unifurcation_count = 0;
-  std::function<void(emp::Ptr<emp::Taxon<int>>)> unifurcation_fun = [&unifurcation_count](emp::Ptr<emp::Taxon<int>> tax){unifurcation_count++;};
+  std::function<void(emp::Ptr<emp::Taxon<int>>)> unifurcation_fun = [&unifurcation_count](emp::Ptr<emp::Taxon<int>>){unifurcation_count++;};
   sys.OnCollapseUnifurcation(unifurcation_fun);
   [[maybe_unused]] auto id1 = sys.AddOrg(3, nullptr);
   sys.SetUpdate(1);
