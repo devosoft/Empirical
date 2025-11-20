@@ -32,14 +32,14 @@ TEST_CASE("Test resources", "[evo]")
   emp::Random random(1);
   emp::World<BitOrg> pop(random);
   pop.SetPopStruct_Mixed(true);
-  pop.SetMutFun([](BitOrg & org, emp::Random & r){return 0;});
+  pop.SetMutFun([](BitOrg &, emp::Random &){return 0;});
 
   emp::vector<emp::Resource> resources;
   resources.push_back(emp::Resource(100, 100, .01));
   resources.push_back(emp::Resource(100, 100, .01));
   resources.push_back(emp::Resource(100, 100, .01));
 
-  pop.OnUpdate([&resources](int ud){
+  pop.OnUpdate([&resources]([[maybe_unused]] int ud){
       for (emp::Resource& res : resources) {
           res.Update();
       }
@@ -64,7 +64,7 @@ TEST_CASE("Test resources", "[evo]")
     pop.Inject(next_org);
   }
 
-  pop.SetFitFun([](BitOrg &org){ return 10; });
+  pop.SetFitFun([](BitOrg &){ return 10; });
 
 
   emp::vector<std::function<double(BitOrg&)> > fit_funs;
