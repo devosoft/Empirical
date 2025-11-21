@@ -976,7 +976,7 @@ namespace emp {
           std::transform(active_taxa.begin(),
                          active_taxa.end(),
                          std::back_inserter(result),
-                         [this](Ptr<taxon_t> tax) { return CountDeleteriousSteps(tax); });
+                         [](Ptr<taxon_t> tax) { return CountDeleteriousSteps(tax); });
           return result;
         });
       }
@@ -999,7 +999,7 @@ namespace emp {
           std::transform(active_taxa.begin(),
                          active_taxa.end(),
                          std::back_inserter(result),
-                         [this](Ptr<taxon_t> tax) { return CountPhenotypeChanges(tax); });
+                         [](Ptr<taxon_t> tax) { return CountPhenotypeChanges(tax); });
           return result;
         });
       }
@@ -1022,7 +1022,7 @@ namespace emp {
           std::transform(active_taxa.begin(),
                          active_taxa.end(),
                          std::back_inserter(result),
-                         [this](Ptr<taxon_t> tax) { return CountUniquePhenotypes(tax); });
+                         [](Ptr<taxon_t> tax) { return CountUniquePhenotypes(tax); });
           return result;
         });
       }
@@ -1047,7 +1047,7 @@ namespace emp {
           std::transform(active_taxa.begin(),
                          active_taxa.end(),
                          std::back_inserter(result),
-                         [this, mutation](Ptr<taxon_t> tax) { return CountMuts(tax, mutation); });
+                         [mutation](Ptr<taxon_t> tax) { return CountMuts(tax, mutation); });
           return result;
         });
       }
