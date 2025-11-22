@@ -85,6 +85,11 @@ namespace emp {
       pop_id = invalid_id;
       return *this;
     }
+
+    bool OK() const {
+      if (IsValid()) return GetPopID() != invalid_id;
+      else return GetPopID() == invalid_id;
+    }
   };
 
   /// A vector that can be indexed with a WorldPosition
