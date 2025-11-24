@@ -77,7 +77,14 @@ namespace emp {
       using wrapped_t = ITERATOR_T;
       using vec_t     = emp::vector<T, Ts...>;
 
-      /// What vector and revision was this iterator created from?
+      using difference_type = typename std::iterator_traits<wrapped_t>::difference_type;
+      using reference       = typename std::iterator_traits<wrapped_t>::reference;
+      // using iterator_concept  = typename std::iterator_traits<wrapped_t>::iterator_concept;
+      using iterator_category = typename std::iterator_traits<wrapped_t>::iterator_category; // legacy
+      using value_type        = typename std::iterator_traits<wrapped_t>::value_type;
+      using pointer           = typename std::iterator_traits<wrapped_t>::pointer;
+
+/// What vector and revision was this iterator created from?
       const vec_t * v_ptr;
       int revision;
 
@@ -162,9 +169,7 @@ namespace emp {
       constexpr this_it_t & operator=(const this_it_t &) & = default;
       constexpr this_it_t & operator=(this_it_t &&) &      = default;
 
-      constexpr operator ITERATOR_T() { return *this; }
-
-      constexpr operator const ITERATOR_T() const { return *this; }
+      constexpr operator wrapped_t() const { return static_cast<const wrapped_t&>(*this); }
 
       [[nodiscard]] constexpr auto & operator*() {
         emp_assert(OK(true, false, "dereference"), ErrorCode());
@@ -185,7 +190,6 @@ namespace emp {
       }
 
       [[nodiscard]] constexpr auto operator->() const {
-        //        emp_assert(OK(true, false, "const ->"), ErrorCode());
         emp_assert(
           OK(true, true, "const ->"),
           ErrorCode());  // Technically can use -> on end() for memory identification, just can't use result.
@@ -214,36 +218,46 @@ namespace emp {
         return this_it_t(wrapped_t::operator--(x), v_ptr);
       }
 
-      [[nodiscard]] constexpr auto operator+(int in) {
+      [[nodiscard]] constexpr this_it_t operator+(difference_type n) const {
         emp_assert(OK(), ErrorCode());
-        return this_it_t(wrapped_t::operator+(in), v_ptr);
+        return this_it_t(static_cast<const wrapped_t &>(*this) + n, v_ptr);
       }
 
-      [[nodiscard]] constexpr auto operator-(int in) {
-        emp_assert(OK(), ErrorCode());
-        return this_it_t(wrapped_t::operator-(in), v_ptr);
+      [[nodiscard]] friend constexpr this_it_t operator+(difference_type n, const this_it_t & it) {
+        emp_assert(it.OK(), ErrorCode());
+        return it + n;
       }
 
-      [[nodiscard]] constexpr auto operator-(const this_it_t & in) {
+      [[nodiscard]] constexpr this_it_t operator-(difference_type n) const {
         emp_assert(OK(), ErrorCode());
-        return ((wrapped_t) * this) - (wrapped_t) in;
+        return this_it_t(static_cast<const wrapped_t &>(*this) - n, v_ptr);
       }
 
-      constexpr this_it_t & operator+=(int in) {
+      [[nodiscard]] constexpr difference_type operator-(const this_it_t & in) const {
         emp_assert(OK(), ErrorCode());
-        wrapped_t::operator+=(in);
+        return static_cast<const wrapped_t &>(*this) - static_cast<const wrapped_t &>(in);
+      }
+
+      constexpr this_it_t & operator+=(difference_type n) {
+        emp_assert(OK(), ErrorCode());
+        static_cast<wrapped_t &>(*this) += n;
         return *this;
       }
 
-      constexpr this_it_t & operator-=(int in) {
+      constexpr this_it_t & operator-=(difference_type n) {
         emp_assert(OK(), ErrorCode());
-        wrapped_t::operator-=(in);
+        static_cast<wrapped_t &>(*this) -= n;
         return *this;
       }
 
-      [[nodiscard]] constexpr auto & operator[](int offset) {
+      [[nodiscard]] constexpr reference operator[](difference_type offset) const {
         emp_assert(OK(), ErrorCode());
-        return wrapped_t::operator[](offset);
+        return static_cast<const wrapped_t&>(*this)[offset];
+      }
+
+      [[nodiscard]] constexpr auto operator<=>(const this_it_t& rhs) const {
+        emp_assert(OK(), ErrorCode());
+        return static_cast<const wrapped_t&>(*this) <=> static_cast<const wrapped_t&>(rhs);
       }
     };  // struct iterator_wrapper
 
