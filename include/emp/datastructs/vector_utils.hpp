@@ -22,6 +22,7 @@
 #include <limits>
 #include <map>
 #include <numeric>
+#include <ranges>
 #include <set>
 #include <stddef.h>
 
@@ -200,10 +201,18 @@ namespace emp {
     }
   }
 
-  template <typename VEC_T, typename IT_T>
-  size_t IteratorIndex(const VEC_T & v, IT_T it) {
-    emp_assert(std::distance(v.begin(), it) > 0);
-    return static_cast<size_t>(std::distance(v.begin(), it));
+  template <std::ranges::random_access_range Range>
+  size_t IteratorIndex(Range& r, std::ranges::iterator_t<Range> it) {
+    emp_assert(it >= std::ranges::begin(r));
+    emp_assert(it <  std::ranges::end(r));
+    return static_cast<size_t>(it - std::ranges::begin(r));
+  }
+
+  template <std::ranges::random_access_range Range>
+  size_t IteratorIndex(const Range& r, std::ranges::iterator_t<const Range> it) {
+    emp_assert(it >= std::ranges::begin(r));
+    emp_assert(it <  std::ranges::end(r));
+    return static_cast<size_t>(it - std::ranges::begin(r));
   }
 
   /// Find the first index where the provided function returns true; return -1 otherwise.
