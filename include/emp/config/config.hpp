@@ -854,7 +854,7 @@ namespace emp {
   bool NAME ## _is_const() const { return false; }
 #define EMP_CONFIG__ACCESS_CONST(NAME, TYPE, VALUE, DESC)                       \
   constexpr static TYPE NAME() { return VALUE; }                                \
-  TYPE NAME(const TYPE & _in) {                                                 \
+  TYPE NAME([[maybe_unused]] const TYPE & _in) {                                \
     std::stringstream ss;                                                       \
     ss << "Trying to set const '" << #NAME << "'. Ignoring." << std::endl;      \
     emp::NotifyWarning(ss.str());                                               \
