@@ -1,0 +1,51 @@
+% This is a comment.  The '%' must be first control on line.
+% Other control characters are: #|*:.
+% A non-control indicates code on the line.
+# Title of new slide
+| Text in a text box.
+| More text in the same text box.
+| \* Bullet in the same text box (using Markback formatting)
+| \** Sub-bullet (num asterisks indicate bullet level)
+
+% Use colons to set properties for the next text box.
+:FontName="32pt Helvetica"
+| New text box (since there was a line break with no symbol.)
+|
+| Same text box, bit with a skipped line.
+
+@{50,50;30,40}
+| This textbox is at position 50,50 with size 30 wide by 40 tall.
+| The @ is a shortcut for :Anchor {x,y} and optionally :Size {width,height}
+
+# Another Slide
+
+% Text boxes can be saved as a variable.
+text_box = | Text in a text box with ID saved in x.
+
+% Next line forces a wait to advanced but NOT a new slide.
+...
+
+x.Move({10,10},2s); % Move the textbox x to screen position 10,10 over 2 seconds.
+
+# New slides automatically imply a ...
+
+y = "Sample Text"
+| We can output variables with \\$.
+| y = \${y}
+| `truetype text`
+| Inside of a textbox only \` and \\ will do anything different from what you are typing.
+| (Markback rules apply.)
+
+
+# Some examples of drawings.
+
+% Note: Drawings are often translated when placed.
+large_node = $circle{ id:"large", center:{0,0}, radius:30, line_color:"black", fill_color:""};
+small_node = $circle{ id:"small", center:{40,50}, radius:20, line_color:"black", fill_color:"blue"};
+combo_node = large_node + small_node;
+
+from = large_node.GetAnchor(0.125);
+to = combo_node["large"].GetAnchor(0.875);
+arrow = $arrow{ from:${from}, to:${to}, line_color:"white", arrow_size:6, line_width:3};
+image1 = large_node + combo_node + arrow;
+image.Draw({50,50});
