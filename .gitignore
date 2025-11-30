@@ -1,7 +1,10 @@
-*~
+# Extensions that we never want to keep.
+*.bak
 *.csv
+*.dat
 *.debug
 *.dSYM
+*.exe
 *.gcov
 *.js.mem
 *.map
@@ -13,28 +16,28 @@
 *.swo
 *.wasm
 *.wast
-*-bak.cc
-*-bak.cpp
-*.dat
-*.exe
-*tmp.*
+
+# Other backup or temporary files to ignore.
+*~
 *-bak.*
 *-bak2.*
+**/bak/
+**/BAK/
+.clang-bak/
+
+incoming/
+*tmp.*
+tmp/
+
 
 */env/*
 */3nv/*
 
+# Generated files or directories
 .DS_Store
+.vscode/
 a.out
 a.out.js
-
-incoming/
-tmp/
-**/bak/
-**/BAK/
-
-.clang-bak/
-.vscode/
 
 */*/coverage_cov*
 coverage_source/*/*
@@ -81,14 +84,23 @@ demos/utils/words/wordplay-remove
 demos/utils/words/wordplay-shuffle
 
 doc/doxygen/
-examples/*/*
-!examples/*/*.cc
-!examples/*/*.cpp
-!examples/*/*.h
-!examples/*/*.hpp
-!examples/*/*.html
-!examples/*/images
-!examples/*/Makefile
+
+# Prevent anything in the examples directory from being included.
+examples/**
+
+# Re-allow directories (only) so git can descend
+!examples/**/
+
+# Re-allow files that we want to maintain.
+!examples/**/*.cc
+!examples/**/*.cpp
+!examples/**/*.css
+!examples/**/*.emplex
+!examples/**/*.h
+!examples/**/*.hpp
+!examples/**/*.html
+!examples/**/images
+!examples/**/Makefile
 !examples/timing/BENCHMARKS
 
 tests/StatsConfig.cfg
