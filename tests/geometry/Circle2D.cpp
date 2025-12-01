@@ -32,25 +32,25 @@ TEST_CASE("Test Circle2D", "[geometry]")
   REQUIRE(circle_big.Contains(test_point2) == true);
 
   emp::Circle circle_xyr({7.0, 10.0}, 3.0);
-  REQUIRE(circle_xyr.GetCenterX() == 7.0);
-  REQUIRE(circle_xyr.GetCenterY() == 10.0);
+  REQUIRE(circle_xyr.GetX() == 7.0);
+  REQUIRE(circle_xyr.GetY() == 10.0);
 
   circle_xyr.SetCenter({4.0, 9.0});
-  REQUIRE(circle_xyr.GetCenterX() == 4.0);
-  REQUIRE(circle_xyr.GetCenterY() == 9.0);
+  REQUIRE(circle_xyr.GetX() == 4.0);
+  REQUIRE(circle_xyr.GetY() == 9.0);
 
-  circle_xyr.SetCenterY(11.0);
-  REQUIRE(circle_xyr.GetCenterY() == 11.0);
+  circle_xyr.SetY(11.0);
+  REQUIRE(circle_xyr.GetY() == 11.0);
 
-  circle_xyr.SetCenterX(2.0);
-  REQUIRE(circle_xyr.GetCenterX() == 2.0);
+  circle_xyr.SetX(2.0);
+  REQUIRE(circle_xyr.GetX() == 2.0);
 
   circle_xyr.SetRadius(7.0);
   REQUIRE(circle_xyr.GetRadius()== 7.0);
 
   circle_xyr.Set({1.0, 9.0}, 2.5);
-  REQUIRE(circle_xyr.GetCenterX() == 1.0);
-  REQUIRE(circle_xyr.GetCenterY() == 9.0);
+  REQUIRE(circle_xyr.GetX() == 1.0);
+  REQUIRE(circle_xyr.GetY() == 9.0);
   REQUIRE(circle_xyr.GetRadius() == 2.5);
 
   REQUIRE(circle_xyr.Contains({1.5,9.5}) == true);
