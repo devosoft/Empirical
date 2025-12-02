@@ -33,7 +33,7 @@ namespace emp {
     emp::vector<Entry> table = emp::vector<Entry>(INIT_CAPACITY);
     size_t table_mask = INIT_CAPACITY - 1;
 
-    // Track "distance from home" of each table entry; 0=no entry.  1=in place.
+    // Track "distance from home" of each table entry; 0=no entry; 1=in place; 2+=dist out of place
     emp::vector<uint8_t> occupied = emp::vector<uint8_t>(INIT_CAPACITY, 0);
     size_t num_elements = 0;
 
@@ -63,7 +63,7 @@ namespace emp {
     [[nodiscard]] size_t CalcOffset(size_t pos) const {
       emp_assert(pos < table.size() && occupied[pos], pos, table.size());
       const size_t ideal_pos = ToPos(table[pos].hash);
-      return ToPos(pos + table.size() - ideal_pos);
+      return ToPos(pos + table.size() - ideal_pos)+1;
     }
 
     void Rehash(size_t new_table_size) {
@@ -96,7 +96,7 @@ namespace emp {
 
     [[nodiscard]] SearchPos MakeSearchPos(const Key & key) const {
       const size_t hash = CalcHash(key);
-      return SearchPos{hash, ToPos(hash), 0};
+      return SearchPos{hash, ToPos(hash), 1};
     }
 
     [[nodiscard]] bool TestAt(const SearchPos & test_pos, const Key & key) const {
@@ -119,7 +119,7 @@ namespace emp {
       emp_assert(OK());
       emp_assert(pos < table.size());
       size_t next = ToPos(pos + 1);
-      while (occupied[next] && CalcOffset(next) != 0) { // Test if next entry should move up.
+      while (occupied[next] && CalcOffset(next) > 1) { // Test if next entry should move up.
         table[pos] = std::move(table[next]);
         pos = next;
         next = ToPos(next + 1);
@@ -154,7 +154,7 @@ namespace emp {
       if (this == &other) return *this;
       table        = std::move(other.table);
       table_mask   = other.table_mask;
-      occupied       = std::move(other.occupied);
+      occupied     = std::move(other.occupied);
       num_elements = other.num_elements;
       if (table.empty()) {
         table.resize(INIT_CAPACITY);
@@ -219,7 +219,7 @@ namespace emp {
       bool IsValid() const {
         return map_ptr &&                        // Does map exist?
                index < map_ptr->table.size() &&  // With the needed index?
-               map_ptr->occupied[index];           // And that index is occupied?
+               map_ptr->occupied[index];         // And that index is occupied?
       }
 
       reference operator*() const {
@@ -331,7 +331,7 @@ namespace emp {
       }
 
       table[test_pos] = std::move(new_entry);
-      occupied[test_pos] = 1;
+      occupied[test_pos] = 1;  // @CAO Use proper distance.
       ++num_elements;
 
       emp_assert(OK());
