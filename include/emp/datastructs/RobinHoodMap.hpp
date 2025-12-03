@@ -28,7 +28,7 @@ namespace emp {
 
     static constexpr size_t INIT_CAPACITY = 16;
     static constexpr size_t GROW_FACTOR = 2; // How much larger should table get on growth?
-    static constexpr size_t LOAD_FACTOR = 2; // Max factor for how much of table can be full.
+    static constexpr size_t LOAD_FACTOR = 2; // Max factor for how full a table can get.
 
     emp::vector<Entry> table = emp::vector<Entry>(INIT_CAPACITY);
     size_t table_mask = INIT_CAPACITY - 1;
@@ -59,13 +59,6 @@ namespace emp {
       }
     }
 
-    // Calculate how far off a current entry is from its ideal position.
-    [[nodiscard]] size_t CalcOffset(size_t pos) const {
-      emp_assert(pos < table.size() && occupied[pos], pos, table.size());
-      const size_t ideal_pos = ToPos(table[pos].hash);
-      return ToPos(pos + table.size() - ideal_pos)+1;
-    }
-
     void Rehash(size_t new_table_size) {
       emp_assert(OK());
       emp::vector<Entry> old_table = std::move(table);
@@ -85,11 +78,12 @@ namespace emp {
     struct SearchPos {
       size_t hash;
       size_t pos;
-      size_t dist;
+      uint8_t dist;
 
       void Next(const size_t table_mask) {
         pos = (pos + 1) & table_mask;
         ++dist;
+        emp_assert(dist < 255);
       }
       operator size_t() const { return pos; }
     };
@@ -107,7 +101,7 @@ namespace emp {
       if (table.size() == 0) return nullptr;
       SearchPos test_pos{MakeSearchPos(key)};
 
-      while (occupied[test_pos] && test_pos.dist <= CalcOffset(test_pos)) {
+      while (test_pos.dist <= occupied[test_pos]) {
         if (TestAt(test_pos, key)) { return &table[test_pos].value; } // Found!
         test_pos.Next(table_mask); // Try the next position.
       }
@@ -119,7 +113,7 @@ namespace emp {
       emp_assert(OK());
       emp_assert(pos < table.size());
       size_t next = ToPos(pos + 1);
-      while (occupied[next] && CalcOffset(next) > 1) { // Test if next entry should move up.
+      while (occupied[next] > 1) { // Test if next entry should move up.
         table[pos] = std::move(table[next]);
         pos = next;
         next = ToPos(next + 1);
@@ -301,15 +295,17 @@ namespace emp {
     std::pair<iterator,bool> Insert(const Key & key, const T & value) {
       emp_assert(OK());
       // Test if we need to grow the table...
-      if (num_elements >= max_load()) { Rehash(table.size() * GROW_FACTOR); }
+      if (num_elements > max_load()) { Rehash(table.size() * GROW_FACTOR); }
 
-      // Search for an existing key. Return false if we find one; end loop if there is not one.
+      // Search for an existing key. Return iterator/false if we find one; else end loop.
       SearchPos test_pos{MakeSearchPos(key)};
       while (occupied[test_pos]) {        
         if (TestAt(test_pos, key)) {
           return { iterator{this, test_pos}, false };  // Key already in table.
         }
-        if (test_pos.dist > CalcOffset(test_pos)) break; // Current is "closer to home", start Robin Hood swap-in.
+
+        // If current is "closer to home" than insert would be, break to start Robin Hood swap-in.
+        if (test_pos.dist > occupied[test_pos]) break;
 
         test_pos.Next(table_mask); // Keep searching at the next position.
       }
@@ -321,17 +317,16 @@ namespace emp {
       // Search for an empty position, juggling entries as we go.
       while (occupied[test_pos]) {
         // Bump entry closer to home.
-        const size_t existing_dist = CalcOffset(test_pos);
-        if (existing_dist < test_pos.dist) {
+        if (occupied[test_pos] < test_pos.dist) {
           std::swap(table[test_pos], new_entry);
-          test_pos.dist = existing_dist;
+          std::swap(test_pos.dist, occupied[test_pos]);
         }
 
         test_pos.Next(table_mask);  // Move on to the next table position.
       }
 
       table[test_pos] = std::move(new_entry);
-      occupied[test_pos] = 1;  // @CAO Use proper distance.
+      occupied[test_pos] = test_pos.dist;
       ++num_elements;
 
       emp_assert(OK());
@@ -357,7 +352,7 @@ namespace emp {
       if (table.empty()) { return false; }  // Nothing to delete.
 
       SearchPos test_pos{MakeSearchPos(key)};
-      while (occupied[test_pos] && CalcOffset(test_pos) >= test_pos.dist) {
+      while (occupied[test_pos] >= test_pos.dist) {
         if (TestAt(test_pos, key)) {  // If we found key, begin deletion and backshift
           EraseAt(test_pos);
           return true;
@@ -368,6 +363,12 @@ namespace emp {
 
       emp_assert(OK());
       return false;  // Couldn't find in table.
+    }
+
+    // Calculate how far off a current entry is from its ideal position.
+    [[nodiscard]] size_t CalcOffset(size_t pos) const {
+      emp_assert(pos < table.size() && occupied[pos], pos, table.size());
+      return ToPos(pos - table[pos].hash) + 1;
     }
 
     [[nodiscard]] bool OK() const {
@@ -397,12 +398,12 @@ namespace emp {
       for (size_t i = 0; i < N; ++i) {
         if (!occupied[i]) continue;
 
-        [[maybe_unused]] const size_t cur_dist = CalcOffset(i);
+        [[maybe_unused]] const size_t cur_dist = ToPos(i - table[i].hash) + 1;
 
         // Distance at next slot (if occupied) must be <= ours + 1 (or we should have swapped)
         size_t j = (i + 1) & table_mask;
         if (occupied[j]) {
-          [[maybe_unused]] const size_t next_dist = CalcOffset(j);
+          [[maybe_unused]] const size_t next_dist = ToPos(j - table[j].hash) + 1;
           emp_assert(next_dist <= cur_dist + 1, i, cur_dist, j, next_dist);
         }
       }
