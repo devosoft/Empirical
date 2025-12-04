@@ -113,8 +113,9 @@ namespace emp {
       emp_assert(OK());
       emp_assert(pos < table.size());
       size_t next = ToPos(pos + 1);
-      while (occupied[next] > 1) { // Test if next entry should move up.
+      while (occupied[next] > 1) { // While next entry should move up...
         table[pos] = std::move(table[next]);
+        occupied[pos] = occupied[next] - 1;
         pos = next;
         next = ToPos(next + 1);
       }
@@ -368,6 +369,7 @@ namespace emp {
     // Calculate how far off a current entry is from its ideal position.
     [[nodiscard]] size_t CalcOffset(size_t pos) const {
       emp_assert(pos < table.size() && occupied[pos], pos, table.size());
+      // Note: don't need to hash % table.size() before subtraction because table is power of two.
       return ToPos(pos - table[pos].hash) + 1;
     }
 
