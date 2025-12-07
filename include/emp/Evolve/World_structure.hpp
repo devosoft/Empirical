@@ -226,10 +226,7 @@ namespace emp {
     });
 
     // Map-Elites does not have a concept of neighbors.
-    world.SetGetNeighborFun([](WorldPosition pos) {
-      emp_assert(false);
-      return pos;
-    });
+    world.SetGetNeighborFun([](WorldPosition pos) { emp_assert(false); return pos; });
 
     // Map-Elites doesn't have a real meaning for killing organisms, so do so randomly.
     world.SetKillOrgFun([&world]() {
@@ -312,36 +309,29 @@ namespace emp {
   struct World_MinDistInfo {
     static constexpr size_t ID_NONE = (size_t) -1;  ///< ID for organism does not exist.
 
-    emp::vector<size_t> nearest_id;  ///< For each individual, whom are they closest to?
-    emp::vector<double> distance;    ///< And what is their distance?
+    emp::vector<size_t> nearest_id; ///< For each individual, whom are they closest to?
+    emp::vector<double> distance;   ///< And what is their distance?
 
     World<ORG> & world;             ///< World object being tracked.
     TraitSet<ORG> traits;           ///< Traits we are trying to spread
     emp::vector<double> min_vals;   ///< Smallest value found for each trait.
     emp::vector<double> max_vals;   ///< Largest value found for each trait.
     emp::vector<double> bin_width;  ///< Largest value found for each trait.
+    size_t num_vals = 0;            ///< Number of values used to calculate the bin info.
 
-    bool is_setup;          ///< Have we initialized the internal data structure?
-    size_t num_trait_bins;  ///< How many bins should we use for each trait?
-    size_t num_total_bins;  ///< How many bins are there overall?
+    bool is_setup = false;          ///< Have we initialized the internal data structure?
+    size_t num_trait_bins = 0;      ///< How many bins should we use for each trait?
+    size_t num_total_bins = 0;      ///< How many bins are there overall?
     emp::vector < std::set < size_t >> bin_ids;  ///< Which org ids fall into each bin?
     emp::vector<size_t> org_bins;                ///< Which bin is each org currently in?
 
     World_MinDistInfo(World<ORG> & in_world, const TraitSet<ORG> & in_traits)
-      : nearest_id()
-      , distance()
-      , world(in_world)
+      : world(in_world)
       , traits(in_traits)
       , min_vals(traits.GetSize(), std::numeric_limits<double>::max())
       , max_vals(traits.GetSize(), std::numeric_limits<double>::min())
       , bin_width(traits.GetSize(), 0.00001)
-      , is_setup(false)
-      , num_trait_bins(0)
-      , num_total_bins(0)
-      , bin_ids()
-      , org_bins() {
-      ;
-    }
+    { }
 
     double CalcDist(size_t id1, size_t id2) {
       emp::vector<double> offsets = traits.CalcOffsets(world.GetOrg(id1), world.GetOrg(id2));
@@ -391,6 +381,8 @@ namespace emp {
 
     /// Calculate which bin an organism should be in.
     size_t CalcBin(size_t id) {
+      emp_assert(traits.GetSize() > 0);
+      emp_assert(num_vals > 0);
       static emp::vector<double> t_vals;
       t_vals        = traits.EvalValues(world.GetOrg(id));
       size_t scale  = 1;
@@ -407,10 +399,14 @@ namespace emp {
 
     /// Reset all of the bins in the multidimensional grid for nearest-neighbor analysis.
     void ResetBins() {
+      emp_assert(num_vals > 0);
       bin_ids.resize(num_total_bins);
       for (auto & bin : bin_ids) { bin.clear(); }
       for (size_t trait_id = 0; trait_id < traits.GetSize(); trait_id++) {
+        emp_assert(max_vals[trait_id] > min_vals[trait_id]);
+        emp_assert(num_trait_bins > 0);
         bin_width[trait_id] = (max_vals[trait_id] - min_vals[trait_id]) / (double) num_trait_bins;
+        emp_assert(bin_width[trait_id] > 0.0);
       }
       org_bins.resize(world.GetSize());
       for (size_t org_id = 0; org_id < world.GetSize(); org_id++) {
@@ -479,9 +475,10 @@ namespace emp {
     /// Assume a position has changed; refresh it AND everything that had it as a closest connection.
     void Update(size_t pos) {
       /// Determine if this new point extends the range of any phenotypes.
-      bool update_chart            = false;
+      bool update_chart = false;
       emp::vector<double> cur_vals = traits.EvalValues(world.GetOrg(pos));
-      for (size_t i = 0; i < cur_vals.size(); i++) {
+      num_vals = cur_vals.size();
+      for (size_t i = 0; i < num_vals; i++) {
         if (cur_vals[i] <= min_vals[i]) {
           min_vals[i]  = cur_vals[i] - bin_width[i] / 2.0;
           update_chart = true;
