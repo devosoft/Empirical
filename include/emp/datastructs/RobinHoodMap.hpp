@@ -373,6 +373,18 @@ namespace emp {
       return ToPos(pos - table[pos].hash) + 1;
     }
 
+    /////////////////////////////////////////
+    // Container analysis tools
+
+    // Identify the average distance that entries have to be pushed from their "home" position.
+    [[nodiscard]] double CalcAveOffset() const {
+      double total = 0.0;
+      for (uint8_t offset : occupied) {
+        if (offset) total += (offset - 1);
+      }
+      return total / num_elemets;
+    }
+
     [[nodiscard]] bool OK() const {
       const size_t N = table.size();
 
