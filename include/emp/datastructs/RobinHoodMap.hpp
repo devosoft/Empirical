@@ -13,6 +13,9 @@
 #ifndef INCLUDE_EMP_DATASTRUCTS_ROBIN_HOOD_MAP_HPP_GUARD
 #define INCLUDE_EMP_DATASTRUCTS_ROBIN_HOOD_MAP_HPP_GUARD
 
+#include <iostream>
+#include <print>
+
 #include "../base/vector.hpp"
 
 namespace emp {
@@ -93,6 +96,7 @@ namespace emp {
       return SearchPos{hash, ToPos(hash), 1};
     }
 
+    // Test if a key is found at a given search position.
     [[nodiscard]] bool TestAt(const SearchPos & test_pos, const Key & key) const {
       return table[test_pos.pos].hash == test_pos.hash && table[test_pos.pos].key == key;
     }
@@ -106,6 +110,13 @@ namespace emp {
         test_pos.Next(table_mask); // Try the next position.
       }
       return nullptr; // Not found!
+    }
+
+    // Run a provided function on each entry.
+    void ForEachEntry(auto fun) const {
+      for (size_t i = 0; i < occupied.size(); ++i) {
+        if (occupied[i]) fun(table[i]);
+      }
     }
 
     // Erase the element at a specified position in the table and do backshift
@@ -382,8 +393,55 @@ namespace emp {
       for (uint8_t offset : occupied) {
         if (offset) total += (offset - 1);
       }
-      return total / num_elemets;
+      return total / num_elements;
     }
+
+    // Calculate how many 1's there are at each bit position across hashes.
+    [[nodiscard]] emp::vector<size_t> CalcHashSums() const {
+      // Count the number of bits we are using.
+      size_t hash_bits = 0;
+      while (table_mask >> hash_bits) ++hash_bits;
+
+      // Count the number of ones at each bit position.
+      emp::vector<size_t> one_counts(hash_bits, 0);
+      for (size_t i = 0; i < occupied.size(); ++i) {
+        if (!occupied[i]) continue;
+        for (size_t pos = 0; pos < hash_bits; ++pos) {
+          if (table[i].hash & (1 << pos)) one_counts[pos]++;
+        }
+      }
+
+      return one_counts;
+    }
+
+    // Print to the provided stream a string describing the quality of the hash function.
+    void EvalHashQuality(std::ostream & os = std::cout) const {
+      if (num_elements < 100) {
+        std::println("Need 100+ entries to evaluate hash; {} found", num_elements);
+      }
+      emp::vector<size_t> one_counts = CalcHashSums();
+
+      // Identify bits that are all the same across hashes (always zero or 1).
+      int locked_bits = 0;
+      std::string pattern;
+      for (size_t cur_count : one_counts) {
+        if (cur_count == 0) { ++locked_bits; pattern = "0" + pattern; }
+        else if (cur_count == num_elements) { ++locked_bits; pattern = "1" + pattern; }
+        else pattern = "." + pattern;
+      }
+      if (locked_bits) {
+        // os << locked_bits << " bits are locked.  Pattern: " << pattern << std::endl;
+        std::println(os, "{} bits are locked.  Pattern: {}", locked_bits, pattern);
+      }
+
+      // Identify the number of duplicate hashes.
+      RobinHoodMap<size_t, size_t> hash_counts;
+      ForEachEntry([&hash_counts](const Entry & entry){ hash_counts[entry.hash]++; });
+
+      double ratio = hash_counts.size() / static_cast<double>(num_elements);
+      std::println(os, "Full hash duplication fraction = {} (lower is better)", 1.0 - ratio);
+      std::println(os, "Average entry offset = {} (lower is better)", CalcAveOffset());
+    } 
 
     [[nodiscard]] bool OK() const {
       const size_t N = table.size();
