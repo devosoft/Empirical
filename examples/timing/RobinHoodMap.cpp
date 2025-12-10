@@ -1,4 +1,5 @@
 #include <ctime>
+#include <flat_map>
 #include <iostream>
 #include <map>
 #include <unordered_map>
@@ -63,6 +64,11 @@ Results Test(emp::String scope, emp::String name) {
   results.search_time = ((double) tot_time) / (double) CLOCKS_PER_SEC;
   results.found_count = found_count;
 
+  if constexpr (std::same_as<MAP_T, emp::RobinHoodMap<size_t, double>> ||
+                std::same_as<MAP_T, emp::RobinHoodMap<size_t, double, true>>) {
+    test_map.EvalHashQuality();
+  }
+
 // std::cout << "  search time = " << emp::MakeString(result, " seconds.").AsANSIGreen() << "\n"
 //           << "  found_count = " << found_count << "\n";
 
@@ -115,7 +121,7 @@ int main(int argc, char * argv[]) {
   size_t cur_key = 0;
   for (size_t & key : keys) {
     cur_key += random.GetUInt(1, MAX_STEP);
-    key = cur_key;
+    key = cur_key; // *16;
   }
   emp::Shuffle(random, keys);
 
@@ -125,8 +131,10 @@ int main(int argc, char * argv[]) {
   if (print_extras) {
     results = Test<std::unordered_map<size_t, double>>("std::", "unordered_map");
     result_vec.push_back(results);
-    results = Test<std::map<size_t, double>>("std::", "map          ");
-    result_vec.push_back(results);
+    // results = Test<std::map<size_t, double>>("std::", "map          ");
+    // result_vec.push_back(results);
+    // results = Test<std::flat_map<size_t, double>>("std::", "flat_map     ");
+    // result_vec.push_back(results);
     results = Test<robin_hood::unordered_map<size_t, double>>("robin_hood::", "unordered_map");
     result_vec.push_back(results);
   }
