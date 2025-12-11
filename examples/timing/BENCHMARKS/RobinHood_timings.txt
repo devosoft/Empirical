@@ -91,3 +91,26 @@ found_count 4000997        4000997        4000997        4000997       4000997
 erase_count 2000646        2000646        2000646        2000646       2000646                
 start_size  10000000       10000000       10000000       10000000      10000000               
 final_size  7999354        7999354        7999354        7999354       7999354
+
+===
+
+Save offset distance in occupied vector.
++ Removed std::map (it's just too slow)
+
+scope       std::          robin_hood::   emp::         emp::                  
+name        unordered_map  unordered_map  RobinHoodMap  RobinHoodMap<IMPROVE>  
+insert_time 2.52062        0.433796       0.671537      0.558305               
+search_time 0.435265       0.193813       0.055888      0.326612               
+erase_time  0.616847       0.126834       0.040138      0.179011               
+found_count 4000121        4000121        4000121       4000121                
+erase_count 2000862        2000862        2000862       2000862                
+start_size  10000000       10000000       10000000      10000000               
+final_size  7999138        7999138        7999138       7999138
+
+Analysis of: emp::RobinHoodMap
+Full hash duplication fraction = 0 (lower is better)
+Average entry offset = 0.0849862 (lower is better)
+
+Analysis of: emp::RobinHoodMap<IMPROVE>
+Full hash duplication fraction = 0 (lower is better)
+Average entry offset = 0.2123166 (lower is better)
