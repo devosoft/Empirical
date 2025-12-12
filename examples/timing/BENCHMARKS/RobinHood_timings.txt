@@ -114,3 +114,26 @@ Average entry offset = 0.0849862 (lower is better)
 Analysis of: emp::RobinHoodMap<IMPROVE>
 Full hash duplication fraction = 0 (lower is better)
 Average entry offset = 0.2123166 (lower is better)
+
+===
+
+Multiplies hashes by 16 (so last 4 bits are always zero)
+
+scope       std::          robin_hood::   emp::         emp::                  
+name        unordered_map  unordered_map  RobinHoodMap  RobinHoodMap<IMPROVE>  
+insert_time 2.21911        0.381296       0.840795      0.541214               
+search_time 0.414757       0.117674       0.028769      0.167188               
+erase_time  0.321938       0.065614       0.021918      0.122849               
+found_count 249577         249577         249577        249577                 
+erase_count 124829         124829         124829        124829                 
+start_size  10000000       10000000       10000000      10000000               
+final_size  9875171        9875171        9875171       9875171
+
+Analysis of: emp::RobinHoodMap
+4 bits are locked.  Pattern: .....................0000
+Full hash duplication fraction = 0 (lower is better)
+Average entry offset = 2.2846581 (lower is better)
+
+Analysis of: emp::RobinHoodMap<IMPROVE>
+Full hash duplication fraction = 0 (lower is better)
+Average entry offset = 0.2123624 (lower is better)
