@@ -26,8 +26,11 @@ struct Results {
   emp::String name;
   double insert_time;
   double search_time;
+  double traverse_time;
   double erase_time;
   size_t found_count;
+  size_t key_total;
+  double value_total;
   size_t erase_count;
   size_t start_size;
   size_t final_size;
@@ -69,8 +72,18 @@ Results Test(emp::String scope, emp::String name) {
     test_map.EvalHashQuality();
   }
 
-// std::cout << "  search time = " << emp::MakeString(result, " seconds.").AsANSIGreen() << "\n"
-//           << "  found_count = " << found_count << "\n";
+  // Test traversal
+  start_time = std::clock();
+  size_t key_total = 0;
+  double value_total = 0.0;
+  for (auto [key, value] : test_map) {
+    key_total += key;
+    value_total += value;
+  }
+  tot_time = std::clock() - start_time;
+  results.traverse_time = ((double) tot_time) / (double) CLOCKS_PER_SEC;
+  results.key_total = key_total;
+  results.value_total = value_total;
 
   // Test deletion
   start_time = std::clock();
@@ -143,22 +156,28 @@ int main(int argc, char * argv[]) {
   results = Test<emp::RobinHoodMap<size_t, double, true>>("emp::", "RobinHoodMap<IMPROVE>");
   result_vec.push_back(results);
 
-  PrintRow(result_vec, "scope       ",
+  PrintRow(result_vec, "scope         ",
     [](const Results & result){ return result.scope; }, emp::ANSI::Yellow);
-  PrintRow(result_vec, "name        ",
+  PrintRow(result_vec, "name          ",
     [](const Results & result){ return result.name; }, emp::ANSI::Yellow);
-  PrintRow(result_vec, "insert_time ",
-    [](const Results & result){ return result.insert_time; }, emp::ANSI::Green);
-  PrintRow(result_vec, "search_time ",
+  PrintRow(result_vec, "insert_time.  ",
+    [](const Results & result){ return result.insert_time; }, emp::ANSI::BrightGreen);
+  PrintRow(result_vec, "search_time   ",
     [](const Results & result){ return result.search_time; }, emp::ANSI::Blue);
-  PrintRow(result_vec, "erase_time  ",
+  PrintRow(result_vec, "traverse_time ",
+    [](const Results & result){ return result.traverse_time; }, emp::ANSI::Green);
+  PrintRow(result_vec, "erase_time    ",
     [](const Results & result){ return result.erase_time; }, emp::ANSI::Red);
-  PrintRow(result_vec, "found_count ",
+  PrintRow(result_vec, "found_count   ",
     [](const Results & result){ return result.found_count; }, emp::ANSI::Cyan);
-  PrintRow(result_vec, "erase_count ",
+  PrintRow(result_vec, "erase_count   ",
     [](const Results & result){ return result.erase_count; }, emp::ANSI::Cyan);
-  PrintRow(result_vec, "start_size  ",
+  PrintRow(result_vec, "start_size    ",
     [](const Results & result){ return result.start_size; }, emp::ANSI::Magenta);
-  PrintRow(result_vec, "final_size  ",
+  PrintRow(result_vec, "final_size    ",
     [](const Results & result){ return result.final_size; }, emp::ANSI::Magenta);
+  PrintRow(result_vec, "key_total%1M  ",
+    [](const Results & result){ return result.key_total % 1000000; }, emp::ANSI::Cyan);
+  PrintRow(result_vec, "value_total   ",
+    [](const Results & result){ return result.value_total; }, emp::ANSI::Cyan);
 }
