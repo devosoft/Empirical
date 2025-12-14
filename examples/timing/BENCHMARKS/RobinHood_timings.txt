@@ -137,3 +137,20 @@ Average entry offset = 2.2846581 (lower is better)
 Analysis of: emp::RobinHoodMap<IMPROVE>
 Full hash duplication fraction = 0 (lower is better)
 Average entry offset = 0.2123624 (lower is better)
+
+==
+
+Added measure of traversal time. (back to normal hashing)
+
+scope         std::          robin_hood::   emp::         emp::                  
+name          unordered_map  unordered_map  RobinHoodMap  RobinHoodMap<IMPROVE>  
+insert_time.  2.35467        0.384859       0.623392      0.535271               
+search_time   0.442865       0.174979       0.062318      0.281476               
+traverse_time 0.410314       0.026163       0.097142      0.064421               
+erase_time    0.668039       0.108729       0.040615      0.167161               
+found_count   3999147        3999147        3999147       3999147                
+erase_count   1999803        1999803        1999803       1999803                
+start_size    10000000       10000000       10000000      10000000               
+final_size    8000197        8000197        8000197       8000197                
+key_total%1M  691826         691826         691826        691826                 
+value_total   4.99844e+12    4.99844e+12    4.99844e+12   4.99844e+12
