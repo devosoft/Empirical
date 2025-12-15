@@ -76,10 +76,9 @@ Results Test(emp::String scope, emp::String name) {
   start_time = std::clock();
   size_t key_total = 0;
   double value_total = 0.0;
-  for (auto [key, value] : test_map) {
-    key_total += key;
-    value_total += value;
-  }
+  for (auto [key, value] : test_map) { key_total += key; }
+  for (auto [key, value] : test_map) { value_total += value; }
+  
   tot_time = std::clock() - start_time;
   results.traverse_time = ((double) tot_time) / (double) CLOCKS_PER_SEC;
   results.key_total = key_total;
