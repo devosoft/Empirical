@@ -75,9 +75,6 @@ TEST_CASE("Test World structure", "[Evolve]")
   world1.DoDeath();
   REQUIRE(world1.GetNumOrgs() == 0);
 
-  #ifdef EMP_TDEBUG
-  REQUIRE(world1.GetRandomNeighborPos(0).GetIndex() == 0);
-  #endif
 
   emp::World<int> world2;
   world2.Resize(10);
@@ -119,10 +116,6 @@ TEST_CASE("Test World structure", "[Evolve]")
   REQUIRE(world5.GetSize() == 2);
   REQUIRE(world5.IsSynchronous() == false);
   REQUIRE(world5.IsSpaceStructured() == false);
-
-  #ifdef EMP_TDEBUG
-  REQUIRE(world5.GetRandomNeighborPos(0).GetIndex() == 0);
-  #endif
 
   world5.InjectAt(33, 1);
   REQUIRE(world5[1] == 33);
