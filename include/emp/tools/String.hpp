@@ -70,6 +70,7 @@ namespace emp {
   [[nodiscard]] inline String MakeTitleCase(String value);
   [[nodiscard]] inline String PascalToCaps(String value);
   [[nodiscard]] inline String MakeCount(int val, const String & item, const String & plural_suffix);
+  [[nodiscard]] inline String MakeCount(int val, const String & item);
   [[nodiscard]] inline String MakeHexString(std::unsigned_integral auto value, size_t min_width=1);
   [[nodiscard]] inline String MakeHexString(std::signed_integral auto value, size_t min_width=1);
   [[nodiscard]] inline String MakeRoman(int val);
