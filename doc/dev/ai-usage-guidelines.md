@@ -2,7 +2,7 @@
 
 ## Guiding Principle
 
-**A human must ultimately take responsibility for all aspects of library code.**
+A human must ultimately take responsibility for all aspects of library code.
 
 All code contributed to Empirical, regardless of how it was generated, must meet the same standards of quality, correctness, and maintainability.
 
