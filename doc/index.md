@@ -55,6 +55,7 @@ bibliography
 dev/empirical-development-practices
 dev/getting-started
 dev/contribution-guidelines-and-review
+dev/ai-usage-guidelines
 dev/adding-documentation
 dev/guide-to-testing
 ```
