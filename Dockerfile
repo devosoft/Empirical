@@ -54,8 +54,6 @@ RUN \
     xdg-utils \
     cmake \
     'python3\.10' \
-    'python3\.10-distutils' \
-    'python3\.10-venv' \
     nodejs \
     npm \
     tar \
@@ -146,7 +144,7 @@ RUN \
     && \
   echo "make xvfb daemon script executable"
 
-ENV DISPLAY :99
+ENV DISPLAY=:99
 
 # magic from https://github.com/puppeteer/puppeteer/issues/3451#issuecomment-523961368
 RUN echo 'kernel.unprivileged_userns_clone=1' > /etc/sysctl.d/userns.conf
