@@ -208,10 +208,11 @@ texinfo_documents = [
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
 if on_rtd: # rtd doesn't run Makefile, so we have to copy assets ourself
-    subprocess.call(
-        'mkdir -p _build/html/docs/; cp -r assets _build/html/docs/',
-        shell=True,
-    )
+    if os.path.isdir('assets'):
+        subprocess.call(
+            'mkdir -p _build/html/docs/; cp -r assets _build/html/docs/',
+            shell=True,
+        )
 else:  # only import and set the theme if we're building docs locally
     import sphinx_rtd_theme
     html_theme = 'sphinx_rtd_theme'
