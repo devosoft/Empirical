@@ -8,7 +8,7 @@ SHELL ["/bin/bash", "-c"]
 # Prevent interactive time zone config.
 # adapted from https://askubuntu.com/a/1013396
 ENV DEBIAN_FRONTEND=noninteractive
-ENV SPHINXBUILD="python3.10 -m sphinx"
+ENV SPHINXBUILD="python3.12 -m sphinx"
 
 RUN \
   echo 'Acquire::http::Timeout "60";' >> "/etc/apt/apt.conf.d/99timeout" \
@@ -53,7 +53,7 @@ RUN \
     lsb-release \
     xdg-utils \
     cmake \
-    'python3\.10' \
+    'python3\.12' \
     nodejs \
     npm \
     tar \
@@ -84,13 +84,13 @@ RUN \
     && \
   echo "installed apt packages"
 
-# Set Python 3.10 as the default version of Python 3
+# Set Python 3.12 as the default version of Python 3
 RUN \
-  update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 1 \
+  update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 1 \
   && \
-  update-alternatives --set python3 /usr/bin/python3.10 \
+  update-alternatives --set python3 /usr/bin/python3.12 \
   && \
-  ln -s /usr/bin/python3.10 /usr/bin/python
+  ln -s /usr/bin/python3.12 /usr/bin/python
 
 RUN \
   echo $' \n\
@@ -165,19 +165,19 @@ RUN \
   echo "finalized set up dependency versions"
 
 RUN \
-  python3.10 --version \
+  python3.12 --version \
     && \
   python3 --version \
     && \
-  curl -sS https://bootstrap.pypa.io/get-pip.py | python3.10 \
+  curl -sS https://bootstrap.pypa.io/get-pip.py | python3.12 \
     && \
-  python3.10 -m pip install --upgrade --force-reinstall pip virtualenv \
+  python3.12 -m pip install --upgrade --force-reinstall pip virtualenv \
     && \
-  python3.10 -m pip install wheel==0.45.1 setuptools==78.1.0 six==1.16.0 \
+  python3.12 -m pip install wheel==0.45.1 setuptools==78.1.0 six==1.16.0 \
     && \
-  python3.10 -m pip install -r /opt/Empirical/third-party/requirements.txt \
+  python3.12 -m pip install -r /opt/Empirical/third-party/requirements.txt \
     && \
-  python3.10 -m pip install -r /opt/Empirical/doc/requirements.txt \
+  python3.12 -m pip install -r /opt/Empirical/doc/requirements.txt \
     && \
   echo "installed documentation build requirements"
 
