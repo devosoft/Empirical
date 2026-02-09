@@ -6,9 +6,8 @@
 #
 alabaster==0.7.13
     # via sphinx
-setuptools>=69.0.0
+setuptools>=69.0.0,<72
     # via pybtex (pkg_resources)
-    # via sphinx
 babel==2.13.1
     # via sphinx
 beautifulsoup4==4.12.2

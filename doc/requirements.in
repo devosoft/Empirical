@@ -1,4 +1,4 @@
-setuptools
+setuptools<72
 sphinx==7.2.6
 sphinx-rtd-theme==2.0.0
 coverxygen==1.8.1
