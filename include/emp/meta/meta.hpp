@@ -1,6 +1,6 @@
 /**
  * This file is part of Empirical, https://github.com/devosoft/Empirical
- * Copyright (C) 2016-2021 Michigan State University
+ * Copyright (C) 2016-2026 Michigan State University
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/meta/meta.hpp
@@ -20,22 +20,21 @@
 #include <functional>
 #include <stddef.h>
 #include <tuple>
+#include <type_traits>
 #include <utility>
 
 #include "../base/vector.hpp"
 
 namespace emp {
 
-  /// A function that will take any number of argument and do nothing with them.
+  /// Take any number of arguments and do nothing (force evaluation of args when passed by value).
   template <typename... Ts>
-  void DoNothing(Ts...) {
-    ;
-  }
+  constexpr void DoNothing(Ts &&...) noexcept { }
 
-  /// Effectively create a function (via constructor) where all args are computed, then ignored.
+  /// Force evaluation of constructor arguments; useful for pack-expansion side effects.
   struct run_and_ignore {
-    template <typename... T>
-    run_and_ignore(T &&...) {}
+    template <typename... Ts>
+    constexpr explicit run_and_ignore(Ts &&...) noexcept {}
   };
 
   template <typename... Ts>
@@ -293,7 +292,7 @@ namespace emp {
   // TEST is a template.  TEST will fail if TEST<T> fails to resolve (substitution failure) -OR-
   // if TEST<T> does resolve, but TEST<T>::value == false.  Otherwise the test passes.
   //
-  // Two helper functions exist to test each part: test_type_exist and test_type_value.
+  // Two helper functions exist to test each part: template_exists and test_type_value.
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
@@ -309,10 +308,8 @@ namespace emp {
   }  // namespace internal
 #endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-  template <template <typename...> class TEST, typename T>
-  constexpr bool test_type_exist() {
-    return internal::tt_exist_impl<TEST, T>(true);
-  }
+  template <template <typename...> class TEST, typename... Args>
+  inline constexpr bool template_exists = requires { typename TEST<Args...>; };
 
   template <template <typename...> class TEST, typename T>
   constexpr bool test_type_value() {
@@ -341,7 +338,7 @@ namespace emp {
     struct test_type_e_impl {
       constexpr static bool Test() {
         using result_t           = TEST<T>;
-        constexpr bool has_value = test_type_exist<value_member, result_t>();
+        constexpr bool has_value = template_exists<value_member, result_t>;
         return test_type_v_impl<result_t, has_value>::Test();
       }
     };
@@ -357,7 +354,7 @@ namespace emp {
   // Function to actually perform a universal test.
   template <template <typename...> class TEST, typename T>
   constexpr bool test_type() {
-    return internal::test_type_e_impl<TEST, T, test_type_exist<TEST, T>()>::Test();
+    return internal::test_type_e_impl<TEST, T, template_exists<TEST, T>>::Test();
   }
 
 // TruncateCall reduces the number of arguments for calling a function if too many are used.
