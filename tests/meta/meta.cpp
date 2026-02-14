@@ -28,57 +28,45 @@ struct MetaTestClass { A a; B b; };
 int Sum4(int a, int b, int c, int d) { return a+b+c+d; }
 
 
-TEST_CASE("Test meta-programming helpers (meta.h)", "[meta]")
+TEST_CASE("Test pack-indexing helpers (meta.h)", "[meta]")
 {
-  // TEST FOR VARIADIC HELPER FUNCTIONS:
+  CHECK( std::same_as<emp::first_type <int, std::string, double, char, bool, float, long long>,  int> );
+  CHECK( std::same_as<emp::second_type<int, std::string, double, char, bool, float, long long>,  std::string> );
+  CHECK( std::same_as<emp::third_type <int, std::string, double, char, bool, float, long long>,  double> );
+  CHECK( std::same_as<emp::fourth_type<int, std::string, double, char, bool, float, long long>,  char> );
 
-  REQUIRE((emp::get_type_index<char, char, bool, int, double>()) == 0);
-  REQUIRE((emp::get_type_index<int, char, bool, int, double>()) == 2);
-  REQUIRE((emp::get_type_index<double, char, bool, int, double>()) == 3);
-  REQUIRE((emp::get_type_index<std::string, char, bool, int, double>()) < 0);
+  CHECK( std::same_as<emp::pack_id<1, int, std::string, double, char, bool, float, long long>,  std::string> );
+  CHECK( std::same_as<emp::pack_id<3, int, std::string, double, char, bool, float, long long>,  char> );
+  CHECK( std::same_as<emp::pack_id<5, int, std::string, double, char, bool, float, long long>,  float> );
 
-  REQUIRE((emp::has_unique_first_type<int, bool, std::string, bool, char>()) == true);
-  REQUIRE((emp::has_unique_first_type<bool, int, std::string, bool, char>()) == false);
-  REQUIRE((emp::has_unique_types<bool, int, std::string, emp::vector<bool>, char>()) == true);
-  REQUIRE((emp::has_unique_types<int, bool, std::string, bool, char>()) == false);
-
-
-  using meta1_t = MetaTestClass<int, double>;
-  using meta2_t = emp::AdaptTemplate<meta1_t, char, bool>;
-  using meta3_t = emp::AdaptTemplate_Arg1<meta1_t, std::string>;
-
-  meta1_t meta1;
-  meta2_t meta2;
-  meta3_t meta3;
-
-  meta1.a = (decltype(meta1.a)) 65.5;
-  meta1.b = (decltype(meta1.b)) 65.5;
-  meta2.a = (decltype(meta2.a)) 65.5;
-  meta2.b = (decltype(meta2.b)) 65.5;
-  meta3.a = (decltype(meta3.a)) "65.5";
-  meta3.b = (decltype(meta3.b)) 65.5;
-
-  REQUIRE( meta1.a == 65 );
-  REQUIRE( meta1.b == 65.5 );
-  REQUIRE( meta2.a == 'A' );
-  REQUIRE( meta2.b == true );
-  REQUIRE( meta3.a == "65.5" );
-  REQUIRE( meta3.b == 65.5 );
-
-  // Combine hash should always return the original values if only one combined.
-  REQUIRE( emp::CombineHash(1) == 1 );
-  REQUIRE( emp::CombineHash(2) == std::hash<int>()(2) );
-  REQUIRE( emp::CombineHash(3) == std::hash<int>()(3) );
-  REQUIRE( emp::CombineHash(4) == std::hash<int>()(4) );
-  REQUIRE( emp::CombineHash(2,3) == 0x9e377a3e );
-  REQUIRE( emp::CombineHash(3,2) == 0x9e377a78);
-  REQUIRE( emp::CombineHash(1,2) == 0x9e3779fa);
-  REQUIRE( emp::CombineHash(3,4) == 0x9e377a7e);
-  REQUIRE( emp::CombineHash(2,3,4) == 0x13c6ef4fc );
-
+  CHECK( std::same_as<emp::last_type<int, std::string, double, char, bool, float, long long>,  long long> );
 }
+
+
+TEST_CASE("Pack membership / counting / uniqueness (meta.h)", "[meta]")
+{
+  CHECK( emp::has_type<int,        std::string, double, char, bool, float, long long>() == false);
+  CHECK( emp::has_type<char,       std::string, double, char, bool, float, long long>() == true);
+  CHECK( emp::has_type<long long,  std::string, double, char, bool, float, long long>() == true);
+
+  CHECK( emp::count_type<int,  int, int, int, int>() == 4);
+  CHECK( emp::count_type<int,  char, char, char, char>() == 0);
+  CHECK( emp::count_type<int,  char, int, bool, float>() == 1);
+
+  CHECK((emp::has_unique_types<bool, int, std::string, emp::vector<bool>, char>()) == true);
+  CHECK((emp::has_unique_types<int, bool, std::string, bool, char>()) == false);
+}
+
+TEST_CASE("Pack indexing (meta.h)", "[meta]")
+{
+  CHECK((emp::get_type_index<char,   char, bool, int, double>()) == 0);
+  CHECK((emp::get_type_index<int,    char, bool, int, double>()) == 2);
+  CHECK((emp::get_type_index<double, char, bool, int, double>()) == 3);
+  CHECK((emp::get_type_index<std::string, char, bool, int, double>()) < 0);
+}
+
 
 TEST_CASE("Test GetSize", "[meta]") {
   int some_ints[] = {1, 2, 4, 8};
-  REQUIRE(emp::GetSize(some_ints) == 4);
+  CHECK(emp::GetSize(some_ints) == 4);
 }
