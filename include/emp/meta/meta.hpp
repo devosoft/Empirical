@@ -37,82 +37,6 @@ namespace emp {
     constexpr explicit run_and_ignore(Ts &&...) noexcept {}
   };
 
-  template <typename... Ts>
-  struct type_index;
-
-  template <>
-  struct type_index<> {
-    using t1 = void;
-    using t2 = void;
-    using t3 = void;
-    using t4 = void;
-  };
-
-  template <typename T1>
-  struct type_index<T1> {
-    using t1 = T1;
-    using t2 = void;
-    using t3 = void;
-    using t4 = void;
-  };
-
-  template <typename T1, typename T2>
-  struct type_index<T1, T2> {
-    using t1 = T1;
-    using t2 = T2;
-    using t3 = void;
-    using t4 = void;
-  };
-
-  template <typename T1, typename T2, typename T3>
-  struct type_index<T1, T2, T3> {
-    using t1 = T1;
-    using t2 = T2;
-    using t3 = T3;
-    using t4 = void;
-  };
-
-  template <typename T1, typename T2, typename T3, typename T4, typename... Ts>
-  struct type_index<T1, T2, T3, T4, Ts...> {
-    using t1 = T1;
-    using t2 = T2;
-    using t3 = T3;
-    using t4 = T4;
-  };
-
-  /// Trim off a specific type position from a pack.
-  template <typename... Ts>
-  using first_type = typename type_index<Ts...>::t1;
-  template <typename... Ts>
-  using second_type = typename type_index<Ts...>::t2;
-  template <typename... Ts>
-  using third_type = typename type_index<Ts...>::t3;
-  template <typename... Ts>
-  using fourth_type = typename type_index<Ts...>::t4;
-
-// Index into a template parameter pack to grab a specific type.
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-  namespace internal {
-    template <size_t ID, typename T, typename... Ts>
-    struct pack_id_impl {
-      using type = typename pack_id_impl<ID - 1, Ts...>::type;
-    };
-
-    template <typename T, typename... Ts>
-    struct pack_id_impl<0, T, Ts...> {
-      using type = T;
-    };
-  }  // namespace internal
-#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
-
-  /// Pick a specific position from a type pack.
-  template <size_t ID, typename... Ts>
-  using pack_id = typename internal::pack_id_impl<ID, Ts...>::type;
-
-  /// Trim off the last type from a pack.
-  template <typename... Ts>
-  using last_type = pack_id<sizeof...(Ts) - 1, Ts...>;
-
   /// A struct declaration with no definition to show a type name in a compile time error.
   template <typename...>
   struct ShowType;
@@ -122,9 +46,107 @@ namespace emp {
   template <class T>
   struct dependent_false : std::false_type {};
 
-  /// Create a placeholder template to substitute for a real type.
-  template <int>
-  struct PlaceholderType;
+
+  // === Pack indexing helpers ===
+
+  /// Pick a specific position from a type pack.
+  template <std::size_t I, typename... Ts>
+  using pack_id = std::tuple_element_t<I, std::tuple<Ts...>>;
+
+  /// First N types from a pack, as convenience aliases
+  template <typename... Ts> using first_type  = pack_id<0, Ts...>;
+  template <typename... Ts> using second_type = pack_id<1, Ts...>;
+  template <typename... Ts> using third_type  = pack_id<2, Ts...>;
+  template <typename... Ts> using fourth_type = pack_id<3, Ts...>;
+
+  template <typename... Ts> using last_type = pack_id<sizeof...(Ts)-1, Ts...>;
+
+
+  // === Pack membership / counting / uniqueness ===
+
+  template <typename Test, typename... Ts>
+  inline constexpr bool has_type_v = (std::same_as<Test, Ts> || ...);
+
+  template <typename Test, typename... Ts>
+  constexpr bool has_type() noexcept { return has_type_v<Test, Ts...>; }
+
+  template <typename Test, typename... Ts>
+  inline constexpr std::size_t count_type_v = (std::size_t{0} + ... + (std::same_as<Test, Ts> ? 1u : 0u));
+
+  template <typename Test, typename... Ts>
+  constexpr std::size_t count_type() noexcept { return count_type_v<Test, Ts...>; }
+
+  template <typename T1, typename... Ts>
+  constexpr bool has_unique_types() noexcept {
+    if constexpr (count_type<T1, Ts...>() > 0) return false; // T1 was found later!
+    if constexpr (sizeof...(Ts) > 1) return has_unique_types<Ts...>();
+    return true;
+  }
+
+
+  // === Pack indexing ===
+
+  namespace internal {
+    template <typename Test, typename... Ts>
+    consteval int get_type_index_impl() noexcept {
+      int idx = 0;
+      bool found = false;
+
+      // consteval loop over the pack with a fold:
+      ((found = found || std::same_as<Test, Ts>, idx += found ? 0 : 1), ...);
+
+      return found ? idx : -1;
+    }
+  }  // namespace internal
+
+  template <typename Test, typename... Ts>
+  consteval int get_type_index() noexcept {
+    if constexpr (sizeof...(Ts) == 0) return -1;
+    else return internal::get_type_index_impl<Test, Ts...>();
+  }
+
+
+  //  ===  Detection / "test_type" utilities  ===
+
+  // - If TEST<T...> is ill-formed: test fails (false).
+  // - If TEST<T...> is well-formed:
+  //     - If TEST<T...>::value exists: result is bool(TEST<T...>::value)
+  //     - Otherwise: existence alone counts as success (true)
+
+  template <typename T>
+  concept has_value_member = requires { T::value; };
+
+  template <template <typename...> class TEST, typename... Args>
+  concept template_well_formed = requires { typename TEST<Args...>; };
+
+  template <template <typename...> class TEST, typename... Args>
+  consteval bool test_type_exist() noexcept {
+    return template_well_formed<TEST, Args...>;
+  }
+
+  template <template <typename...> class TEST, typename... Args>
+  consteval bool test_type_value() noexcept
+    requires template_well_formed<TEST, Args...> && has_value_member<TEST<Args...>>
+  {
+    return static_cast<bool>(TEST<Args...>::value);
+  }
+
+  template <template <typename...> class TEST, typename... Args>
+  consteval bool test_type() noexcept {
+    if constexpr (!template_well_formed<TEST, Args...>) return false;
+    else if constexpr (has_value_member< TEST<Args...> >) {
+      return static_cast<bool>( TEST<Args...> ::value);
+    }
+    else return true;
+  }
+
+
+ 
+
+
+
+
+
 
   /// Group types in a parameter pack to build a vector of a designated type.
   template <typename OBJ_T>
@@ -190,84 +212,6 @@ namespace emp {
     return out_v;
   }
 
-  // Trick to call a function using each entry in a parameter pack.
-#define EMP_EXPAND_PPACK(PPACK) ::emp::run_and_ignore{ 0, ((PPACK), void(), 0)... }
-
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-  // Check to see if a specified type is part of a set of types.
-  template <typename TEST>
-  constexpr bool has_type() {
-    return false;
-  }
-#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  template <typename TEST, typename FIRST, typename... OTHERS>
-  constexpr bool has_type() {
-    return std::is_same<TEST, FIRST>() || has_type<TEST, OTHERS...>();
-  }
-
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-  // Count how many times a specified type appears in a set of types.
-  template <typename TEST>
-  constexpr size_t count_type() {
-    return 0;
-  }
-#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  template <typename TEST, typename FIRST, typename... OTHERS>
-  constexpr size_t count_type() {
-    return count_type<TEST, OTHERS...>() + (std::is_same<TEST, FIRST>() ? 1 : 0);
-  }
-
-  // Return the index of a test type in a set of types.
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-  namespace internal {
-    template <typename TEST_T>
-    constexpr int get_type_index_impl() {
-      return -1;
-    }  // Not found!
-
-    template <typename TEST_T, typename T1, typename... Ts>
-    constexpr int get_type_index_impl() {
-      if (std::is_same<TEST_T, T1>()) {
-        return 0;  // Found here!
-      }
-      constexpr int next_id = get_type_index_impl<TEST_T, Ts...>();  // Keep looking...
-      if (next_id < 0) {
-        return -1;  // Not found!
-      }
-      return next_id + 1;  // Found later!
-    }
-  }  // namespace internal
-#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
-  template <typename TEST_T, typename... Ts>
-  constexpr int get_type_index() {
-    return internal::get_type_index_impl<TEST_T, Ts...>();
-  }
-
-// These functions can be used to test if a type-set has all unique types or not.
-
-// Base cases...
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-  template <typename TYPE1>
-  constexpr bool has_unique_first_type() {
-    return true;
-  }
-
-  template <typename TYPE1>
-  constexpr bool has_unique_types() {
-    return true;
-  }
-#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
-
-  template <typename TYPE1, typename TYPE2, typename... TYPE_LIST>
-  constexpr bool has_unique_first_type() {
-    return (!std::is_same<TYPE1, TYPE2>()) && emp::has_unique_first_type<TYPE1, TYPE_LIST...>();
-  }
-
-  template <typename TYPE1, typename TYPE2, typename... TYPE_LIST>
-  constexpr bool has_unique_types() {
-    return has_unique_first_type<TYPE1, TYPE2, TYPE_LIST...>()  // Check first against all others...
-        && has_unique_types<TYPE2, TYPE_LIST...>();             // Recurse through other types.
-  }
 
   // sfinae_decoy<X,Y> will always evaluate to X no matter what Y is.
   // X is type you want it to be; Y is a decoy trigger potential substitution failure.
@@ -287,75 +231,7 @@ namespace emp {
 #define emp_int_decoy(TEST) emp::sfinae_decoy<int, decltype(TEST)>
 
 
-  // constexpr bool test_type<TEST,T>() returns true if T passes the TEST, false otherwise.
-  //
-  // TEST is a template.  TEST will fail if TEST<T> fails to resolve (substitution failure) -OR-
-  // if TEST<T> does resolve, but TEST<T>::value == false.  Otherwise the test passes.
-  //
-  // Two helper functions exist to test each part: template_exists and test_type_value.
 
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-  namespace internal {
-    template <template <typename...> class FILTER, typename T>
-    constexpr bool tt_exist_impl(bool_decoy<FILTER<T>>) {
-      return true;
-    }
-
-    template <template <typename...> class FILTER, typename T>
-    constexpr bool tt_exist_impl(...) {
-      return false;
-    }
-  }  // namespace internal
-#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
-
-  template <template <typename...> class TEST, typename... Args>
-  inline constexpr bool template_exists = requires { typename TEST<Args...>; };
-
-  template <template <typename...> class TEST, typename T>
-  constexpr bool test_type_value() {
-    return TEST<T>::value;
-  }
-
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-  namespace internal {
-    // If a test does have a value field, that value determines success.
-    template <typename RESULT, bool value_exist>
-    struct test_type_v_impl {
-      constexpr static bool Test() { return RESULT::value; }
-    };
-
-    // If a test does not have a value field, the fact it resolved at all indicates success.
-    template <typename RESULT>
-    struct test_type_v_impl<RESULT, 0> {
-      constexpr static bool Test() { return true; }
-    };
-
-    template <typename T>
-    using value_member = decltype(T::value);
-
-    // If TEST<T> *does* resolve, check the value field to determine test success.
-    template <template <typename...> class TEST, typename T, bool exist>
-    struct test_type_e_impl {
-      constexpr static bool Test() {
-        using result_t           = TEST<T>;
-        constexpr bool has_value = template_exists<value_member, result_t>;
-        return test_type_v_impl<result_t, has_value>::Test();
-      }
-    };
-
-    // If TEST<T> does *not* resolve, test fails, so return false.
-    template <template <typename...> class TEST, typename T>
-    struct test_type_e_impl<TEST, T, 0> {
-      constexpr static bool Test() { return false; }
-    };
-  }  // namespace internal
-#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
-
-  // Function to actually perform a universal test.
-  template <template <typename...> class TEST, typename T>
-  constexpr bool test_type() {
-    return internal::test_type_e_impl<TEST, T, template_exists<TEST, T>>::Test();
-  }
 
 // TruncateCall reduces the number of arguments for calling a function if too many are used.
 // @CAO: This should be simplified using TypeSet
