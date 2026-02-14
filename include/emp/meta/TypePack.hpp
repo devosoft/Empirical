@@ -1,6 +1,6 @@
 /**
  * This file is part of Empirical, https://github.com/devosoft/Empirical
- * Copyright (C) 2016-2021 Michigan State University
+ * Copyright (C) 2016-2026 Michigan State University
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/meta/TypePack.hpp
@@ -15,7 +15,7 @@
  *
  * After manipulations, you can apply a type pack using the apply<> member template.  E.g.,
  *
- *   my_pack::resize<5,char>::reverse::apply<std::tuple> my_tuple;
+ *   my_pack::resize<5,char>::rotate::apply<std::tuple> my_tuple;
  *
  * ...would create a variable of type std::tuple<char, char, double, std::string, int>.
  *
@@ -45,7 +45,6 @@
  *   merge<P>           - Append all of pack P to the end of this pack.
  *   find_union<P>      - Join this pack to P, keeping only one of each type.
  *   find_intersect<P>  - Limit to only common types between this pack and P
- *   reverse            - Reverse the order of types in this pack.
  *   rotate             - Move the first type in pack to the end.
  *
  * Applications:
@@ -132,7 +131,7 @@ namespace emp {
     struct tp_filter {
       using cur_t                      = typename T::first_t;          // Isolate the first type
       using other_tp                   = typename T::pop;              // Isolate remaining types
-      constexpr static bool cur_result = test_type<FILTER, cur_t>();   // Run filter of cur type
+      static constexpr bool cur_result = test_type<FILTER, cur_t>();   // Run filter of cur type
       using cur_ftp   = typename tp_filter1<cur_t, cur_result>::type;  // Use cur type if true
       using other_ftp = typename tp_filter<other_tp, FILTER, N - 1>::type;  // Recurse
       using type      = typename cur_ftp::template merge<other_ftp>;        // Merge
@@ -151,7 +150,7 @@ namespace emp {
     struct tp_filter_out {
       using cur_t                      = typename T::first_t;           // Isolate the first type
       using other_tp                   = typename T::pop;               // Isolate remaining types
-      constexpr static bool cur_result = test_type<FILTER, cur_t>();    // Run filter of cur type
+      static constexpr bool cur_result = test_type<FILTER, cur_t>();    // Run filter of cur type
       using cur_ftp   = typename tp_filter1<cur_t, !cur_result>::type;  // Use cur type if true
       using other_ftp = typename tp_filter_out<other_tp, FILTER, N - 1>::type;  // Recurse
       using type      = typename cur_ftp::template merge<other_ftp>;            // Merge
@@ -181,7 +180,7 @@ namespace emp {
     struct tp_wrap {
       using cur_t                      = typename T::first_t;    // Isolate the first type
       using other_tp                   = typename T::pop;        // Isolate remaining types
-      constexpr static bool cur_result = test_type<W, cur_t>();  // Use wrap to filter cur type
+      static constexpr bool cur_result = test_type<W, cur_t>();  // Use wrap to filter cur type
       using cur_ftp   = typename tp_wrap1<cur_t, W, cur_result>::type;  // Use cur type if true
       using other_ftp = typename tp_wrap<other_tp, W, N - 1>::type;     // Recurse
       using type      = typename cur_ftp::template merge<other_ftp>;    // Merge
@@ -238,46 +237,46 @@ namespace emp {
   struct TypePack<T1, Ts...> {
     /// Return a bool indicating whether the specified type is present.
     template <typename T>
-    constexpr static bool Has() {
+    static constexpr bool Has() {
       return emp::has_type<T, T1, Ts...>();
     }
 
     /// Return a type indicating whether the specified type is present.
     template <typename T>
-    using has_type = typename std::integral_constant<bool, Has<T>()>;
+    using has_type = std::integral_constant<bool, Has<T>()>;
 
     /// Count the number of instances of the specified type.
     template <typename T>
-    constexpr static size_t Count() {
+    static constexpr size_t Count() {
       return count_type<T, T1, Ts...>();
     }
 
     /// Return the position of the specified type.
     template <typename T>
-    constexpr static int GetID() {
+    static constexpr int GetID() {
       return get_type_index<T, T1, Ts...>();
     }
 
     /// Return the position of the type of owner.
     template <typename T>
-    constexpr static int GetID(const T &) {
+    static constexpr int GetID(const T &) {
       return get_type_index<T, T1, Ts...>();
     }
 
     /// Set to the number of types in this pack.
-    constexpr static int SIZE = 1 + sizeof...(Ts);
+    static constexpr int SIZE = 1 + sizeof...(Ts);
 
     /// Return the number of types in this pack.
-    constexpr static int GetSize() { return SIZE; }
+    static constexpr int GetSize() { return SIZE; }
 
     /// Return bool indicating if there are any types in this pack.
-    constexpr static bool IsEmpty() { return false; }
+    static constexpr bool IsEmpty() { return false; }
 
     /// Return bool indicating if all types in this pack are different from each other.
-    constexpr static bool IsUnique() { return has_unique_types<T1, Ts...>(); }
+    static constexpr bool IsUnique() { return has_unique_types<T1, Ts...>(); }
 
     /// Count how many distinct types are in this pack.
-    constexpr static int CountUnique() { return make_unique::GetSize(); }
+    static constexpr int CountUnique() { return make_unique::GetSize(); }
 
     /// Get the type associated with a specified position in the pack.
     template <int POS>
@@ -338,9 +337,6 @@ namespace emp {
     template <typename IN>
     using find_intersect = typename internal::tp_filter_t<this_t, IN::template has_type>;
 
-    /// Rearrange types in TypePack into reverse order.
-    using reverse = typename pop::reverse::template push_back<T1>;
-
     /// Rotate types through TypePack by the specified number of steps.
     using rotate = typename pop::template push_back<T1>;
 
@@ -398,23 +394,23 @@ namespace emp {
   template <>
   struct TypePack<> {
     template <typename T>
-    constexpr static bool Has() {
+    static constexpr bool Has() {
       return false;
     }
 
     template <typename T>
-    constexpr static size_t Count() {
+    static constexpr size_t Count() {
       return 0;
     }
 
     // GetID() NOT IMPLEMENTED since no ID's are available.
-    constexpr static int SIZE = 0;
+    static constexpr int SIZE = 0;
 
-    constexpr static int GetSize() { return 0; }
+    static constexpr int GetSize() { return 0; }
 
-    constexpr static bool IsEmpty() { return true; }
+    static constexpr bool IsEmpty() { return true; }
 
-    constexpr static bool IsUnique() { return true; }
+    static constexpr bool IsUnique() { return true; }
 
     // pop_t not implemented, since no types are available.
 
@@ -442,7 +438,6 @@ namespace emp {
 
     template <typename IN>
     using merge   = IN;
-    using reverse = this_t;
     using rotate  = this_t;
 
     template <typename RETURN_T>
