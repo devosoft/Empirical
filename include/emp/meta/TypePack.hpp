@@ -15,7 +15,7 @@
  *
  * After manipulations, you can apply a type pack using the apply<> member template.  E.g.,
  *
- *   my_pack::resize<5,char>::rotate::apply<std::tuple> my_tuple;
+ *   my_pack::resize<5,char>::push_back<int>::apply<std::tuple> my_tuple;
  *
  * ...would create a variable of type std::tuple<char, char, double, std::string, int>.
  *
@@ -45,7 +45,6 @@
  *   merge<P>           - Append all of pack P to the end of this pack.
  *   find_union<P>      - Join this pack to P, keeping only one of each type.
  *   find_intersect<P>  - Limit to only common types between this pack and P
- *   rotate             - Move the first type in pack to the end.
  *
  * Applications:
  *   apply<T>           - Take template T and apply these types as its arguments.
@@ -337,9 +336,6 @@ namespace emp {
     template <typename IN>
     using find_intersect = typename internal::tp_filter_t<this_t, IN::template has_type>;
 
-    /// Rotate types through TypePack by the specified number of steps.
-    using rotate = typename pop::template push_back<T1>;
-
     /// Set the type at the specified position to the new type provided.  Return as new TypePack.
     template <int ID, typename T>
     using set = typename shrink<ID>::template push_back<T>::template merge<popN<ID + 1>>;
@@ -438,7 +434,6 @@ namespace emp {
 
     template <typename IN>
     using merge   = IN;
-    using rotate  = this_t;
 
     template <typename RETURN_T>
     using to_function_t = RETURN_T();
