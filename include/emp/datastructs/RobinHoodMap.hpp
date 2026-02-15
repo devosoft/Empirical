@@ -1,6 +1,6 @@
 /**
  * This file is part of Empirical, https://github.com/devosoft/Empirical
- * Copyright (C) 2025 Michigan State University
+ * Copyright (C) 2025-2026 Michigan State University
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/datastructs/RobinHoodMap.hpp
@@ -13,10 +13,20 @@
 #ifndef INCLUDE_EMP_DATASTRUCTS_ROBIN_HOOD_MAP_HPP_GUARD
 #define INCLUDE_EMP_DATASTRUCTS_ROBIN_HOOD_MAP_HPP_GUARD
 
+#include <algorithm>   // for std::max
+#include <compare>     // for operator<=> helpers
+#include <cstddef>     // for std::ptrdiff_t
+#include <functional>  // for std::hash
 #include <iostream>
+#include <iterator>    // for iterator tags
+#include <optional>
 #include <print>
+#include <string>
+#include <type_traits> // for std::conditional_t
+#include <utility>     // for std::swap
 
 #include "../base/vector.hpp"
+#include "../meta/type_traits.hpp"
 
 namespace emp {
 
@@ -110,17 +120,6 @@ namespace emp {
       return hash_cache[test_pos.pos] == test_pos.hash && table[test_pos.pos].Key() == key;
     }
 
-    [[nodiscard]] const MAPPED_T * FindPtr_impl(const KEY_T & key) const {
-      if (table.size() == 0) return nullptr;
-      SearchPos test_pos{MakeSearchPos(key)};
-
-      while (test_pos.dist <= occupied[test_pos]) {
-        if (TestAt(test_pos, key)) { return &table[test_pos].Value(); } // Found!
-        test_pos.Next(table_mask); // Try the next position.
-      }
-      return nullptr; // Not found!
-    }
-
     [[nodiscard]] std::optional<size_t> FindIndex(const KEY_T & key) const {
       if (table.size() == 0) return {}; // Nothing in table!
       SearchPos test_pos{MakeSearchPos(key)};
@@ -200,21 +199,10 @@ namespace emp {
       friend class RobinHoodMap;
 
       // Build types based on if this is a const iterator.
-      using MapType   = std::conditional_t<IS_CONST, const RobinHoodMap, RobinHoodMap>;
-      using EntryType = std::conditional_t<IS_CONST, const Entry, Entry>;
-      using MappedRef = std::conditional_t<IS_CONST, const MAPPED_T, MAPPED_T>;
+      using map_t = std::conditional_t<IS_CONST, const RobinHoodMap, RobinHoodMap>;
   
-      MapType * map_ptr = nullptr;  // Map that owns this iterator
-      size_t index      = 0;        // Current index in the table
-
-      // Proxy type used as iterator::reference; works with structured bindings.
-      struct Ref {
-        const KEY_T & first;
-        MappedRef & second;
-
-        // Implicit conversion to std::pair for algorithms that expect value_type.
-        operator std::pair<const KEY_T, MAPPED_T>() const { return { first, second }; }
-      };
+      map_t * map_ptr = nullptr;  // Map that owns this iterator
+      size_t index      = 0;      // Current index in the table
 
       bool MakeValid() {
         if (!map_ptr) return false; // Cannot make valid.
@@ -233,7 +221,7 @@ namespace emp {
       using pointer           = void;  // no real pointer type
 
       iterator_base() = default;
-      iterator_base(MapType * map_ptr, size_t index=0) : map_ptr(map_ptr), index(index) {
+      iterator_base(map_t * map_ptr, size_t index=0) : map_ptr(map_ptr), index(index) {
         MakeValid();
       }
       iterator_base(const iterator_base &) = default;
@@ -372,13 +360,23 @@ namespace emp {
       return { iterator{this, found_pos}, true };
     }
 
-    [[nodiscard]] const MAPPED_T * FindPtr(const KEY_T & key) const { return FindPtr_impl(key); }
+    template <class Self>
+    [[nodiscard]] auto * FindPtr(this Self & self, const KEY_T & key) {
+      if (self.table.size() > 0) {
+        SearchPos test_pos{self.MakeSearchPos(key)};
 
-    [[nodiscard]] MAPPED_T * FindPtr(const KEY_T & key) { return const_cast<MAPPED_T*>(FindPtr_impl(key)); }
+        while (test_pos.dist <= self.occupied[test_pos]) {
+          if (self.TestAt(test_pos, key)) { return &self.table[test_pos].Value(); } // Found!
+          test_pos.Next(self.table_mask); // Try the next position.
+        }
+      }
+      using base_t = emp::match_const_t<MAPPED_T, Self>;
+      return static_cast<base_t *>(nullptr); // Not found!
+    }
 
     // Find and return an object by value; may provide a default for "not found"
     [[nodiscard]] MAPPED_T FindValue(const KEY_T & key, MAPPED_T default_obj={}) const {
-      const MAPPED_T & ptr = FindPtr(key);
+      const MAPPED_T * ptr = FindPtr(key);
       if (ptr) return *ptr;
       return default_obj;
     }
@@ -389,8 +387,6 @@ namespace emp {
 
       Insert(key, MAPPED_T{});
       return *FindPtr(key);
-      // auto it = Insert(key, MAPPED_T{}).first;
-      // return (*it).second;
     }
 
     // Standard-library compatible find()
@@ -455,7 +451,7 @@ namespace emp {
       for (size_t i = 0; i < occupied.size(); ++i) {
         if (!occupied[i]) continue;
         for (size_t pos = 0; pos < hash_bits; ++pos) {
-          if (hash_cache[i] & (1 << pos)) one_counts[pos]++;
+          if (hash_cache[i] & (size_t{1} << pos)) one_counts[pos]++;
         }
       }
 
@@ -465,7 +461,7 @@ namespace emp {
     // Print to the provided stream a string describing the quality of the hash function.
     void EvalHashQuality(std::ostream & os = std::cout) const {
       if (num_elements < 100) {
-        std::println("Need 100+ entries to evaluate hash; {} found", num_elements);
+        std::println("Poor hash quality evaluation with < 100 entries; {} found", num_elements);
       }
       emp::vector<size_t> one_counts = CalcHashSums();
 
@@ -484,7 +480,10 @@ namespace emp {
 
       // Identify the number of duplicate hashes.
       RobinHoodMap<size_t, size_t> hash_counts;
-      for (size_t cur_hash : hash_cache) hash_counts[cur_hash]++;
+      for (size_t i = 0; i < hash_cache.size(); ++i) {
+        if (!occupied[i]) continue;
+        hash_counts[hash_cache[i]]++;
+      }
 
       double ratio = hash_counts.size() / static_cast<double>(num_elements);
       std::println(os, "Full hash duplication fraction = {} (lower is better)", 1.0 - ratio);
