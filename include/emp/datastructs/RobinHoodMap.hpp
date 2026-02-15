@@ -20,13 +20,20 @@
 
 namespace emp {
 
-  template <typename Key, typename T, bool IMPROVE_HASH=false>
+  template <typename KEY_T, typename MAPPED_T, bool IMPROVE_HASH=false>
   class RobinHoodMap {
   private:
     struct Entry {
-      Key key;
-      T value;
-      size_t hash = 0;        // Store hash to avoid recomputing
+      KEY_T first;
+      MAPPED_T second;
+
+      [[nodiscard]] KEY_T & Key() { return first; }
+      [[nodiscard]] const KEY_T & Key() const { return first; }
+      [[nodiscard]] MAPPED_T & Value() { return second; }
+      [[nodiscard]] const MAPPED_T & Value() const { return second; }
+
+      // Implicit conversion to std::pair for algorithms that expect value_type.
+      operator std::pair<const KEY_T, MAPPED_T>() const { return { first, second }; }
     };
 
     static constexpr size_t INIT_CAPACITY = 16;
@@ -34,6 +41,7 @@ namespace emp {
     static constexpr size_t LOAD_FACTOR = 2; // Max factor for how full a table can get.
 
     emp::vector<Entry> table = emp::vector<Entry>(INIT_CAPACITY);
+    emp::vector<size_t> hash_cache = emp::vector<size_t>(INIT_CAPACITY, 0);
     size_t table_mask = INIT_CAPACITY - 1;
 
     // Track "distance from home" of each table entry; 0=no entry; 1=in place; 2+=dist out of place
@@ -53,8 +61,8 @@ namespace emp {
       return hash_value;
     }
   
-    [[nodiscard]] static size_t CalcHash(const Key & key) {
-      const size_t hash_val = std::hash<Key>{}(key);
+    [[nodiscard]] static size_t CalcHash(const KEY_T & key) {
+      const size_t hash_val = std::hash<KEY_T>{}(key);
       if constexpr (IMPROVE_HASH) {
         return ImproveHash(hash_val);
       } else {
@@ -64,16 +72,17 @@ namespace emp {
 
     void Rehash(size_t new_table_size) {
       emp_assert(OK());
-      emp::vector<Entry> old_table = std::move(table);
-      emp::vector<uint8_t> old_occupied = std::move(occupied);
-      table = emp::vector<Entry>(new_table_size);
-      occupied = emp::vector<uint8_t>(new_table_size);
-      num_elements = 0;
-      table_mask = new_table_size - 1;
+      emp::vector<Entry> old_table = std::move(table);          // Back up the current table
+      emp::vector<uint8_t> old_occupied = std::move(occupied);  // Back up the occupied tracker
+      table = emp::vector<Entry>(new_table_size);               // Build a new table with the larger size
+      hash_cache = emp::vector<size_t>(new_table_size, 0);      // Build a new cache for storing hash values
+      occupied = emp::vector<uint8_t>(new_table_size, 0);       // Build a new set of occupied elements
+      num_elements = 0;                                         // Reset number of elements to zero before reinsertion
+      table_mask = new_table_size - 1;                          // Update the table mask for the new table size
 
-      // Move all elements into the new hash table.
+      // Restore all elements into the new hash table.
       for (size_t i = 0; i < old_occupied.size(); ++i) {
-        if (old_occupied[i]) { Insert(old_table[i].key, old_table[i].value); }
+        if (old_occupied[i]) { Insert(old_table[i].Key(), old_table[i].Value()); }
       }
       emp_assert(OK());
     }
@@ -91,32 +100,36 @@ namespace emp {
       operator size_t() const { return pos; }
     };
 
-    [[nodiscard]] SearchPos MakeSearchPos(const Key & key) const {
+    [[nodiscard]] SearchPos MakeSearchPos(const KEY_T & key) const {
       const size_t hash = CalcHash(key);
       return SearchPos{hash, ToPos(hash), 1};
     }
 
     // Test if a key is found at a given search position.
-    [[nodiscard]] bool TestAt(const SearchPos & test_pos, const Key & key) const {
-      return table[test_pos.pos].hash == test_pos.hash && table[test_pos.pos].key == key;
+    [[nodiscard]] bool TestAt(const SearchPos & test_pos, const KEY_T & key) const {
+      return hash_cache[test_pos.pos] == test_pos.hash && table[test_pos.pos].Key() == key;
     }
 
-    [[nodiscard]] const T * FindPtr_impl(const Key & key) const {
+    [[nodiscard]] const MAPPED_T * FindPtr_impl(const KEY_T & key) const {
       if (table.size() == 0) return nullptr;
       SearchPos test_pos{MakeSearchPos(key)};
 
       while (test_pos.dist <= occupied[test_pos]) {
-        if (TestAt(test_pos, key)) { return &table[test_pos].value; } // Found!
+        if (TestAt(test_pos, key)) { return &table[test_pos].Value(); } // Found!
         test_pos.Next(table_mask); // Try the next position.
       }
       return nullptr; // Not found!
     }
 
-    // Run a provided function on each entry.
-    void ForEachEntry(auto fun) const {
-      for (size_t i = 0; i < occupied.size(); ++i) {
-        if (occupied[i]) fun(table[i]);
+    [[nodiscard]] std::optional<size_t> FindIndex(const KEY_T & key) const {
+      if (table.size() == 0) return {}; // Nothing in table!
+      SearchPos test_pos{MakeSearchPos(key)};
+
+      while (test_pos.dist <= occupied[test_pos]) {
+        if (TestAt(test_pos, key)) { return test_pos.pos; } // Found!
+        test_pos.Next(table_mask); // Try the next position.
       }
+      return {}; // Not found!
     }
 
     // Erase the element at a specified position in the table and do backshift
@@ -126,6 +139,7 @@ namespace emp {
       size_t next = ToPos(pos + 1);
       while (occupied[next] > 1) { // While next entry should move up...
         table[pos] = std::move(table[next]);
+        hash_cache[pos] = hash_cache[next];
         occupied[pos] = occupied[next] - 1;
         pos = next;
         next = ToPos(next + 1);
@@ -142,12 +156,14 @@ namespace emp {
     RobinHoodMap(const RobinHoodMap & other) = default;
     RobinHoodMap(RobinHoodMap && other) noexcept
       : table(std::move(other.table))
+      , hash_cache(std::move(other.hash_cache))
       , table_mask(other.table_mask)
       , occupied(std::move(other.occupied))
       , num_elements(other.num_elements)
     {
-      if (table.empty()) {
+      if (table.empty()) { // In case we are moving in an already moved-from object.
         table.resize(INIT_CAPACITY);
+        hash_cache.resize(INIT_CAPACITY);
         occupied.resize(INIT_CAPACITY, 0);
         table_mask = INIT_CAPACITY-1;
       }
@@ -159,11 +175,13 @@ namespace emp {
     RobinHoodMap & operator=(RobinHoodMap && other) noexcept {
       if (this == &other) return *this;
       table        = std::move(other.table);
+      hash_cache   = std::move(other.hash_cache);
       table_mask   = other.table_mask;
       occupied     = std::move(other.occupied);
       num_elements = other.num_elements;
       if (table.empty()) {
         table.resize(INIT_CAPACITY);
+        hash_cache.resize(INIT_CAPACITY);
         occupied.resize(INIT_CAPACITY, 0);
         table_mask = INIT_CAPACITY-1;
       }
@@ -184,18 +202,18 @@ namespace emp {
       // Build types based on if this is a const iterator.
       using MapType   = std::conditional_t<IS_CONST, const RobinHoodMap, RobinHoodMap>;
       using EntryType = std::conditional_t<IS_CONST, const Entry, Entry>;
-      using MappedRef = std::conditional_t<IS_CONST, const T, T>;
+      using MappedRef = std::conditional_t<IS_CONST, const MAPPED_T, MAPPED_T>;
   
       MapType * map_ptr = nullptr;  // Map that owns this iterator
       size_t index      = 0;        // Current index in the table
 
       // Proxy type used as iterator::reference; works with structured bindings.
       struct Ref {
-        const Key & first;
+        const KEY_T & first;
         MappedRef & second;
 
         // Implicit conversion to std::pair for algorithms that expect value_type.
-        operator std::pair<const Key, T>() const { return { first, second }; }
+        operator std::pair<const KEY_T, MAPPED_T>() const { return { first, second }; }
       };
 
       bool MakeValid() {
@@ -209,9 +227,9 @@ namespace emp {
 
     public:
       using iterator_category = std::forward_iterator_tag;
-      using value_type        = std::pair<const Key, T>;
+      using value_type        = std::pair<const KEY_T, MAPPED_T>;
       using difference_type   = std::ptrdiff_t;
-      using reference         = Ref;
+      using reference         = Entry;
       using pointer           = void;  // no real pointer type
 
       iterator_base() = default;
@@ -228,14 +246,20 @@ namespace emp {
                map_ptr->occupied[index];         // And that index is occupied?
       }
 
-      reference operator*() const {
+      const reference & operator*() const {
         emp_assert(IsValid());
-        auto & entry = map_ptr->table[index];
-        return Ref{ entry.key, entry.value };
+        return map_ptr->table[index];
       }
 
-      // If you really want ->, you can return a by-value proxy; often not needed.
-      // pointer operator->() const = delete;
+      const Entry * operator->() const {
+        emp_assert(IsValid());
+        return &map_ptr->table[index];
+      }
+
+      Entry * operator->() {
+        emp_assert(IsValid());
+        return &map_ptr->table[index];
+      }
 
       iterator_base & operator++() {
         ++index;
@@ -254,9 +278,9 @@ namespace emp {
 
     using iterator        = iterator_base<false>;
     using const_iterator  = iterator_base<true>;
-    using key_type        = Key;
-    using mapped_type     = T;
-    using value_type      = std::pair<const Key, T>;
+    using key_type        = KEY_T;
+    using mapped_type     = MAPPED_T;
+    using value_type      = std::pair<const KEY_T, MAPPED_T>;
     using size_type       = size_t;
     using difference_type = std::ptrdiff_t;
 
@@ -268,7 +292,7 @@ namespace emp {
 
     [[nodiscard]] bool empty() const { return num_elements == 0; }
 
-    [[nodiscard]] bool contains(const Key & key) const { return FindPtr(key) != nullptr; }
+    [[nodiscard]] bool contains(const KEY_T & key) const { return FindPtr(key) != nullptr; }
 
     [[nodiscard]] iterator begin() { return iterator(this, 0); }
     [[nodiscard]] iterator end() { return iterator(this, table.size()); }
@@ -298,13 +322,13 @@ namespace emp {
       emp_assert(OK());
     }
 
-    std::pair<iterator,bool> insert(const std::pair<const Key, T> & in) {
+    std::pair<iterator,bool> insert(const std::pair<const KEY_T, MAPPED_T> & in) {
       return Insert(in.first, in.second);
     }
 
     /// Insert with "unique key" semantics.
     /// @return pair of iterator to key and bool to indicate if a new element was inserted.
-    std::pair<iterator,bool> Insert(const Key & key, const T & value) {
+    std::pair<iterator,bool> Insert(const KEY_T & key, const MAPPED_T & value) {
       emp_assert(OK());
       // Test if we need to grow the table...
       if (num_elements > max_load()) { Rehash(table.size() * GROW_FACTOR); }
@@ -313,7 +337,7 @@ namespace emp {
       SearchPos test_pos{MakeSearchPos(key)};
       while (occupied[test_pos]) {        
         if (TestAt(test_pos, key)) {
-          return { iterator{this, test_pos}, false };  // Key already in table.
+          return { iterator{this, test_pos}, false };  // KEY_T already in table.
         }
 
         // If current is "closer to home" than insert would be, break to start Robin Hood swap-in.
@@ -323,14 +347,16 @@ namespace emp {
       }
 
       // Current key not in table; perform standard Robin Hood insertion from found position.
-      Entry new_entry{key, value, test_pos.hash};
-      size_t found_pos = test_pos;
+      Entry new_entry{key, value};
+      size_t new_hash{test_pos.hash};
+      size_t found_pos{test_pos};
 
       // Search for an empty position, juggling entries as we go.
       while (occupied[test_pos]) {
         // Bump entry closer to home.
         if (occupied[test_pos] < test_pos.dist) {
           std::swap(table[test_pos], new_entry);
+          std::swap(hash_cache[test_pos], new_hash);
           std::swap(test_pos.dist, occupied[test_pos]);
         }
 
@@ -338,6 +364,7 @@ namespace emp {
       }
 
       table[test_pos] = std::move(new_entry);
+      hash_cache[test_pos] = new_hash;
       occupied[test_pos] = test_pos.dist;
       ++num_elements;
 
@@ -345,21 +372,42 @@ namespace emp {
       return { iterator{this, found_pos}, true };
     }
 
-    [[nodiscard]] const T * FindPtr(const Key & key) const { return FindPtr_impl(key); }
+    [[nodiscard]] const MAPPED_T * FindPtr(const KEY_T & key) const { return FindPtr_impl(key); }
 
-    [[nodiscard]] T * FindPtr(const Key & key) { return const_cast<T*>(FindPtr_impl(key)); }
+    [[nodiscard]] MAPPED_T * FindPtr(const KEY_T & key) { return const_cast<MAPPED_T*>(FindPtr_impl(key)); }
 
-    T & operator[](const Key & key) {
-      T * val = FindPtr(key);
+    // Find and return an object by value; may provide a default for "not found"
+    [[nodiscard]] MAPPED_T FindValue(const KEY_T & key, MAPPED_T default_obj={}) const {
+      const MAPPED_T & ptr = FindPtr(key);
+      if (ptr) return *ptr;
+      return default_obj;
+    }
+
+    MAPPED_T & operator[](const KEY_T & key) {
+      MAPPED_T * val = FindPtr(key);
       if (val) { return *val; }
 
-      Insert(key, T{});
+      Insert(key, MAPPED_T{});
       return *FindPtr(key);
-      // auto it = Insert(key, T{}).first;
+      // auto it = Insert(key, MAPPED_T{}).first;
       // return (*it).second;
     }
 
-    bool erase(const Key & key) {
+    // Standard-library compatible find()
+    [[nodiscard]] iterator find(const KEY_T & key) {
+      std::optional<size_t> index = FindIndex(key);
+      if (index) return iterator{this, *index};
+      return end();
+    }
+
+    // Standard-library compatible const find()
+    [[nodiscard]] const_iterator find(const KEY_T & key) const {
+      std::optional<size_t> index = FindIndex(key);
+      if (index) return const_iterator{this, *index};
+      return end();
+    }
+
+    bool erase(const KEY_T & key) {
       emp_assert(OK());
       if (table.empty()) { return false; }  // Nothing to delete.
 
@@ -380,8 +428,8 @@ namespace emp {
     // Calculate how far off a current entry is from its ideal position.
     [[nodiscard]] size_t CalcOffset(size_t pos) const {
       emp_assert(pos < table.size() && occupied[pos], pos, table.size());
-      // Note: don't need to hash % table.size() before subtraction because table is power of two.
-      return ToPos(pos - table[pos].hash) + 1;
+      // Note: We don't need to hash % table.size() before subtraction because table is power of two.
+      return ToPos(pos - hash_cache[pos]) + 1;
     }
 
     /////////////////////////////////////////
@@ -407,7 +455,7 @@ namespace emp {
       for (size_t i = 0; i < occupied.size(); ++i) {
         if (!occupied[i]) continue;
         for (size_t pos = 0; pos < hash_bits; ++pos) {
-          if (table[i].hash & (1 << pos)) one_counts[pos]++;
+          if (hash_cache[i] & (1 << pos)) one_counts[pos]++;
         }
       }
 
@@ -436,7 +484,7 @@ namespace emp {
 
       // Identify the number of duplicate hashes.
       RobinHoodMap<size_t, size_t> hash_counts;
-      ForEachEntry([&hash_counts](const Entry & entry){ hash_counts[entry.hash]++; });
+      for (size_t cur_hash : hash_cache) hash_counts[cur_hash]++;
 
       double ratio = hash_counts.size() / static_cast<double>(num_elements);
       std::println(os, "Full hash duplication fraction = {} (lower is better)", 1.0 - ratio);
@@ -446,7 +494,8 @@ namespace emp {
     [[nodiscard]] bool OK() const {
       const size_t N = table.size();
 
-      // Make sure the occupied size is the same as the table.
+      // Make sure the hash cache and occupied sizes are the same as the table.
+      emp_assert(hash_cache.size() == N, hash_cache.size(), table.size());
       emp_assert(occupied.size() == N, occupied.size(), table.size());
 
       // Make sure the size is valid (at least minumum and a power of two.)
@@ -463,19 +512,19 @@ namespace emp {
       // Make sure all hash values are correct
       for (size_t id = 0; id < N; ++id) {
         if (!occupied[id]) continue;
-        emp_assert(table[id].hash == CalcHash(table[id].key));
+        emp_assert(hash_cache[id] == CalcHash(table[id].Key()));
       }
 
       // Test that distances match expectations.
       for (size_t i = 0; i < N; ++i) {
         if (!occupied[i]) continue;
 
-        [[maybe_unused]] const size_t cur_dist = ToPos(i - table[i].hash) + 1;
+        [[maybe_unused]] const size_t cur_dist = ToPos(i - hash_cache[i]) + 1;
 
         // Distance at next slot (if occupied) must be <= ours + 1 (or we should have swapped)
         size_t j = (i + 1) & table_mask;
         if (occupied[j]) {
-          [[maybe_unused]] const size_t next_dist = ToPos(j - table[j].hash) + 1;
+          [[maybe_unused]] const size_t next_dist = ToPos(j - hash_cache[j]) + 1;
           emp_assert(next_dist <= cur_dist + 1, i, cur_dist, j, next_dist);
         }
       }
