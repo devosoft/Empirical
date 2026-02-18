@@ -199,5 +199,20 @@ TEST_CASE("Test hash_utils", "[datastructs]")
   }
 }
 
+TEST_CASE("Test CombineHash()", "[datastructs]")
+{
+  // Combine hash should always return the original values if only one combined.
+  CHECK( emp::CombineHash(1) == 1 );
+  CHECK( emp::CombineHash(2) == std::hash<int>()(2) );
+  CHECK( emp::CombineHash(3) == std::hash<int>()(3) );
+  CHECK( emp::CombineHash(4) == std::hash<int>()(4) );
+  CHECK( emp::CombineHash(2,3) == 0x9e377a3e );
+  CHECK( emp::CombineHash(3,2) == 0x9e377a78);
+  CHECK( emp::CombineHash(1,2) == 0x9e3779fa);
+  CHECK( emp::CombineHash(3,4) == 0x9e377a7e);
+  CHECK( emp::CombineHash(2,3,4) == 0x13c6ef4fc );
+
+}
+
 // Local settings for Empecable file checker.
 // empecable_words: spn smhasher aappleby szudzik
