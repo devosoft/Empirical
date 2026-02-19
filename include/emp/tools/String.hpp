@@ -432,7 +432,7 @@ namespace emp {
     }
 
     /// Is string a valid number (int, floating point, or scientific notation all valid)
-    [[nodiscard]] inline bool IsNumber() const;
+    [[nodiscard]] inline bool IsNumber(bool allow_float=true) const;
 
     /// Is string a valid identifier? At least one char; cannot begin with digit, only letters, digits and `_`
     [[nodiscard]] bool IsIdentifier() const {
@@ -555,17 +555,17 @@ namespace emp {
 
     String & RemovePunctuation() { return RemoveChars(PunctuationCharSet()); }
 
-    String AsRemoveWhitespace() const { return MakeRemoveChars(*this, WhitespaceCharSet()); }
+    [[nodiscard]] String AsRemoveWhitespace() const { return MakeRemoveChars(*this, WhitespaceCharSet()); }
 
-    String AsRemoveUpper() const { return MakeRemoveChars(*this, UpperCharSet()); }
+    [[nodiscard]] String AsRemoveUpper() const { return MakeRemoveChars(*this, UpperCharSet()); }
 
-    String AsRemoveLower() const { return MakeRemoveChars(*this, LowerCharSet()); }
+    [[nodiscard]] String AsRemoveLower() const { return MakeRemoveChars(*this, LowerCharSet()); }
 
-    String AsRemoveLetters() const { return MakeRemoveChars(*this, LetterCharSet()); }
+    [[nodiscard]] String AsRemoveLetters() const { return MakeRemoveChars(*this, LetterCharSet()); }
 
-    String AsRemoveDigits() const { return MakeRemoveChars(*this, DigitCharSet()); }
+    [[nodiscard]] String AsRemoveDigits() const { return MakeRemoveChars(*this, DigitCharSet()); }
 
-    String AsRemovePunctuation() const { return MakeRemoveChars(*this, PunctuationCharSet()); }
+    [[nodiscard]] String AsRemovePunctuation() const { return MakeRemoveChars(*this, PunctuationCharSet()); }
 
     String & Resize(size_t new_size) {
       resize(new_size);
@@ -712,9 +712,9 @@ namespace emp {
 
     // Find any instances of ${X} and replace with dictionary lookup of X in new variable.
     template <typename MAP_T>
-    String AsReplaceVars(const MAP_T & var_map,
-                         const String & symbol = "$",
-                         const Syntax & syntax = Syntax::Full());
+    [[nodiscard]] String AsReplaceVars(const MAP_T & var_map,
+                                       const String & symbol = "$",
+                                       const Syntax & syntax = Syntax::Full()) const;
 
     // Find any instances of ${X} and replace with dictionary lookup of X in this variable.
     template <typename MAP_T>
@@ -985,7 +985,7 @@ namespace emp {
     //  std::string operator+(const std::string & in) const
 
     template <typename T>
-    String operator+(T && in) const {
+    [[nodiscard]] String operator+(T && in) const {
       if constexpr (std::derived_from<T, std::string> || std::same_as<T, std::string_view>) {
         return str() + std::forward<T>(in);
       } else {
@@ -993,7 +993,7 @@ namespace emp {
       }
     }
 
-    String operator*(size_t count) const {
+    [[nodiscard]] String operator*(size_t count) const {
       String out;
       out.reserve(size() * count);
       for (size_t i = 0; i < count; ++i) { out += *this; }
@@ -1012,7 +1012,7 @@ namespace emp {
     }
 
     template <typename T>
-    T As() const {
+    [[nodiscard]] T As() const {
       std::stringstream ss;
       ss << *this;
       T out;
@@ -1679,18 +1679,18 @@ namespace emp {
   ////////////////////////////////////////////////////////////////////////////
 
   /// Determine if this string represents a proper number.
-  bool String::IsNumber() const {
+  bool String::IsNumber(bool allow_float) const {
     if (empty()) { return false; }  // If string is empty, not a number!
 
     size_t pos = 0;
-    if (HasOneOfAt("+-", pos)) { ++pos; }  // Allow leading +/-
-    while (HasDigitAt(pos)) { ++pos; }     // Any number of digits (none is okay)
-    if (HasCharAt('.', pos)) {             // If there's a DECIMAL PLACE, look for more digits.
-      ++pos;                               // Skip over the dot.
+    if (HasOneOfAt("+-", pos)) { ++pos; }        // Allow leading +/-
+    while (HasDigitAt(pos)) { ++pos; }           // Any number of digits (none is okay)
+    if (allow_float && HasCharAt('.', pos)) {    // If a DECIMAL PLACE, look for more digits.
+      ++pos;                                     // Skip over the dot.
       if (!HasDigitAt(pos++)) { return false; }  // Must have at least one digit after '.'
       while (HasDigitAt(pos)) { ++pos; }         // Any number of digits is okay.
     }
-    if (HasOneOfAt("eE", pos)) {                 // If there's an e... SCIENTIFIC NOTATION!
+    if (allow_float && HasOneOfAt("eE", pos)) {  // If there's an e... SCIENTIFIC NOTATION!
       ++pos;                                     // Skip over the e.
       if (HasOneOfAt("+-", pos)) { ++pos; }      // skip leading +/-
       if (!HasDigitAt(pos++)) { return false; }  // Must have at least one digit after 'e'
@@ -2272,7 +2272,7 @@ namespace emp {
   template <typename MAP_T>
   String String::AsReplaceVars(const MAP_T & var_map,
                                const String & symbol,
-                               const Syntax & syntax) {
+                               const Syntax & syntax) const {
     String out(*this);
     return out.SetReplaceVars(var_map, symbol, syntax);
   }
