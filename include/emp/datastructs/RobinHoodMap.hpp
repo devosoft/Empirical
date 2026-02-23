@@ -244,7 +244,7 @@ namespace emp {
         return &map_ptr->table[index];
       }
 
-      Entry * operator->() {
+      Entry * operator->() requires (!IS_CONST) {
         emp_assert(IsValid());
         return &map_ptr->table[index];
       }
@@ -361,17 +361,18 @@ namespace emp {
     }
 
     template <class Self>
-    [[nodiscard]] auto * FindPtr(this Self & self, const KEY_T & key) {
-      if (self.table.size() > 0) {
-        SearchPos test_pos{self.MakeSearchPos(key)};
+    [[nodiscard]] auto FindPtr(this Self & self, const KEY_T & key)
+      -> std::add_pointer_t<emp::match_const_t<MAPPED_T, Self>>
+    {
+      if (self.table.size() == 0) return nullptr;
 
-        while (test_pos.dist <= self.occupied[test_pos]) {
-          if (self.TestAt(test_pos, key)) { return &self.table[test_pos].Value(); } // Found!
-          test_pos.Next(self.table_mask); // Try the next position.
-        }
+      SearchPos test_pos{self.MakeSearchPos(key)};
+      while (test_pos.dist <= self.occupied[test_pos]) {
+        if (self.TestAt(test_pos, key)) { return &self.table[test_pos].Value(); } // Found!
+        test_pos.Next(self.table_mask); // Try the next position.
       }
-      using base_t = emp::match_const_t<MAPPED_T, Self>;
-      return static_cast<base_t *>(nullptr); // Not found!
+
+      return nullptr; // Not found!
     }
 
     // Find and return an object by value; may provide a default for "not found"
