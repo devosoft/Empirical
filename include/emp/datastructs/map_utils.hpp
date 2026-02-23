@@ -1,6 +1,6 @@
 /**
  * This file is part of Empirical, https://github.com/devosoft/Empirical
- * Copyright (C) 2016-2023 Michigan State University
+ * Copyright (C) 2016-2026 Michigan State University
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/datastructs/map_utils.hpp
@@ -47,19 +47,17 @@ namespace emp {
   template <class MAP_T, class KEY_T>
   inline void IncrementCounter(MAP_T & in_map, const KEY_T & key) {
     static_assert(std::is_same<typename MAP_T::key_type, int>::value);
-    if (emp::Has(in_map, key)) {
-      in_map[key]++;
-    } else {
-      in_map[key] = 1;
-    }
+    if (emp::Has(in_map, key)) in_map[key]++;
+    else in_map[key] = 1;
   }
 
   // Check to see if any of the elements in a map satisfy a function.
-  template <typename KEY_T, typename ELEMENT_T, typename FUN_T>
-  bool AnyOf(const std::map<KEY_T, ELEMENT_T> & c, FUN_T fun) {
+  template <class MAP_T, typename FUN_T>
+  [[nodiscard]] bool AnyOf(const MAP_T & c, FUN_T fun) {
+    using mapped_t = MAP_T::mapped_type;
     // If the provided function takes just the element type, that's all we should give it.
-    if constexpr (std::is_invocable_r<bool, FUN_T, ELEMENT_T>()) {
-      return std::any_of(c.begin(), c.end(), [fun](auto x) { return fun(x.second); });
+    if constexpr (std::is_invocable_r<bool, FUN_T, mapped_t>()) {
+      return std::any_of(c.begin(), c.end(), [fun](auto x){ return fun(x.second); });
     }
 
     // Otherwise provide both key and element.
@@ -69,10 +67,12 @@ namespace emp {
   }
 
   // Check to see if any of the elements in a map satisfy a function.
-  template <typename KEY_T, typename ELEMENT_T, typename FUN_T>
-  bool AllOf(const std::map<KEY_T, ELEMENT_T> & c, FUN_T fun) {
+  template <class MAP_T, typename FUN_T>
+  bool AllOf(const MAP_T & c, FUN_T fun) {
+    using mapped_t = MAP_T::mapped_type;
+
     // If the provided function takes just the element type, that's all we should give it.
-    if constexpr (std::is_invocable_r<bool, FUN_T, ELEMENT_T>()) {
+    if constexpr (std::is_invocable_r<bool, FUN_T, mapped_t>()) {
       return std::all_of(c.begin(), c.end(), [fun](auto x) { return fun(x.second); });
     }
 
@@ -83,10 +83,12 @@ namespace emp {
   }
 
   // Check to see if any of the elements in a map satisfy a function.
-  template <typename KEY_T, typename ELEMENT_T, typename FUN_T>
-  bool NoneOf(const std::map<KEY_T, ELEMENT_T> & c, FUN_T fun) {
+  template <class MAP_T, typename FUN_T>
+  bool NoneOf(const MAP_T & c, FUN_T fun) {
+    using mapped_t = MAP_T::mapped_type;
+
     // If the provided function takes just the element type, that's all we should give it.
-    if constexpr (std::is_invocable_r<bool, FUN_T, ELEMENT_T>()) {
+    if constexpr (std::is_invocable_r<bool, FUN_T, mapped_t>()) {
       return std::none_of(c.begin(), c.end(), [fun](auto x) { return fun(x.second); });
     }
 
