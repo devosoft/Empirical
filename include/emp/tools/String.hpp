@@ -1,6 +1,6 @@
 /**
  * This file is part of Empirical, https://github.com/devosoft/Empirical
- * Copyright (C) 2023-2025 Michigan State University
+ * Copyright (C) 2023-2026 Michigan State University
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/tools/String.hpp
@@ -2785,7 +2785,7 @@ namespace emp {
     ++it;
 
     // Print any additional elements with separator in between.
-    while (it != container.end) {
+    while (it != container.end()) {
       out.Append(separator, *it);
       ++it;
     }
