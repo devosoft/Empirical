@@ -18,7 +18,7 @@
 #define INCLUDE_EMP_META_META_HPP_GUARD
 
 #include <functional>
-#include <stddef.h>
+#include <cstddef>
 #include <tuple>
 #include <type_traits>
 #include <utility>
@@ -79,7 +79,7 @@ namespace emp {
   template <typename T1, typename... Ts>
   constexpr bool has_unique_types() noexcept {
     if constexpr (count_type<T1, Ts...>() > 0) return false; // T1 was found later!
-    if constexpr (sizeof...(Ts) > 1) return has_unique_types<Ts...>();
+    if constexpr (sizeof...(Ts) > 0) return has_unique_types<Ts...>();
     return true;
   }
 
@@ -140,85 +140,19 @@ namespace emp {
     else return true;
   }
 
-
- 
-
-
-
-
-
-
-  /// Group types in a parameter pack to build a vector of a designated type.
-  template <typename OBJ_T>
-  void BuildObjVector1(emp::vector<OBJ_T> &) {}
-
-  template <typename OBJ_T>
-  void BuildObjVector2(emp::vector<OBJ_T> &) {}
-
-  template <typename OBJ_T>
-  void BuildObjVector3(emp::vector<OBJ_T> &) {}
-
-  template <typename OBJ_T>
-  void BuildObjVector4(emp::vector<OBJ_T> &) {}
-
-  template <typename OBJ_T, typename T1, typename... Ts>
-  void BuildObjVector1(emp::vector<OBJ_T> & v, T1 & arg1, Ts &... extras) {
-    v.emplace_back(arg1);
-    BuildObjVector1(v, extras...);
+  /// Determine the size of a built-in array.
+  template <typename T, std::size_t N>
+  constexpr std::size_t GetSize(T (&)[N]) {
+    return N;
   }
 
-  template <typename OBJ_T, typename T1, typename T2, typename... Ts>
-  void BuildObjVector2(emp::vector<OBJ_T> & v, T1 & arg1, T2 & arg2, Ts &... extras) {
-    v.emplace_back(arg1, arg2);
-    BuildObjVector2(v, extras...);
-  }
 
-  template <typename OBJ_T, typename T1, typename T2, typename T3, typename... Ts>
-  void BuildObjVector3(emp::vector<OBJ_T> & v, T1 & arg1, T2 & arg2, T3 & arg3, Ts &... extras) {
-    v.emplace_back(arg1, arg2, arg3);
-    BuildObjVector3(v, extras...);
-  }
-
-  template <typename OBJ_T, typename T1, typename T2, typename T3, typename T4, typename... Ts>
-  void BuildObjVector4(emp::vector<OBJ_T> & v,
-                       T1 & arg1,
-                       T2 & arg2,
-                       T3 & arg3,
-                       T4 & arg4,
-                       Ts &... extras) {
-    v.emplace_back(arg1, arg2, arg3, arg4);
-    BuildObjVector4(v, extras...);
-  }
-
-  template <typename OBJ_T, size_t NUM_ARGS, typename... Ts>
-  emp::vector<OBJ_T> BuildObjVector(Ts &... args) {
-    emp::vector<OBJ_T> out_v;
-    constexpr size_t TOTAL_ARGS = sizeof...(Ts);
-    static_assert((TOTAL_ARGS % NUM_ARGS) == 0,
-                  "emp::BuildObjVector() : Must have the same number of args for each object.");
-    out_v.reserve(TOTAL_ARGS / NUM_ARGS);
-
-    if constexpr (NUM_ARGS == 1) {
-      BuildObjVector1<OBJ_T>(out_v, args...);
-    } else if constexpr (NUM_ARGS == 2) {
-      BuildObjVector2<OBJ_T>(out_v, args...);
-    } else if constexpr (NUM_ARGS == 3) {
-      BuildObjVector3<OBJ_T>(out_v, args...);
-    } else if constexpr (NUM_ARGS == 4) {
-      BuildObjVector4<OBJ_T>(out_v, args...);
-    }
-    static_assert(NUM_ARGS < 5, "BuildObjVector currently has a cap of 4 arguments per object.");
-
-    return out_v;
-  }
-
+  // === Decoy templates for SFINAE (should phase out in favor of concepts and if constexpr!) ===
 
   // sfinae_decoy<X,Y> will always evaluate to X no matter what Y is.
   // X is type you want it to be; Y is a decoy trigger potential substitution failure.
   template <typename REAL_TYPE, typename EVAL_TYPE>
   using sfinae_decoy = REAL_TYPE;
-  template <typename REAL_TYPE, typename EVAL_TYPE>
-  using type_decoy = REAL_TYPE;
   template <typename REAL_TYPE, typename EVAL_TYPE>
   using decoy_t = REAL_TYPE;
   template <typename EVAL_TYPE>
@@ -226,133 +160,44 @@ namespace emp {
   template <typename EVAL_TYPE>
   using int_decoy = int;
 
-  // Deprecated macros
-#define emp_bool_decoy(TEST) emp::sfinae_decoy<bool, decltype(TEST)>
-#define emp_int_decoy(TEST) emp::sfinae_decoy<int, decltype(TEST)>
 
+  //  === Other utilities ===
+  
+  /// BuildObjVector groups arguments into objects and return emp::vector<OBJ_T>
 
-
-
-// TruncateCall reduces the number of arguments for calling a function if too many are used.
-// @CAO: This should be simplified using TypeSet
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
   namespace internal {
-    template <typename... PARAMS>
-    struct tcall_impl {
-      template <typename FUN_T, typename... EXTRA>
-      static auto call(FUN_T fun, PARAMS... args, EXTRA...) {
-        return fun(args...);
-      }
-    };
-  }  // namespace internal
-#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
-
-  // Truncate the arguments provided, using only the relevant ones for a function call.
-  template <typename R, typename... PARAMS, typename... ARGS>
-  auto TruncateCall(std::function<R(PARAMS...)> fun, ARGS &&... args) {
-    return internal::tcall_impl<PARAMS...>::call(fun, std::forward<ARGS>(args)...);
-  }
-
-  // Expand a function to take (and ignore) extra arguments.
-  template <typename R, typename... ARGS>
-  struct AdaptFunction {
-    template <typename... EXTRA_ARGS>
-    static auto Expand(const std::function<R(ARGS...)> & fun) {
-      return [fun](ARGS... args, EXTRA_ARGS...) { return fun(args...); };
+    template <typename OBJ_T, std::size_t NUM_ARGS, std::size_t BASE, typename Tuple, std::size_t... Is>
+    void emplace_from_tuple(emp::vector<OBJ_T> & out, Tuple && tup, std::index_sequence<Is...>) {
+      out.emplace_back(std::get<BASE + Is>(std::forward<Tuple>(tup))...);
     }
-  };
 
-// Change the internal type arguments on a template...
-// Adapted from: Sam Varshavchik
-// http://stackoverflow.com/questions/36511990/is-it-possible-to-disentangle-a-template-from-its-arguments-in-c
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-  namespace internal {
-    template <typename T, typename... U>
-    struct AdaptTemplateHelper {
-      using type = T;
-    };
-
-    template <template <typename...> class T, typename... V, typename... U>
-    struct AdaptTemplateHelper<T<V...>, U...> {
-      using type = T<U...>;
-    };
+    template <typename OBJ_T, std::size_t NUM_ARGS, typename Tuple, std::size_t... ChunkIs>
+    void build_obj_vector_from_tuple(emp::vector<OBJ_T> & out, Tuple && tup, std::index_sequence<ChunkIs...>) {
+      // For each chunk k, BASE = k * NUM_ARGS
+      (emplace_from_tuple<OBJ_T, NUM_ARGS, ChunkIs * NUM_ARGS>(
+        out, std::forward<Tuple>(tup), std::make_index_sequence<NUM_ARGS>{}
+      ), ...);
+    }
   }  // namespace internal
-#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-  template <typename T, typename... U>
-  using AdaptTemplate = typename internal::AdaptTemplateHelper<T, U...>::type;
+  template <typename OBJ_T, std::size_t NUM_ARGS, typename... Args>
+  emp::vector<OBJ_T> BuildObjVector(Args &&... args) {
+    static_assert(NUM_ARGS >= 1);
+    constexpr std::size_t TOTAL_ARGS = sizeof...(Args);
+    static_assert((TOTAL_ARGS % NUM_ARGS) == 0,
+                  "emp::BuildObjVector(): Must have the same number of args for each object.");
 
+    auto tup = std::forward_as_tuple(std::forward<Args>(args)...);
 
-// Variation of AdaptTemplate that only adapts first template argument.
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-  namespace internal {
-    template <typename T, typename U>
-    class AdaptTemplateHelper_Arg1 {
-    public:
-      using type = T;
-    };
+    emp::vector<OBJ_T> out;
+    out.reserve(TOTAL_ARGS / NUM_ARGS);
 
-    template <template <typename...> class T, typename X, typename... V, typename U>
-    class AdaptTemplateHelper_Arg1<T<X, V...>, U> {
-    public:
-      using type = T<U, V...>;
-    };
-  }  // namespace internal
-#endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
+    internal::build_obj_vector_from_tuple<OBJ_T, NUM_ARGS>(
+      out, tup, std::make_index_sequence<TOTAL_ARGS / NUM_ARGS>{}
+    );
 
-  template <typename T, typename U>
-  using AdaptTemplate_Arg1 = typename internal::AdaptTemplateHelper_Arg1<T, U>::type;
-
-  // Some math inside templates...
-  template <int I, int... Is>
-  struct tIntMath {
-    static constexpr int Sum() { return I + tIntMath<Is...>::Sum(); }
-
-    static constexpr int Product() { return I * tIntMath<Is...>::Product(); }
-  };
-
-  template <int I>
-  struct tIntMath<I> {
-    static constexpr int Sum() { return I; }
-
-    static constexpr int Product() { return I; }
-  };
-
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-
-  // This bit of magic is from
-  // http://meh.schizofreni.co/programming/magic/2013/01/23/function-pointer-from-lambda.html
-  // and is useful for fixing lambda function woes
-  template <typename Function>
-  struct function_traits : public function_traits<decltype(&Function::operator())> {};
-
-  template <typename ClassType, typename ReturnType, typename... Args>
-  struct function_traits<ReturnType (ClassType::*)(Args...) const> {
-    typedef ReturnType (*pointer)(Args...);
-    typedef std::function<ReturnType(Args...)> function;
-  };
-
-  template <typename Function>
-  typename function_traits<Function>::pointer to_function_pointer(Function & lambda) {
-    return static_cast<typename function_traits<Function>::pointer>(lambda);
+    return out;
   }
-
-  template <typename Function>
-  typename function_traits<Function>::function to_function(Function & lambda) {
-    return static_cast<typename function_traits<Function>::function>(lambda);
-  }
-
-#endif /*DOXYGEN_SHOULD_SKIP_THIS*/  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
-
-  /// Determine the size of a built-in array.
-  template <typename T, size_t N>
-  constexpr size_t GetSize(T (&)[N]) {
-    return N;
-  }
-
 }  // namespace emp
 
 #endif  // #ifndef INCLUDE_EMP_META_META_HPP_GUARD
-
-// Local settings for Empecable file checker.
-// empecable_words: schizofreni Varshavchik tcall
