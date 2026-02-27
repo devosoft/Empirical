@@ -644,9 +644,23 @@ namespace emp {
     constexpr void New(T &&... args) {
       Tracker().DecID(id);  // Remove a pointer to any old memory...
 
-      ptr = new TYPE(std::forward<T>(args)...);  // Special new that uses allocated space.
+      ptr = new TYPE(std::forward<T>(args)...);
 
       if (GetPtrDebug()) { std::cout << "Ptr::New() : " << ptr << std::endl; }
+      id = Tracker().New(ptr);  // And track it!
+      DebugInfo().AddPtr();
+    }
+
+    // Reallocate this Ptr to a newly allocated value of a DERIVED type, using arguments passed in.
+    template <typename DERIVED_T, typename... Ts>
+    constexpr void NewDerived(Ts &&... args) {
+      static_assert(std::derived_from<DERIVED_T, TYPE>);
+
+      Tracker().DecID(id);  // Remove a pointer to any old memory...
+
+      ptr = new DERIVED_T(std::forward<Ts>(args)...);
+
+      if (GetPtrDebug()) { std::cout << "Ptr::NewDerived() : " << ptr << std::endl; }
       id = Tracker().New(ptr);  // And track it!
       DebugInfo().AddPtr();
     }
@@ -1021,10 +1035,16 @@ namespace emp {
       return reinterpret_cast<T2 *>(ptr);
     }
 
-    template <typename... T>
-    constexpr void New(T &&... args) {
-      ptr = new TYPE(std::forward<T>(args)...);
+    template <typename... Ts>
+    constexpr void New(Ts &&... args) {
+      ptr = new TYPE(std::forward<Ts>(args)...);
     }  // New raw pointer.
+
+    // Build a derived version of the current type.
+    template <typename DERIVED_T, typename... Ts>
+    constexpr void NewDerived(Ts &&... args) {
+      ptr = new DERIVED_T(std::forward<Ts>(args)...);
+    }
 
     constexpr void NewArray(size_t array_size) { ptr = new TYPE[array_size]; }
 
