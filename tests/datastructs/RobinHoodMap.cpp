@@ -17,6 +17,7 @@ TEST_CASE("Test RobinHoodMap", "[datastructs]")
 
   CHECK(test_map.size() == 0);
   CHECK(test_map.empty() == true);
+  CHECK(test_map.OK());
 
   test_map["pi"] = 3.14159265358979; // Try inserting a value
 
@@ -52,4 +53,19 @@ TEST_CASE("Test RobinHoodMap", "[datastructs]")
 
   CHECK(test_map2.size() == 3);
   CHECK(test_map.size() == 4);  // Old map should remain unchanged.
+
+
+  // Check FindValue
+  // Test map has "ONE" "TWO" "pi" and "help"
+  CHECK(test_map.FindValue("ONE") == 1.0);          // Find "ONE" correctly
+  CHECK(test_map.FindValue("TWO") == 2.0);          // Find "TWO" correctly
+  CHECK(test_map.FindValue("TWO", 5.0) == 2.0);     // "TWO" should not change with fallback value.
+  CHECK(test_map.FindValue("THREE", 10.5) == 10.5); // "THREE" in not there; default to provided fallback
+  CHECK(test_map.FindValue("THREE") == 0.0);        // "THREE" is not there; default to fallback of zero.
+
+  // Double-check contents
+  CHECK(test_map.contains("ONE"));
+  CHECK(test_map.contains("TWO"));
+  CHECK(!test_map.contains("THREE"));
+  CHECK(test_map.size() == 4);
 }
