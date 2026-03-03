@@ -1,6 +1,6 @@
 /**
  * This file is part of Empirical, https://github.com/devosoft/Empirical
- * Copyright (C) 2022-2025 Michigan State University
+ * Copyright (C) 2022-2026 Michigan State University
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/bits/Bits.hpp
@@ -367,7 +367,7 @@ namespace emp {
 
     /// @brief Set bits to 0 in the range [start, stop)
     Bits & Clear(const size_t start, const size_t stop) {
-      return ApplyRange([](field_t) -> size_t { return 0; }, start, std::min(stop, GetSize()));
+      return ApplyRange([](field_t) -> field_t { return FIELD_0; }, start, std::min(stop, GetSize()));
     }
 
     /// @brief Const index operator -- return the bit at the specified position.
@@ -682,7 +682,8 @@ namespace emp {
     /// @brief Push given bit(s) onto the back of a vector.
     /// @param bit value of bit to be pushed.
     /// @param num number of bits to be pushed.
-    void PushBack(const bool bit = true, const size_t num = 1);
+    /// @return first new position.
+    size_t PushBack(const bool bit = true, const size_t num = 1);
 
     /// @brief Push given bit(s) onto the front of a vector.
     /// @param bit value of bit to be pushed.
@@ -1108,7 +1109,10 @@ namespace emp {
 
     void push_back(const bool bit = true, const size_t num = 1) { PushBack(bit, num); }
 
-    void pop_back() { resize(GetSize() - 1); }
+    void pop_back() {
+      emp_assert(GetSize() > 0, "Nothing to pop!");
+      resize(GetSize() - 1);
+    }
 
     [[nodiscard]] constexpr bool all() const { return All(); }
 
@@ -2029,7 +2033,7 @@ namespace emp {
   template <typename DATA_T, bool ZERO_LEFT>
   void Bits<DATA_T, ZERO_LEFT>::SetByte(size_t index, uint8_t value) {
     if constexpr (IsAutoResize()) {
-      if (index >= GetNumBytes()) { Resize(index + 8 + 8); }
+      if (index >= GetNumBytes()) { Resize(index * 8 + 8); }
     }
     emp_assert(index < GetNumBytes(), index, GetNumBytes());
     const size_t field_id  = Byte2Field(index);
@@ -2087,7 +2091,7 @@ namespace emp {
   template <typename T>
   T Bits<DATA_T, ZERO_LEFT>::GetValueAtBit(const size_t index) const {
     // @CAO For the moment, must fit inside bounds; eventually should pad with zeros.
-    emp_assert((index + 7) / 8 + sizeof(T) < _data.TotalBytes());
+    emp_assert((index + 7) / 8 + sizeof(T) <= _data.TotalBytes());
 
     Bits<DATA_T, ZERO_LEFT> out_bits(*this);
     out_bits >>= index;
@@ -2186,6 +2190,7 @@ namespace emp {
   /// @return value of the popped bit.
   template <typename DATA_T, bool ZERO_LEFT>
   bool Bits<DATA_T, ZERO_LEFT>::PopBack() {
+    emp_assert(GetSize() > 0, "Nothing to pop!");
     const bool val = Get(GetSize() - 1);
     Resize(GetSize() - 1);
     return val;
@@ -2194,10 +2199,13 @@ namespace emp {
   /// Push given bit(s) onto the back of a vector.
   /// @param bit value of bit to be pushed.
   /// @param num number of bits to be pushed.
+  /// @return first new position.
   template <typename DATA_T, bool ZERO_LEFT>
-  void Bits<DATA_T, ZERO_LEFT>::PushBack(const bool bit, const size_t num) {
-    Resize(GetSize() + num);
+  size_t Bits<DATA_T, ZERO_LEFT>::PushBack(const bool bit, const size_t num) {
+    const size_t out_pos = GetSize();
+    Resize(out_pos + num);
     if (bit) { SetRange(GetSize() - num, GetSize()); }
+    return out_pos;
   }
 
   /// Push given bit(s) onto the front of a vector.
@@ -2206,7 +2214,7 @@ namespace emp {
   template <typename DATA_T, bool ZERO_LEFT>
   void Bits<DATA_T, ZERO_LEFT>::PushFront(const bool bit, const size_t num) {
     Resize(GetSize() + num);
-    SHIFT_SELF(-num);
+    SHIFT_SELF(-static_cast<int>(num));
     if (bit) { SetRange(0, num); }
   }
 
@@ -2251,11 +2259,24 @@ namespace emp {
   /// Return the position of the first zero; return npos if no zeros in vector.
   template <typename DATA_T, bool ZERO_LEFT>
   size_t Bits<DATA_T, ZERO_LEFT>::FindZero() const {
+    if (GetSize() == 0) return npos;
+
     const size_t NUM_FIELDS = NumFields();
-    size_t field_id         = 0;
+    size_t field_id = 0;
+
+    // Skip over fields with no zeros.
     while (field_id < NUM_FIELDS && _data.bits[field_id] == FIELD_ALL) { field_id++; }
-    return (field_id < NUM_FIELDS) ? (find_bit(~_data.bits[field_id]) + (field_id * FIELD_BITS))
-                                   : npos;
+
+    if (field_id == NUM_FIELDS) return npos; // We have exhausted all fields!
+
+    field_t not_field = ~_data.bits[field_id];
+    if (field_id == NUM_FIELDS - 1) {
+      not_field &= _data.EndMask();    // Set final bits to zero.
+      if (not_field == 0) return npos;  // There were no zero bits in the final field.
+    }
+    const size_t result = find_bit(not_field) + (field_id * FIELD_BITS);
+    emp_assert(result < GetSize());
+    return result;
   }
 
   /// Return the position of the first one after start_pos; return npos if no ones in vector.
@@ -2576,10 +2597,10 @@ namespace emp {
     const size_t NUM_FIELDS  = NumFields();
     const size_t NUM_FIELDS2 = bits2.NumFields();
     emp_assert(GetSize() >= bits2.GetSize());
-    for (size_t i = 0; i < NUM_FIELDS; i++) {
+    for (size_t i = 0; i < NUM_FIELDS2; i++) {
       _data.bits[i] = ~(_data.bits[i] & bits2._data.bits[i]);
     }
-    // Assume all "extra" bits in bits2 (if any) are zeros.
+    // Assume all "missing" bits in bits2 (if any) are zeros.
     for (size_t i = NUM_FIELDS2; i < NUM_FIELDS; ++i) { _data.bits[i] = FIELD_ALL; }
     return ClearExcessBits();
   }
@@ -2594,10 +2615,10 @@ namespace emp {
     const size_t NUM_FIELDS  = NumFields();
     const size_t NUM_FIELDS2 = bits2.NumFields();
     emp_assert(GetSize() >= bits2.GetSize());
-    for (size_t i = 0; i < NUM_FIELDS; i++) {
+    for (size_t i = 0; i < NUM_FIELDS2; i++) {
       _data.bits[i] = ~(_data.bits[i] | bits2._data.bits[i]);
     }
-    // Assume all "extra" bits in bits2 (if any) are zeros.
+    // Assume all "missing" bits in bits2 (if any) are zeros.
     for (size_t i = NUM_FIELDS2; i < NUM_FIELDS; ++i) { _data.bits[i] = ~_data.bits[i]; }
     return ClearExcessBits();
   }
@@ -2628,15 +2649,15 @@ namespace emp {
     const size_t NUM_FIELDS  = NumFields();
     const size_t NUM_FIELDS2 = bits2.NumFields();
     emp_assert(GetSize() >= bits2.GetSize());
-    for (size_t i = 0; i < NUM_FIELDS; i++) {
+    for (size_t i = 0; i < NUM_FIELDS2; i++) {
       _data.bits[i] = ~(_data.bits[i] ^ bits2._data.bits[i]);
     }
     // Assume all "extra" bits in bits2 (if any) are zeros.
-    for (size_t i = NUM_FIELDS2; i < NUM_FIELDS; ++i) { _data.bits[i] = FIELD_ALL; }
+    for (size_t i = NUM_FIELDS2; i < NUM_FIELDS; ++i) { _data.bits[i] = ~(_data.bits[i] ^ 0); }
     return ClearExcessBits();
   }
 
-  /// Positive shifts go left and negative go right (0 does nothing); return result.
+  /// Positive shifts go right and negative go left (0 does nothing); return result.
   template <typename DATA_T, bool ZERO_LEFT>
   Bits<DATA_T, ZERO_LEFT> Bits<DATA_T, ZERO_LEFT>::SHIFT(const int shift_size) const {
     Bits<DATA_T, ZERO_LEFT> out_bits(*this);
@@ -2648,7 +2669,7 @@ namespace emp {
     return out_bits;
   }
 
-  /// Positive shifts go left and negative go right; store result here, and return this object.
+  /// Positive shifts go right and negative go left; store result here, and return this object.
   template <typename DATA_T, bool ZERO_LEFT>
   Bits<DATA_T, ZERO_LEFT> & Bits<DATA_T, ZERO_LEFT>::SHIFT_SELF(const int shift_size) {
     if (shift_size > 0) {
@@ -2807,8 +2828,8 @@ namespace emp {
   [[nodiscard]] auto FindAnyOnes(const CONTAINER_T & container) {
     using bits_t = typename CONTAINER_T::value_type;
 
-    // Identify cells where exactly one state is possible.
-    bits_t found;
+    // Identify positions where at least one bit sequences are set to 1.
+    bits_t found = container.front();
     for (const bits_t & bits : container) { found |= bits; }
 
     return found;
@@ -2819,8 +2840,8 @@ namespace emp {
   [[nodiscard]] auto FindAllOnes(const CONTAINER_T & container) {
     using bits_t = typename CONTAINER_T::value_type;
 
-    // Identify cells where exactly one state is possible.
-    bits_t found;
+    // Identify positions where all bit sequences are set to 1.
+    bits_t found = container.front();
     for (const bits_t & bits : container) { found &= bits; }
 
     return found;
@@ -2829,13 +2850,7 @@ namespace emp {
   /// Find bit positions where NO sequences have a one in that position.
   template <typename CONTAINER_T>
   [[nodiscard]] auto FindNoOnes(const CONTAINER_T & container) {
-    using bits_t = typename CONTAINER_T::value_type;
-
-    // Identify cells where exactly one state is possible.
-    bits_t ones_found;
-    for (const bits_t & bits : container) { ones_found |= bits; }
-
-    return ~ones_found;
+    return ~FindAnyOnes(container);
   }
 
   /// Find bit positions where exactly one sequence has a one in that position.
