@@ -1,6 +1,6 @@
 /**
  * This file is part of Empirical, https://github.com/devosoft/Empirical
- * Copyright (C) 2019 Michigan State University
+ * Copyright (C) 2019-2026 Michigan State University
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/config/ArgManager.hpp
@@ -19,13 +19,13 @@
 #include <limits>
 #include <map>
 #include <numeric>
+#include <optional>
 #include <set>
 #include <stddef.h>
 #include <string>
 #include <tuple>
 #include <vector>
 
-#include "../base/optional.hpp"
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"
 
@@ -52,7 +52,7 @@ namespace emp {
     std::unordered_set<std::string> aliases;
 
     /// Function that can process this flag and its arguments.
-    std::function<void(emp::optional<emp::vector<std::string>>)> callback;
+    std::function<void(std::optional<emp::vector<std::string>>)> callback;
 
     /// Should this flag collect subsequent flags (that begin with -) as arguments?
     bool gobble_flags;
@@ -64,7 +64,7 @@ namespace emp {
     ArgSpec(const size_t quota_                            = 0,
             const std::string description_                 = "No description provided.",
             const std::unordered_set<std::string> aliases_ = std::unordered_set<std::string>(),
-            const std::function<void(emp::optional<emp::vector<std::string>>)> callback_ = nullptr,
+            const std::function<void(std::optional<emp::vector<std::string>>)> callback_ = nullptr,
             const bool gobble_flags_                                                     = false,
             const bool flatten_                                                          = false)
       : ArgSpec(quota_, quota_, description_, aliases_, callback_, gobble_flags_, flatten_) {
@@ -75,7 +75,7 @@ namespace emp {
             const size_t least_quota_,
             const std::string description_                 = "No description provided.",
             const std::unordered_set<std::string> aliases_ = std::unordered_set<std::string>(),
-            const std::function<void(emp::optional<emp::vector<std::string>>)> callback_ = nullptr,
+            const std::function<void(std::optional<emp::vector<std::string>>)> callback_ = nullptr,
             const bool gobble_flags_                                                     = false,
             const bool flatten_                                                          = false)
       : most_quota(most_quota_)
@@ -275,7 +275,7 @@ namespace emp {
                  1,
                  "Unknown arguments.",
                  {},
-                 [](emp::optional<pack_t> res) {
+                 [](std::optional<pack_t> res) {
                    if (res) {
                      std::cerr << "UNKNOWN | _unknown:";
                      for (const auto & v : *res) { std::cerr << " " << v; }
@@ -288,13 +288,13 @@ namespace emp {
                  1,
                  "Command name.",
                  {},
-                 [](emp::optional<emp::vector<std::string>> /* res */) { /*no-op*/ })},
+                 [](std::optional<emp::vector<std::string>> /* res */) { /*no-op*/ })},
         {"help", ArgSpec(0, "Print help information.", {"h"})},
         {"gen",
          ArgSpec(1,
                  "Generate configuration file.",
                  {},
-                 [config](emp::optional<pack_t> res) {
+                 [config](std::optional<pack_t> res) {
                    if (res && config) {
                      const std::string cfg_file = res->front();
                      std::cout << "Generating new config file: " << cfg_file << std::endl;
@@ -307,7 +307,7 @@ namespace emp {
         //   1,
         //   "Generate const version of macros file.",
         //   {},
-        //   [config](emp::optional<pack_t> res){
+        //   [config](std::optional<pack_t> res){
         //     if (res && config) {
         //       const std::string macro_file = res->front();
         //       std::cout << "Generating new macros file: " << macro_file << std::endl;
@@ -329,7 +329,7 @@ namespace emp {
                                              entry->GetDefault(),
                                              ')'),
                               {},
-                              [config, entry](emp::optional<pack_t> res) {
+                              [config, entry](std::optional<pack_t> res) {
                                 if (res && config) { config->Set(entry->GetName(), res->front()); }
                               })});
         }
@@ -397,8 +397,8 @@ namespace emp {
     }
 
     /// UseArg consumes an argument pack accessed by a certain name.
-    emp::optional<pack_t> UseArg(const std::string & name) {
-      const auto res = [this, name]() -> emp::optional<pack_t> {
+    std::optional<pack_t> UseArg(const std::string & name) {
+      const auto res = [this, name]() -> std::optional<pack_t> {
         if (!packs.count(name)) { return std::nullopt; }
 
         const auto & pack = packs.lower_bound(name)->second;

@@ -26,6 +26,7 @@
 #include <limits>
 #include <math.h>
 #include <mutex>
+#include <optional>
 #include <ratio>
 #include <shared_mutex>
 #include <stddef.h>
@@ -36,7 +37,6 @@
 
 #include "../base/assert.hpp"
 #include "../base/errors.hpp"
-#include "../base/optional.hpp"
 #include "../base/vector.hpp"
 #include "../data/DataFile.hpp"
 #include "../data/DataNode.hpp"
@@ -67,7 +67,7 @@ namespace emp::internal {
     struct LogEntry {
       query_t query;
       // when a match results in no tags, this is a std::nullopt, and we write an empty string
-      emp::optional<tag_t> maybe_tag;
+      std::optional<tag_t> maybe_tag;
       std::string buffer;
 
       operator size_t() const { return emp::CombineHash(query, maybe_tag, buffer); }
@@ -520,7 +520,7 @@ namespace emp {
         if (cache.IsAvailable() && cache.IsActivated()) {
           // try cache lookup first
           if (cache.CountRegulated(query)) {
-            const auto res = cache.GetRegulated(query)(n); /* emp::optional */
+            const auto res = cache.GetRegulated(query)(n); /* std::optional */
             if (res) { return res.value(); }
           }
 
@@ -575,7 +575,7 @@ namespace emp {
         if (cache.IsAvailable() && cache.IsActivated()) {
           // try cache lookup first
           if (cache.CountRaw(query)) {
-            const auto res = cache.GetRaw(query)(n); /* emp::optional */
+            const auto res = cache.GetRaw(query)(n); /* std::optional */
             if (res) { return res.value(); }
           }
           auto cacheResult = makeResult();

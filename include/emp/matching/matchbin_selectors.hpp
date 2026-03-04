@@ -19,6 +19,7 @@
 #include <functional>
 #include <iostream>
 #include <limits>
+#include <optional>
 #include <ratio>
 #include <stddef.h>
 #include <stdexcept>
@@ -29,7 +30,6 @@
 
 #include "../base/array.hpp"
 #include "../base/assert.hpp"
-#include "../base/optional.hpp"
 #include "../base/vector.hpp"
 #include "../datastructs/hash_utils.hpp"
 #include "../datastructs/IndexMap.hpp"
@@ -46,7 +46,7 @@ namespace emp {
 
     virtual ~CacheStateBase() {}
 
-    virtual emp::optional<emp::vector<size_t>> operator()(size_t n) = 0;
+    virtual std::optional<emp::vector<size_t>> operator()(size_t n) = 0;
   };
 
   struct RouletteCacheState : public CacheStateBase {
@@ -65,13 +65,13 @@ namespace emp {
       ;
     }
 
-    emp::optional<emp::vector<size_t>> operator()(size_t n) override {
+    std::optional<emp::vector<size_t>> operator()(size_t n) override {
       if (n == std::numeric_limits<size_t>::max()) { n = default_n; }
 
       // don't perform a lookup into an empty IndexMap, that's a segfault
       // double braces: an empty vector inside an optional
       if (indexMap.GetSize() == 0) {
-        return emp::optional<emp::vector<size_t>>{emp::vector<size_t>{}};
+        return std::optional<emp::vector<size_t>>{emp::vector<size_t>{}};
       }
 
       emp::vector<size_t> res;
@@ -105,7 +105,7 @@ namespace emp {
       emp_assert(uids.size() == probs.size());
     }
 
-    emp::optional<emp::vector<size_t>> operator()(size_t n) override {
+    std::optional<emp::vector<size_t>> operator()(size_t n) override {
       if (n == std::numeric_limits<size_t>::max()) { n = default_n; }
 
       emp::vector<size_t> res;
@@ -130,7 +130,7 @@ namespace emp {
       ;
     }
 
-    emp::optional<emp::vector<size_t>> operator()(size_t n) override {
+    std::optional<emp::vector<size_t>> operator()(size_t n) override {
       if (n == std::numeric_limits<size_t>::max()) { n = default_n; }
 
       if (n > requestSize) { return std::nullopt; }
