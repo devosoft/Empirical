@@ -406,10 +406,10 @@ namespace emp {
         if (specs.count(name)) {
           const auto & spec = specs.find(name)->second;
           return (spec.least_quota <= pack.size() && pack.size() <= spec.most_quota)
-                 ? emp::make_optional(pack)
+                 ? std::make_optional(pack)
                  : std::nullopt;
         } else {
-          return emp::make_optional(pack);
+          return std::make_optional(pack);
         }
       }();
 

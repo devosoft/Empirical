@@ -1,7 +1,7 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2015
+ *  date: 2015-2026
 */
 /**
  *  @file
@@ -14,7 +14,6 @@
 #include <optional>
 
 #include "emp/base/assert.hpp"
-#include "emp/base/optional.hpp"
 #include "emp/base/vector.hpp"
 #include "emp/config/ArgManager.hpp"
 #include "emp/config/config.hpp"
@@ -387,7 +386,7 @@ TEST_CASE("Test ArgManager", "[config]")
         0,
         "blah",
         {},
-        [&test](emp::optional<emp::vector<std::string>> res){
+        [&test](std::optional<emp::vector<std::string>> res){
           if (!res) test = true;
         }
       )}
