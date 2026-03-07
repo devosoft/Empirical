@@ -4,7 +4,7 @@
 
 A human must ultimately take responsibility for all aspects of library code.
 
-## Rules
+## Project Policies
 
 1. **Human Manager Responsibility:** The human manager is responsible for reviewing and fully understanding all contributed code.
 
