@@ -16,8 +16,6 @@ A human must ultimately take responsibility for all aspects of library code.
 
 5. **Limits on extent of Agentic AI use:** Agentic AI may be used to perform simple maintenance tasks (e.g., figuring out we need to update a version number) but not to generate new core-library source code.
 
-6. **Energy Safeguards for Agentic AI use:** Agentic AI should not be run automatically and there should be restrictions added to ensure it stops promptly if it is not able to solve a problem.
+6. **Energy Safeguards for Agentic AI use:** Agentic AI should not be run automatically without first reaching a consensus among primary developers, and there should be restrictions added to ensure it stops promptly if it is not able to solve a problem.
 
-7. **Research privacy:** Code that has not yet been made public should not be run through an external AI that may add the code to its database.
-
-8. **In-code citations:** Any code that was added via an AI should be clearly marked and ideally include a link to the chat session that generated it.
+7. **In-code citations:** Any code that was added via an AI should be clearly marked and ideally include a link to the chat session that generated it.
