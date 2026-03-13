@@ -4,14 +4,75 @@
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/config/SettingsManager.hpp
- * @brief A simple tool for managing configuration settings.
+ * @brief A flexible manager for named configuration settings with file I/O.
  * @note An older version of this class became SettingCombos.hpp
  * @note Status: Alpha
  *
- * Settings can be either a string of a numerical value (size_t or double).
+ * ## Overview
+ *
+ * `emp::SettingsManager` maintains a collection of named settings, each bound
+ * directly to an external variable.  When a setting is loaded from a file or
+ * set programmatically, the bound variable is updated automatically via a
+ * stored action callback.
+ *
+ * Two kinds of identifiers are supported:
+ *
+ *  - **Settings** – named variables with a fixed type and a single value.
+ *    Supported types are `emp::String`, `bool`, `int`, `size_t`, and `double`.
+ *
+ *  - **Keywords** – special command words that trigger an arbitrary callback
+ *    and receive the remaining tokens on the line as arguments.  They are
+ *    useful for directives that do not follow the `name = value` pattern
+ *    (e.g. `include other_file.cfg;`).
+ *
+ * ## Config-file format
+ *
+ * Files are parsed line-by-line.  Each line has one of the following forms:
+ *
+ * ```
+ * # This is a comment (ignored)
+ *
+ * setting_name = value;        # assign a literal value to a setting
+ * setting_name = other_name;   # copy the current value of another setting
+ * keyword arg1 arg2 ...;       # invoke a keyword with zero or more arguments
+ * ```
+ *
+ * The assignment operator defaults to `=` but can be changed.  Booleans
+ * accept `On`/`Off`/`True`/`False`/`1`/`0` (case-insensitive).  Strings may
+ * be bare identifiers or double-quoted literals with standard escape sequences.
+ * Lines may be terminated by `;` or a newline; blank lines are skipped.
+ *
+ * ## Basic usage
+ *
+ * ```cpp
+ * std::string name = "World";
+ * size_t      reps = 10;
+ * bool        verbose = false;
+ *
+ * emp::SettingsManager cfg;
+ * cfg.AddSetting("name",    name,    "Name to greet",      'n', "name");
+ * cfg.AddSetting("reps",    reps,    "Number of repeats",  'r', "reps");
+ * cfg.AddSetting("verbose", verbose, "Enable verbose mode",'v', "verbose");
+ *
+ * cfg.Load("my_config.cfg"); // updates name, reps, verbose from file
+ * cfg.Save("my_config.cfg"); // writes current values with inline comments
+ * ```
+ *
+ * ## Key methods
+ *
+ *  - `AddSetting(name, var, desc, flag, option)` – register a setting bound
+ *    to `var`; `flag` is a one-character CLI flag, `option` a long-form name.
+ *  - `AddKeyword(keyword, fun, desc)` – register a keyword that invokes `fun`
+ *    with its argument tokens.
+ *  - `Load(filename)` – parse a config file; returns `false` on error.
+ *  - `Save(filename)` – write all settings as a commented config file.
+ *  - `Get<T>(name)` / `Set(name, value)` – programmatic get/set.
+ *  - `HasError()` / `GetError()` – inspect the last load error.
  *
  * DEVELOPER NOTES:
  * - Consider allowing types to be more dynamic, perhaps set in a template.
+ * - Command-line argument parsing (using flag/option fields) is not yet
+ *   implemented; those fields are stored but unused by Load/Save.
  */
 
 #pragma once
@@ -22,9 +83,7 @@
 #include <fstream>
 #include <functional>
 #include <map>
-#include <sstream>
 #include <stddef.h>
-#include <unordered_map>
 #include <variant>
 
 #include "../base/notify.hpp"
@@ -49,7 +108,7 @@ namespace emp {
       emp::String desc   = "";    ///< Description of setting
       char flag          = '\0';  ///< Command-line flag ('\0' for none)
       emp::String option = "";    ///< Command-line longer option ("" for none)
-      std::function<void(const SettingInfo &)> action;  /// Action to take when set.
+      std::function<void(const SettingInfo &)> action;  ///< Action to take when set.
 
       // Helper: convert from string to val_t of current type.
       val_t ParseFromString(emp::String str) const {
@@ -118,6 +177,11 @@ namespace emp {
         return std::holds_alternative<T>(value);
       }
 
+      template <typename T>
+      [[nodiscard]] bool IsUsableType() const {
+        return IsType<std::remove_cvref_t<T>>();
+      }
+
       [[nodiscard]] bool IsString() const { return IsType<emp::String>(); }
       [[nodiscard]] bool IsBool() const { return IsType<bool>(); }
       [[nodiscard]] bool IsInt() const { return IsType<int>(); }
@@ -137,7 +201,7 @@ namespace emp {
       /// Set the value; must maintain current type.
       template <typename T>
       void SetValue(T && val) {
-        emp_assert(IsType<T>(), name);
+        emp_assert(IsUsableType<T>(), name);
         value = std::forward<T>(val);
         if (action) { action(*this); }
       }
@@ -169,7 +233,7 @@ namespace emp {
         return "";
       }
 
-      /// Check the type
+      /// Check the type (return std::string for compatibility with type manager)
       [[nodiscard]] std::string GetTypeName() const {
         if (IsString()) { return "emp::String"; }
         if (IsBool()) { return "bool"; }
@@ -181,9 +245,9 @@ namespace emp {
     }; // END OF SettingInfo definition
 
     struct KeywordInfo {
-      emp::String name;           ///< Label for this setting in config files
+      emp::String name;           ///< Label for this keyword in config files
       keyword_fun_t fun;          ///< Function to call when keyword is triggered
-      emp::String desc   = "";    ///< Description of setting
+      emp::String desc   = "";    ///< Description of keyword
     };
 
     // === MEMBER VARIABLES ===
@@ -195,18 +259,6 @@ namespace emp {
     bool verbose = false;
 
     // === HELPER FUNCTIONS ===
-
-    // template<typename THIS_T>
-    // auto & GetSettingInfo(this THIS_T & self, const emp::String & name) {
-    //   emp_assert(self.HasSetting(name), "Invalid setting name", name);
-    //   return self.setting_map.find(name)->second;
-    // }
-
-    // template<typename THIS_T>
-    // auto & GetKeywordInfo(this THIS_T & self, const emp::String & name) {
-    //   emp_assert(self.HasKeyword(name), "Invalid setting name", name);
-    //   return self.keyword_map.find(name)->second;
-    // }
 
     auto & GetSettingInfo(const emp::String & name) {
       emp_assert(HasSetting(name), "Invalid setting name", name);
@@ -230,6 +282,7 @@ namespace emp {
 
   public:
     void SetVerbose(bool in=true) { verbose = in; }
+    void SetAssignOp(const emp::String & op) { assign_op = op; }
 
     [[nodiscard]] bool HasSetting(const emp::String & name) const {
       return setting_map.contains(name);
@@ -288,11 +341,13 @@ namespace emp {
       return *this;
     }
 
-    void Save(emp::String filename) const {
+    bool Save(const emp::String & filename) {
       std::ofstream ofs(filename);
+      error_note.clear();
       if (!ofs) {
-        notify::Error("Failed to open config file for saving:", filename);
-        return;
+        error_note.Set("Failed to open config file for saving: ", filename);
+        notify::Error(error_note);
+        return false;
       }
 
       for (const auto & [key, info] : setting_map) {
@@ -300,6 +355,8 @@ namespace emp {
         for (const auto & line : lines) { ofs << "# " << line << "\n"; }
         ofs << key << " = " << info.AsLiteral() << ";\n\n";
       }
+
+      return true;
     }
 
     // Load a specified file; return success.
@@ -332,14 +389,14 @@ namespace emp {
         if (verbose) emp::PrintLn("Found initial line token '", name_token.lexeme, "'.");
 
         if (name_token != ident_ID) {
-        if (verbose) emp::PrintLn("Error: Not identifier.");
+          if (verbose) emp::PrintLn("Error: Not identifier.");
           error_note = "UnexpectedToken '" + name_token.lexeme
-                     + "'; expected keyword or parameter name.";
+                        + "'; expected keyword or parameter name.";
           return false;
         }
         const emp::String name = name_token.lexeme;
 
-        // If this line triggering a KEYWORD ?
+        // Test if this line triggers a config KEYWORD; send rest of line as vector of emp::String.
         if (HasKeyword(name)) {
           if (verbose) emp::PrintLn("...identified as keyword!");
           // Grab the rest of the line.
@@ -378,7 +435,6 @@ namespace emp {
           else if (value_token.IsOneOf(bool_on_ID, bool_off_ID, int_ID, double_ID, string_ID)) {
             if (verbose) emp::PrintLn("...being set from literal '", value_token.lexeme, "'.");
             GetSettingInfo(name).SetFromString(value_token.lexeme);
-            continue;
           }
           else {
             // If we made it this far, we don't know how to do the assignment.
