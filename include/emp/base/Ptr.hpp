@@ -1,6 +1,6 @@
 /**
  * This file is part of Empirical, https://github.com/devosoft/Empirical
- * Copyright (C) 2016-2025 Michigan State University
+ * Copyright (C) 2016-2026 Michigan State University
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/base/Ptr.hpp
@@ -379,11 +379,10 @@ namespace emp {
 #ifdef EMP_TRACK_MEM
 
   namespace {
-    // @CAO: Build this for real!
     template <typename FROM, typename TO>
-    constexpr bool PtrIsConvertible(FROM * ptr) {
-      (void) ptr;
-      return true;
+    constexpr bool PtrIsConvertible(FROM *) {
+      if constexpr (std::is_void_v<TO>) return true;
+      else return std::is_convertible_v<FROM*, TO*>;
     }
 
     // Debug information provided for each pointer type.
@@ -883,12 +882,8 @@ namespace emp {
       // Make sure a pointer is active before we write to it.
       emp_assert(Tracker().IsDeleted(id) == false /*, typeid(TYPE).name() */, id);
       emp_assert(Tracker().IsArrayID(id) || id == UNTRACKED_ID, "Only arrays can fill memory.", id);
-      emp_assert(Tracker().GetArrayBytes(id) >= num_bytes,
-                 "Overfilling memory.",
-                 id,
-                 ptr,
-                 sizeof(TYPE),
-                 Tracker().GetArrayBytes(id));
+      emp_assert(Tracker().GetArrayBytes(id) >= num_bytes || id == UNTRACKED_ID,
+           "Overfilling memory.", id, ptr, sizeof(TYPE), Tracker().GetArrayBytes(id));
       emp_assert(ptr != nullptr, "Do not follow a null pointer!");
 
       emp::FillMemory(*this, num_bytes, fill_value);
