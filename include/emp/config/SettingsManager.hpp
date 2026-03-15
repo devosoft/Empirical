@@ -37,10 +37,10 @@
  * keyword arg1 arg2 ...;       # invoke a keyword with zero or more arguments
  * ```
  *
- * The assignment operator defaults to `=` but can be changed.  Booleans
- * accept `On`/`Off`/`True`/`False`/`1`/`0` (case-insensitive).  Strings may
- * be bare identifiers or double-quoted literals with standard escape sequences.
- * Lines may be terminated by `;` or a newline; blank lines are skipped.
+ * Booleans accept `On`/`Off`/`True`/`False`/`1`/`0` (case-insensitive).
+ * Strings may be bare identifiers or double-quoted literals with standard
+ * escape sequences.  Lines may be terminated by `;` or a newline; blank lines
+ * are skipped.
  *
  * ## Basic usage
  *
@@ -254,42 +254,76 @@ namespace emp {
 
     std::map<emp::String, SettingInfo> setting_map;
     std::map<emp::String, KeywordInfo> keyword_map;
-    emp::String assign_op = "=";
+    emp::vector<emp::String> cur_scopes{};
     emp::String error_note;
     bool verbose = false;
 
+    // Build the lexer to load the file.
+    Lexer lexer;
+    const int bool_value_ID;
+    const int ident_ID;
+    const int int_ID;
+    const int double_ID;
+    const int string_ID;
+
+    emp::TokenStream tokens;
+    emp::TokenStream::Iterator it;
+
     // === HELPER FUNCTIONS ===
 
-    auto & GetSettingInfo(const emp::String & name) {
-      emp_assert(HasSetting(name), "Invalid setting name", name);
-      return setting_map.find(name)->second;
+    void PushScope(const emp::String & scope) {
+      emp_assert(scope.size() > 0);
+      cur_scopes.push_back(scope);
     }
 
-    auto & GetKeywordInfo(const emp::String & name) {
-      emp_assert(HasKeyword(name), "Invalid setting name", name);
-      return keyword_map.find(name)->second;
+    emp::String PopScope() {
+      emp_assert(cur_scopes.size() > 0);
+      emp::String back = std::move(cur_scopes.back());
+      cur_scopes.pop_back();
+      return back;
     }
 
-    const auto & GetSettingInfo(const emp::String & name) const {
-      emp_assert(HasSetting(name), "Invalid setting name", name);
-      return setting_map.find(name)->second;
+    emp::String AppendScope(const emp::String & name) const {
+      emp_assert(name.size() > 0);
+      emp::String out;
+      for (emp::String & scope : cur_scopes) {
+        out += scope + '.';
+      }
+      out += name;
+      return out;
     }
 
-    const auto & GetKeywordInfo(const emp::String & name) const {
-      emp_assert(HasKeyword(name), "Invalid setting name", name);
-      return keyword_map.find(name)->second;
+    auto & GetSettingInfo(this auto & self, const emp::String & name) {
+      emp_assert(self.HasSetting(name), "Invalid setting name", name);
+      return self.setting_map.find(self.AppendScope(name))->second;
+    }
+
+    auto & GetKeywordInfo(this auto & self, const emp::String & name) {
+      emp_assert(self.HasKeyword(name), "Invalid setting name", name);
+      return self.keyword_map.find(self.AppendScope(name))->second;
     }
 
   public:
+    SettingsManager()
+      : bool_value_ID(lexer.AddToken("bool_val", "[Oo][Nn]|[Tt][Rr][Uu][Ee]|[Oo][Ff][Ff]|[Ff][Aa][Ll][Ss][Ee]"))
+      , ident_ID(lexer.AddToken("identifier", "[a-zA-Z_][a-zA-Z0-9_.]*"))
+      , int_ID(lexer.AddToken("int", "[0-9]+"))
+      , double_ID(lexer.AddToken("double", "[0-9]+\\.[0-9]+"))
+      , string_ID(lexer.AddToken("string", "(\\\"([^\"\\\\]|(\\\\.))*\\\")"))
+    {
+      lexer.IgnoreToken("whitespace", "[ \\t\\r]+");
+      lexer.IgnoreToken("comment", "#.+");
+      lexer.IgnoreToken("continue_line", "\\\\[ ]*\\n");
+    }
+
     void SetVerbose(bool in=true) { verbose = in; }
-    void SetAssignOp(const emp::String & op) { assign_op = op; }
 
     [[nodiscard]] bool HasSetting(const emp::String & name) const {
-      return setting_map.contains(name);
+      return setting_map.contains(AppendScope(name));
     }
 
     [[nodiscard]] bool HasKeyword(const emp::String & name) const {
-      return keyword_map.contains(name);
+      return keyword_map.contains(AppendScope(name));
     }
 
     [[nodiscard]] bool HasIdentifier(const emp::String & name) const {
@@ -326,8 +360,10 @@ namespace emp {
                                  emp::String desc,
                                  char flag          = '\0',
                                  emp::String option = "") {
-      emp_assert(!HasSetting(name), "Trying to add a SettingsManager setting that already exists", name);
-      setting_map.emplace(name, SettingInfo{name, value, desc, flag, option});
+      emp_assert(!HasSetting(name), "Trying to add a SettingsManager setting that already exists",
+                 AppendScope(name));
+      const emp::String full_name = AppendScope(name);
+      setting_map.emplace(full_name, SettingInfo{full_name, value, desc, flag, option});
       return *this;
     }
 
@@ -359,106 +395,108 @@ namespace emp {
       return true;
     }
 
-    // Load a specified file; return success.
-    bool Load(const std::string & filename) {
-      // Build the lexer to load the file.
-      Lexer lexer;
-      const int bool_on_ID  = lexer.AddToken("bool_on", "[Oo][Nn]|[Tt][Rr][Uu][Ee]");
-      const int bool_off_ID = lexer.AddToken("bool_off", "[Oo][Ff][Ff]|[Ff][Aa][Ll][Ss][Ee]");
-      const int ident_ID    = lexer.AddToken("identifier", "[a-zA-Z_][a-zA-Z0-9_]*");
-      const int int_ID      = lexer.AddToken("int", "[0-9]+");
-      const int double_ID   = lexer.AddToken("double", "[0-9]+\\.[0-9]+");
-      const int string_ID   = lexer.AddToken("string", "(\\\"([^\"\\\\]|(\\\\.))*\\\")");
-      const int assign_ID   = lexer.AddToken("assign", assign_op.AsLiteral());
-      const int endline_ID  = lexer.AddToken("endline", "[;\n]");
-      lexer.IgnoreToken("whitespace", "[ \\t\\r]+");
-      lexer.IgnoreToken("comment", "#.+");
-      // const int error_ID = lexer.AddToken("error", ".");
+    [[nodiscard]] bool IsEndLine(int id) { return id == ';' || id == '\n'; }
 
-      // Load in the tokens from the provided file.
-      auto tokens = lexer.TokenizeFile(filename);
-      auto it     = tokens.begin();
+    /// Trigger an error that prints of verbose and stores an error note.
+    bool IOError(auto... args) {
+      error_note = emp::MakeString(args...);
+      if (verbose) emp::PrintLn(error_note);
+      return false;
+    }
+
+    /// Use the next token if it's the right type; return false if not.
+    [[nodiscard]] bool RequireToken(int token_id, const emp::String & name) {
+      const Token cur_token = it.Use();
+      if (cur_token != token_id) {
+        return IOError("UnexpectedToken '", cur_token.lexeme, "'; expected ", name, ".");
+      }
+
+      return true;
+    }
+
+    /// We found a keyword during a load; load all arguments and trigger it.
+    [[nodiscard]] bool LoadKeyword(const emp::String & keyword) {
+      if (verbose) emp::PrintLn("...identified as keyword!");
+      // Grab the rest of the line.
+      emp::vector<emp::String> keyword_vars;
+      while (it.IsValid() && !(IsEndLine(it.Peek()))) {
+        keyword_vars.push_back(it.Use().lexeme);
+      }
+      GetKeywordInfo(keyword).fun(keyword_vars);
+      return true;
+    }
+
+    std::optional<emp::String> TokenToStringValue(const Token & token) {
+      // If literal value, use it directly.
+      if (token.IsOneOf(bool_value_ID, int_ID, double_ID, string_ID)) {
+        return token.lexeme;
+      }
+
+      // If identifier, look it up.
+      if (token == ident_ID) {
+        if (HasSetting(token.lexeme)) {
+          return GetSettingInfo(token.lexeme).AsLiteral();
+        }
+        IOError("Identifier '", token.lexeme, "' UNKNOWN!");
+      }
+
+      // If we made it this far, we don't know how to do the conversion.
+      IOError("UnexpectedToken '", token.lexeme, "'; expected value.");
+      return std::nullopt;
+    }
+
+    // We have found a setting name at the beginning of a line; load it!
+    [[nodiscard]] bool LoadSetting(const emp::String & name) {
+      if (verbose) emp::PrintLn("...identified as setting!");
+
+        // setting name must be followed by an '='
+        if (!RequireToken('=', "assignment")) return false;
+
+      std::optional<emp::String> string_val = TokenToStringValue(it.Use());
+      if (string_val) {
+        GetSettingInfo(name).SetFromString(*string_val);
+        return true;
+      }
+      return false;
+    }
+
+    [[nodiscard]] bool LoadScope(const emp::String & name) {
+      // Scopes must be opened with a '{'
+      if (!RequireToken('{', "open scope")) return false;
+      PushScope(name);
+
+      while (it.Any() && it.Peek() != '}') LoadLine(it);
+
+      PopScope();
+      if (!RequireToken('}', "close scope")) return false;
+
+      return true;
+    }
+
+    // Load a single line starting from the current token iterator.
+    bool LoadLine(emp::TokenStream::Iterator it) {
+      // Skip any extra lines.
+      if (IsEndLine(it.Peek())) { ++it; return true; }
+
+      const Token name_token = it.Use();
+      if (verbose) emp::PrintLn("Found initial line token '", name_token.lexeme, "'.");
+
+      if (name_token != ident_ID) {
+        return IOError("UnexpectedToken '", name_token.lexeme, "'; expected keyword or parameter name.");
+      }
+      const emp::String name = name_token.lexeme;
+      if (HasKeyword(name)) { return LoadKeyword(name); }
+      if (HasSetting(name)) { return LoadSetting(name); }
+      return LoadScope(name); // Unknown id must be a new scope.
+    }
+
+    // Load a specified file; return success.
+    bool Load(const std::string & filename) {      
+      tokens = lexer.TokenizeFile(filename);
+      it = tokens.begin();
       error_note.clear();
 
-      // Loop line-by-line processing the input file.
-      while (it.Any()) {
-        // Skip any extra lines.
-        if (it.Is(endline_ID)) { ++it; continue; }
-
-        const Token name_token = it.Use();
-        if (verbose) emp::PrintLn("Found initial line token '", name_token.lexeme, "'.");
-
-        if (name_token != ident_ID) {
-          if (verbose) emp::PrintLn("Error: Not identifier.");
-          error_note = "UnexpectedToken '" + name_token.lexeme
-                        + "'; expected keyword or parameter name.";
-          return false;
-        }
-        const emp::String name = name_token.lexeme;
-
-        // Test if this line triggers a config KEYWORD; send rest of line as vector of emp::String.
-        if (HasKeyword(name)) {
-          if (verbose) emp::PrintLn("...identified as keyword!");
-          // Grab the rest of the line.
-          emp::vector<emp::String> keyword_vars;
-          while (it.IsValid() && !it.Is(endline_ID)) {
-            keyword_vars.push_back(it.Use().lexeme);
-          }
-          GetKeywordInfo(name).fun(keyword_vars);
-        }
-
-        // Is this line configuring a SETTING ?
-        else if (HasSetting(name)) {
-          if (verbose) emp::PrintLn("...identified as setting!");
-
-          const Token op_token = it.Use();
-
-          // setting name must be followed by an '='
-          if (op_token != assign_ID) {
-            if (verbose) emp::PrintLn("...expected assignment, but found '", op_token.lexeme, "'.");
-            error_note = "UnexpectedToken '" + op_token.lexeme + "'; expected '" + assign_op + "'.";
-            return false;
-          }
-
-          // Next, we must have the value for that setting.
-          const Token value_token = it.Use();
-          if (value_token == ident_ID) {
-            if (verbose) emp::PrintLn("...being set to identifier '", value_token.lexeme, "'.");
-            // Set equal to another identifier.
-            if (!setting_map.contains(value_token.lexeme)) {
-              if (verbose) emp::PrintLn("Identifier '", value_token.lexeme, "' UNKNOWN!");
-              error_note = "Setting to unknown configuration variable, '" + value_token.lexeme + "'.";
-              return false;
-            }
-            GetSettingInfo(name).SetFromString(GetSettingInfo(value_token.lexeme).AsLiteral());
-          }
-          else if (value_token.IsOneOf(bool_on_ID, bool_off_ID, int_ID, double_ID, string_ID)) {
-            if (verbose) emp::PrintLn("...being set from literal '", value_token.lexeme, "'.");
-            GetSettingInfo(name).SetFromString(value_token.lexeme);
-          }
-          else {
-            // If we made it this far, we don't know how to do the assignment.
-            if (verbose) emp::PrintLn("...being set to something unknown '", value_token.lexeme, "'.");
-            error_note = "UnexpectedToken '" + value_token.lexeme + "'; expected assignment value.";
-            return false;
-          }
-        }
-        else {
-          if (verbose) emp::PrintLn("...unknown!");
-          error_note = "Unknown keyword or configuration setting, '" + name + "'.";
-          return false;
-        }
-
-        // Each line must end in a newline (or end of file)
-        if (it.Any()) {
-          const Token el_token = it.Use();
-          if (el_token != endline_ID) {
-            if (verbose) emp::PrintLn("...does not terminate in an endline!");
-            error_note = "UnexpectedToken '" + el_token.lexeme + "'; expected end of line.";
-            return false;
-          }
-        }
-      }
+      while (it.Any()) LoadLine(it);
 
       return true;
     }
