@@ -83,6 +83,7 @@
 #include <fstream>
 #include <functional>
 #include <map>
+#include <optional>
 #include <stddef.h>
 #include <variant>
 
@@ -286,7 +287,7 @@ namespace emp {
     emp::String AppendScope(const emp::String & name) const {
       emp_assert(name.size() > 0);
       emp::String out;
-      for (emp::String & scope : cur_scopes) {
+      for (const emp::String & scope : cur_scopes) {
         out += scope + '.';
       }
       out += name;
@@ -300,7 +301,110 @@ namespace emp {
 
     auto & GetKeywordInfo(this auto & self, const emp::String & name) {
       emp_assert(self.HasKeyword(name), "Invalid setting name", name);
-      return self.keyword_map.find(self.AppendScope(name))->second;
+      return self.keyword_map.find(name)->second;
+    }
+
+    // === Direct parsing helpers ===
+
+    [[nodiscard]] bool IsEndLine(int id) const { return id == ';' || id == '\n'; }
+
+    /// Trigger an error that prints of verbose and stores an error note.
+    bool IOError(auto... args) {
+      error_note = emp::MakeString(args...);
+      if (verbose) emp::PrintLn(error_note);
+      return false;
+    }
+
+    /// Use the next token if it's the right type; return false if not.
+    [[nodiscard]] bool RequireToken(int token_id, const emp::String & name) {
+      const Token cur_token = it.Use();
+      if (cur_token != token_id) {
+        return IOError("UnexpectedToken '", cur_token.lexeme, "'; expected ", name, ".");
+      }
+
+      return true;
+    }
+
+    /// We found a keyword during a load; load all arguments and trigger it.
+    [[nodiscard]] bool LoadKeyword(const emp::String & keyword) {
+      if (verbose) emp::PrintLn("...identified as keyword!");
+      // Grab the rest of the line.
+      emp::vector<emp::String> keyword_vars;
+      while (it.IsValid() && !(IsEndLine(it.Peek()))) {
+        keyword_vars.push_back(it.Use().lexeme);
+      }
+      GetKeywordInfo(keyword).fun(keyword_vars);
+      return true;
+    }
+
+    std::optional<emp::String> TokenToStringValue(const Token & token) {
+      // If literal value, use it directly.
+      if (token.IsOneOf(bool_value_ID, int_ID, double_ID, string_ID)) {
+        return token.lexeme;
+      }
+
+      // If identifier, look it up.
+      if (token == ident_ID) {
+        if (HasSetting(token.lexeme)) {
+          return GetSettingInfo(token.lexeme).AsLiteral();
+        }
+        IOError("Identifier '", token.lexeme, "' UNKNOWN!");
+        return std::nullopt;
+      }
+
+      // If we made it this far, we don't know how to do the conversion.
+      IOError("UnexpectedToken '", token.lexeme, "'; expected value.");
+      return std::nullopt;
+    }
+
+    // We have found a setting name at the beginning of a line; load it!
+    [[nodiscard]] bool LoadSetting(const emp::String & name) {
+      if (verbose) emp::PrintLn("...identified as setting!");
+
+        // setting name must be followed by an '='
+        if (!RequireToken('=', "assignment")) return false;
+
+      std::optional<emp::String> string_val = TokenToStringValue(it.Use());
+      if (string_val) {
+        GetSettingInfo(name).SetFromString(*string_val);
+        return true;
+      }
+      return false;
+    }
+
+    [[nodiscard]] bool LoadScope(const emp::String & name) {
+      // Scopes must be opened with a '{'
+      if (!RequireToken('{', "open scope")) return false;
+      PushScope(name);
+
+      while (it.Any() && it.Peek() != '}') {
+        if (!LoadLine()) {
+          PopScope();
+          return false;
+        }
+      }
+
+      PopScope();
+      if (!RequireToken('}', "close scope")) return false;
+
+      return true;
+    }
+
+    // Load a single line starting from the current token iterator.
+    bool LoadLine() {
+      // Skip any extra lines.
+      if (IsEndLine(it.Peek())) { ++it; return true; }
+
+      const Token name_token = it.Use();
+      if (verbose) emp::PrintLn("Found initial line token '", name_token.lexeme, "'.");
+
+      if (name_token != ident_ID) {
+        return IOError("UnexpectedToken '", name_token.lexeme, "'; expected keyword or parameter name.");
+      }
+      const emp::String name = name_token.lexeme;
+      if (HasKeyword(name)) { return LoadKeyword(name); }
+      if (HasSetting(name)) { return LoadSetting(name); }
+      return LoadScope(name); // Unknown id must be a new scope.
     }
 
   public:
@@ -323,7 +427,7 @@ namespace emp {
     }
 
     [[nodiscard]] bool HasKeyword(const emp::String & name) const {
-      return keyword_map.contains(AppendScope(name));
+      return keyword_map.contains(name);
     }
 
     [[nodiscard]] bool HasIdentifier(const emp::String & name) const {
@@ -395,108 +499,15 @@ namespace emp {
       return true;
     }
 
-    [[nodiscard]] bool IsEndLine(int id) { return id == ';' || id == '\n'; }
-
-    /// Trigger an error that prints of verbose and stores an error note.
-    bool IOError(auto... args) {
-      error_note = emp::MakeString(args...);
-      if (verbose) emp::PrintLn(error_note);
-      return false;
-    }
-
-    /// Use the next token if it's the right type; return false if not.
-    [[nodiscard]] bool RequireToken(int token_id, const emp::String & name) {
-      const Token cur_token = it.Use();
-      if (cur_token != token_id) {
-        return IOError("UnexpectedToken '", cur_token.lexeme, "'; expected ", name, ".");
-      }
-
-      return true;
-    }
-
-    /// We found a keyword during a load; load all arguments and trigger it.
-    [[nodiscard]] bool LoadKeyword(const emp::String & keyword) {
-      if (verbose) emp::PrintLn("...identified as keyword!");
-      // Grab the rest of the line.
-      emp::vector<emp::String> keyword_vars;
-      while (it.IsValid() && !(IsEndLine(it.Peek()))) {
-        keyword_vars.push_back(it.Use().lexeme);
-      }
-      GetKeywordInfo(keyword).fun(keyword_vars);
-      return true;
-    }
-
-    std::optional<emp::String> TokenToStringValue(const Token & token) {
-      // If literal value, use it directly.
-      if (token.IsOneOf(bool_value_ID, int_ID, double_ID, string_ID)) {
-        return token.lexeme;
-      }
-
-      // If identifier, look it up.
-      if (token == ident_ID) {
-        if (HasSetting(token.lexeme)) {
-          return GetSettingInfo(token.lexeme).AsLiteral();
-        }
-        IOError("Identifier '", token.lexeme, "' UNKNOWN!");
-      }
-
-      // If we made it this far, we don't know how to do the conversion.
-      IOError("UnexpectedToken '", token.lexeme, "'; expected value.");
-      return std::nullopt;
-    }
-
-    // We have found a setting name at the beginning of a line; load it!
-    [[nodiscard]] bool LoadSetting(const emp::String & name) {
-      if (verbose) emp::PrintLn("...identified as setting!");
-
-        // setting name must be followed by an '='
-        if (!RequireToken('=', "assignment")) return false;
-
-      std::optional<emp::String> string_val = TokenToStringValue(it.Use());
-      if (string_val) {
-        GetSettingInfo(name).SetFromString(*string_val);
-        return true;
-      }
-      return false;
-    }
-
-    [[nodiscard]] bool LoadScope(const emp::String & name) {
-      // Scopes must be opened with a '{'
-      if (!RequireToken('{', "open scope")) return false;
-      PushScope(name);
-
-      while (it.Any() && it.Peek() != '}') LoadLine(it);
-
-      PopScope();
-      if (!RequireToken('}', "close scope")) return false;
-
-      return true;
-    }
-
-    // Load a single line starting from the current token iterator.
-    bool LoadLine(emp::TokenStream::Iterator it) {
-      // Skip any extra lines.
-      if (IsEndLine(it.Peek())) { ++it; return true; }
-
-      const Token name_token = it.Use();
-      if (verbose) emp::PrintLn("Found initial line token '", name_token.lexeme, "'.");
-
-      if (name_token != ident_ID) {
-        return IOError("UnexpectedToken '", name_token.lexeme, "'; expected keyword or parameter name.");
-      }
-      const emp::String name = name_token.lexeme;
-      if (HasKeyword(name)) { return LoadKeyword(name); }
-      if (HasSetting(name)) { return LoadSetting(name); }
-      return LoadScope(name); // Unknown id must be a new scope.
-    }
-
     // Load a specified file; return success.
-    bool Load(const std::string & filename) {      
+    bool Load(const emp::String & filename) {
       tokens = lexer.TokenizeFile(filename);
       it = tokens.begin();
       error_note.clear();
 
-      while (it.Any()) LoadLine(it);
+      while (it.Any()) {
+        if (!LoadLine()) return false;
+      }
 
       return true;
     }
