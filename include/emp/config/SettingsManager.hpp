@@ -1,6 +1,6 @@
 /**
  * This file is part of Empirical, https://github.com/devosoft/Empirical
- * Copyright (C) 2025 Michigan State University
+ * Copyright (C) 2025-2026 Michigan State University
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/config/SettingsManager.hpp
@@ -15,6 +15,11 @@
  * set programmatically, the bound variable is updated automatically via a
  * stored action callback.
  *
+ * Settings can be organized into **scopes** using dot-notation names
+ * (e.g. `"robot1.speed"`).  This makes it straightforward to configure
+ * multiple objects of the same type without name collisions.  Internally
+ * all settings are stored with their full dotted key.
+ *
  * Two kinds of identifiers are supported:
  *
  *  - **Settings** – named variables with a fixed type and a single value.
@@ -23,7 +28,8 @@
  *  - **Keywords** – special command words that trigger an arbitrary callback
  *    and receive the remaining tokens on the line as arguments.  They are
  *    useful for directives that do not follow the `name = value` pattern
- *    (e.g. `include other_file.cfg;`).
+ *    (e.g. `include other_file.cfg;`).  Keywords are always global; they are
+ *    not affected by the current scope.
  *
  * ## Config-file format
  *
@@ -32,15 +38,24 @@
  * ```
  * # This is a comment (ignored)
  *
- * setting_name = value;        # assign a literal value to a setting
- * setting_name = other_name;   # copy the current value of another setting
- * keyword arg1 arg2 ...;       # invoke a keyword with zero or more arguments
+ * setting_name = value;          # assign a literal value to a setting
+ * setting_name = other_name;     # copy the current value of another setting
+ * keyword arg1 arg2 ...;         # invoke a keyword with zero or more arguments
+ *
+ * scope.setting = value;         # dot-notation: assign a scoped setting directly
+ *
+ * scope_name {                   # brace-block: enter a scope
+ *   setting = value;             #   all names inside are prefixed with scope_name
+ *   inner { setting = value; }   #   scopes may nest arbitrarily
+ * }
  * ```
  *
- * Booleans accept `On`/`Off`/`True`/`False`/`1`/`0` (case-insensitive).
- * Strings may be bare identifiers or double-quoted literals with standard
- * escape sequences.  Lines may be terminated by `;` or a newline; blank lines
- * are skipped.
+ * Dot notation and brace-block notation may be freely mixed in the same file.
+ * A trailing `\` at the end of a line continues onto the next line (the
+ * newline is ignored).  Booleans accept `On`/`Off`/`True`/`False`/`1`/`0`
+ * (case-insensitive).  Strings may be bare identifiers or double-quoted
+ * literals with standard C escape sequences.  Lines may be terminated by `;`
+ * or a newline; blank lines and comment-only lines are skipped.
  *
  * ## Basic usage
  *
@@ -48,31 +63,48 @@
  * std::string name = "World";
  * size_t      reps = 10;
  * bool        verbose = false;
+ * int         r1_speed = 0, r2_speed = 0;
  *
  * emp::SettingsManager cfg;
- * cfg.AddSetting("name",    name,    "Name to greet",      'n', "name");
- * cfg.AddSetting("reps",    reps,    "Number of repeats",  'r', "reps");
- * cfg.AddSetting("verbose", verbose, "Enable verbose mode",'v', "verbose");
+ * cfg.AddSetting("name",         name,     "Name to greet",      'n', "name");
+ * cfg.AddSetting("reps",         reps,     "Number of repeats",  'r', "reps");
+ * cfg.AddSetting("verbose",      verbose,  "Enable verbose mode",'v', "verbose");
+ * cfg.AddSetting("robot1.speed", r1_speed, "Robot 1 speed");
+ * cfg.AddSetting("robot2.speed", r2_speed, "Robot 2 speed");
  *
- * cfg.Load("my_config.cfg"); // updates name, reps, verbose from file
- * cfg.Save("my_config.cfg"); // writes current values with inline comments
+ * cfg.Load("my_config.cfg");    // updates variables from file
+ * cfg.Save("my_config.cfg");    // writes current values with description comments
+ *
+ * // Apply settings from command-line arguments (e.g. -s "reps = 5")
+ * emp::vector<emp::String> args(argv, argv + argc);
+ * cfg.LoadArgs(args);
  * ```
  *
  * ## Key methods
  *
- *  - `AddSetting(name, var, desc, flag, option)` – register a setting bound
- *    to `var`; `flag` is a one-character CLI flag, `option` a long-form name.
+ *  - `AddSetting(name, var, desc [, flag [, option]])` – register a setting
+ *    bound to `var`; `flag` is a one-character CLI flag (optional),
+ *    `option` a long-form name (optional).  Returns `*this` for chaining.
  *  - `AddKeyword(keyword, fun, desc)` – register a keyword that invokes `fun`
- *    with its argument tokens.
- *  - `Load(filename)` – parse a config file; returns `false` on error.
- *  - `Save(filename)` – write all settings as a commented config file.
+ *    with its argument tokens.  Returns `*this` for chaining.
+ *  - `Load(istream&)` / `Load(filename)` – parse settings; returns `false` on
+ *    error.  Multiple calls accumulate; later values override earlier ones.
+ *  - `LoadArgs(args [, erase_on_use])` – scan a `vector<emp::String>` of
+ *    command-line arguments and apply each `-s`/`--set` value string.  When
+ *    `erase_on_use` is `true` the flag and value are removed from `args`.
+ *  - `Save(ostream&)` / `Save(filename)` – write all settings as a commented
+ *    config file; returns `false` on error.
  *  - `Get<T>(name)` / `Set(name, value)` – programmatic get/set.
- *  - `HasError()` / `GetError()` – inspect the last load error.
+ *  - `HasSetting(name)` / `HasKeyword(name)` / `HasIdentifier(name)` – query
+ *    whether a name is registered.
+ *  - `HasError()` / `GetError()` – inspect the last error message.
+ *  - `SetVerbose()` – enable diagnostic printing during Load/Save.
  *
  * DEVELOPER NOTES:
  * - Consider allowing types to be more dynamic, perhaps set in a template.
- * - Command-line argument parsing (using flag/option fields) is not yet
- *   implemented; those fields are stored but unused by Load/Save.
+ * - The `flag` and `option` fields in `AddSetting` are stored and queryable
+ *   but are not yet used automatically by `LoadArgs`; that function currently
+ *   only recognizes the hard-coded `-s`/`--set` syntax.
  */
 
 #pragma once
@@ -134,45 +166,14 @@ namespace emp {
       SettingInfo(const SettingInfo &) = default;
       SettingInfo(SettingInfo &&)      = default;
 
+      template <typename T>
       SettingInfo(emp::String name,
-                  emp::String & var,
+                  T & var,
                   emp::String desc,
                   char flag          = '\0',
                   emp::String option = "")
         : name(name), value(var), desc(desc), flag(flag), option(option)
-        , action([&var](const SettingInfo & info) { var = info.GetValue<emp::String>(); }) {}
-
-      SettingInfo(emp::String name,
-                  bool & var,
-                  emp::String desc,
-                  char flag          = '\0',
-                  emp::String option = "")
-        : name(name), value(var), desc(desc), flag(flag), option(option)
-        , action([&var](const SettingInfo & info) { var = info.GetValue<bool>(); }) {}
-
-      SettingInfo(emp::String name,
-                  int & var,
-                  emp::String desc,
-                  char flag          = '\0',
-                  emp::String option = "")
-        : name(name), value(var), desc(desc), flag(flag), option(option)
-        , action([&var](const SettingInfo & info) { var = info.GetValue<int>(); }) {}
-
-      SettingInfo(emp::String name,
-                  size_t & var,
-                  emp::String desc,
-                  char flag          = '\0',
-                  emp::String option = "")
-        : name(name), value(var), desc(desc), flag(flag), option(option)
-        , action([&var](const SettingInfo & info) { var = info.GetValue<size_t>(); }) {}
-
-      SettingInfo(emp::String name,
-                  double & var,
-                  emp::String desc,
-                  char flag          = '\0',
-                  emp::String option = "")
-        : name(name), value(var), desc(desc), flag(flag), option(option)
-        , action([&var](const SettingInfo & info) { var = info.GetValue<double>(); }) {}
+        , action([&var](const SettingInfo & info) { var = info.GetValue<T>(); }) {}
 
       template <typename T>
       [[nodiscard]] bool IsType() const {
