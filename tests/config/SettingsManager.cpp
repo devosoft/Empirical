@@ -1,7 +1,7 @@
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
- *  date: 2021
+ *  date: 2026
 */
 /**
  *  @file
@@ -9,8 +9,257 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
+#include <sstream>
+
 #include "emp/config/SettingsManager.hpp"
 
-TEST_CASE("Test SettingManager", "[config]")
+TEST_CASE("Test SettingsManager", "[config]")
 {
+  // AddSetting registers settings; HasSetting and Get work for all types
+  {
+    emp::SettingsManager cfg;
+    int i = 3;
+    double d = 1.5;
+    bool b = true;
+    emp::String s = "hello";
+    size_t n = 10;
+
+    cfg.AddSetting("i", i, "an int",    'i', "int-val")
+       .AddSetting("d", d, "a double")
+       .AddSetting("b", b, "a bool")
+       .AddSetting("s", s, "a string")
+       .AddSetting("n", n, "a size_t");
+
+    REQUIRE(cfg.HasSetting("i"));
+    REQUIRE(cfg.HasSetting("d"));
+    REQUIRE(cfg.HasSetting("b"));
+    REQUIRE(cfg.HasSetting("s"));
+    REQUIRE(cfg.HasSetting("n"));
+    REQUIRE(!cfg.HasSetting("missing"));
+
+    REQUIRE(cfg.Get<int>("i")          == 3);
+    REQUIRE(cfg.Get<double>("d")       == 1.5);
+    REQUIRE(cfg.Get<bool>("b")         == true);
+    REQUIRE(cfg.Get<emp::String>("s")  == "hello");
+    REQUIRE(cfg.Get<size_t>("n")       == 10);
+
+    REQUIRE(cfg.GetDesc("i")   == "an int");
+    REQUIRE(cfg.GetFlag("i")   == 'i');
+    REQUIRE(cfg.GetOption("i") == "int-val");
+  }
+
+  // Set() updates both the internal value and the bound variable
+  {
+    emp::SettingsManager cfg;
+    int x = 0;
+    cfg.AddSetting("x", x, "int");
+
+    cfg.Set("x", 42);
+    REQUIRE(cfg.Get<int>("x") == 42);
+    REQUIRE(x == 42);
+  }
+
+  // Load from stream: basic assignment of each supported type
+  {
+    emp::SettingsManager cfg;
+    int i = 0;
+    double d = 0.0;
+    emp::String s = "";
+    size_t n = 0;
+
+    cfg.AddSetting("i", i, "int")
+       .AddSetting("d", d, "double")
+       .AddSetting("s", s, "string")
+       .AddSetting("n", n, "size_t");
+
+    std::istringstream is(
+      "i = 7;\n"
+      "d = 2.5;\n"
+      "s = \"hello world\";\n"
+      "n = 100;\n"
+    );
+    REQUIRE(cfg.Load(is));
+    REQUIRE(!cfg.HasError());
+    REQUIRE(i == 7);
+    REQUIRE(d == 2.5);
+    REQUIRE(s == "hello world");
+    REQUIRE(n == 100);
+  }
+
+  // Load: boolean literals (On/Off/True/False/1/0, case-insensitive)
+  {
+    emp::SettingsManager cfg;
+    // cfg.SetVerbose();
+    bool on_var = false, tr = false, off_var = true, fa = true, one = false, zero = true;
+
+    cfg.AddSetting("on_v",  on_var, "bool")
+       .AddSetting("tr",    tr,     "bool")
+       .AddSetting("off_v", off_var,    "bool")
+       .AddSetting("fa",    fa,     "bool")
+       .AddSetting("one",   one,    "bool")
+       .AddSetting("zero",  zero,   "bool");
+
+    std::istringstream is("on_v = On\ntr = True\noff_v = Off\nfa = False\none = 1\nzero = 0\n");
+    REQUIRE(cfg.Load(is));
+    REQUIRE(on_var  == true);
+    REQUIRE(tr      == true);
+    REQUIRE(off_var == false);
+    REQUIRE(fa      == false);
+    REQUIRE(one     == true);
+    REQUIRE(zero    == false);
+  }
+
+  // Load: setting-to-setting copy (identifier on right-hand side)
+  {
+    emp::SettingsManager cfg;
+    int a = 99, b = 0;
+    cfg.AddSetting("a", a, "source")
+       .AddSetting("b", b, "dest");
+
+    std::istringstream is("b = a\n");
+    REQUIRE(cfg.Load(is));
+    REQUIRE(b == 99);
+  }
+
+  // Load: comments and blank lines are skipped
+  {
+    emp::SettingsManager cfg;
+    int x = 0;
+    cfg.AddSetting("x", x, "int");
+
+    std::istringstream is(
+      "# this is a comment\n"
+      "\n"
+      "x = 7  # inline comment\n"
+    );
+    REQUIRE(cfg.Load(is));
+    REQUIRE(x == 7);
+  }
+
+  // Load: multiple loads accumulate (second load overrides first)
+  {
+    emp::SettingsManager cfg;
+    int x = 0;
+    cfg.AddSetting("x", x, "int");
+
+    std::istringstream is1("x = 10\n");
+    REQUIRE(cfg.Load(is1));
+    REQUIRE(x == 10);
+
+    std::istringstream is2("x = 20\n");
+    REQUIRE(cfg.Load(is2));
+    REQUIRE(x == 20);
+  }
+
+  // AddKeyword: keyword fires callback with remaining line tokens
+  {
+    emp::SettingsManager cfg;
+    emp::String captured = "";
+
+    cfg.AddKeyword("greet", [&captured](emp::vector<emp::String> args) {
+      captured = args.empty() ? "" : args[0];
+    }, "test keyword");
+
+    REQUIRE(cfg.HasKeyword("greet"));
+    REQUIRE(cfg.HasIdentifier("greet"));
+    REQUIRE(!cfg.HasSetting("greet"));
+
+    std::istringstream is("greet world\n");
+    REQUIRE(cfg.Load(is));
+    REQUIRE(captured == "world");
+  }
+
+  // Scopes: dot-notation registers and loads scoped settings
+  {
+    emp::SettingsManager cfg;
+    int s1 = 0, s2 = 0;
+    cfg.AddSetting("robot1.speed", s1, "robot1 speed")
+       .AddSetting("robot2.speed", s2, "robot2 speed");
+
+    std::istringstream is("robot1.speed = 10\nrobot2.speed = 20\n");
+    REQUIRE(cfg.Load(is));
+    REQUIRE(s1 == 10);
+    REQUIRE(s2 == 20);
+  }
+
+  // Scopes: brace-block syntax is equivalent to dot notation
+  {
+    emp::SettingsManager cfg;
+    int s1 = 0, s2 = 0;
+    cfg.AddSetting("robot1.speed", s1, "robot1 speed")
+       .AddSetting("robot2.speed", s2, "robot2 speed");
+
+    std::istringstream is("robot1 { speed = 10; }\nrobot2 { speed = 20; }\n");
+    REQUIRE(cfg.Load(is));
+    REQUIRE(s1 == 10);
+    REQUIRE(s2 == 20);
+  }
+
+  // Scopes: dot notation and brace syntax can be mixed in the same file
+  {
+    emp::SettingsManager cfg;
+    int s1 = 0, s2 = 0;
+    cfg.AddSetting("robot1.speed", s1, "robot1 speed")
+       .AddSetting("robot2.speed", s2, "robot2 speed");
+
+    std::istringstream is("robot1.speed = 5\nrobot2 { speed = 15; }\n");
+    REQUIRE(cfg.Load(is));
+    REQUIRE(s1 == 5);
+    REQUIRE(s2 == 15);
+  }
+
+  // Scopes: nested brace blocks
+  {
+    emp::SettingsManager cfg;
+    int val = 0;
+    cfg.AddSetting("outer.inner.val", val, "nested value");
+
+    std::istringstream is("outer { inner { val = 99; } }\n");
+    REQUIRE(cfg.Load(is));
+    REQUIRE(val == 99);
+  }
+
+  // Error: unknown identifier returns false and sets error
+  {
+    emp::SettingsManager cfg;
+    std::istringstream is("unknown_setting = 5\n");
+    REQUIRE(!cfg.Load(is));
+    REQUIRE(cfg.HasError());
+    REQUIRE(cfg.GetError().size() > 0);
+  }
+
+  // Error: load nonexistent file returns false and sets error
+  {
+    emp::SettingsManager cfg;
+    REQUIRE(!cfg.Load("this_file_does_not_exist_12345.cfg"));
+    REQUIRE(cfg.HasError());
+  }
+
+  // Save and reload: round-trip preserves all values
+  {
+    emp::SettingsManager cfg;
+    int i = 42;
+    bool b = true;
+    emp::String s = "saved";
+
+    cfg.AddSetting("i", i, "int")
+       .AddSetting("b", b, "bool")
+       .AddSetting("s", s, "string");
+
+    const std::string tmp = "/tmp/emp_settings_manager_test.cfg";
+    REQUIRE(cfg.Save(tmp));
+
+    int i2 = 0;
+    bool b2 = false;
+    emp::String s2 = "";
+    emp::SettingsManager cfg2;
+    cfg2.AddSetting("i", i2, "int")
+        .AddSetting("b", b2, "bool")
+        .AddSetting("s", s2, "string");
+
+    REQUIRE(cfg2.Load(tmp));
+    REQUIRE(i2 == 42);
+    REQUIRE(b2 == true);
+    REQUIRE(s2 == "saved");
+  }
 }
