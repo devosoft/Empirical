@@ -28,6 +28,7 @@ namespace emp {
     emp::vector<Token> tokens;
 
   public:
+    TokenStream() = default;
     TokenStream(const String & in_name) : name(in_name) {}
 
     TokenStream(const TokenStream &) = default;
@@ -46,10 +47,11 @@ namespace emp {
 
     class Iterator {
     private:
-      emp::Ptr<const TokenStream> ts;
-      size_t pos;
+      emp::Ptr<const TokenStream> ts = nullptr;
+      size_t pos = 0;
 
     public:
+      Iterator() = default;
       Iterator(const Iterator &) = default;
 
       Iterator(const TokenStream & in_ts, size_t in_pos) : ts(&in_ts), pos(in_pos) {}
@@ -59,6 +61,8 @@ namespace emp {
       [[nodiscard]] const TokenStream & GetTokenStream() const { return *ts; }
 
       [[nodiscard]] size_t GetIndex() const { return pos; }
+
+      [[nodiscard]] bool IsValid() const { return !ts.IsNull(); }
 
       [[nodiscard]] emp::Ptr<const Token> ToPtr() const { return ts->GetPtr(pos); }
 
