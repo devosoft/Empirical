@@ -100,6 +100,7 @@ namespace emp {
     using val_t = std::variant<emp::String, bool, int, size_t, double>;
     using keyword_fun_arg_t = emp::vector<emp::String>;
     using keyword_fun_t = std::function<void(keyword_fun_arg_t)>;
+    using Iterator = emp::TokenStream::Iterator;
 
     /// Class to manage a single setting.
     class SettingInfo {
@@ -267,9 +268,6 @@ namespace emp {
     const int double_ID;
     const int string_ID;
 
-    emp::TokenStream tokens;
-    emp::TokenStream::Iterator it;
-
     // === HELPER FUNCTIONS ===
 
     void PushScope(const emp::String & scope) {
@@ -316,7 +314,7 @@ namespace emp {
     }
 
     /// Use the next token if it's the right type; return false if not.
-    [[nodiscard]] bool RequireToken(int token_id, const emp::String & name) {
+    [[nodiscard]] bool RequireToken(Iterator & it, int token_id, const emp::String & name) {
       const Token cur_token = it.Use();
       if (cur_token != token_id) {
         return IOError("UnexpectedToken '", cur_token.lexeme, "'; expected ", name, ".");
@@ -326,7 +324,7 @@ namespace emp {
     }
 
     /// We found a keyword during a load; load all arguments and trigger it.
-    [[nodiscard]] bool LoadKeyword(const emp::String & keyword) {
+    [[nodiscard]] bool LoadKeyword(Iterator & it, const emp::String & keyword) {
       if (verbose) emp::PrintLn("...identified as keyword!");
       // Grab the rest of the line.
       emp::vector<emp::String> keyword_vars;
@@ -358,11 +356,11 @@ namespace emp {
     }
 
     // We have found a setting name at the beginning of a line; load it!
-    [[nodiscard]] bool LoadSetting(const emp::String & name) {
+    [[nodiscard]] bool LoadSetting(Iterator & it, const emp::String & name) {
       if (verbose) emp::PrintLn("...identified as setting!");
 
-        // setting name must be followed by an '='
-        if (!RequireToken('=', "assignment")) return false;
+      // setting name must be followed by an '='
+      if (!RequireToken(it, '=', "assignment")) return false;
 
       std::optional<emp::String> string_val = TokenToStringValue(it.Use());
       if (string_val) {
@@ -372,26 +370,26 @@ namespace emp {
       return false;
     }
 
-    [[nodiscard]] bool LoadScope(const emp::String & name) {
+    [[nodiscard]] bool LoadScope(Iterator & it, const emp::String & name) {
       // Scopes must be opened with a '{'
-      if (!RequireToken('{', "open scope")) return false;
+      if (!RequireToken(it, '{', "open scope")) return false;
       PushScope(name);
 
       while (it.Any() && it.Peek() != '}') {
-        if (!LoadLine()) {
+        if (!LoadLine(it)) {
           PopScope();
           return false;
         }
       }
 
       PopScope();
-      if (!RequireToken('}', "close scope")) return false;
+      if (!RequireToken(it, '}', "close scope")) return false;
 
       return true;
     }
 
     // Load a single line starting from the current token iterator.
-    bool LoadLine() {
+    bool LoadLine(Iterator & it) {
       // Skip any extra lines.
       if (IsEndLine(it.Peek())) { ++it; return true; }
 
@@ -402,9 +400,9 @@ namespace emp {
         return IOError("UnexpectedToken '", name_token.lexeme, "'; expected keyword or parameter name.");
       }
       const emp::String name = name_token.lexeme;
-      if (HasKeyword(name)) { return LoadKeyword(name); }
-      if (HasSetting(name)) { return LoadSetting(name); }
-      return LoadScope(name); // Unknown id must be a new scope.
+      if (HasKeyword(name)) { return LoadKeyword(it, name); }
+      if (HasSetting(name)) { return LoadSetting(it, name); }
+      return LoadScope(it, name); // Unknown id must be a new scope.
     }
 
   public:
@@ -499,17 +497,24 @@ namespace emp {
       return true;
     }
 
-    // Load a specified file; return success.
-    bool Load(const emp::String & filename) {
-      tokens = lexer.TokenizeFile(filename);
-      it = tokens.begin();
+    // Load settings from a stream; return success.
+    bool Load(std::istream & is) {
+      emp::TokenStream tokens = lexer.Tokenize(is);
+      Iterator it = tokens.begin();
       error_note.clear();
 
       while (it.Any()) {
-        if (!LoadLine()) return false;
+        if (!LoadLine(it)) return false;
       }
 
       return true;
+    }
+
+    // Load settings from a file; return success.
+    bool Load(const emp::String & filename) {
+      std::ifstream is(filename);
+      if (!is) return IOError("Failed to open config file for loading: ", filename);
+      return Load(is);
     }
   };
 
