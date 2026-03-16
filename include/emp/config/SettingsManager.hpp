@@ -479,14 +479,9 @@ namespace emp {
       return *this;
     }
 
-    bool Save(const emp::String & filename) {
-      std::ofstream ofs(filename);
+    bool Save(std::ostream & ofs) {
+      emp_assert(ofs);
       error_note.clear();
-      if (!ofs) {
-        error_note.Set("Failed to open config file for saving: ", filename);
-        notify::Error(error_note);
-        return false;
-      }
 
       for (const auto & [key, info] : setting_map) {
         const auto lines = info.GetDescription().Slice("\n");
@@ -495,6 +490,16 @@ namespace emp {
       }
 
       return true;
+    }
+
+    bool Save(const emp::String & filename) {
+      std::ofstream ofs{filename};
+      if (!ofs) {
+        error_note.Set("Failed to open config file for saving: ", filename);
+        notify::Error(error_note);
+        return false;
+      }
+      return Save(ofs);
     }
 
     // Load settings from a stream; return success.
@@ -515,6 +520,34 @@ namespace emp {
       std::ifstream is(filename);
       if (!is) return IOError("Failed to open config file for loading: ", filename);
       return Load(is);
+    }
+
+    /// Scan command-line arguments and apply any `-s`/`--set` options.
+    /// Each occurrence expects the next argument to be an inline config string
+    /// (e.g. `-s "x = 5; robot1.speed = 10"`), which is tokenized and loaded
+    /// exactly as if it were a config file.  Other arguments are ignored.
+    /// Returns false (and sets the error note) on the first parse error.
+    bool LoadArgs(emp::vector<emp::String> & args, bool erase_on_use=false) {
+      error_note.clear();
+      for (size_t i = 0; i < args.size(); ++i) {
+        if (args[i] == "-s" || args[i] == "--set") {
+          if (erase_on_use) args.erase(args.begin() + i);
+          else ++i;
+          if (i >= args.size()) {
+            return IOError("Expected config string after '--set'.");
+          }
+          emp::TokenStream tokens = lexer.Tokenize(args[i]);
+          Iterator it = tokens.begin();
+          while (it.Any()) {
+            if (!LoadLine(it)) return false;
+          }
+          if (erase_on_use) {
+            args.erase(args.begin() + i);
+            --i; // May wrap around to max, but immediately reset on loop.
+          }
+        }
+      }
+      return true;
     }
   };
 
