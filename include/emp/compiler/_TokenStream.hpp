@@ -62,8 +62,6 @@ namespace emp {
 
       [[nodiscard]] size_t GetIndex() const { return pos; }
 
-      [[nodiscard]] bool IsValid() const { return !ts.IsNull(); }
-
       [[nodiscard]] emp::Ptr<const Token> ToPtr() const { return ts->GetPtr(pos); }
 
       [[nodiscard]] Token operator*() const { return ts->tokens[pos]; }
@@ -104,7 +102,7 @@ namespace emp {
         return old;
       }
 
-      [[nodiscard]] bool IsValid() const { return pos < ts->size(); }
+      [[nodiscard]] bool IsValid() const { return !ts.IsNull() && pos < ts->size(); }
 
       [[nodiscard]] bool AtEnd() const { return pos == ts->size(); }
 
