@@ -67,10 +67,10 @@ TEST_CASE("Test ArgManager", "[config]")
 
     REQUIRE(am.HasUnused());
 
-    REQUIRE(*am.UseArg("dir") == (emp::vector<std::string>) {"/some_path"} );
+    REQUIRE(*am.UseArg("dir") == emp::vector<std::string>{"/some_path"} );
     REQUIRE(!am.UseArg("dir"));
 
-    REQUIRE(*am.UseArg("_command") == (emp::vector<std::string>) {"command"} );
+    REQUIRE(*am.UseArg("_command") == emp::vector<std::string>{"command"} );
     REQUIRE(!am.UseArg("_command"));
 
     REQUIRE(!am.HasUnused());
@@ -137,11 +137,11 @@ TEST_CASE("Test ArgManager", "[config]")
 
     REQUIRE(am.HasUnused());
 
-    REQUIRE(*am.UseArg("dir") == (emp::vector<std::string>) {"/some_path"} );
-    REQUIRE(*am.UseArg("dir") == (emp::vector<std::string>) {"/other_path"} );
+    REQUIRE(*am.UseArg("dir") == emp::vector<std::string>{"/some_path"} );
+    REQUIRE(*am.UseArg("dir") == emp::vector<std::string>{"/other_path"} );
     REQUIRE(!am.UseArg("dir"));
 
-    REQUIRE(*am.UseArg("_command") == (emp::vector<std::string>) {"./command"});
+    REQUIRE(*am.UseArg("_command") == emp::vector<std::string>{"./command"});
 
     REQUIRE(!am.ProcessBuiltin(&config));
     REQUIRE(!am.UseArg("help"));
@@ -150,23 +150,22 @@ TEST_CASE("Test ArgManager", "[config]")
     REQUIRE(!am.UseArg("duo"));
 
     REQUIRE(
-      *am.UseArg("_positional")
-      == ((emp::vector<std::string>) {
-        "pos1", "pos2", "pos3", "pos4", "--duo", "-a", "b"
-      })
+      *am.UseArg("_positional") == emp::vector<std::string>{
+          "pos1", "pos2", "pos3", "pos4", "--duo", "-a", "b"
+      }
     );
     REQUIRE(!am.UseArg("_positional"));
 
     REQUIRE(!am.ProcessBuiltin(&config));
     REQUIRE(
       *am.UseArg("_unknown")
-      == ((emp::vector<std::string>) {"-unspecified", "unspec", "unspec"})
+      == (emp::vector<std::string>{"-unspecified", "unspec", "unspec"})
     );
     REQUIRE(
       *am.UseArg("_unknown")
-      == (emp::vector<std::string>) {"-unspecified"}
+      == emp::vector<std::string>{"-unspecified"}
     );
-    REQUIRE(*am.UseArg("_unknown") == ((emp::vector<std::string>) {"-a", "b"}));
+    REQUIRE(*am.UseArg("_unknown") == (emp::vector<std::string>{"-a", "b"}));
     REQUIRE(!am.UseArg("_unknown"));
 
     REQUIRE(config.RANDOM_SEED() == 0);
@@ -175,13 +174,13 @@ TEST_CASE("Test ArgManager", "[config]")
 
     REQUIRE(
       am.ViewArg("duo")
-      == ((emp::vector<emp::vector<std::string>>) {{"b"},{},{"a","b"}})
+      == (emp::vector<emp::vector<std::string>>{{"b"},{},{"a","b"}})
     );
 
-    REQUIRE(am.ViewArg("nope") == (emp::vector<emp::vector<std::string>>) {});
+    REQUIRE(am.ViewArg("nope") == emp::vector<emp::vector<std::string>>{});
     REQUIRE(
       am.ViewArg("extra_nope")
-      == (emp::vector<emp::vector<std::string>>) {}
+      == emp::vector<emp::vector<std::string>>{}
     );
     REQUIRE(!am.UseArg("nope"));
     REQUIRE(!am.UseArg("extra_nope"));
@@ -249,11 +248,11 @@ TEST_CASE("Test ArgManager", "[config]")
 
     REQUIRE(am.HasUnused());
 
-    REQUIRE(*am.UseArg("dir") == (emp::vector<std::string>) {"/some path"} );
-    REQUIRE(*am.UseArg("dir") == (emp::vector<std::string>) {"/other path"} );
+    REQUIRE(*am.UseArg("dir") == emp::vector<std::string>{"/some path"} );
+    REQUIRE(*am.UseArg("dir") == emp::vector<std::string>{"/other path"} );
     REQUIRE(!am.UseArg("dir"));
 
-    REQUIRE(*am.UseArg("_command") == (emp::vector<std::string>) {"./command"});
+    REQUIRE(*am.UseArg("_command") == emp::vector<std::string>{"./command"});
 
     REQUIRE(!am.ProcessBuiltin(&config));
     REQUIRE(!am.UseArg("help"));
@@ -262,8 +261,7 @@ TEST_CASE("Test ArgManager", "[config]")
     REQUIRE(!am.UseArg("duo"));
 
     REQUIRE(
-      *am.UseArg("_positional")
-      == ((emp::vector<std::string>) {
+      *am.UseArg("_positional") == (emp::vector<std::string>{
         "pos 1", "pos 2", "pos 3", "pos 4", "--duo", "-a", "b"
       })
     );
@@ -272,13 +270,13 @@ TEST_CASE("Test ArgManager", "[config]")
     REQUIRE(!am.ProcessBuiltin(&config));
     REQUIRE(
       *am.UseArg("_unknown")
-      == ((emp::vector<std::string>) {"-unspecified", "unspec", "unspec"})
+      == (emp::vector<std::string>{"-unspecified", "unspec", "unspec"})
     );
     REQUIRE(
       *am.UseArg("_unknown")
-      == (emp::vector<std::string>) {"-unspecified"}
+      == emp::vector<std::string>{"-unspecified"}
     );
-    REQUIRE(*am.UseArg("_unknown") == ((emp::vector<std::string>) {"-a", "b"}));
+    REQUIRE(*am.UseArg("_unknown") == (emp::vector<std::string>{"-a", "b"}));
     REQUIRE(!am.UseArg("_unknown"));
 
     REQUIRE(config.RANDOM_SEED() == 0);
@@ -286,14 +284,13 @@ TEST_CASE("Test ArgManager", "[config]")
     REQUIRE(config.RANDOM_SEED() == 32);
 
     REQUIRE(
-      am.ViewArg("duo")
-      == ((emp::vector<emp::vector<std::string>>) {{"b"},{},{"a","b"}})
+      am.ViewArg("duo") == (emp::vector<emp::vector<std::string>>{{"b"},{},{"a","b"}})
     );
 
-    REQUIRE(am.ViewArg("nope") == (emp::vector<emp::vector<std::string>>) {});
+    REQUIRE(am.ViewArg("nope") == emp::vector<emp::vector<std::string>>{});
     REQUIRE(
       am.ViewArg("extra_nope")
-      == (emp::vector<emp::vector<std::string>>) {}
+      == emp::vector<emp::vector<std::string>>{}
     );
     REQUIRE(!am.UseArg("nope"));
     REQUIRE(!am.UseArg("extra_nope"));
@@ -318,13 +315,13 @@ TEST_CASE("Test ArgManager", "[config]")
     am.PrintDiagnostic(std::cout);
     REQUIRE(
       *am.UseArg("_unknown")
-      == ((emp::vector<std::string>) {"--dir", "/some_path"})
+      == (emp::vector<std::string>{"--dir", "/some_path"})
     );
-    REQUIRE(*am.UseArg("_unknown") == (emp::vector<std::string>) {"-unk"});
+    REQUIRE(*am.UseArg("_unknown") == emp::vector<std::string>{"-unk"});
 
-    REQUIRE(am.UseArg("help") == (emp::vector<std::string>) {});
+    REQUIRE(am.UseArg("help") == emp::vector<std::string>{});
 
-    REQUIRE(*am.UseArg("_command") == (emp::vector<std::string>) {"command"});
+    REQUIRE(*am.UseArg("_command") == emp::vector<std::string>{"command"});
     REQUIRE(!am.UseArg("_command"));
 
     REQUIRE(!am.HasUnused());
@@ -349,10 +346,10 @@ TEST_CASE("Test ArgManager", "[config]")
 
     REQUIRE(am.HasUnused());
 
-    REQUIRE(*am.UseArg("_command") == (emp::vector<std::string>) {"command"});
-    REQUIRE(*am.UseArg("_unknown") == (emp::vector<std::string>) {"--dir"});
-    REQUIRE(*am.UseArg("_unknown") == (emp::vector<std::string>) {"/some"});
-    REQUIRE(*am.UseArg("_unknown") == (emp::vector<std::string>) {"-h"});
+    REQUIRE(*am.UseArg("_command") == emp::vector<std::string>{"command"});
+    REQUIRE(*am.UseArg("_unknown") == emp::vector<std::string>{"--dir"});
+    REQUIRE(*am.UseArg("_unknown") == emp::vector<std::string>{"/some"});
+    REQUIRE(*am.UseArg("_unknown") == emp::vector<std::string>{"-h"});
 
     REQUIRE(!am.HasUnused());
 
@@ -410,9 +407,9 @@ TEST_CASE("Test ArgManager", "[config]")
     REQUIRE(!am.UseArg("RANDOM_SEED"));
     REQUIRE(test);
 
-    REQUIRE(*am.UseArg("_unknown") == (emp::vector<std::string>) {"--unknown"});
+    REQUIRE(*am.UseArg("_unknown") == emp::vector<std::string>{"--unknown"});
 
-    REQUIRE(*am.UseArg("no_callback") == (emp::vector<std::string>) {});
+    REQUIRE(*am.UseArg("no_callback") == emp::vector<std::string>{});
 
     REQUIRE(!am.HasUnused());
 
@@ -462,18 +459,18 @@ TEST_CASE("Test ArgManager", "[config]")
 
     REQUIRE(
       *am.UseArg("_positional")
-      == ((emp::vector<std::string>) {"help"})
+      == (emp::vector<std::string>{"help"})
     );
 
     // Take a look at these, @mmore500
     // REQUIRE(
     //   *am.UseArg("_unknown")
-    //   == ((emp::vector<std::string>) {"--help"})
+    //   == (emp::vector<std::string>{"--help"})
     // );
 
     // REQUIRE(am.UseArg("help") == std::nullopt);
 
-    // REQUIRE(*am.UseArg("_command") == (emp::vector<std::string>) {"command"});
+    // REQUIRE(*am.UseArg("_command") == emp::vector<std::string>{"command"});
     // REQUIRE(!am.UseArg("_command"));
 
     // REQUIRE(!am.HasUnused());
@@ -505,11 +502,11 @@ TEST_CASE("Test ArgManager", "[config]")
 
     am.PrintDiagnostic(std::cout);
 
-    REQUIRE(am.UseArg("help") == ((emp::vector<std::string>) {}));
-    REQUIRE(am.UseArg("apple") == ((emp::vector<std::string>) {}));
-    REQUIRE(am.UseArg("info") == ((emp::vector<std::string>) {}));
+    REQUIRE(am.UseArg("help") == (emp::vector<std::string>{}));
+    REQUIRE(am.UseArg("apple") == (emp::vector<std::string>{}));
+    REQUIRE(am.UseArg("info") == (emp::vector<std::string>{}));
 
-    REQUIRE(*am.UseArg("_command") == (emp::vector<std::string>) {"command"});
+    REQUIRE(*am.UseArg("_command") == emp::vector<std::string>{"command"});
     REQUIRE(!am.UseArg("_command"));
 
     REQUIRE(!am.HasUnused());
@@ -542,13 +539,13 @@ TEST_CASE("Test ArgManager", "[config]")
 
     am.PrintDiagnostic(std::cout);
 
-    REQUIRE(am.UseArg("help") == ((emp::vector<std::string>) {}));
+    REQUIRE(am.UseArg("help") == (emp::vector<std::string>{}));
     REQUIRE(am.UseArg("aardvark") == std::nullopt);
-    REQUIRE(am.UseArg("ink") == ((emp::vector<std::string>) {"boop"}));
+    REQUIRE(am.UseArg("ink") == (emp::vector<std::string>{"boop"}));
 
-    REQUIRE(am.UseArg("_invalid") == ((emp::vector<std::string>) {"-ahi"}));
+    REQUIRE(am.UseArg("_invalid") == (emp::vector<std::string>{"-ahi"}));
 
-    REQUIRE(*am.UseArg("_command") == (emp::vector<std::string>) {"command"});
+    REQUIRE(*am.UseArg("_command") == emp::vector<std::string>{"command"});
     REQUIRE(!am.UseArg("_command"));
 
     REQUIRE(!am.HasUnused());
@@ -580,15 +577,15 @@ TEST_CASE("Test ArgManager", "[config]")
 
     am.PrintDiagnostic(std::cout);
 
-    REQUIRE(am.UseArg("help") == ((emp::vector<std::string>) {}));
+    REQUIRE(am.UseArg("help") == (emp::vector<std::string>{}));
     REQUIRE(am.UseArg("aardvark") == std::nullopt);
     REQUIRE(am.UseArg("ink") == std::nullopt);
 
     REQUIRE(am.UseArg("_positional") ==
-      ((emp::vector<std::string>) {"-i", "boop", "-ahi", "--aardvark"})
+      (emp::vector<std::string>{"-i", "boop", "-ahi", "--aardvark"})
     );
 
-    REQUIRE(*am.UseArg("_command") == (emp::vector<std::string>) {"command"});
+    REQUIRE(*am.UseArg("_command") == emp::vector<std::string>{"command"});
     REQUIRE(!am.UseArg("_command"));
 
     REQUIRE(!am.HasUnused());
