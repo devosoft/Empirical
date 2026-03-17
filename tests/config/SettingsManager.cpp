@@ -92,12 +92,12 @@ TEST_CASE("Test SettingsManager", "[config]")
     // cfg.SetVerbose();
     bool on_var = false, tr = false, off_var = true, fa = true, one = false, zero = true;
 
-    cfg.AddSetting("on_v",  on_var, "bool")
-       .AddSetting("tr",    tr,     "bool")
-       .AddSetting("off_v", off_var,    "bool")
-       .AddSetting("fa",    fa,     "bool")
-       .AddSetting("one",   one,    "bool")
-       .AddSetting("zero",  zero,   "bool");
+    cfg.AddSetting("on_v",  on_var,  "bool")
+       .AddSetting("tr",    tr,      "bool")
+       .AddSetting("off_v", off_var, "bool")
+       .AddSetting("fa",    fa,      "bool")
+       .AddSetting("one",   one,     "bool")
+       .AddSetting("zero",  zero,    "bool");
 
     std::istringstream is("on_v = On\ntr = True\noff_v = Off\nfa = False\none = 1\nzero = 0\n");
     REQUIRE(cfg.Load(is));
@@ -232,6 +232,121 @@ TEST_CASE("Test SettingsManager", "[config]")
   {
     emp::SettingsManager cfg;
     REQUIRE(!cfg.Load("this_file_does_not_exist_12345.cfg"));
+    REQUIRE(cfg.HasError());
+  }
+
+  // LoadArgs: -s / --set applies a bulk config string
+  {
+    emp::SettingsManager cfg;
+    int x = 0;
+    double d = 0.0;
+    cfg.AddSetting("x", x, "int")
+       .AddSetting("d", d, "double");
+
+    emp::vector<emp::String> args = { "program", "-s", "x = 7; d = 3.5" };
+    REQUIRE(cfg.LoadArgs(args));
+    REQUIRE(x == 7);
+    REQUIRE(d == 3.5);
+
+    emp::vector<emp::String> args2 = { "program", "--set", "x = 99" };
+    REQUIRE(cfg.LoadArgs(args2));
+    REQUIRE(x == 99);
+  }
+
+  // LoadArgs: per-setting short flag sets the bound variable
+  {
+    emp::SettingsManager cfg;
+    int count = 0;
+    bool verbose = false;
+    emp::String name = "";
+    cfg.AddSetting("count",   count,   "count",   'c', "count")
+       .AddSetting("verbose", verbose, "verbose", 'v', "verbose")
+       .AddSetting("name",    name,    "name",    'n', "name");
+
+    emp::vector<emp::String> args = { "program", "-c", "5", "-v", "On", "-n", "Alice" };
+    REQUIRE(cfg.LoadArgs(args));
+    REQUIRE(count   == 5);
+    REQUIRE(verbose == true);
+    REQUIRE(name    == "Alice");
+  }
+
+  // LoadArgs: per-setting long option sets the bound variable
+  {
+    emp::SettingsManager cfg;
+    int count = 0;
+    emp::String name = "";
+    cfg.AddSetting("count", count, "count", '\0', "count")
+       .AddSetting("name",  name,  "name",  '\0', "name");
+
+    emp::vector<emp::String> args = { "program", "--count", "12", "--name", "Bob" };
+    REQUIRE(cfg.LoadArgs(args));
+    REQUIRE(count == 12);
+    REQUIRE(name  == "Bob");
+  }
+
+  // LoadArgs: unrecognised arguments are left untouched
+  {
+    emp::SettingsManager cfg;
+    int x = 0;
+    cfg.AddSetting("x", x, "int", 'x', "xval");
+
+    emp::vector<emp::String> args = { "program", "--other", "stuff", "-x", "3" };
+    REQUIRE(cfg.LoadArgs(args));
+    REQUIRE(x == 3);
+    REQUIRE(args.size() == 5); // untouched without erase_on_use
+  }
+
+  // LoadArgs: erase_on_use removes processed flag+value pairs
+  {
+    emp::SettingsManager cfg;
+    int x = 0;
+    emp::String name = "";
+    cfg.AddSetting("x",    x,    "int",    'x', "xval")
+       .AddSetting("name", name, "string", 'n', "name");
+
+    emp::vector<emp::String> args = { "program", "-x", "7", "other", "-n", "Carol" };
+    REQUIRE(cfg.LoadArgs(args, /*erase_on_use=*/true));
+    REQUIRE(x    == 7);
+    REQUIRE(name == "Carol");
+    // Only "program" and "other" should remain
+    REQUIRE(args.size() == 2);
+    REQUIRE(args[0] == "program");
+    REQUIRE(args[1] == "other");
+  }
+
+  // LoadArgs: erase_on_use removes -s / --set and its config string
+  {
+    emp::SettingsManager cfg;
+    int x = 0;
+    cfg.AddSetting("x", x, "int");
+
+    emp::vector<emp::String> args = { "program", "-s", "x = 4", "leftover" };
+    REQUIRE(cfg.LoadArgs(args, /*erase_on_use=*/true));
+    REQUIRE(x == 4);
+    REQUIRE(args.size() == 2);
+    REQUIRE(args[0] == "program");
+    REQUIRE(args[1] == "leftover");
+  }
+
+  // LoadArgs: missing value after short flag returns false and sets error
+  {
+    emp::SettingsManager cfg;
+    int x = 0;
+    cfg.AddSetting("x", x, "int", 'x');
+
+    emp::vector<emp::String> args = { "program", "-x" };
+    REQUIRE(!cfg.LoadArgs(args));
+    REQUIRE(cfg.HasError());
+  }
+
+  // LoadArgs: missing value after long option returns false and sets error
+  {
+    emp::SettingsManager cfg;
+    int x = 0;
+    cfg.AddSetting("x", x, "int", '\0', "xval");
+
+    emp::vector<emp::String> args = { "program", "--xval" };
+    REQUIRE(!cfg.LoadArgs(args));
     REQUIRE(cfg.HasError());
   }
 
