@@ -90,8 +90,10 @@
  *  - `Load(istream&)` / `Load(filename)` – parse settings; returns `false` on
  *    error.  Multiple calls accumulate; later values override earlier ones.
  *  - `LoadArgs(args [, erase_on_use])` – scan a `vector<emp::String>` of
- *    command-line arguments and apply each `-s`/`--set` value string.  When
- *    `erase_on_use` is `true` the flag and value are removed from `args`.
+ *    command-line arguments.  Per-setting short flags (`-x val`) and long
+ *    options (`--opt val`) registered via `AddSetting` are applied directly;
+ *    `-s`/`--set` applies the next argument as a bulk config string.  When
+ *    `erase_on_use` is `true` each matched flag and its value are removed.
  *  - `Save(ostream&)` / `Save(filename)` – write all settings as a commented
  *    config file; returns `false` on error.
  *  - `Get<T>(name)` / `Set(name, value)` – programmatic get/set.
@@ -102,9 +104,6 @@
  *
  * DEVELOPER NOTES:
  * - Consider allowing types to be more dynamic, perhaps set in a template.
- * - The `flag` and `option` fields in `AddSetting` are stored and queryable
- *   but are not yet used automatically by `LoadArgs`; that function currently
- *   only recognizes the hard-coded `-s`/`--set` syntax.
  */
 
 #pragma once
@@ -257,6 +256,8 @@ namespace emp {
 
     std::map<emp::String, SettingInfo> setting_map;
     std::map<emp::String, KeywordInfo> keyword_map;
+    std::map<char, emp::String>        flag_map;    ///< Short flag char  -> full setting name
+    std::map<emp::String, emp::String> option_map;  ///< Long option name -> full setting name
     emp::vector<emp::String> cur_scopes{};
     emp::String error_note;
     bool verbose = false;
@@ -465,8 +466,14 @@ namespace emp {
                                  emp::String option = "") {
       emp_assert(!HasSetting(name), "Trying to add a SettingsManager setting that already exists",
                  AppendScope(name));
+      emp_assert(flag == '\0' || !flag_map.contains(flag),
+                 "Duplicate CLI flag in SettingsManager", flag);
+      emp_assert(option.empty() || !option_map.contains(option),
+                 "Duplicate CLI option in SettingsManager", option);
       const emp::String full_name = AppendScope(name);
       setting_map.emplace(full_name, SettingInfo{full_name, value, desc, flag, option});
+      if (flag != '\0')    flag_map[flag]     = full_name;
+      if (!option.empty()) option_map[option] = full_name;
       return *this;
     }
 
@@ -523,15 +530,56 @@ namespace emp {
       return Load(is);
     }
 
-    /// Scan command-line arguments and apply any `-s`/`--set` options.
-    /// Each occurrence expects the next argument to be an inline config string
-    /// (e.g. `-s "x = 5; robot1.speed = 10"`), which is tokenized and loaded
-    /// exactly as if it were a config file.  Other arguments are ignored.
+    /// Scan command-line arguments and apply recognised settings options.
+    ///
+    /// Three argument forms are handled:
+    ///  - `-x val`      – short flag registered via AddSetting; `val` is the
+    ///                    value string for that setting.
+    ///  - `--option val` – long option registered via AddSetting; `val` is the
+    ///                    value string for that setting.
+    ///  - `-s "x=5; y=10"` / `--set "..."` – bulk config string tokenized and
+    ///                    loaded exactly as if it were a config file.
+    ///
+    /// All other arguments are left untouched.  When `erase_on_use` is true
+    /// each matched flag/option and its value are removed from `args`.
     /// Returns false (and sets the error note) on the first parse error.
     bool LoadArgs(emp::vector<emp::String> & args, bool erase_on_use=false) {
       error_note.clear();
       for (size_t i = 0; i < args.size(); ++i) {
-        if (args[i] == "-s" || args[i] == "--set") {
+        const emp::String & arg = args[i];
+
+        // Per-setting short flag: -x val
+        if (arg.size() == 2 && arg[0] == '-' && arg[1] != '-') {
+          const char flag_char = arg[1];
+          if (flag_map.contains(flag_char)) {
+            if (erase_on_use) args.erase(args.begin() + i);
+            else ++i;
+            if (i >= args.size()) {
+              return IOError("Expected value after '-", flag_char, "'.");
+            }
+            setting_map.at(flag_map.at(flag_char)).SetFromString(args[i]);
+            if (erase_on_use) { args.erase(args.begin() + i); --i; }
+            continue;
+          }
+        }
+
+        // Per-setting long option: --option val
+        if (arg.size() > 2 && arg[0] == '-' && arg[1] == '-') {
+          const emp::String opt = arg.substr(2);
+          if (option_map.contains(opt)) {
+            if (erase_on_use) args.erase(args.begin() + i);
+            else ++i;
+            if (i >= args.size()) {
+              return IOError("Expected value after '--", opt, "'.");
+            }
+            setting_map.at(option_map.at(opt)).SetFromString(args[i]);
+            if (erase_on_use) { args.erase(args.begin() + i); --i; }
+            continue;
+          }
+        }
+
+        // Bulk config string: -s "x = 5; y = 10" or --set "..."
+        if (arg == "-s" || arg == "--set") {
           if (erase_on_use) args.erase(args.begin() + i);
           else ++i;
           if (i >= args.size()) {
