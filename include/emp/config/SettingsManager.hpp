@@ -228,16 +228,18 @@ namespace emp {
     }; // END OF SettingInfo definition
 
     struct KeywordInfo {
-      emp::String name;           ///< Label for this keyword in config files
-      keyword_fun_t fun;          ///< Function to call when keyword is triggered
-      emp::String desc   = "";    ///< Description of keyword
+      emp::String name;                  ///< Label for this keyword in config files
+      keyword_fun_t fun;                 ///< Function to call when keyword is triggered
+      emp::String desc = "";             ///< Description of keyword
+      char flag = '\0';                  ///< Command-line flag ('\0' for none)
+      size_t max_args = emp::MAX_SIZE_T; ///< Max number of command-line args to send.
     };
 
     // === MEMBER VARIABLES ===
 
     std::map<emp::String, SettingInfo> setting_map;
     std::map<emp::String, KeywordInfo> keyword_map;
-    std::map<char, emp::String>        flag_map;    ///< Short flag char  -> full setting name
+    std::map<char, emp::String> flag_map;  ///< Flag char -> setting/keyword name
     emp::vector<emp::String> cur_scopes{};
     emp::String error_note;
     bool verbose = false;
@@ -285,6 +287,20 @@ namespace emp {
     }
 
     // === Direct parsing helpers ===
+
+    // Count the number of non-option arguments available from a starting index.
+    size_t CountFlagArgs(emp::vector<emp::String> & args,
+                         size_t start_index,
+                         size_t max_args = emp::MAX_SIZE_T)
+    {
+      max_args = std::min(max_args, args.size() - start_index);
+      const size_t max_index = start_index + max_args;
+      size_t end_index = start_index;
+      while (end_index < max_index &&
+             args[end_index].size() > 0 &&
+             args[end_index][0] != '-') { ++end_index; }
+      return end_index - start_index;
+    }
 
     [[nodiscard]] bool IsEndLine(int id) const { return id == ';' || id == '\n'; }
 
@@ -438,14 +454,14 @@ namespace emp {
     SettingsManager & AddSetting(const emp::String & name,
                                  T & value,
                                  emp::String desc,
-                                 char flag          = '\0') {
-      emp_assert(!HasSetting(name), "Trying to add a SettingsManager setting that already exists",
+                                 char flag = '\0') {
+      emp_assert(!HasIdentifier(name), "Trying to add SettingsManager identifier that already exists",
                  AppendScope(name));
       emp_assert(flag == '\0' || !flag_map.contains(flag),
                  "Duplicate CLI flag in SettingsManager", flag);
       const emp::String full_name = AppendScope(name);
       setting_map.emplace(full_name, SettingInfo{full_name, value, desc, flag});
-      if (flag != '\0')    flag_map[flag]     = full_name;
+      if (flag != '\0')    flag_map[flag] = full_name;
       return *this;
     }
 
@@ -453,9 +469,14 @@ namespace emp {
     /// function with the remaining tokens before the next semicolon.
     SettingsManager & AddKeyword(const emp::String & keyword,
                                  keyword_fun_t fun,
-                                 emp::String desc) {
-      emp_assert(!HasKeyword(keyword), "Trying to add a keyword that already exists", keyword);
-      keyword_map.emplace(keyword, KeywordInfo{keyword, fun, desc});
+                                 emp::String desc,
+                                 char flag = '\0',
+                                 size_t max_args = emp::MAX_SIZE_T) {
+      emp_assert(!HasIdentifier(keyword), "Adding keyword with preexisting identifier", keyword);
+      emp_assert(flag == '\0' || !flag_map.contains(flag), "Duplicate CLI flag in SettingsManager",
+        keyword, flag);
+      keyword_map.emplace(keyword, KeywordInfo{keyword, fun, desc, flag, max_args});
+      if (flag != '\0') flag_map[flag] = keyword;
       return *this;
     }
 
@@ -501,13 +522,18 @@ namespace emp {
       if (!is) return IOError("Failed to open config file for loading: ", filename);
       return Load(is);
     }
-
+    
     /// Scan command-line arguments and apply recognised settings options.
     ///
     /// Three argument forms are handled:
-    ///  - `-x val`      – short flag registered via AddSetting; `val` is the
-    ///                    value string for that setting.
-    ///  - `--setting val` – Same as `setting = val` in a config file.
+    ///  - `-x val`        – short flag registered via AddSetting; `val` is the
+    ///                      value string for that setting.
+    ///  - `-k arg ...`    – short flag registered via AddKeyword; remaining
+    ///                      non-option arguments (up to max_args) are passed to
+    ///                      the keyword callback.
+    ///  - `--setting val` – same as `setting = val` in a config file.
+    ///  - `--keyword arg ...` – triggers a keyword by name with the following
+    ///                      non-option arguments.
     ///  - `-s "x=5; y=10"` / `--set "..."` – bulk config string tokenized and
     ///                    loaded exactly as if it were a config file.
     ///
@@ -519,22 +545,49 @@ namespace emp {
       for (size_t i = 0; i < args.size(); ++i) {
         const emp::String test_arg = args[i];
 
-        // Per-setting short flag: -x val
+        // Short flag for setting or keyword, such as: -x val
         if (test_arg.size() == 2 && test_arg[0] == '-' && test_arg[1] != '-') {
           const char flag_char = test_arg[1];
           if (flag_map.contains(flag_char)) {
+            // Erase this setting if needed; otherwise advance to next.
             if (erase_on_use) args.erase(args.begin() + i);
             else ++i;
-            if (i >= args.size()) {
-              return IOError("Expected value after '-", flag_char, "'.");
+
+            emp::String identifier = flag_map.at(flag_char);
+
+            // If this is a setting...
+            if (setting_map.contains(identifier)) {
+              if (CountFlagArgs(args, i) < 1) {
+                return IOError("Expected value after '-", flag_char, "'.");
+              }
+              setting_map.at(identifier).SetFromString(args[i]);
+              if (erase_on_use) { args.erase(args.begin() + i); --i; }
+              continue;
             }
-            setting_map.at(flag_map.at(flag_char)).SetFromString(args[i]);
-            if (erase_on_use) { args.erase(args.begin() + i); --i; }
-            continue;
+
+            // Otherwise it must be a keyword...
+            else {
+              emp_assert(keyword_map.contains(identifier), identifier);
+              const KeywordInfo & info = keyword_map.at(identifier);
+              size_t args_found = CountFlagArgs(args, i, info.max_args);
+              emp::vector<emp::String> keyword_vars(args_found);
+              for (size_t arg_id = 0; arg_id < args_found; ++arg_id) {
+                keyword_vars[arg_id] = args[i + arg_id];
+              }
+              info.fun(keyword_vars);
+              if (erase_on_use) {
+                args.erase(args.begin()+i, args.begin()+i+args_found);
+                --i;
+              } else {
+                i += args_found - 1;
+              }
+              continue;
+            }
           }
         }
 
         // Per-setting long option: --setting val
+        // Per-keyword long option: --keyword arg1 arg2 ...
         if (test_arg.size() > 2 && test_arg[0] == '-' && test_arg[1] == '-') {
           const emp::String opt = test_arg.substr(2);
           if (setting_map.contains(opt)) {
@@ -545,6 +598,23 @@ namespace emp {
             }
             setting_map.at(opt).SetFromString(args[i]);
             if (erase_on_use) { args.erase(args.begin() + i); --i; }
+            continue;
+          } else if (keyword_map.contains(opt)) {
+            if (erase_on_use) args.erase(args.begin() + i);
+            else ++i;
+            const KeywordInfo & info = keyword_map.at(opt);
+            size_t args_found = CountFlagArgs(args, i, info.max_args);
+            emp::vector<emp::String> keyword_vars(args_found);
+            for (size_t arg_id = 0; arg_id < args_found; ++arg_id) {
+              keyword_vars[arg_id] = args[i + arg_id];
+            }
+            info.fun(keyword_vars);
+            if (erase_on_use) {
+              args.erase(args.begin()+i, args.begin()+i+args_found);
+              --i;
+            } else {
+              i += args_found - 1;
+            }
             continue;
           }
         }
