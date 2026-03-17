@@ -78,7 +78,8 @@
  *  - Load(istream&) or Load(filename) – parse settings; return success (true/false)
  *  - LoadArgs(args) – scan a 'vector<emp::String>' of command-line arguments, deleting those used:
  *       '-x val' or '--setting val' set specified setting (registered with AddSetting)
- *       '-s' or '--set' applies the next argument as a bulk config string.
+ *       '-k arg...' or '--keyword arg...' trigger a keyword (registered with AddKeyword)
+ *       '-s "cfg"' or '--set "cfg"' apply a bulk config string (built-in keyword).
  *  - Save(ostream&) or Save(filename) – write all settings as config file; return success.
  *  - Get<T>(name) or Set(name, value) – programmatic get/set.
  *  - HasSetting(name) or HasKeyword(name) or HasIdentifier(name) – query if name is registered.
@@ -98,6 +99,7 @@
 #include <functional>
 #include <map>
 #include <optional>
+#include <print>
 #include <stddef.h>
 #include <variant>
 
@@ -236,6 +238,7 @@ namespace emp {
 
     // === MEMBER VARIABLES ===
 
+    emp::String exe_name;
     std::map<emp::String, SettingInfo> setting_map;
     std::map<emp::String, KeywordInfo> keyword_map;
     std::map<char, emp::String> flag_map;  ///< Flag char -> setting/keyword name
@@ -316,7 +319,8 @@ namespace emp {
 
     /// Apply a keyword at args[i..]
     /// Called after the flag/option token itself has already been consumed.
-    void LoadArgKeyword(emp::vector<emp::String> & args, size_t & i, const KeywordInfo & info) {
+    /// Returns false if the keyword callback set an error.
+    bool LoadArgKeyword(emp::vector<emp::String> & args, size_t & i, const KeywordInfo & info) {
       size_t args_found = CountFlagArgs(args, i, info.max_args);
       emp::vector<emp::String> keyword_vars(args_found);
       for (size_t arg_id = 0; arg_id < args_found; ++arg_id) {
@@ -325,6 +329,7 @@ namespace emp {
       info.fun(keyword_vars);
       args.erase(args.begin()+i, args.begin()+i+args_found);
       --i;
+      return !HasError();
     }
 
     [[nodiscard]] bool IsEndLine(int id) const { return id == ';' || id == '\n'; }
@@ -439,6 +444,19 @@ namespace emp {
       lexer.IgnoreToken("whitespace", "[ \\t\\r]+");
       lexer.IgnoreToken("comment", "#.+");
       lexer.IgnoreToken("continue_line", "\\\\[ ]*\\n");
+
+      // Built-in keyword: Print help information.
+      AddKeyword("help",
+        [this](emp::vector<emp::String> kw_args) { PrintHelp(kw_args); },
+        "Print help info for this program", 'h', /*max_args=*/1);
+
+      // Built-in keyword: applies a bulk config string (same as a config file fragment).
+      AddKeyword("set", [this](emp::vector<emp::String> kw_args) {
+        if (kw_args.empty()) { IOError("Expected config string after '--set'."); return; }
+        emp::TokenStream tokens = lexer.Tokenize(kw_args[0]);
+        Iterator it = tokens.begin();
+        while (it.Any()) { if (!LoadLine(it)) return; }
+      }, "Apply a bulk config string", 's', /*max_args=*/1);
     }
 
     void SetVerbose(bool in=true) { verbose = in; }
@@ -505,6 +523,40 @@ namespace emp {
       return *this;
     }
 
+    // Print out all info on the currently known settings.
+    void PrintSettings(std::ostream & os=std::cout) {
+      std::println(os, "Available settings:");
+      for (const auto & [name, info] : setting_map) {
+        std::print(os, "  {} : {}", name, info.GetDescription());
+        if (info.GetFlag()) std::println(os, " (setting flag -{})", info.GetFlag());
+        else std::println(os, "");
+      }
+    }
+
+    // Print out all info on the current options.
+    void PrintHelp(const emp::vector<emp::String> & args, std::ostream & os=std::cout) {
+      if (args.size()) {
+        for (const emp::String & arg : args) {
+          if (arg == "settings") PrintSettings(os);
+          else std::println(os, "Unknown help argument '{}'", arg);
+        }
+        return;
+      }
+
+      std::println(os, "Format: {} [flags]", exe_name);
+      std::println(os, "Allowed flags include:");
+
+      for (const auto & [name, info] : keyword_map) {
+        if (info.flag) {
+          std::println(os, "  --{} (or -{}) : {}", name, info.flag, info.desc);
+        } else {
+          std::println(os, "  --{} : {}", name, info.desc);
+        }
+      }
+
+      std::println(os, "Use `{} --help settings` for a full list of settings", exe_name);
+    }
+
     bool Save(std::ostream & ofs) {
       emp_assert(ofs);
       error_note.clear();
@@ -550,7 +602,7 @@ namespace emp {
     
     /// Scan command-line arguments and apply recognised settings options.
     ///
-    /// Three argument forms are handled:
+    /// The following argument forms are handled:
     ///  - `-x val`        – short flag registered via AddSetting; `val` is the
     ///                      value string for that setting.
     ///  - `-k arg ...`    – short flag registered via AddKeyword; remaining
@@ -559,15 +611,18 @@ namespace emp {
     ///  - `--setting val` – same as `setting = val` in a config file.
     ///  - `--keyword arg ...` – triggers a keyword by name with the following
     ///                      non-option arguments.
-    ///  - `-s "x=5; y=10"` / `--set "..."` – bulk config string tokenized and
-    ///                    loaded exactly as if it were a config file.
+    ///  - `-s "cfg"` / `--set "cfg"` – built-in "set" keyword; tokenizes the
+    ///                      string and loads it exactly as a config file.
     ///
     /// Each matched flag/option and its value are removed from `args`;
     /// all other arguments are left untouched.
     /// Returns false (and sets the error note) on the first parse error.
     bool LoadArgs(emp::vector<emp::String> & args) {
+      if (args.size() == 0) return false;
+      exe_name = args[0];
+
       error_note.clear();
-      for (size_t i = 0; i < args.size(); ++i) {
+      for (size_t i = 1; i < args.size(); ++i) {
         const emp::String test_arg = args[i];
 
         // Short flag: -x  (single character, registered via AddSetting or AddKeyword)
@@ -581,7 +636,7 @@ namespace emp {
                 return false;
               }
             } else {
-              LoadArgKeyword(args, i, keyword_map.at(id));
+              if (!LoadArgKeyword(args, i, keyword_map.at(id))) return false;
             }
             continue;
           }
@@ -596,24 +651,9 @@ namespace emp {
             continue;
           } else if (keyword_map.contains(opt)) {
             args.erase(args.begin() + i); // Remove the used argument.
-            LoadArgKeyword(args, i, keyword_map.at(opt));
+            if (!LoadArgKeyword(args, i, keyword_map.at(opt))) return false;
             continue;
           }
-        }
-
-        // Bulk config string: -s "x = 5; y = 10" or --set "..."
-        if (test_arg == "-s" || test_arg == "--set") {
-          args.erase(args.begin() + i); // Remove the used argument.
-          if (i >= args.size()) {
-            return IOError("Expected config string after '--set'.");
-          }
-          emp::TokenStream tokens = lexer.Tokenize(args[i]);
-          Iterator it = tokens.begin();
-          while (it.Any()) {
-            if (!LoadLine(it)) return false;
-          }
-          args.erase(args.begin() + i);
-          --i; // May wrap around to max, but immediately reset on loop.
         }
       }
       return true;
