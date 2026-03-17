@@ -76,10 +76,9 @@
  *     'flag' is a one-character CLI flag (optional).
  *  - AddKeyword(keyword, fun, desc) – register a keyword that invokes 'fun' with its args.
  *  - Load(istream&) or Load(filename) – parse settings; return success (true/false)
- *  - LoadArgs(args [, erase_on_use]) – scan a 'vector<emp::String>' of command-line arguments:
+ *  - LoadArgs(args) – scan a 'vector<emp::String>' of command-line arguments, deleting those used:
  *       '-x val' or '--setting val' set specified setting (registered with AddSetting)
  *       '-s' or '--set' applies the next argument as a bulk config string.
- *       if erase_on_use is set, matched flags and values are removed.
  *  - Save(ostream&) or Save(filename) – write all settings as config file; return success.
  *  - Get<T>(name) or Set(name, value) – programmatic get/set.
  *  - HasSetting(name) or HasKeyword(name) or HasIdentifier(name) – query if name is registered.
@@ -302,41 +301,30 @@ namespace emp {
       return end_index - start_index;
     }
 
-    /// Consume a flag or option token: erase it if erase_on_use, otherwise advance i.
-    void ConsumeArg(emp::vector<emp::String> & args, size_t & i, bool erase_on_use) {
-      if (erase_on_use) args.erase(args.begin() + i);
-      else ++i;
-    }
-
-    /// Apply a setting value at args[i]; adjust i for erase_on_use.
+    /// Apply a setting value at args[i]
     /// Called after the flag/option token itself has already been consumed.
     bool LoadArgSetting(emp::vector<emp::String> & args, size_t & i,
-                        SettingInfo & info, const emp::String & flag_desc,
-                        bool erase_on_use) {
+                        SettingInfo & info, const emp::String & flag_desc) {
       if (i >= args.size()) {
         return IOError("Expected value after '", flag_desc, "'.");
       }
       info.SetFromString(args[i]);
-      if (erase_on_use) { args.erase(args.begin() + i); --i; }
+      args.erase(args.begin() + i);
+      --i;
       return true;
     }
 
-    /// Apply a keyword at args[i..]; adjust i for erase_on_use.
+    /// Apply a keyword at args[i..]
     /// Called after the flag/option token itself has already been consumed.
-    void LoadArgKeyword(emp::vector<emp::String> & args, size_t & i,
-                        const KeywordInfo & info, bool erase_on_use) {
+    void LoadArgKeyword(emp::vector<emp::String> & args, size_t & i, const KeywordInfo & info) {
       size_t args_found = CountFlagArgs(args, i, info.max_args);
       emp::vector<emp::String> keyword_vars(args_found);
       for (size_t arg_id = 0; arg_id < args_found; ++arg_id) {
         keyword_vars[arg_id] = args[i + arg_id];
       }
       info.fun(keyword_vars);
-      if (erase_on_use) {
-        args.erase(args.begin()+i, args.begin()+i+args_found);
-        --i;
-      } else {
-        i += args_found - 1;
-      }
+      args.erase(args.begin()+i, args.begin()+i+args_found);
+      --i;
     }
 
     [[nodiscard]] bool IsEndLine(int id) const { return id == ';' || id == '\n'; }
@@ -574,10 +562,10 @@ namespace emp {
     ///  - `-s "x=5; y=10"` / `--set "..."` – bulk config string tokenized and
     ///                    loaded exactly as if it were a config file.
     ///
-    /// All other arguments are left untouched.  When `erase_on_use` is true
-    /// each matched flag/option and its value are removed from `args`.
+    /// Each matched flag/option and its value are removed from `args`;
+    /// all other arguments are left untouched.
     /// Returns false (and sets the error note) on the first parse error.
-    bool LoadArgs(emp::vector<emp::String> & args, bool erase_on_use=false) {
+    bool LoadArgs(emp::vector<emp::String> & args) {
       error_note.clear();
       for (size_t i = 0; i < args.size(); ++i) {
         const emp::String test_arg = args[i];
@@ -586,14 +574,14 @@ namespace emp {
         if (test_arg.size() == 2 && test_arg[0] == '-' && test_arg[1] != '-') {
           const char flag_char = test_arg[1];
           if (flag_map.contains(flag_char)) {
-            ConsumeArg(args, i, erase_on_use);
+            args.erase(args.begin() + i); // Remove the used argument.
             const emp::String & id = flag_map.at(flag_char);
             if (setting_map.contains(id)) {
-              if (!LoadArgSetting(args, i, setting_map.at(id), "-"+flag_char, erase_on_use)) {
+              if (!LoadArgSetting(args, i, setting_map.at(id), emp::MakeString('-',flag_char))) {
                 return false;
               }
             } else {
-              LoadArgKeyword(args, i, keyword_map.at(id), erase_on_use);
+              LoadArgKeyword(args, i, keyword_map.at(id));
             }
             continue;
           }
@@ -603,19 +591,19 @@ namespace emp {
         if (test_arg.size() > 2 && test_arg[0] == '-' && test_arg[1] == '-') {
           const emp::String opt = test_arg.substr(2);
           if (setting_map.contains(opt)) {
-            ConsumeArg(args, i, erase_on_use);
-            if (!LoadArgSetting(args, i, setting_map.at(opt), "--"+opt, erase_on_use)) return false;
+            args.erase(args.begin() + i); // Remove the used argument.
+            if (!LoadArgSetting(args, i, setting_map.at(opt), "--"+opt)) return false;
             continue;
           } else if (keyword_map.contains(opt)) {
-            ConsumeArg(args, i, erase_on_use);
-            LoadArgKeyword(args, i, keyword_map.at(opt), erase_on_use);
+            args.erase(args.begin() + i); // Remove the used argument.
+            LoadArgKeyword(args, i, keyword_map.at(opt));
             continue;
           }
         }
 
         // Bulk config string: -s "x = 5; y = 10" or --set "..."
         if (test_arg == "-s" || test_arg == "--set") {
-          ConsumeArg(args, i, erase_on_use);
+          args.erase(args.begin() + i); // Remove the used argument.
           if (i >= args.size()) {
             return IOError("Expected config string after '--set'.");
           }
@@ -624,10 +612,8 @@ namespace emp {
           while (it.Any()) {
             if (!LoadLine(it)) return false;
           }
-          if (erase_on_use) {
-            args.erase(args.begin() + i);
-            --i; // May wrap around to max, but immediately reset on loop.
-          }
+          args.erase(args.begin() + i);
+          --i; // May wrap around to max, but immediately reset on loop.
         }
       }
       return true;

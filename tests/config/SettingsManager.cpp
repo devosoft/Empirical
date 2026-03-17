@@ -234,7 +234,7 @@ TEST_CASE("Test SettingsManager", "[config]")
     REQUIRE(cfg.HasError());
   }
 
-  // LoadArgs: -s / --set applies a bulk config string
+  // LoadArgs: -s / --set applies a bulk config string and is removed from args
   {
     emp::SettingsManager cfg;
     int x = 0;
@@ -246,13 +246,15 @@ TEST_CASE("Test SettingsManager", "[config]")
     REQUIRE(cfg.LoadArgs(args));
     REQUIRE(x == 7);
     REQUIRE(d == 3.5);
+    REQUIRE(args.size() == 1); // only "program" remains
 
     emp::vector<emp::String> args2 = { "program", "--set", "x = 99" };
     REQUIRE(cfg.LoadArgs(args2));
     REQUIRE(x == 99);
+    REQUIRE(args2.size() == 1);
   }
 
-  // LoadArgs: per-setting short flag sets the bound variable
+  // LoadArgs: per-setting short flag sets the bound variable and is removed from args
   {
     emp::SettingsManager cfg;
     int count = 0;
@@ -267,9 +269,10 @@ TEST_CASE("Test SettingsManager", "[config]")
     REQUIRE(count   == 5);
     REQUIRE(verbose == true);
     REQUIRE(name    == "Alice");
+    REQUIRE(args.size() == 1); // only "program" remains
   }
 
-  // LoadArgs: per-setting long option sets the bound variable
+  // LoadArgs: per-setting long option sets the bound variable and is removed from args
   {
     emp::SettingsManager cfg;
     int count = 0;
@@ -281,6 +284,7 @@ TEST_CASE("Test SettingsManager", "[config]")
     REQUIRE(cfg.LoadArgs(args));
     REQUIRE(count == 12);
     REQUIRE(name  == "Bob");
+    REQUIRE(args.size() == 1); // only "program" remains
   }
 
   // LoadArgs: unrecognised arguments are left untouched
@@ -292,10 +296,10 @@ TEST_CASE("Test SettingsManager", "[config]")
     emp::vector<emp::String> args = { "program", "--other", "stuff", "-x", "3" };
     REQUIRE(cfg.LoadArgs(args));
     REQUIRE(x == 3);
-    REQUIRE(args.size() == 5); // untouched without erase_on_use
+    REQUIRE(args.size() == 3); // "program", "--other", "stuff" remain; "-x" and "3" consumed
   }
 
-  // LoadArgs: erase_on_use removes processed flag+value pairs
+  // LoadArgs: processed short flags and their values are removed from args
   {
     emp::SettingsManager cfg;
     int x = 0;
@@ -304,25 +308,24 @@ TEST_CASE("Test SettingsManager", "[config]")
        .AddSetting("name", name, "string", 'n');
 
     emp::vector<emp::String> args = { "program", "-x", "7", "other", "-n", "Carol" };
-    REQUIRE(cfg.LoadArgs(args, /*erase_on_use=*/true));
+    REQUIRE(cfg.LoadArgs(args));
     REQUIRE(x    == 7);
     REQUIRE(name == "Carol");
-    // Only "program" and "other" should remain
-    REQUIRE(args.size() == 2);
+    REQUIRE(args.size() == 2); // only "program" and "other" remain
     REQUIRE(args[0] == "program");
     REQUIRE(args[1] == "other");
   }
 
-  // LoadArgs: erase_on_use removes -s / --set and its config string
+  // LoadArgs: -s / --set and its config string are removed from args
   {
     emp::SettingsManager cfg;
     int x = 0;
     cfg.AddSetting("x", x, "int");
 
     emp::vector<emp::String> args = { "program", "-s", "x = 4", "leftover" };
-    REQUIRE(cfg.LoadArgs(args, /*erase_on_use=*/true));
+    REQUIRE(cfg.LoadArgs(args));
     REQUIRE(x == 4);
-    REQUIRE(args.size() == 2);
+    REQUIRE(args.size() == 2); // only "program" and "leftover" remain
     REQUIRE(args[0] == "program");
     REQUIRE(args[1] == "leftover");
   }
@@ -416,14 +419,14 @@ TEST_CASE("Test SettingsManager", "[config]")
     REQUIRE(captured[2] == "baz");
   }
 
-  // LoadArgs: erase_on_use removes processed long option and its value
+  // LoadArgs: processed long option and its value are removed from args
   {
     emp::SettingsManager cfg;
     int count = 0;
     cfg.AddSetting("count", count, "count");
 
     emp::vector<emp::String> args = { "program", "--count", "7", "other" };
-    REQUIRE(cfg.LoadArgs(args, /*erase_on_use=*/true));
+    REQUIRE(cfg.LoadArgs(args));
     REQUIRE(count == 7);
     REQUIRE(args.size() == 2);
     REQUIRE(args[0] == "program");
