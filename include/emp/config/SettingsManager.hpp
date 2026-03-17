@@ -302,6 +302,43 @@ namespace emp {
       return end_index - start_index;
     }
 
+    /// Consume a flag or option token: erase it if erase_on_use, otherwise advance i.
+    void ConsumeArg(emp::vector<emp::String> & args, size_t & i, bool erase_on_use) {
+      if (erase_on_use) args.erase(args.begin() + i);
+      else ++i;
+    }
+
+    /// Apply a setting value at args[i]; adjust i for erase_on_use.
+    /// Called after the flag/option token itself has already been consumed.
+    bool LoadArgSetting(emp::vector<emp::String> & args, size_t & i,
+                        SettingInfo & info, const emp::String & flag_desc,
+                        bool erase_on_use) {
+      if (i >= args.size()) {
+        return IOError("Expected value after '", flag_desc, "'.");
+      }
+      info.SetFromString(args[i]);
+      if (erase_on_use) { args.erase(args.begin() + i); --i; }
+      return true;
+    }
+
+    /// Apply a keyword at args[i..]; adjust i for erase_on_use.
+    /// Called after the flag/option token itself has already been consumed.
+    void LoadArgKeyword(emp::vector<emp::String> & args, size_t & i,
+                        const KeywordInfo & info, bool erase_on_use) {
+      size_t args_found = CountFlagArgs(args, i, info.max_args);
+      emp::vector<emp::String> keyword_vars(args_found);
+      for (size_t arg_id = 0; arg_id < args_found; ++arg_id) {
+        keyword_vars[arg_id] = args[i + arg_id];
+      }
+      info.fun(keyword_vars);
+      if (erase_on_use) {
+        args.erase(args.begin()+i, args.begin()+i+args_found);
+        --i;
+      } else {
+        i += args_found - 1;
+      }
+    }
+
     [[nodiscard]] bool IsEndLine(int id) const { return id == ';' || id == '\n'; }
 
     /// Trigger an error that prints of verbose and stores an error note.
@@ -545,84 +582,40 @@ namespace emp {
       for (size_t i = 0; i < args.size(); ++i) {
         const emp::String test_arg = args[i];
 
-        // Short flag for setting or keyword, such as: -x val
+        // Short flag: -x  (single character, registered via AddSetting or AddKeyword)
         if (test_arg.size() == 2 && test_arg[0] == '-' && test_arg[1] != '-') {
           const char flag_char = test_arg[1];
           if (flag_map.contains(flag_char)) {
-            // Erase this setting if needed; otherwise advance to next.
-            if (erase_on_use) args.erase(args.begin() + i);
-            else ++i;
-
-            emp::String identifier = flag_map.at(flag_char);
-
-            // If this is a setting...
-            if (setting_map.contains(identifier)) {
-              if (CountFlagArgs(args, i) < 1) {
-                return IOError("Expected value after '-", flag_char, "'.");
+            ConsumeArg(args, i, erase_on_use);
+            const emp::String & id = flag_map.at(flag_char);
+            if (setting_map.contains(id)) {
+              if (!LoadArgSetting(args, i, setting_map.at(id), "-"+flag_char, erase_on_use)) {
+                return false;
               }
-              setting_map.at(identifier).SetFromString(args[i]);
-              if (erase_on_use) { args.erase(args.begin() + i); --i; }
-              continue;
+            } else {
+              LoadArgKeyword(args, i, keyword_map.at(id), erase_on_use);
             }
-
-            // Otherwise it must be a keyword...
-            else {
-              emp_assert(keyword_map.contains(identifier), identifier);
-              const KeywordInfo & info = keyword_map.at(identifier);
-              size_t args_found = CountFlagArgs(args, i, info.max_args);
-              emp::vector<emp::String> keyword_vars(args_found);
-              for (size_t arg_id = 0; arg_id < args_found; ++arg_id) {
-                keyword_vars[arg_id] = args[i + arg_id];
-              }
-              info.fun(keyword_vars);
-              if (erase_on_use) {
-                args.erase(args.begin()+i, args.begin()+i+args_found);
-                --i;
-              } else {
-                i += args_found - 1;
-              }
-              continue;
-            }
+            continue;
           }
         }
 
-        // Per-setting long option: --setting val
-        // Per-keyword long option: --keyword arg1 arg2 ...
+        // Long option: --name  (setting value or keyword arguments)
         if (test_arg.size() > 2 && test_arg[0] == '-' && test_arg[1] == '-') {
           const emp::String opt = test_arg.substr(2);
           if (setting_map.contains(opt)) {
-            if (erase_on_use) args.erase(args.begin() + i);
-            else ++i;
-            if (i >= args.size()) {
-              return IOError("Expected value after '--", opt, "'.");
-            }
-            setting_map.at(opt).SetFromString(args[i]);
-            if (erase_on_use) { args.erase(args.begin() + i); --i; }
+            ConsumeArg(args, i, erase_on_use);
+            if (!LoadArgSetting(args, i, setting_map.at(opt), "--"+opt, erase_on_use)) return false;
             continue;
           } else if (keyword_map.contains(opt)) {
-            if (erase_on_use) args.erase(args.begin() + i);
-            else ++i;
-            const KeywordInfo & info = keyword_map.at(opt);
-            size_t args_found = CountFlagArgs(args, i, info.max_args);
-            emp::vector<emp::String> keyword_vars(args_found);
-            for (size_t arg_id = 0; arg_id < args_found; ++arg_id) {
-              keyword_vars[arg_id] = args[i + arg_id];
-            }
-            info.fun(keyword_vars);
-            if (erase_on_use) {
-              args.erase(args.begin()+i, args.begin()+i+args_found);
-              --i;
-            } else {
-              i += args_found - 1;
-            }
+            ConsumeArg(args, i, erase_on_use);
+            LoadArgKeyword(args, i, keyword_map.at(opt), erase_on_use);
             continue;
           }
         }
 
         // Bulk config string: -s "x = 5; y = 10" or --set "..."
         if (test_arg == "-s" || test_arg == "--set") {
-          if (erase_on_use) args.erase(args.begin() + i);
-          else ++i;
+          ConsumeArg(args, i, erase_on_use);
           if (i >= args.size()) {
             return IOError("Expected config string after '--set'.");
           }
