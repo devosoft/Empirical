@@ -8,99 +8,83 @@
  * @note An older version of this class became SettingCombos.hpp
  * @note Status: Alpha
  *
- * ## Overview
+ * SettingsManager maintains a collection of named settings, each bound to callback functions
+ * that are triggered when it is get or set.  These are usually associated with C++ variables
+ * whose values are maintained, but can also trigger more complex functions (for example, setting
+ * a random number seed might call ResetSeed on the random number generator.)
+ * 
+ * Supported setting types are `emp::String`, `bool`, `int`, `size_t`, and `double`.
  *
- * `emp::SettingsManager` maintains a collection of named settings, each bound
- * directly to an external variable.  When a setting is loaded from a file or
- * set programmatically, the bound variable is updated automatically via a
- * stored action callback.
+ * Settings can be organized into scopes using dot-notation names (e.g. `"robot1.speed"`), which
+ * simplifies configuring multiple objects of the same type without name collisions.
+ * (Internally all settings are stored with their full dotted key.)
  *
- * Settings can be organized into **scopes** using dot-notation names
- * (e.g. `"robot1.speed"`).  This makes it straightforward to configure
- * multiple objects of the same type without name collisions.  Internally
- * all settings are stored with their full dotted key.
+ * In addition to settings, users can also specify "Keywords", which trigger an arbitrary callback,
+ * receiving the remaining tokens on the line as arguments.  They are useful for arbitrary
+ * directives that do not follow the `name = value` pattern (e.g. `include other_file.cfg;`).
+ * Keywords are always global; they are not affected by the current scope.
  *
- * Two kinds of identifiers are supported:
- *
- *  - **Settings** – named variables with a fixed type and a single value.
- *    Supported types are `emp::String`, `bool`, `int`, `size_t`, and `double`.
- *
- *  - **Keywords** – special command words that trigger an arbitrary callback
- *    and receive the remaining tokens on the line as arguments.  They are
- *    useful for directives that do not follow the `name = value` pattern
- *    (e.g. `include other_file.cfg;`).  Keywords are always global; they are
- *    not affected by the current scope.
- *
- * ## Config-file format
+ * === Config-file format ===
  *
  * Files are parsed line-by-line.  Each line has one of the following forms:
  *
- * ```
- * # This is a comment (ignored)
+ *     # This is a comment (ignored)
  *
- * setting_name = value;          # assign a literal value to a setting
- * setting_name = other_name;     # copy the current value of another setting
- * keyword arg1 arg2 ...;         # invoke a keyword with zero or more arguments
+ *     setting_name = value;          # assign a literal value to a setting
+ *     setting_name = other_name;     # copy the current value of another setting
+ *     keyword arg1 arg2 ...;         # invoke a keyword with zero or more arguments
  *
- * scope.setting = value;         # dot-notation: assign a scoped setting directly
+ *     scope.setting = value;         # dot-notation: assign a scoped setting directly
  *
- * scope_name {                   # brace-block: enter a scope
- *   setting = value;             #   all names inside are prefixed with scope_name
- *   inner { setting = value; }   #   scopes may nest arbitrarily
- * }
- * ```
+ *     scope_name {                   # brace-block: enter a scope
+ *       setting = value;             #   all names inside are prefixed with scope_name
+ *       inner { setting = value; }   #   scopes may nest arbitrarily
+ *     }
  *
  * Dot notation and brace-block notation may be freely mixed in the same file.
- * A trailing `\` at the end of a line continues onto the next line (the
- * newline is ignored).  Booleans accept `On`/`Off`/`True`/`False`/`1`/`0`
- * (case-insensitive).  Strings may be bare identifiers or double-quoted
- * literals with standard C escape sequences.  Lines may be terminated by `;`
- * or a newline; blank lines and comment-only lines are skipped.
+ * A trailing '\' at the end of a line continues onto the next line (the newline is ignored).
+ * Booleans accept 'On', 'Off', 'True', 'False', '1', or '0' (case-insensitive).
+ * Strings may be single- or double-quoted literals with standard C escape sequences.
+ * Lines may be terminated by ';' or a newline; blank lines and comment-only lines are skipped.
  *
- * ## Basic usage
+ * === Basic usage ===
  *
- * ```cpp
- * std::string name = "World";
- * size_t      reps = 10;
- * bool        verbose = false;
- * int         r1_speed = 0, r2_speed = 0;
+ *     std::string name = "World";
+ *     size_t      reps = 10;
+ *     bool        verbose = false;
+ *     int         r1_speed = 0, r2_speed = 0;
  *
- * emp::SettingsManager cfg;
- * cfg.AddSetting("name",         name,     "Name to greet",      'n', "name");
- * cfg.AddSetting("reps",         reps,     "Number of repeats",  'r', "reps");
- * cfg.AddSetting("verbose",      verbose,  "Enable verbose mode",'v', "verbose");
- * cfg.AddSetting("robot1.speed", r1_speed, "Robot 1 speed");
- * cfg.AddSetting("robot2.speed", r2_speed, "Robot 2 speed");
+ *     emp::SettingsManager cfg;
+ *     // AddSetting can take the setting name, the C++ variable, a description, and an optional
+ *     // single-character flag (for quick setting on command line).
+ *     cfg.AddSetting("name",         name,     "Name to greet",      'n');
+ *     cfg.AddSetting("reps",         reps,     "Number of repeats",  'r');
+ *     cfg.AddSetting("verbose",      verbose,  "Enable verbose mode",'v');
+ *     cfg.AddSetting("robot1.speed", r1_speed, "Robot 1 speed");
+ *     cfg.AddSetting("robot2.speed", r2_speed, "Robot 2 speed");
  *
- * cfg.Load("my_config.cfg");    // updates variables from file
- * cfg.Save("my_config.cfg");    // writes current values with description comments
+ *     cfg.Load("my_config.cfg");    // updates variables from file
+ *     cfg.Save("my_config.cfg");    // writes current values with description comments
  *
- * // Apply settings from command-line arguments (e.g. -s "reps = 5")
- * emp::vector<emp::String> args(argv, argv + argc);
- * cfg.LoadArgs(args);
- * ```
+ *     // Apply settings from command-line arguments (e.g. -s "reps = 5")
+ *     emp::vector<emp::String> args(argv, argv + argc);
+ *     cfg.LoadArgs(args);
  *
- * ## Key methods
+ * === Main methods ===
  *
- *  - `AddSetting(name, var, desc [, flag [, option]])` – register a setting
- *    bound to `var`; `flag` is a one-character CLI flag (optional),
- *    `option` a long-form name (optional).  Returns `*this` for chaining.
- *  - `AddKeyword(keyword, fun, desc)` – register a keyword that invokes `fun`
- *    with its argument tokens.  Returns `*this` for chaining.
- *  - `Load(istream&)` / `Load(filename)` – parse settings; returns `false` on
- *    error.  Multiple calls accumulate; later values override earlier ones.
- *  - `LoadArgs(args [, erase_on_use])` – scan a `vector<emp::String>` of
- *    command-line arguments.  Per-setting short flags (`-x val`) and long
- *    options (`--opt val`) registered via `AddSetting` are applied directly;
- *    `-s`/`--set` applies the next argument as a bulk config string.  When
- *    `erase_on_use` is `true` each matched flag and its value are removed.
- *  - `Save(ostream&)` / `Save(filename)` – write all settings as a commented
- *    config file; returns `false` on error.
- *  - `Get<T>(name)` / `Set(name, value)` – programmatic get/set.
- *  - `HasSetting(name)` / `HasKeyword(name)` / `HasIdentifier(name)` – query
- *    whether a name is registered.
- *  - `HasError()` / `GetError()` – inspect the last error message.
- *  - `SetVerbose()` – enable diagnostic printing during Load/Save.
+ *  - AddSetting(name, var, desc [, flag ]) – register a setting bound to 'var';
+ *     'flag' is a one-character CLI flag (optional).
+ *  - AddKeyword(keyword, fun, desc) – register a keyword that invokes 'fun' with its args.
+ *  - Load(istream&) or Load(filename) – parse settings; return success (true/false)
+ *  - LoadArgs(args [, erase_on_use]) – scan a 'vector<emp::String>' of command-line arguments:
+ *       '-x val' or '--setting val' set specified setting (registered with AddSetting)
+ *       '-s' or '--set' applies the next argument as a bulk config string.
+ *       if erase_on_use is set, matched flags and values are removed.
+ *  - Save(ostream&) or Save(filename) – write all settings as config file; return success.
+ *  - Get<T>(name) or Set(name, value) – programmatic get/set.
+ *  - HasSetting(name) or HasKeyword(name) or HasIdentifier(name) – query if name is registered.
+ *  - HasError() or GetError() – inspect the last error message.
+ *  - SetVerbose() – enable diagnostic printing during Load/Save.
  *
  * DEVELOPER NOTES:
  * - Consider allowing types to be more dynamic, perhaps set in a template.
@@ -140,13 +124,12 @@ namespace emp {
       val_t value;                ///< Current value of this setting.
       emp::String desc   = "";    ///< Description of setting
       char flag          = '\0';  ///< Command-line flag ('\0' for none)
-      emp::String option = "";    ///< Command-line longer option ("" for none)
       std::function<void(const SettingInfo &)> action;  ///< Action to take when set.
 
       // Helper: convert from string to val_t of current type.
       val_t ParseFromString(emp::String str) const {
         if (IsString()) {
-          if (str.size() && str[0] == '\"') { return emp::MakeStringFromLiteral(str); }
+          if (str.size() && (str[0] == '\"' || str[0] == '\'')) { return emp::MakeStringFromLiteral(str, "\"'"); }
           else { return str; }
         }
         if (IsBool()) {
@@ -169,9 +152,8 @@ namespace emp {
       SettingInfo(emp::String name,
                   T & var,
                   emp::String desc,
-                  char flag          = '\0',
-                  emp::String option = "")
-        : name(name), value(var), desc(desc), flag(flag), option(option)
+                  char flag          = '\0')
+        : name(name), value(var), desc(desc), flag(flag)
         , action([&var](const SettingInfo & info) { var = info.GetValue<T>(); }) {}
 
       template <typename T>
@@ -193,7 +175,6 @@ namespace emp {
       [[nodiscard]] const emp::String & GetName() const { return name; }
       [[nodiscard]] const emp::String & GetDescription() const { return desc; }
       [[nodiscard]] char GetFlag() const { return flag; }
-      [[nodiscard]] const emp::String & GetOption() const { return option; }
 
       template <typename T>
       [[nodiscard]] const T & GetValue() const {
@@ -257,7 +238,6 @@ namespace emp {
     std::map<emp::String, SettingInfo> setting_map;
     std::map<emp::String, KeywordInfo> keyword_map;
     std::map<char, emp::String>        flag_map;    ///< Short flag char  -> full setting name
-    std::map<emp::String, emp::String> option_map;  ///< Long option name -> full setting name
     emp::vector<emp::String> cur_scopes{};
     emp::String error_note;
     bool verbose = false;
@@ -413,7 +393,7 @@ namespace emp {
       , ident_ID(lexer.AddToken("identifier", "[a-zA-Z_][a-zA-Z0-9_.]*"))
       , int_ID(lexer.AddToken("int", "[0-9]+"))
       , double_ID(lexer.AddToken("double", "[0-9]+\\.[0-9]+"))
-      , string_ID(lexer.AddToken("string", "(\\\"([^\"\\\\]|(\\\\.))*\\\")"))
+      , string_ID(lexer.AddToken("string", "(\\\"([^\"\\\\]|(\\\\.))*\\\")|(\\'([^'\\\\]|(\\\\.))*\\')"))
     {
       lexer.IgnoreToken("whitespace", "[ \\t\\r]+");
       lexer.IgnoreToken("comment", "#.+");
@@ -445,10 +425,6 @@ namespace emp {
 
     [[nodiscard]] char GetFlag(const emp::String & name) const { return GetSettingInfo(name).GetFlag(); }
 
-    [[nodiscard]] const emp::String & GetOption(const emp::String & name) const {
-      return GetSettingInfo(name).GetOption();
-    }
-
     template <typename T>
     void Set(const emp::String & name, T && value) {
       GetSettingInfo(name).SetValue(std::forward<T>(value));
@@ -462,18 +438,14 @@ namespace emp {
     SettingsManager & AddSetting(const emp::String & name,
                                  T & value,
                                  emp::String desc,
-                                 char flag          = '\0',
-                                 emp::String option = "") {
+                                 char flag          = '\0') {
       emp_assert(!HasSetting(name), "Trying to add a SettingsManager setting that already exists",
                  AppendScope(name));
       emp_assert(flag == '\0' || !flag_map.contains(flag),
                  "Duplicate CLI flag in SettingsManager", flag);
-      emp_assert(option.empty() || !option_map.contains(option),
-                 "Duplicate CLI option in SettingsManager", option);
       const emp::String full_name = AppendScope(name);
-      setting_map.emplace(full_name, SettingInfo{full_name, value, desc, flag, option});
+      setting_map.emplace(full_name, SettingInfo{full_name, value, desc, flag});
       if (flag != '\0')    flag_map[flag]     = full_name;
-      if (!option.empty()) option_map[option] = full_name;
       return *this;
     }
 
@@ -535,8 +507,7 @@ namespace emp {
     /// Three argument forms are handled:
     ///  - `-x val`      – short flag registered via AddSetting; `val` is the
     ///                    value string for that setting.
-    ///  - `--option val` – long option registered via AddSetting; `val` is the
-    ///                    value string for that setting.
+    ///  - `--setting val` – Same as `setting = val` in a config file.
     ///  - `-s "x=5; y=10"` / `--set "..."` – bulk config string tokenized and
     ///                    loaded exactly as if it were a config file.
     ///
@@ -546,11 +517,11 @@ namespace emp {
     bool LoadArgs(emp::vector<emp::String> & args, bool erase_on_use=false) {
       error_note.clear();
       for (size_t i = 0; i < args.size(); ++i) {
-        const emp::String & arg = args[i];
+        const emp::String test_arg = args[i];
 
         // Per-setting short flag: -x val
-        if (arg.size() == 2 && arg[0] == '-' && arg[1] != '-') {
-          const char flag_char = arg[1];
+        if (test_arg.size() == 2 && test_arg[0] == '-' && test_arg[1] != '-') {
+          const char flag_char = test_arg[1];
           if (flag_map.contains(flag_char)) {
             if (erase_on_use) args.erase(args.begin() + i);
             else ++i;
@@ -563,23 +534,23 @@ namespace emp {
           }
         }
 
-        // Per-setting long option: --option val
-        if (arg.size() > 2 && arg[0] == '-' && arg[1] == '-') {
-          const emp::String opt = arg.substr(2);
-          if (option_map.contains(opt)) {
+        // Per-setting long option: --setting val
+        if (test_arg.size() > 2 && test_arg[0] == '-' && test_arg[1] == '-') {
+          const emp::String opt = test_arg.substr(2);
+          if (setting_map.contains(opt)) {
             if (erase_on_use) args.erase(args.begin() + i);
             else ++i;
             if (i >= args.size()) {
               return IOError("Expected value after '--", opt, "'.");
             }
-            setting_map.at(option_map.at(opt)).SetFromString(args[i]);
+            setting_map.at(opt).SetFromString(args[i]);
             if (erase_on_use) { args.erase(args.begin() + i); --i; }
             continue;
           }
         }
 
         // Bulk config string: -s "x = 5; y = 10" or --set "..."
-        if (arg == "-s" || arg == "--set") {
+        if (test_arg == "-s" || test_arg == "--set") {
           if (erase_on_use) args.erase(args.begin() + i);
           else ++i;
           if (i >= args.size()) {
