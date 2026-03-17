@@ -430,6 +430,50 @@ TEST_CASE("Test SettingsManager", "[config]")
     REQUIRE(args[1] == "other");
   }
 
+  // LoadArgs: keyword triggered via short flag (-k arg1 arg2)
+  {
+    emp::SettingsManager cfg;
+    emp::vector<emp::String> captured;
+    cfg.AddKeyword("greet", [&captured](emp::vector<emp::String> args) {
+      captured = args;
+    }, "greeting keyword", 'g');
+
+    emp::vector<emp::String> args = { "program", "-g", "hello", "world" };
+    REQUIRE(cfg.LoadArgs(args));
+    REQUIRE(captured.size() == 2);
+    REQUIRE(captured[0] == "hello");
+    REQUIRE(captured[1] == "world");
+  }
+
+  // LoadArgs: keyword triggered via long option (--keyword arg1 arg2)
+  {
+    emp::SettingsManager cfg;
+    emp::vector<emp::String> captured;
+    cfg.AddKeyword("greet", [&captured](emp::vector<emp::String> args) {
+      captured = args;
+    }, "greeting keyword");
+
+    emp::vector<emp::String> args = { "program", "--greet", "hello", "world" };
+    REQUIRE(cfg.LoadArgs(args));
+    REQUIRE(captured.size() == 2);
+    REQUIRE(captured[0] == "hello");
+    REQUIRE(captured[1] == "world");
+  }
+
+  // LoadArgs: keyword max_args limits how many arguments are consumed
+  {
+    emp::SettingsManager cfg;
+    emp::vector<emp::String> captured;
+    cfg.AddKeyword("greet", [&captured](emp::vector<emp::String> args) {
+      captured = args;
+    }, "greeting keyword", '\0', /*max_args=*/1);
+
+    emp::vector<emp::String> args = { "program", "--greet", "hello", "world" };
+    REQUIRE(cfg.LoadArgs(args));
+    REQUIRE(captured.size() == 1);
+    REQUIRE(captured[0] == "hello");
+  }
+
   // LoadArgs: missing config string after --set / -s returns false and sets error
   {
     emp::SettingsManager cfg;
