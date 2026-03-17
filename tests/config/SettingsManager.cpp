@@ -24,28 +24,27 @@ TEST_CASE("Test SettingsManager", "[config]")
     emp::String s = "hello";
     size_t n = 10;
 
-    cfg.AddSetting("i", i, "an int",    'i', "int-val")
-       .AddSetting("d", d, "a double")
-       .AddSetting("b", b, "a bool")
-       .AddSetting("s", s, "a string")
-       .AddSetting("n", n, "a size_t");
+    cfg.AddSetting("i-val", i, "an int",    'i')
+       .AddSetting("d-val", d, "a double")
+       .AddSetting("b-val", b, "a bool")
+       .AddSetting("s-val", s, "a string")
+       .AddSetting("n-val", n, "a size_t");
 
-    REQUIRE(cfg.HasSetting("i"));
-    REQUIRE(cfg.HasSetting("d"));
-    REQUIRE(cfg.HasSetting("b"));
-    REQUIRE(cfg.HasSetting("s"));
-    REQUIRE(cfg.HasSetting("n"));
+    REQUIRE(cfg.HasSetting("i-val"));
+    REQUIRE(cfg.HasSetting("d-val"));
+    REQUIRE(cfg.HasSetting("b-val"));
+    REQUIRE(cfg.HasSetting("s-val"));
+    REQUIRE(cfg.HasSetting("n-val"));
     REQUIRE(!cfg.HasSetting("missing"));
 
-    REQUIRE(cfg.Get<int>("i")          == 3);
-    REQUIRE(cfg.Get<double>("d")       == 1.5);
-    REQUIRE(cfg.Get<bool>("b")         == true);
-    REQUIRE(cfg.Get<emp::String>("s")  == "hello");
-    REQUIRE(cfg.Get<size_t>("n")       == 10);
+    REQUIRE(cfg.Get<int>("i-val")         == 3);
+    REQUIRE(cfg.Get<double>("d-val")      == 1.5);
+    REQUIRE(cfg.Get<bool>("b-val")        == true);
+    REQUIRE(cfg.Get<emp::String>("s-val") == "hello");
+    REQUIRE(cfg.Get<size_t>("n-val")      == 10);
 
-    REQUIRE(cfg.GetDesc("i")   == "an int");
-    REQUIRE(cfg.GetFlag("i")   == 'i');
-    REQUIRE(cfg.GetOption("i") == "int-val");
+    REQUIRE(cfg.GetDesc("i-val")   == "an int");
+    REQUIRE(cfg.GetFlag("i-val")   == 'i');
   }
 
   // Set() updates both the internal value and the bound variable
@@ -259,9 +258,9 @@ TEST_CASE("Test SettingsManager", "[config]")
     int count = 0;
     bool verbose = false;
     emp::String name = "";
-    cfg.AddSetting("count",   count,   "count",   'c', "count")
-       .AddSetting("verbose", verbose, "verbose", 'v', "verbose")
-       .AddSetting("name",    name,    "name",    'n', "name");
+    cfg.AddSetting("count",   count,   "count",   'c')
+       .AddSetting("verbose", verbose, "verbose", 'v')
+       .AddSetting("name",    name,    "name",    'n');
 
     emp::vector<emp::String> args = { "program", "-c", "5", "-v", "On", "-n", "Alice" };
     REQUIRE(cfg.LoadArgs(args));
@@ -275,8 +274,8 @@ TEST_CASE("Test SettingsManager", "[config]")
     emp::SettingsManager cfg;
     int count = 0;
     emp::String name = "";
-    cfg.AddSetting("count", count, "count", '\0', "count")
-       .AddSetting("name",  name,  "name",  '\0', "name");
+    cfg.AddSetting("count", count, "count", '\0')
+       .AddSetting("name",  name,  "name",  '\0');
 
     emp::vector<emp::String> args = { "program", "--count", "12", "--name", "Bob" };
     REQUIRE(cfg.LoadArgs(args));
@@ -288,7 +287,7 @@ TEST_CASE("Test SettingsManager", "[config]")
   {
     emp::SettingsManager cfg;
     int x = 0;
-    cfg.AddSetting("x", x, "int", 'x', "xval");
+    cfg.AddSetting("x", x, "int", 'x');
 
     emp::vector<emp::String> args = { "program", "--other", "stuff", "-x", "3" };
     REQUIRE(cfg.LoadArgs(args));
@@ -301,8 +300,8 @@ TEST_CASE("Test SettingsManager", "[config]")
     emp::SettingsManager cfg;
     int x = 0;
     emp::String name = "";
-    cfg.AddSetting("x",    x,    "int",    'x', "xval")
-       .AddSetting("name", name, "string", 'n', "name");
+    cfg.AddSetting("x",    x,    "int",    'x')
+       .AddSetting("name", name, "string", 'n');
 
     emp::vector<emp::String> args = { "program", "-x", "7", "other", "-n", "Carol" };
     REQUIRE(cfg.LoadArgs(args, /*erase_on_use=*/true));
@@ -343,11 +342,130 @@ TEST_CASE("Test SettingsManager", "[config]")
   {
     emp::SettingsManager cfg;
     int x = 0;
-    cfg.AddSetting("x", x, "int", '\0', "xval");
+    cfg.AddSetting("xval", x, "int");
 
     emp::vector<emp::String> args = { "program", "--xval" };
     REQUIRE(!cfg.LoadArgs(args));
     REQUIRE(cfg.HasError());
+  }
+
+  // Load: single-quoted string literals
+  {
+    emp::SettingsManager cfg;
+    emp::String s = "";
+    cfg.AddSetting("s", s, "string");
+
+    std::istringstream is("s = 'hello world'\n");
+    REQUIRE(cfg.Load(is));
+    REQUIRE(s == "hello world");
+  }
+
+  // Load: line continuation (trailing backslash joins lines)
+  {
+    emp::SettingsManager cfg;
+    int x = 0;
+    cfg.AddSetting("x", x, "int");
+
+    // The '\' at end of line is consumed; the value token follows on the next line
+    std::istringstream is("x = \\\n7\n");
+    REQUIRE(cfg.Load(is));
+    REQUIRE(x == 7);
+  }
+
+  // Save: stream overload writes description comments and key=value lines
+  {
+    emp::SettingsManager cfg;
+    int x = 42;
+    bool b = true;
+    cfg.AddSetting("x", x, "the answer")
+       .AddSetting("b", b, "a flag");
+
+    std::ostringstream os;
+    REQUIRE(cfg.Save(os));
+    const std::string out = os.str();
+    REQUIRE(out.find("# the answer\n") != std::string::npos);
+    REQUIRE(out.find("x = 42;\n")      != std::string::npos);
+    REQUIRE(out.find("# a flag\n")     != std::string::npos);
+    REQUIRE(out.find("b = On;\n")      != std::string::npos);
+  }
+
+  // Save: scoped settings are saved with their full dotted key
+  {
+    emp::SettingsManager cfg;
+    int speed = 10;
+    cfg.AddSetting("robot.speed", speed, "speed");
+
+    std::ostringstream os;
+    REQUIRE(cfg.Save(os));
+    REQUIRE(os.str().find("robot.speed = 10;\n") != std::string::npos);
+  }
+
+  // AddKeyword: callback receives all argument tokens
+  {
+    emp::SettingsManager cfg;
+    emp::vector<emp::String> captured;
+    cfg.AddKeyword("cmd", [&captured](emp::vector<emp::String> args) {
+      captured = args;
+    }, "multi-arg keyword");
+
+    std::istringstream is("cmd foo bar baz\n");
+    REQUIRE(cfg.Load(is));
+    REQUIRE(captured.size() == 3);
+    REQUIRE(captured[0] == "foo");
+    REQUIRE(captured[1] == "bar");
+    REQUIRE(captured[2] == "baz");
+  }
+
+  // LoadArgs: erase_on_use removes processed long option and its value
+  {
+    emp::SettingsManager cfg;
+    int count = 0;
+    cfg.AddSetting("count", count, "count");
+
+    emp::vector<emp::String> args = { "program", "--count", "7", "other" };
+    REQUIRE(cfg.LoadArgs(args, /*erase_on_use=*/true));
+    REQUIRE(count == 7);
+    REQUIRE(args.size() == 2);
+    REQUIRE(args[0] == "program");
+    REQUIRE(args[1] == "other");
+  }
+
+  // LoadArgs: missing config string after --set / -s returns false and sets error
+  {
+    emp::SettingsManager cfg;
+    int x = 0;
+    cfg.AddSetting("x", x, "int");
+
+    emp::vector<emp::String> args = { "program", "--set" };
+    REQUIRE(!cfg.LoadArgs(args));
+    REQUIRE(cfg.HasError());
+  }
+
+  // LoadArgs: scoped setting via long option (--robot.speed 42)
+  {
+    emp::SettingsManager cfg;
+    int speed = 0;
+    cfg.AddSetting("robot.speed", speed, "speed");
+
+    emp::vector<emp::String> args = { "program", "--robot.speed", "42" };
+    REQUIRE(cfg.LoadArgs(args));
+    REQUIRE(speed == 42);
+  }
+
+  // Error: a successful load clears the error from a previous failed load
+  {
+    emp::SettingsManager cfg;
+    int x = 0;
+    cfg.AddSetting("x", x, "int");
+
+    std::istringstream bad("unknown = 5\n");
+    REQUIRE(!cfg.Load(bad));
+    REQUIRE(cfg.HasError());
+
+    std::istringstream good("x = 3\n");
+    REQUIRE(cfg.Load(good));
+    REQUIRE(!cfg.HasError());
+    REQUIRE(x == 3);
   }
 
   // Save and reload: round-trip preserves all values
