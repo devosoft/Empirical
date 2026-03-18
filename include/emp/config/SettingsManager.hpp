@@ -101,7 +101,6 @@
 #include <optional>
 #include <print>
 #include <stddef.h>
-#include <variant>
 
 #include "../base/notify.hpp"
 #include "../base/vector.hpp"
@@ -113,7 +112,6 @@ namespace emp {
 
   class SettingsManager {
   private:
-    using val_t = std::variant<emp::String, bool, int, size_t, double>;
     using keyword_fun_arg_t = emp::vector<emp::String>;
     using keyword_fun_t = std::function<void(keyword_fun_arg_t)>;
     using Iterator = emp::TokenStream::Iterator;
@@ -122,109 +120,117 @@ namespace emp {
     class SettingInfo {
     private:
       emp::String name;           ///< Label for this setting in config files
-      val_t value;                ///< Current value of this setting.
       emp::String desc   = "";    ///< Description of setting
       char flag          = '\0';  ///< Command-line flag ('\0' for none)
-      std::function<void(const SettingInfo &)> action;  ///< Action to take when set.
 
-      // Helper: convert from string to val_t of current type.
-      val_t ParseFromString(emp::String str) const {
-        if (IsString()) {
-          if (str.size() && (str[0] == '\"' || str[0] == '\'')) { return emp::MakeStringFromLiteral(str, "\"'"); }
-          else { return str; }
-        }
-        if (IsBool()) {
-          str.SetLower();
-          return str == "on" || str == "true" || str == "1";
-        }
-        if (IsInt()) { return std::stoi(str); }
-        if (IsULL()) { return static_cast<size_t>(std::stoull(str)); }
-        if (IsDouble()) { return std::stod(str); }
-        emp_assert(false, "Invalid type in Setting Info", name);
-        return 0.0;
+      enum class Type { ERROR=0, STRING, BOOL, INT, SIZE_T, DOUBLE };
+      Type type;
+
+      std::function<void(const emp::String &)> set_string;
+      std::function<void(bool)>                set_bool;
+      std::function<void(int)>                 set_int;
+      std::function<void(size_t)>              set_size_t;
+      std::function<void(double)>              set_double;
+
+      std::function<emp::String()> get_string;
+      std::function<bool()>        get_bool;
+      std::function<int()>         get_int;
+      std::function<size_t()>      get_size_t;
+      std::function<double()>      get_double;
+
+      template <typename T> static constexpr Type ToTypeEnum() {
+        using base_t = std::remove_cv_t<T>;
+        if constexpr (std::same_as<base_t, bool>)             return Type::BOOL;
+        else if constexpr (std::same_as<base_t, int>)         return Type::INT;
+        else if constexpr (std::same_as<base_t, size_t>)      return Type::SIZE_T;
+        else if constexpr (std::same_as<base_t, double>)      return Type::DOUBLE;
+        else if constexpr (std::same_as<base_t, emp::String>) return Type::STRING;
+        else return Type::ERROR;
       }
+
+      template <typename TO_T, typename FROM_T>
+      [[nodiscard]] static TO_T Convert(const FROM_T & in) {
+        using base_to_t = std::remove_cv_t<TO_T>;
+        if constexpr (std::same_as<FROM_T, base_to_t>) return in;
+        else if constexpr (std::same_as<base_to_t, emp::String>) return emp::MakeString(in);
+        else if constexpr (std::same_as<FROM_T, emp::String>) {
+          if constexpr (std::same_as<base_to_t, bool>) return !in.AsLower().IsOneOf("off", "false", "0");
+          if constexpr (std::same_as<base_to_t, int>) return in.AsInt();
+          if constexpr (std::same_as<base_to_t, size_t>) return in.AsULL();
+          if constexpr (std::same_as<base_to_t, double>) return in.AsDouble();
+        }
+        else return static_cast<base_to_t>(in);
+      }
+
 
     public:
       SettingInfo()                    = delete;
       SettingInfo(const SettingInfo &) = default;
       SettingInfo(SettingInfo &&)      = default;
 
-      template <typename T>
-      SettingInfo(emp::String name,
-                  T & var,
-                  emp::String desc,
-                  char flag          = '\0')
-        : name(name), value(var), desc(desc), flag(flag)
-        , action([&var](const SettingInfo & info) { var = info.GetValue<T>(); }) {}
+      // Create from a string variable.
+      template <typename VAR_T>
+      SettingInfo(emp::String name, VAR_T & var, emp::String desc, char flag = '\0')
+        : name(name), desc(desc), flag(flag), type(ToTypeEnum<VAR_T>())
+        , set_string([&var](const emp::String & in){ var = Convert<VAR_T>(in); })
+        , set_bool(  [&var](bool in)               { var = Convert<VAR_T>(in); })
+        , set_int(   [&var](int in)                { var = Convert<VAR_T>(in); })
+        , set_size_t([&var](size_t in)             { var = Convert<VAR_T>(in); })
+        , set_double([&var](double in)             { var = Convert<VAR_T>(in); })
+        , get_string([&var]() { return Convert<emp::String>(var); })
+        , get_bool([&var]()   { return Convert<bool>(var); })
+        , get_int([&var]()    { return Convert<int>(var); })
+        , get_size_t([&var]() { return Convert<size_t>(var); })
+        , get_double([&var]() { return Convert<double>(var); }) {}
 
-      template <typename T>
-      [[nodiscard]] bool IsType() const {
-        return std::holds_alternative<T>(value);
-      }
 
-      template <typename T>
-      [[nodiscard]] bool IsUsableType() const {
-        return IsType<std::remove_cvref_t<T>>();
-      }
-
-      [[nodiscard]] bool IsString() const { return IsType<emp::String>(); }
-      [[nodiscard]] bool IsBool() const { return IsType<bool>(); }
-      [[nodiscard]] bool IsInt() const { return IsType<int>(); }
-      [[nodiscard]] bool IsULL() const { return IsType<size_t>(); }
-      [[nodiscard]] bool IsDouble() const { return IsType<double>(); }
+      [[nodiscard]] bool IsString() const { return type == Type::STRING; }
+      [[nodiscard]] bool IsBool() const { return type == Type::BOOL; }
+      [[nodiscard]] bool IsInt() const { return type == Type::INT; }
+      [[nodiscard]] bool IsULL() const { return type == Type::SIZE_T; }
+      [[nodiscard]] bool IsDouble() const { return type == Type::DOUBLE; }
 
       [[nodiscard]] const emp::String & GetName() const { return name; }
       [[nodiscard]] const emp::String & GetDescription() const { return desc; }
       [[nodiscard]] char GetFlag() const { return flag; }
 
       template <typename T>
-      [[nodiscard]] const T & GetValue() const {
-        return std::get<T>(value);
+      [[nodiscard]] T GetValue() const {
+        if constexpr (std::same_as<T, emp::String>) return get_string();
+        else if constexpr (std::same_as<T, bool>) return get_bool();
+        else if constexpr (std::same_as<T, int>) return get_int();
+        else if constexpr (std::same_as<T, size_t>) return get_size_t();
+        else if constexpr (std::same_as<T, double>) return get_double();
+        else {
+          static_assert(emp::dependent_false<T>(), "unsupported type");
+          return T{};
+        }
       }
 
       /// Set the value; must maintain current type.
-      template <typename T>
-      void SetValue(T && val) {
-        emp_assert(IsUsableType<T>(), name);
-        value = std::forward<T>(val);
-        if (action) { action(*this); }
-      }
+      void SetValue(const emp::String & val) { set_string(val); }
+      void SetValue(bool val) { set_bool(val); }
+      void SetValue(int val) { set_int(val); }
+      void SetValue(size_t val) { set_size_t(val); }
+      void SetValue(double val) { set_double(val); }
 
-      /// If input is a string, convert it to the correct type.
-      void SetFromString(const emp::String & input) {
-        value = ParseFromString(input);
-        if (action) { action(*this); }
-      }
-
-      /// Convert to string for display
-      [[nodiscard]] emp::String AsString() const {
-        if (IsString()) { return std::get<emp::String>(value); }
-        if (IsBool()) { return std::get<bool>(value) ? "1" : "0"; }
-        if (IsInt()) { return emp::MakeString(std::get<int>(value)); }
-        if (IsULL()) { return emp::MakeString(std::get<size_t>(value)); }
-        if (IsDouble()) { return emp::MakeString(std::get<double>(value)); }
-        emp_assert(false, "Invalid type in Setting Info", name);
-        return "";
-      }
+      [[nodiscard]] emp::String AsString() const { return get_string(); }
 
       [[nodiscard]] emp::String AsLiteral() const {
-        if (IsString()) { return std::get<emp::String>(value).AsLiteral(); }
-        if (IsBool()) { return std::get<bool>(value) ? "On" : "Off"; }
-        if (IsInt()) { return emp::MakeString(std::get<int>(value)); }
-        if (IsULL()) { return emp::MakeString(std::get<size_t>(value)); }
-        if (IsDouble()) { return emp::MakeString(std::get<double>(value)); }
-        emp_assert(false, "Invalid type in Setting Info", name);
-        return "";
+        if (IsString()) { return AsString().AsLiteral(); }
+        return AsString();
       }
 
       /// Check the type (return std::string for compatibility with type manager)
       [[nodiscard]] std::string GetTypeName() const {
-        if (IsString()) { return "emp::String"; }
-        if (IsBool()) { return "bool"; }
-        if (IsInt()) { return "int"; }
-        if (IsULL()) { return "size_t"; }
-        if (IsDouble()) { return "double"; }
-        return "error";
+        switch (type) {
+          case Type::STRING: return "emp::String";
+          case Type::BOOL: return "bool";
+          case Type::INT: return "int";
+          case Type::SIZE_T: return "size_t";
+          case Type::DOUBLE: return "double";
+          default: return "error";
+        }
       }
     }; // END OF SettingInfo definition
 
@@ -311,7 +317,7 @@ namespace emp {
       if (i >= args.size()) {
         return IOError("Expected value after '", flag_desc, "'.");
       }
-      info.SetFromString(args[i]);
+      info.SetValue(args[i]);
       args.erase(args.begin() + i);
       --i;
       return true;
@@ -364,9 +370,14 @@ namespace emp {
     }
 
     std::optional<emp::String> TokenToStringValue(const Token & token) {
-      // If literal value, use it directly.
-      if (token.IsOneOf(bool_value_ID, int_ID, double_ID, string_ID)) {
+      // If numeric literal value, use it directly.
+      if (token.IsOneOf(bool_value_ID, int_ID, double_ID)) {
         return token.lexeme;
+      }
+
+      // If string literal, convert it to a regular string.
+      if (token == string_ID) {
+        return token.lexeme.ConvertStringFromLiteral("\"'");
       }
 
       // If identifier, look it up.
@@ -392,7 +403,7 @@ namespace emp {
 
       std::optional<emp::String> string_val = TokenToStringValue(it.Use());
       if (string_val) {
-        GetSettingInfo(name).SetFromString(*string_val);
+        GetSettingInfo(name).SetValue(*string_val);
         return true;
       }
       return false;
@@ -618,7 +629,7 @@ namespace emp {
     /// all other arguments are left untouched.
     /// Returns false (and sets the error note) on the first parse error.
     bool LoadArgs(emp::vector<emp::String> & args) {
-      if (args.size() == 0) return false;
+      if (args.size() == 0) return true;
       exe_name = args[0];
 
       error_note.clear();
