@@ -39,7 +39,7 @@ namespace emp {
     using this_t = emp::vector<T, Ts...>;
     using stdv_t = std::vector<T, Ts...>;
 
-#ifndef NDEBUG
+#ifndef NDEBUG // == Debug mode only ==
     /// Setup a threshold; if we try to make a vector bigger than MAX_SIZE, throw a warning.
     constexpr static const size_t MAX_SIZE = 2'000'000'001;  // 2x10^9 + 1
 
@@ -67,6 +67,8 @@ namespace emp {
 
     this_t & operator=(const this_t &) & = default;
     this_t & operator=(this_t &&) &      = default;
+    template <typename... ARGS>
+    constexpr void assign(ARGS &&... args) { stdv_t::assign(std::forward<ARGS>(args)...); }
 
 #else   // #ifdef NDEBUG
 
@@ -343,6 +345,11 @@ namespace emp {
 
     constexpr this_t & operator=(const this_t &) & = default;
     constexpr this_t & operator=(this_t &&) &      = default;
+    template <typename... ARGS>
+    constexpr void assign(ARGS &&... args) {
+      ++revision;
+      stdv_t::assign(std::forward<ARGS>(args)...);
+    }
 
     [[nodiscard]] constexpr T & operator[](size_t pos) {
       emp_assert(pos < stdv_t::size(), pos, stdv_t::size());
@@ -427,7 +434,7 @@ namespace emp {
     using this_t = emp::vector<bool, Ts...>;
     using stdv_t = std::vector<bool, Ts...>;
 
-#ifndef NDEBUG
+#ifndef NDEBUG  // == Debug mode only ==
     /// Setup a threshold; if we try to make a vector bigger than MAX_SIZE, throw a warning.
     constexpr static const size_t MAX_SIZE = 2'000'000'001;
 #endif  // #ifndef NDEBUG
@@ -457,7 +464,7 @@ namespace emp {
       ;
     }
 
-#ifndef NDEBUG
+#ifndef NDEBUG // == Debug mode only ==
     // In debug mode, wrap functions important to test.
 
     // operator stdv_t &() { return v; }
