@@ -389,7 +389,7 @@ TEST_CASE("Test SettingsManager", "[config]")
     REQUIRE(out.find("# the answer\n") != std::string::npos);
     REQUIRE(out.find("x = 42;\n")      != std::string::npos);
     REQUIRE(out.find("# a flag\n")     != std::string::npos);
-    REQUIRE(out.find("b = On;\n")      != std::string::npos);
+    REQUIRE(out.find("b = 1;\n")      != std::string::npos);
   }
 
   // Save: scoped settings are saved with their full dotted key
