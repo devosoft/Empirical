@@ -66,7 +66,7 @@
  *     cfg.Load("my_config.cfg");    // updates variables from file
  *     cfg.Save("my_config.cfg");    // writes current values with description comments
  *
- *     // Apply settings from command-line arguments (e.g. -s "reps = 5")
+ *     // Apply settings from command-line arguments (e.g. -S "reps = 5")
  *     emp::vector<emp::String> args(argv, argv + argc);
  *     cfg.LoadArgs(args);
  *
@@ -79,7 +79,7 @@
  *  - LoadArgs(args) – scan a 'vector<emp::String>' of command-line arguments, deleting those used:
  *       '-x val' or '--setting val' set specified setting (registered with AddSetting)
  *       '-k arg...' or '--keyword arg...' trigger a keyword (registered with AddKeyword)
- *       '-s "cfg"' or '--set "cfg"' apply a bulk config string (built-in keyword).
+ *       '-S "cfg"' or '--set "cfg"' apply a bulk config string (built-in keyword).
  *  - Save(ostream&) or Save(filename) – write all settings as config file; return success.
  *  - Get<T>(name) or Set(name, value) – programmatic get/set.
  *  - HasSetting(name) or HasKeyword(name) or HasIdentifier(name) – query if name is registered.
@@ -155,9 +155,16 @@ namespace emp {
         else if constexpr (std::same_as<base_to_t, emp::String>) return emp::MakeString(in);
         else if constexpr (std::same_as<FROM_T, emp::String>) {
           if constexpr (std::same_as<base_to_t, bool>) return !in.AsLower().IsOneOf("off", "false", "0");
-          if constexpr (std::same_as<base_to_t, int>) return in.AsInt();
-          if constexpr (std::same_as<base_to_t, size_t>) return in.AsULL();
-          if constexpr (std::same_as<base_to_t, double>) return in.AsDouble();
+          else if constexpr (std::signed_integral<base_to_t>) {
+            return static_cast<TO_T>(in.AsInt());
+          }
+          else if constexpr (std::unsigned_integral<base_to_t>) {
+            return static_cast<TO_T>(in.AsULL());
+          }
+          else if constexpr (std::floating_point<base_to_t>) {
+            return static_cast<TO_T>(in.AsDouble());
+          }
+          else static_assert(false, "Cannot convert from string to unknown type.");
         }
         else return static_cast<base_to_t>(in);
       }
@@ -168,7 +175,7 @@ namespace emp {
       SettingInfo(const SettingInfo &) = default;
       SettingInfo(SettingInfo &&)      = default;
 
-      // Create from a string variable.
+      // Create from a bound variable.
       template <typename VAR_T>
       SettingInfo(emp::String name, VAR_T & var, emp::String desc, char flag = '\0')
         : name(name), desc(desc), flag(flag), type(ToTypeEnum<VAR_T>())
@@ -182,6 +189,24 @@ namespace emp {
         , get_int([&var]()    { return Convert<int>(var); })
         , get_size_t([&var]() { return Convert<size_t>(var); })
         , get_double([&var]() { return Convert<double>(var); }) {}
+
+      // Create from getter/setter functions; T is deduced from the getter's return type.
+      template <typename GETTER_T, typename SETTER_T,
+                typename T = std::remove_cvref_t<std::invoke_result_t<GETTER_T>>>
+        requires std::invocable<GETTER_T>
+      SettingInfo(emp::String name, GETTER_T getter, SETTER_T setter,
+                  emp::String desc, char flag = '\0')
+        : name(name), desc(desc), flag(flag), type(ToTypeEnum<T>())
+        , set_string([setter](const emp::String & in){ setter(Convert<T>(in)); })
+        , set_bool(  [setter](bool in)               { setter(Convert<T>(in)); })
+        , set_int(   [setter](int in)                { setter(Convert<T>(in)); })
+        , set_size_t([setter](size_t in)             { setter(Convert<T>(in)); })
+        , set_double([setter](double in)             { setter(Convert<T>(in)); })
+        , get_string([getter]() { return Convert<emp::String>(getter()); })
+        , get_bool(  [getter]() { return Convert<bool>(getter()); })
+        , get_int(   [getter]() { return Convert<int>(getter()); })
+        , get_size_t([getter]() { return Convert<size_t>(getter()); })
+        , get_double([getter]() { return Convert<double>(getter()); }) {}
 
 
       [[nodiscard]] bool IsString() const { return type == Type::STRING; }
@@ -456,18 +481,13 @@ namespace emp {
       lexer.IgnoreToken("comment", "#.+");
       lexer.IgnoreToken("continue_line", "\\\\[ ]*\\n");
 
-      // Built-in keyword: Print help information.
-      AddKeyword("help",
-        [this](emp::vector<emp::String> kw_args) { PrintHelp(kw_args); },
-        "Print help info for this program", 'h', /*max_args=*/1);
-
       // Built-in keyword: applies a bulk config string (same as a config file fragment).
       AddKeyword("set", [this](emp::vector<emp::String> kw_args) {
         if (kw_args.empty()) { IOError("Expected config string after '--set'."); return; }
         emp::TokenStream tokens = lexer.Tokenize(kw_args[0]);
         Iterator it = tokens.begin();
         while (it.Any()) { if (!LoadLine(it)) return; }
-      }, "Apply a bulk config string", 's', /*max_args=*/1);
+      }, "Apply a bulk config string", 'S', /*max_args=*/1);
     }
 
     void SetVerbose(bool in=true) { verbose = in; }
@@ -515,6 +535,25 @@ namespace emp {
                  "Duplicate CLI flag in SettingsManager", flag);
       const emp::String full_name = AppendScope(name);
       setting_map.emplace(full_name, SettingInfo{full_name, value, desc, flag});
+      if (flag != '\0')    flag_map[flag] = full_name;
+      return *this;
+    }
+
+    /// Register a setting controlled by explicit getter/setter functions.
+    /// The value type T is deduced from the getter's return type.
+    template <typename GETTER_T, typename SETTER_T>
+      requires std::invocable<GETTER_T>
+    SettingsManager & AddSetting(const emp::String & name,
+                                 GETTER_T getter,
+                                 SETTER_T setter,
+                                 emp::String desc,
+                                 char flag = '\0') {
+      emp_assert(!HasIdentifier(name), "Trying to add SettingsManager identifier that already exists",
+                 AppendScope(name));
+      emp_assert(flag == '\0' || !flag_map.contains(flag),
+                 "Duplicate CLI flag in SettingsManager", flag);
+      const emp::String full_name = AppendScope(name);
+      setting_map.emplace(full_name, SettingInfo{full_name, getter, setter, desc, flag});
       if (flag != '\0')    flag_map[flag] = full_name;
       return *this;
     }
@@ -622,7 +661,7 @@ namespace emp {
     ///  - `--setting val` – same as `setting = val` in a config file.
     ///  - `--keyword arg ...` – triggers a keyword by name with the following
     ///                      non-option arguments.
-    ///  - `-s "cfg"` / `--set "cfg"` – built-in "set" keyword; tokenizes the
+    ///  - `-S "cfg"` / `--set "cfg"` – built-in "set" keyword; tokenizes the
     ///                      string and loads it exactly as a config file.
     ///
     /// Each matched flag/option and its value are removed from `args`;
