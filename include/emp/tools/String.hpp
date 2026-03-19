@@ -2952,6 +2952,11 @@ struct std::hash<emp::String> {
   size_t operator()(const emp::String & str) const noexcept { return str.Hash(); }
 };
 
+// Allow emp::String to be used directly with std::format / std::print.
+// Without this, the range-of-char formatter would be used, printing ['h','e','l','l','o'].
+template <typename CHAR_T>
+struct std::formatter<emp::String, CHAR_T> : std::formatter<std::string, CHAR_T> {};
+
 #endif  // #ifndef INCLUDE_EMP_TOOLS_STRING_HPP_GUARD
 
 // Local settings for Empecable file checker.
