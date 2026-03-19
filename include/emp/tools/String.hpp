@@ -1109,7 +1109,9 @@ namespace emp {
       return MakeFromLiteral<T>(*this);
     }
 
-    [[nodiscard]] String ConvertStringFromLiteral() const { return MakeStringFromLiteral(*this); }
+    [[nodiscard]] String ConvertStringFromLiteral(CharSet quotes="\"") const {
+      return MakeStringFromLiteral(*this, quotes);
+    }
 
     String & AppendUpper(const String & in) { return (*this += MakeUpper(in)); }
 
