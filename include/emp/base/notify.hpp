@@ -551,4 +551,8 @@ namespace emp {
 
 }  // namespace emp
 
+// Some backward compatibility with older Empirical error reporting.
+#define emp_error(...) emp::notify::Error(__VA_ARGS__)
+#define emp_warning(...) emp::notify::Warning(__VA_ARGS__)
+
 #endif  // #ifndef INCLUDE_EMP_BASE_NOTIFY_HPP_GUARD
