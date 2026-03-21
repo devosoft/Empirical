@@ -50,7 +50,7 @@
  * === Basic usage ===
  *
  *     std::string name = "World";
- *     size_t      reps = 10;
+ *     uint64_t    reps = 10;
  *     bool        verbose = false;
  *     int64_t     r1_speed = 0, r2_speed = 0;
  *
@@ -100,6 +100,7 @@
 #include <map>
 #include <optional>
 #include <print>
+#include <cstdint>
 #include <stddef.h>
 
 #include "../base/notify.hpp"
@@ -124,26 +125,26 @@ namespace emp {
       emp::String default_val;    ///< Default value as a string (for SaveTemplate)
       char flag          = '\0';  ///< Command-line flag ('\0' for none)
 
-      enum class Type { ERROR=0, STRING, BOOL, INT, SIZE_T, DOUBLE };
+      enum class Type { ERROR=0, STRING, BOOL, INT64, UINT64, DOUBLE };
       Type type;
 
       std::function<void(const emp::String &)> set_string;
       std::function<void(bool)>                set_bool;
-      std::function<void(int)>                 set_int;
-      std::function<void(size_t)>              set_size_t;
+      std::function<void(int64_t)>             set_int64;
+      std::function<void(uint64_t)>            set_uint64;
       std::function<void(double)>              set_double;
 
       std::function<emp::String()> get_string;
       std::function<bool()>        get_bool;
-      std::function<int()>         get_int;
-      std::function<size_t()>      get_size_t;
+      std::function<int64_t()>     get_int64;
+      std::function<uint64_t()>    get_uint64;
       std::function<double()>      get_double;
 
       template <typename T> static constexpr Type ToTypeEnum() {
         using base_t = std::remove_cv_t<T>;
         if constexpr (std::same_as<base_t, bool>)               return Type::BOOL;
-        else if constexpr (std::signed_integral<base_t>)        return Type::INT;
-        else if constexpr (std::unsigned_integral<base_t>)      return Type::SIZE_T;
+        else if constexpr (std::signed_integral<base_t>)        return Type::INT64;
+        else if constexpr (std::unsigned_integral<base_t>)      return Type::UINT64;
         else if constexpr (std::floating_point<base_t>)         return Type::DOUBLE;
         else if constexpr (std::same_as<base_t, emp::String> ||
                            std::same_as<base_t, std::string>)   return Type::STRING;
@@ -157,8 +158,8 @@ namespace emp {
 
         if constexpr (to_type == Type::STRING) return in;
         else if constexpr (to_type == Type::BOOL) return !in.AsLower().IsOneOf("off", "false", "0");
-        else if constexpr (to_type == Type::INT) return static_cast<TO_T>(in.AsInt());
-        else if constexpr (to_type == Type::SIZE_T) return static_cast<TO_T>(in.AsULL());
+        else if constexpr (to_type == Type::INT64) return static_cast<TO_T>(std::stoll(in));
+        else if constexpr (to_type == Type::UINT64) return static_cast<TO_T>(in.AsULL());
         else if constexpr (to_type == Type::DOUBLE) return static_cast<TO_T>(in.AsDouble());
         else static_assert(false, "Cannot convert from string to unknown type.");
       }
@@ -193,13 +194,13 @@ namespace emp {
         , flag(flag), type(ToTypeEnum<VAR_T>())
         , set_string([&var](const emp::String & in){ var = Convert<VAR_T>(in); })
         , set_bool(  [&var](bool in)               { var = Convert<VAR_T>(in); })
-        , set_int(   [&var](int in)                { var = Convert<VAR_T>(in); })
-        , set_size_t([&var](size_t in)             { var = Convert<VAR_T>(in); })
+        , set_int64( [&var](int64_t in)            { var = Convert<VAR_T>(in); })
+        , set_uint64([&var](uint64_t in)           { var = Convert<VAR_T>(in); })
         , set_double([&var](double in)             { var = Convert<VAR_T>(in); })
         , get_string([&var]() { return Convert<emp::String>(var); })
-        , get_bool([&var]()   { return Convert<bool>(var); })
-        , get_int([&var]()    { return Convert<int>(var); })
-        , get_size_t([&var]() { return Convert<size_t>(var); })
+        , get_bool(  [&var]() { return Convert<bool>(var); })
+        , get_int64( [&var]() { return Convert<int64_t>(var); })
+        , get_uint64([&var]() { return Convert<uint64_t>(var); })
         , get_double([&var]() { return Convert<double>(var); }) {}
 
       // Create from getter/setter functions; T is deduced from the getter's return type.
@@ -213,20 +214,20 @@ namespace emp {
         , flag(flag), type(ToTypeEnum<T>())
         , set_string([setter](const emp::String & in){ setter(Convert<T>(in)); })
         , set_bool(  [setter](bool in)               { setter(Convert<T>(in)); })
-        , set_int(   [setter](int in)                { setter(Convert<T>(in)); })
-        , set_size_t([setter](size_t in)             { setter(Convert<T>(in)); })
+        , set_int64( [setter](int64_t in)            { setter(Convert<T>(in)); })
+        , set_uint64([setter](uint64_t in)           { setter(Convert<T>(in)); })
         , set_double([setter](double in)             { setter(Convert<T>(in)); })
         , get_string([getter]() { return Convert<emp::String>(getter()); })
         , get_bool(  [getter]() { return Convert<bool>(getter()); })
-        , get_int(   [getter]() { return Convert<int>(getter()); })
-        , get_size_t([getter]() { return Convert<size_t>(getter()); })
+        , get_int64( [getter]() { return Convert<int64_t>(getter()); })
+        , get_uint64([getter]() { return Convert<uint64_t>(getter()); })
         , get_double([getter]() { return Convert<double>(getter()); }) {}
 
 
       [[nodiscard]] bool IsString() const { return type == Type::STRING; }
       [[nodiscard]] bool IsBool() const { return type == Type::BOOL; }
-      [[nodiscard]] bool IsInt() const { return type == Type::INT; }
-      [[nodiscard]] bool IsULL() const { return type == Type::SIZE_T; }
+      [[nodiscard]] bool IsInt64() const { return type == Type::INT64; }
+      [[nodiscard]] bool IsUInt64() const { return type == Type::UINT64; }
       [[nodiscard]] bool IsDouble() const { return type == Type::DOUBLE; }
 
       [[nodiscard]] const emp::String & GetName() const { return name; }
@@ -243,11 +244,11 @@ namespace emp {
 
       template <typename T>
       [[nodiscard]] T GetValue() const {
-        if constexpr (std::same_as<T, emp::String>) return get_string();
-        else if constexpr (std::same_as<T, bool>) return get_bool();
-        else if constexpr (std::same_as<T, int>) return get_int();
-        else if constexpr (std::same_as<T, size_t>) return get_size_t();
-        else if constexpr (std::same_as<T, double>) return get_double();
+        if constexpr (std::same_as<T, emp::String>)  return get_string();
+        else if constexpr (std::same_as<T, bool>)    return get_bool();
+        else if constexpr (std::same_as<T, double>)  return get_double();
+        else if constexpr (std::signed_integral<T>)  return static_cast<T>(get_int64());
+        else if constexpr (std::unsigned_integral<T>) return static_cast<T>(get_uint64());
         else {
           static_assert(emp::dependent_false<T>(), "unsupported type");
           return T{};
@@ -256,10 +257,10 @@ namespace emp {
 
       /// Set the value; must maintain current type.
       void SetValue(const emp::String & val) { set_string(val); }
-      void SetValue(bool val) { set_bool(val); }
-      void SetValue(int val) { set_int(val); }
-      void SetValue(size_t val) { set_size_t(val); }
-      void SetValue(double val) { set_double(val); }
+      void SetValue(bool val)     { set_bool(val); }
+      void SetValue(int64_t val)  { set_int64(val); }
+      void SetValue(uint64_t val) { set_uint64(val); }
+      void SetValue(double val)   { set_double(val); }
 
       [[nodiscard]] emp::String AsString() const { return get_string(); }
 
@@ -272,9 +273,9 @@ namespace emp {
       [[nodiscard]] std::string GetTypeName() const {
         switch (type) {
           case Type::STRING: return "emp::String";
-          case Type::BOOL: return "bool";
-          case Type::INT: return "int";
-          case Type::SIZE_T: return "size_t";
+          case Type::BOOL:   return "bool";
+          case Type::INT64:  return "int64_t";
+          case Type::UINT64: return "uint64_t";
           case Type::DOUBLE: return "double";
           default: return "error";
         }
