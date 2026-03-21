@@ -13,7 +13,7 @@
  * whose values are maintained, but can also trigger more complex functions (for example, setting
  * a random number seed might call ResetSeed on the random number generator.)
  * 
- * Supported setting types are `emp::String`, `bool`, `int`, `size_t`, and `double`.
+ * Supported setting types are `emp::String`, `bool`, `int64_t`, `uint64_t`, and `double`.
  *
  * Settings can be organized into scopes using dot-notation names (e.g. `"robot1.speed"`), which
  * simplifies configuring multiple objects of the same type without name collisions.
@@ -52,7 +52,7 @@
  *     std::string name = "World";
  *     size_t      reps = 10;
  *     bool        verbose = false;
- *     int         r1_speed = 0, r2_speed = 0;
+ *     int64_t     r1_speed = 0, r2_speed = 0;
  *
  *     emp::SettingsManager cfg;
  *     // AddSetting can take the setting name, the C++ variable, a description, and an optional
@@ -141,41 +141,41 @@ namespace emp {
 
       template <typename T> static constexpr Type ToTypeEnum() {
         using base_t = std::remove_cv_t<T>;
-        if constexpr (std::same_as<base_t, bool>)             return Type::BOOL;
-        else if constexpr (std::same_as<base_t, int>)         return Type::INT;
-        else if constexpr (std::same_as<base_t, size_t>)      return Type::SIZE_T;
-        else if constexpr (std::same_as<base_t, double>)      return Type::DOUBLE;
-        else if constexpr (std::same_as<base_t, emp::String>) return Type::STRING;
+        if constexpr (std::same_as<base_t, bool>)               return Type::BOOL;
+        else if constexpr (std::signed_integral<base_t>)        return Type::INT;
+        else if constexpr (std::unsigned_integral<base_t>)      return Type::SIZE_T;
+        else if constexpr (std::floating_point<base_t>)         return Type::DOUBLE;
+        else if constexpr (std::same_as<base_t, emp::String> ||
+                           std::same_as<base_t, std::string>)   return Type::STRING;
         else return Type::ERROR;
       }
 
+      // Dynamic conversion from a STRING type.
+      template <typename TO_T>
+      [[nodiscard]] static TO_T Convert(const emp::String & in) {
+        constexpr Type to_type = ToTypeEnum<TO_T>();
+
+        if constexpr (to_type == Type::STRING) return in;
+        else if constexpr (to_type == Type::BOOL) return !in.AsLower().IsOneOf("off", "false", "0");
+        else if constexpr (to_type == Type::INT) return static_cast<TO_T>(in.AsInt());
+        else if constexpr (to_type == Type::SIZE_T) return static_cast<TO_T>(in.AsULL());
+        else if constexpr (to_type == Type::DOUBLE) return static_cast<TO_T>(in.AsDouble());
+        else static_assert(false, "Cannot convert from string to unknown type.");
+      }
+
+      // Allow conversions from std::string.
+      template <typename TO_T>
+      [[nodiscard]] static TO_T Convert(const std::string & in) {
+        return Convert<TO_T>(emp::String{in});
+      }
+
+      // Dynamic conversion from a NUMERICAL type.
       template <typename TO_T, typename FROM_T>
       [[nodiscard]] static TO_T Convert(const FROM_T & in) {
-        // If the from type is not an emp::String but can convert to one (e.g., std::string) do so.
-        if constexpr (std::same_as<FROM_T, std::string>) {
-          return Convert<TO_T, emp::String>(emp::String{in});
-        }
-        else {
-          using base_to_t = std::remove_cv_t<TO_T>;
-          if constexpr (std::same_as<FROM_T, base_to_t>) return in;
-          else if constexpr (std::convertible_to<base_to_t, emp::String>) return emp::MakeString(in);
-          else if constexpr (std::same_as<FROM_T, emp::String>) {
-            if constexpr (std::same_as<base_to_t, bool>) {
-              return !in.AsLower().IsOneOf("off", "false", "0");
-            }
-            else if constexpr (std::signed_integral<base_to_t>) {
-              return static_cast<TO_T>(in.AsInt());
-            }
-            else if constexpr (std::unsigned_integral<base_to_t>) {
-              return static_cast<TO_T>(in.AsULL());
-            }
-            else if constexpr (std::floating_point<base_to_t>) {
-              return static_cast<TO_T>(in.AsDouble());
-            }
-            else static_assert(false, "Cannot convert from string to unknown type.");
-          }
-          else return static_cast<base_to_t>(in);
-        }
+        constexpr Type to_type = ToTypeEnum<TO_T>();
+
+        if constexpr (to_type == Type::STRING) return emp::MakeString(in);
+        else return static_cast<TO_T>(in);
       }
 
 
