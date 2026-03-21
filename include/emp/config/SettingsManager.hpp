@@ -121,6 +121,7 @@ namespace emp {
     private:
       emp::String name;           ///< Label for this setting in config files
       emp::String desc   = "";    ///< Description of setting
+      emp::String default_val;    ///< Default value as a string (for SaveTemplate)
       char flag          = '\0';  ///< Command-line flag ('\0' for none)
 
       enum class Type { ERROR=0, STRING, BOOL, INT, SIZE_T, DOUBLE };
@@ -150,23 +151,31 @@ namespace emp {
 
       template <typename TO_T, typename FROM_T>
       [[nodiscard]] static TO_T Convert(const FROM_T & in) {
-        using base_to_t = std::remove_cv_t<TO_T>;
-        if constexpr (std::same_as<FROM_T, base_to_t>) return in;
-        else if constexpr (std::same_as<base_to_t, emp::String>) return emp::MakeString(in);
-        else if constexpr (std::same_as<FROM_T, emp::String>) {
-          if constexpr (std::same_as<base_to_t, bool>) return !in.AsLower().IsOneOf("off", "false", "0");
-          else if constexpr (std::signed_integral<base_to_t>) {
-            return static_cast<TO_T>(in.AsInt());
-          }
-          else if constexpr (std::unsigned_integral<base_to_t>) {
-            return static_cast<TO_T>(in.AsULL());
-          }
-          else if constexpr (std::floating_point<base_to_t>) {
-            return static_cast<TO_T>(in.AsDouble());
-          }
-          else static_assert(false, "Cannot convert from string to unknown type.");
+        // If the from type is not an emp::String but can convert to one (e.g., std::string) do so.
+        if constexpr (std::same_as<FROM_T, std::string>) {
+          return Convert<TO_T, emp::String>(emp::String{in});
         }
-        else return static_cast<base_to_t>(in);
+        else {
+          using base_to_t = std::remove_cv_t<TO_T>;
+          if constexpr (std::same_as<FROM_T, base_to_t>) return in;
+          else if constexpr (std::convertible_to<base_to_t, emp::String>) return emp::MakeString(in);
+          else if constexpr (std::same_as<FROM_T, emp::String>) {
+            if constexpr (std::same_as<base_to_t, bool>) {
+              return !in.AsLower().IsOneOf("off", "false", "0");
+            }
+            else if constexpr (std::signed_integral<base_to_t>) {
+              return static_cast<TO_T>(in.AsInt());
+            }
+            else if constexpr (std::unsigned_integral<base_to_t>) {
+              return static_cast<TO_T>(in.AsULL());
+            }
+            else if constexpr (std::floating_point<base_to_t>) {
+              return static_cast<TO_T>(in.AsDouble());
+            }
+            else static_assert(false, "Cannot convert from string to unknown type.");
+          }
+          else return static_cast<base_to_t>(in);
+        }
       }
 
 
@@ -177,8 +186,11 @@ namespace emp {
 
       // Create from a bound variable.
       template <typename VAR_T>
-      SettingInfo(emp::String name, VAR_T & var, emp::String desc, char flag = '\0')
-        : name(name), desc(desc), flag(flag), type(ToTypeEnum<VAR_T>())
+      SettingInfo(emp::String name, VAR_T & var, emp::String desc, char flag = '\0',
+                  emp::String explicit_default = "")
+        : name(name), desc(desc)
+        , default_val(explicit_default.empty() ? Convert<emp::String>(var) : explicit_default)
+        , flag(flag), type(ToTypeEnum<VAR_T>())
         , set_string([&var](const emp::String & in){ var = Convert<VAR_T>(in); })
         , set_bool(  [&var](bool in)               { var = Convert<VAR_T>(in); })
         , set_int(   [&var](int in)                { var = Convert<VAR_T>(in); })
@@ -195,8 +207,10 @@ namespace emp {
                 typename T = std::remove_cvref_t<std::invoke_result_t<GETTER_T>>>
         requires std::invocable<GETTER_T>
       SettingInfo(emp::String name, GETTER_T getter, SETTER_T setter,
-                  emp::String desc, char flag = '\0')
-        : name(name), desc(desc), flag(flag), type(ToTypeEnum<T>())
+                  emp::String desc, char flag = '\0', emp::String explicit_default = "")
+        : name(name), desc(desc)
+        , default_val(explicit_default.empty() ? Convert<emp::String>(getter()) : explicit_default)
+        , flag(flag), type(ToTypeEnum<T>())
         , set_string([setter](const emp::String & in){ setter(Convert<T>(in)); })
         , set_bool(  [setter](bool in)               { setter(Convert<T>(in)); })
         , set_int(   [setter](int in)                { setter(Convert<T>(in)); })
@@ -218,6 +232,14 @@ namespace emp {
       [[nodiscard]] const emp::String & GetName() const { return name; }
       [[nodiscard]] const emp::String & GetDescription() const { return desc; }
       [[nodiscard]] char GetFlag() const { return flag; }
+      [[nodiscard]] const emp::String & GetDefault() const { return default_val; }
+      void SetDefault(const emp::String & val) { default_val = val; }
+
+      /// Return the default in a form suitable for writing to a config file.
+      [[nodiscard]] emp::String GetDefaultLiteral() const {
+        if (IsString()) return default_val.AsLiteral();
+        return default_val;
+      }
 
       template <typename T>
       [[nodiscard]] T GetValue() const {
@@ -528,13 +550,14 @@ namespace emp {
     SettingsManager & AddSetting(const emp::String & name,
                                  T & value,
                                  emp::String desc,
-                                 char flag = '\0') {
+                                 char flag = '\0',
+                                 emp::String default_val = "") {
       emp_assert(!HasIdentifier(name), "Trying to add SettingsManager identifier that already exists",
                  AppendScope(name));
       emp_assert(flag == '\0' || !flag_map.contains(flag),
                  "Duplicate CLI flag in SettingsManager", flag);
       const emp::String full_name = AppendScope(name);
-      setting_map.emplace(full_name, SettingInfo{full_name, value, desc, flag});
+      setting_map.emplace(full_name, SettingInfo{full_name, value, desc, flag, default_val});
       if (flag != '\0')    flag_map[flag] = full_name;
       return *this;
     }
@@ -547,13 +570,14 @@ namespace emp {
                                  GETTER_T getter,
                                  SETTER_T setter,
                                  emp::String desc,
-                                 char flag = '\0') {
+                                 char flag = '\0',
+                                 emp::String default_val = "") {
       emp_assert(!HasIdentifier(name), "Trying to add SettingsManager identifier that already exists",
                  AppendScope(name));
       emp_assert(flag == '\0' || !flag_map.contains(flag),
                  "Duplicate CLI flag in SettingsManager", flag);
       const emp::String full_name = AppendScope(name);
-      setting_map.emplace(full_name, SettingInfo{full_name, getter, setter, desc, flag});
+      setting_map.emplace(full_name, SettingInfo{full_name, getter, setter, desc, flag, default_val});
       if (flag != '\0')    flag_map[flag] = full_name;
       return *this;
     }
@@ -577,9 +601,9 @@ namespace emp {
     void PrintSettings(std::ostream & os=std::cout) {
       std::println(os, "Available settings:");
       for (const auto & [name, info] : setting_map) {
-        std::print(os, "  {} : {}", name, info.GetDescription());
-        if (info.GetFlag()) std::println(os, " (setting flag -{})", info.GetFlag());
-        else std::println(os, "");
+        std::print(os, "  {} : {} (Default: {}", name, info.GetDescription(), info.GetDefaultLiteral());
+        if (info.GetFlag()) std::println(os, "; setting flag: -{})", info.GetFlag());
+        else std::println(os, ")");
       }
     }
 
@@ -628,6 +652,31 @@ namespace emp {
         return false;
       }
       return Save(ofs);
+    }
+
+    /// Write a starter config file using each setting's default value.
+    /// Useful for distributing a template that users can customize.
+    bool SaveTemplate(std::ostream & ofs) {
+      emp_assert(ofs);
+      error_note.clear();
+
+      for (const auto & [key, info] : setting_map) {
+        const auto lines = info.GetDescription().Slice("\n");
+        for (const auto & line : lines) { ofs << "# " << line << "\n"; }
+        ofs << key << " = " << info.GetDefaultLiteral() << ";\n\n";
+      }
+
+      return true;
+    }
+
+    bool SaveTemplate(const emp::String & filename) {
+      std::ofstream ofs{filename};
+      if (!ofs) {
+        error_note.Set("Failed to open config file for saving: ", filename);
+        notify::Error(error_note);
+        return false;
+      }
+      return SaveTemplate(ofs);
     }
 
     // Load settings from a stream; return success.
