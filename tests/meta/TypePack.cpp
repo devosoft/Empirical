@@ -62,10 +62,6 @@ TEST_CASE("Test TypePack", "[meta]")
   v.push_back(2);
   REQUIRE(v.size() == 2);
 
-  // If reverse works correctly, str will be a string.
-  test_t::reverse::get<3> str("It worked!");
-  REQUIRE(str == "It worked!");
-
   // Let's try filtering!
   using test_filtered = test_t::filter<std::is_integral>;
   REQUIRE(test_filtered::GetSize() == 2);

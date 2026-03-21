@@ -20,6 +20,9 @@
  * ...would create a variable of type std::tuple<char, char, double, std::string, int>.
  *
  *
+ * Fixed values:
+ *   SIZE - number of types in this pack (size_t)
+ * 
  * Member functions include (all of which are constexpr):
  *   Has<T>()           - Return true/false: Is T is part of the pack?
  *   Count<T>()         - Return number of times T is in the pack.
