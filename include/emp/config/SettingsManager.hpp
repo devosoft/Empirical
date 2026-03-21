@@ -250,17 +250,23 @@ namespace emp {
         else if constexpr (std::signed_integral<T>)  return static_cast<T>(get_int64());
         else if constexpr (std::unsigned_integral<T>) return static_cast<T>(get_uint64());
         else {
-          static_assert(emp::dependent_false<T>(), "unsupported type");
+          static_assert(false, "unsupported type");
           return T{};
         }
       }
 
-      /// Set the value; must maintain current type.
+      /// Set the value from a string (parsed to the setting's native type).
       void SetValue(const emp::String & val) { set_string(val); }
-      void SetValue(bool val)     { set_bool(val); }
-      void SetValue(int64_t val)  { set_int64(val); }
-      void SetValue(uint64_t val) { set_uint64(val); }
-      void SetValue(double val)   { set_double(val); }
+
+      /// Set the value from a typed argument; dispatches by concept like GetValue.
+      template <typename T>
+      void SetValue(T val) {
+        if constexpr (std::same_as<T, bool>)           set_bool(val);
+        else if constexpr (std::same_as<T, double>)    set_double(val);
+        else if constexpr (std::signed_integral<T>)    set_int64(static_cast<int64_t>(val));
+        else if constexpr (std::unsigned_integral<T>)  set_uint64(static_cast<uint64_t>(val));
+        else static_assert(false, "unsupported type for SetValue");
+      }
 
       [[nodiscard]] emp::String AsString() const { return get_string(); }
 
