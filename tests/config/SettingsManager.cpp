@@ -9,6 +9,7 @@
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
+#include <cstdint>
 #include <sstream>
 
 #include "emp/config/SettingsManager.hpp"
@@ -18,17 +19,17 @@ TEST_CASE("Test SettingsManager", "[config]")
   // AddSetting registers settings; HasSetting and Get work for all types
   {
     emp::SettingsManager cfg;
-    int i = 3;
-    double d = 1.5;
-    bool b = true;
+    int64_t  i = 3;
+    double   d = 1.5;
+    bool     b = true;
     emp::String s = "hello";
-    size_t n = 10;
+    uint64_t n = 10;
 
-    cfg.AddSetting("i-val", i, "an int",    'i')
+    cfg.AddSetting("i-val", i, "an int64_t", 'i')
        .AddSetting("d-val", d, "a double")
        .AddSetting("b-val", b, "a bool")
        .AddSetting("s-val", s, "a string")
-       .AddSetting("n-val", n, "a size_t");
+       .AddSetting("n-val", n, "a uint64_t");
 
     REQUIRE(cfg.HasSetting("i-val"));
     REQUIRE(cfg.HasSetting("d-val"));
@@ -37,13 +38,13 @@ TEST_CASE("Test SettingsManager", "[config]")
     REQUIRE(cfg.HasSetting("n-val"));
     REQUIRE(!cfg.HasSetting("missing"));
 
-    REQUIRE(cfg.Get<int>("i-val")         == 3);
+    REQUIRE(cfg.Get<int64_t>("i-val")     == 3);
     REQUIRE(cfg.Get<double>("d-val")      == 1.5);
     REQUIRE(cfg.Get<bool>("b-val")        == true);
     REQUIRE(cfg.Get<emp::String>("s-val") == "hello");
-    REQUIRE(cfg.Get<size_t>("n-val")      == 10);
+    REQUIRE(cfg.Get<uint64_t>("n-val")    == 10);
 
-    REQUIRE(cfg.GetDesc("i-val")   == "an int");
+    REQUIRE(cfg.GetDesc("i-val")   == "an int64_t");
     REQUIRE(cfg.GetFlag("i-val")   == 'i');
   }
 
@@ -61,15 +62,15 @@ TEST_CASE("Test SettingsManager", "[config]")
   // Load from stream: basic assignment of each supported type
   {
     emp::SettingsManager cfg;
-    int i = 0;
-    double d = 0.0;
+    int64_t  i = 0;
+    double   d = 0.0;
     emp::String s = "";
-    size_t n = 0;
+    uint64_t n = 0;
 
-    cfg.AddSetting("i", i, "int")
+    cfg.AddSetting("i", i, "int64_t")
        .AddSetting("d", d, "double")
        .AddSetting("s", s, "string")
-       .AddSetting("n", n, "size_t");
+       .AddSetting("n", n, "uint64_t");
 
     std::istringstream is(
       "i = 7;\n"
@@ -242,7 +243,7 @@ TEST_CASE("Test SettingsManager", "[config]")
     cfg.AddSetting("x", x, "int")
        .AddSetting("d", d, "double");
 
-    emp::vector<emp::String> args = { "program", "-s", "x = 7; d = 3.5" };
+    emp::vector<emp::String> args = { "program", "-S", "x = 7; d = 3.5" };
     REQUIRE(cfg.LoadArgs(args));
     REQUIRE(x == 7);
     REQUIRE(d == 3.5);
@@ -322,7 +323,7 @@ TEST_CASE("Test SettingsManager", "[config]")
     int x = 0;
     cfg.AddSetting("x", x, "int");
 
-    emp::vector<emp::String> args = { "program", "-s", "x = 4", "leftover" };
+    emp::vector<emp::String> args = { "program", "-S", "x = 4", "leftover" };
     REQUIRE(cfg.LoadArgs(args));
     REQUIRE(x == 4);
     REQUIRE(args.size() == 2); // only "program" and "leftover" remain
@@ -541,5 +542,128 @@ TEST_CASE("Test SettingsManager", "[config]")
     REQUIRE(i2 == 42);
     REQUIRE(b2 == true);
     REQUIRE(s2 == "saved");
+  }
+
+  // AddSetting(getter, setter): primary use case – class with private member via accessors
+  {
+    class Robot {
+      int64_t speed_ = 0;
+    public:
+      int64_t GetSpeed() const { return speed_; }
+      void    SetSpeed(int64_t v) { speed_ = v; }
+    };
+    Robot robot;
+    emp::SettingsManager cfg;
+    cfg.AddSetting("speed",
+      [&robot]() { return robot.GetSpeed(); },
+      [&robot](int64_t v) { robot.SetSpeed(v); },
+      "Robot speed", 'p');
+
+    REQUIRE(cfg.HasSetting("speed"));
+    cfg.Set("speed", INT64_C(42));
+    REQUIRE(robot.GetSpeed() == 42);
+    REQUIRE(cfg.Get<int64_t>("speed") == 42);
+  }
+
+  // AddSetting(getter, setter): setter with side effects (value clamping)
+  {
+    int val = 0;
+    emp::SettingsManager cfg;
+    cfg.AddSetting("level",
+      [&val]() { return val; },
+      [&val](int v) { val = std::clamp(v, 0, 10); },
+      "Level (clamped 0-10)");
+
+    std::istringstream is("level = 15\n");
+    REQUIRE(cfg.Load(is));
+    REQUIRE(val == 10);  // clamped to max
+
+    cfg.Set("level", -5);
+    REQUIRE(val == 0);   // clamped to min
+  }
+
+  // AddSetting(getter, setter): Load updates value through setter; setter call is tracked
+  {
+    int x = 0;
+    int set_count = 0;
+    emp::SettingsManager cfg;
+    cfg.AddSetting("x",
+      [&x]() { return x; },
+      [&x, &set_count](int v) { x = v; ++set_count; },
+      "int with call counter");
+
+    std::istringstream is("x = 7\n");
+    REQUIRE(cfg.Load(is));
+    REQUIRE(x == 7);
+    REQUIRE(set_count == 1);
+  }
+
+  // AddSetting(getter, setter): all supported types
+  {
+    emp::String  s = "";
+    bool         b = false;
+    double       d = 0.0;
+    uint64_t     n = 0;
+    emp::SettingsManager cfg;
+    cfg.AddSetting("s", [&s]() { return s; }, [&s](emp::String v)  { s = v; }, "string")
+       .AddSetting("b", [&b]() { return b; }, [&b](bool v)         { b = v; }, "bool")
+       .AddSetting("d", [&d]() { return d; }, [&d](double v)        { d = v; }, "double")
+       .AddSetting("n", [&n]() { return n; }, [&n](uint64_t v)      { n = v; }, "uint64_t");
+
+    std::istringstream is("s = \"hello\"\nb = On\nd = 3.14\nn = 99\n");
+    REQUIRE(cfg.Load(is));
+    REQUIRE(s == "hello");
+    REQUIRE(b == true);
+    REQUIRE(d == 3.14);
+    REQUIRE(n == 99);
+  }
+
+  // AddSetting(getter, setter): LoadArgs routes through the setter
+  {
+    int count = 0;
+    emp::SettingsManager cfg;
+    cfg.AddSetting("count",
+      [&count]() { return count; },
+      [&count](int v) { count = v; },
+      "count", 'c');
+
+    emp::vector<emp::String> args = { "program", "-c", "5" };
+    REQUIRE(cfg.LoadArgs(args));
+    REQUIRE(count == 5);
+    REQUIRE(args.size() == 1);
+  }
+
+  // AddSetting(getter, setter): Save reads the current value through the getter
+  {
+    int x = 99;
+    emp::SettingsManager cfg;
+    cfg.AddSetting("x",
+      [&x]() { return x; },
+      [&x](int v) { x = v; },
+      "a value");
+
+    std::ostringstream os;
+    REQUIRE(cfg.Save(os));
+    REQUIRE(os.str().find("x = 99;\n") != std::string::npos);
+
+    x = 7;  // mutate directly, bypassing the setter
+    std::ostringstream os2;
+    REQUIRE(cfg.Save(os2));
+    REQUIRE(os2.str().find("x = 7;\n") != std::string::npos);
+  }
+
+  // AddSetting(getter, setter): getter can return a computed (non-stored) value
+  {
+    int a = 3, b = 4;
+    int received = -1;
+    emp::SettingsManager cfg;
+    cfg.AddSetting("sum",
+      [&a, &b]() { return a + b; },
+      [&received](int v) { received = v; },
+      "computed sum");
+
+    REQUIRE(cfg.Get<int>("sum") == 7);
+    a = 10;
+    REQUIRE(cfg.Get<int>("sum") == 14);  // getter reflects live state
   }
 }
