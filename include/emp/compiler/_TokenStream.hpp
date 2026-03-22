@@ -164,6 +164,8 @@ namespace emp {
 
     [[nodiscard]] const Token & Get(size_t pos) const { return tokens[pos]; }
 
+    [[nodiscard]] const Token & operator[](size_t pos) const { return tokens[pos]; }
+
     [[nodiscard]] emp::Ptr<const Token> GetPtr(size_t pos) const { return &(tokens.data()[pos]); }
 
     [[nodiscard]] const String & GetName() const { return name; }
