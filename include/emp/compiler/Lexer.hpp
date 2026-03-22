@@ -63,7 +63,6 @@ namespace emp {
     int cur_token_id = MAX_ID;            ///< ID for next new token (higher has priority)
     mutable bool generate_lexer = false;  ///< Do we need to regenerate the lexer?
     mutable DFA lexer_dfa{};              ///< Table driven lexer implementation.
-    mutable String lexeme{};              ///< Current state of lexeme being generated.
 
     static constexpr int ERROR_ID = -1;  ///< Code for unknown token ID.
 
@@ -91,7 +90,8 @@ namespace emp {
     void Reset();
 
     /// Add a new token, specified by a name and the regex used to identify it.
-    /// Note that token ids count down with highest IDs having priority.
+    /// Tokens are assigned IDs counting down from MAX_ID; the first token added has the
+    /// highest ID and therefore the highest priority (first rule wins, same as flex).
     int AddToken(String name,
                  String regex,
                  bool save_lexeme = true,
@@ -126,9 +126,13 @@ namespace emp {
                        bool keep_all = false) const;
 
     /// Perform a single step in the Tokenize process, updating line number as we go.
+    /// Note: the stream must support seekg/tellg (i.e., seekable); non-seekable streams
+    /// such as stdin or pipes are not supported.
     Token TokenizeNext(std::istream & in_stream, size_t & cur_line, bool keep_all = false) const;
 
     /// Perform a single step in the Tokenize process.
+    /// Note: the stream must support seekg/tellg (i.e., seekable); non-seekable streams
+    /// such as stdin or pipes are not supported.
     Token TokenizeNext(std::istream & in_stream) const {
       size_t cur_line = 0;
       return TokenizeNext(in_stream, cur_line, false);
@@ -152,9 +156,6 @@ namespace emp {
       std::ifstream file(filename);
       return Tokenize(file, filename);
     }
-
-    /// Get the lexeme associated with the last token identified.
-    const String & GetLexeme() const { return lexeme; }
 
     /// Print the full information about this lexer (for debugging)
     void Print(std::ostream & os = std::cout) const;
@@ -325,7 +326,7 @@ namespace emp {
     // If best_pos < cur_pos, rewind the input stream.
     if (best_pos < cur_pos) { cur_pos = best_pos; }
 
-    lexeme = in.substr(start_pos, best_pos - start_pos);
+    String lexeme = in.substr(start_pos, best_pos - start_pos);
     start_pos += lexeme.size();
 
     // If we can't find a token, return error (for no valid options)
@@ -374,7 +375,7 @@ namespace emp {
     // 1: We may be able to continue the current lexeme, and
     // 2: We have not entered an invalid state, and
     // 3: Our input stream has more symbols.
-    lexeme.resize(0);
+    String lexeme{};
     while (cur_stop >= 0 && cur_state >= 0 && !AtEOF(is)) {
       const char next_char = static_cast<char>(is.get());
       lexeme.push_back(next_char);
@@ -449,9 +450,8 @@ namespace emp {
       Token token   = Process(is);
       token.line_id = cur_line;
       cur_line += token.lexeme.Count('\n');
-      if (keep_all || GetSaveToken(token)) {
-        return token;  // Skip ignored tokens and try again.
-      }
+      // Return only if the token should be kept.
+      if (keep_all || GetSaveToken(token)) return token;  
     }
   }
 
@@ -495,7 +495,7 @@ namespace emp {
     std::stringstream ss;
     ss << test_string;
 
-    Token token = 1;
+    Token token{1};
     while (token > 0) {
       token = Process(ss);
       std::cout << GetTokenName(token) << " : \"" << token.lexeme << "\"" << std::endl;
@@ -613,7 +613,7 @@ namespace emp {
                       "      if (id == '\\n') return \"'\\\\n'\";",
                       "      if (id == '\\r') return \"'\\\\r'\";",
                       "      if (id == '\\t') return \"'\\\\t'\";",
-                      "      if (id == '\\\\') return \"'\\\\n'\";",
+                      "      if (id == '\\\\') return \"'\\\\\\\\'\";",
                       "      return ${str_type}(\"Token ID: \") + std::to_string(id);",
                       "    }; // End switch.",
                       "  }",
@@ -624,7 +624,7 @@ namespace emp {
                       "    case 0:");
     for (size_t i = token_set.size(); i > 0; --i) {
       const auto & token = token_set[i - 1];
-      if (token.save_lexeme == false) { file.AddCode("    case ", token.id, ":"); }
+      if (token.save_token == false) { file.AddCode("    case ", token.id, ":"); }
     }
     file.AddCodeBlock("      return true;",
                       "    default: return false;",
