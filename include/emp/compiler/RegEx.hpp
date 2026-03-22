@@ -463,7 +463,7 @@ namespace emp {
         if (pos >= regex.size()) { return out; }
         c = regex[pos++];
       }
-      char prev_c = -1;
+      int prev_c = -1;
       while (c != ']' && pos < regex.size()) {
         // Hyphens indicate a range UNLESS they are the first character in the set.
         if (c == '-' && prev_c != -1) {
@@ -509,10 +509,10 @@ namespace emp {
             case '7':
             case '8':
             case '9':
-              if (pos + 3 >= regex.size()) { Error("Escaped ascii codes must have three digits!"); }
-              c2 = regex[pos + 1];
+              if (pos + 1 >= regex.size()) { Error("Escaped ascii codes must have three digits!"); }
+              c2 = regex[pos];
               if (!is_digit(c2)) { Error("Escaped ascii codes must have three digits!"); }
-              c3 = regex[pos + 2];
+              c3 = regex[pos + 1];
               if (!is_digit(c3)) { Error("Escaped ascii codes must have three digits!"); }
               c -= '0';
               c2 -= '0';
@@ -523,7 +523,7 @@ namespace emp {
                 Error("Escaped ascii codes must be in range 0-127!");
               }
               c = c * 100 + c2 * 10 + c3;
-              pos += 3;
+              pos += 2;
               break;
             // Any of these characters should just be themselves; escaping may be only way to get them.
             case '-':
