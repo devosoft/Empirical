@@ -605,6 +605,16 @@ namespace emp {
     }
 
     // Print out all info on the currently known settings.
+    void PrintKeywords(std::ostream & os=std::cout) {
+      std::println(os, "General Options:");
+      for (const auto & [name, info] : keyword_map) {
+        std::print(os, "  {} : {}", name, info.desc);
+        if (info.flag) std::println(os, "; (flag: -{})", info.flag);
+        else std::println(os, "");
+      }
+    }
+
+    // Print out all info on the currently known settings.
     void PrintSettings(std::ostream & os=std::cout) {
       std::println(os, "Available settings:");
       for (const auto & [name, info] : setting_map) {
@@ -614,28 +624,37 @@ namespace emp {
       }
     }
 
-    // Print out all info on the current options.
+    // Print help info.
     void PrintHelp(const emp::vector<emp::String> & args, std::ostream & os=std::cout) {
       if (args.size()) {
         for (const emp::String & arg : args) {
-          if (arg == "settings") PrintSettings(os);
+          if (arg == "options") PrintKeywords(os);
+          else if (arg == "settings") PrintSettings(os);
           else std::println(os, "Unknown help argument '{}'", arg);
         }
         return;
       }
 
-      std::println(os, "Format: {} [flags]", exe_name);
+      // Default to printing all current options that were given flags.
+      std::println(os, "Format: {} [flags ...]", exe_name);
       std::println(os, "Allowed flags include:");
 
+      std::map<emp::String, emp::String> flag_map;
       for (const auto & [name, info] : keyword_map) {
-        if (info.flag) {
-          std::println(os, "  --{} (or -{}) : {}", name, info.flag, info.desc);
-        } else {
-          std::println(os, "  --{} : {}", name, info.desc);
-        }
+        if (!info.flag) continue; // Only include keywords with flags.
+        flag_map[name] = std::format("  --{} (or -{}) : {}", name, info.flag, info.desc);
+      }
+      for (const auto & [name, info] : setting_map) {
+        if (!info.GetFlag()) continue; // Only include settings with flags.
+        flag_map[name] = std::format("  --{} (or -{}) : {}", name, info.GetFlag(), info.GetDescription());
       }
 
-      std::println(os, "Use `{} --help settings` for a full list of settings", exe_name);
+      for (auto [_, line] : flag_map) {
+        std::println(os, "{}", line);
+      }
+
+      std::println(os, "Use `{} --help settings` for a full list of variables to set", exe_name);
+      std::println(os, "Use `{} --help options` for a full list of all other options", exe_name);
     }
 
     bool Save(std::ostream & ofs) {
