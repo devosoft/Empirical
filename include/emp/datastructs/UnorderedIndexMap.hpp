@@ -223,6 +223,7 @@ namespace emp {
       ResolveRefresh();
 
       // Make sure we don't try to index beyond end of map.
+      emp_assert(cur_id < weights.size(), cur_id, weights.size());
       emp_assert(index < weights[cur_id], index, cur_id, weights.size(), weights[cur_id]);
 
       // If we are on a leaf, we have our answer!
