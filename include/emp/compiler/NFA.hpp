@@ -55,13 +55,15 @@ namespace emp {
       State() = default;
     };
 
-    emp::vector<State> states;       ///< Information about available states.
-    size_t start;                    ///< Main start state (others might be reached for free.)
-    emp::vector<STOP_TYPE> is_stop;  ///< 0=no 1=yes (char instead of bool for speed)
+    emp::vector<State> states;          ///< Information about available states.
+    size_t start;                       ///< Main start state (others might be reached for free.)
+    emp::vector<STOP_TYPE> is_stop;      ///< 0=no; otherwise the stop value (e.g., token ID).
+    emp::vector<STOP_TYPE> is_tc_stop;  ///< Non-zero = trailing-context r1 boundary for this token.
+    emp::vector<STOP_TYPE> is_tc_final; ///< Non-zero = trailing-context r2 final accept (backtrack to r1).
 
   public:
     tNFA(size_t num_states = 1, size_t start_state = 0)
-      : states(num_states), start(start_state), is_stop(num_states, 0) {
+      : states(num_states), start(start_state), is_stop(num_states, 0), is_tc_stop(num_states, 0), is_tc_final(num_states, 0) {
       if (num_states > start) { states[start].free_to.Include(start); }
     }
 
@@ -136,6 +138,8 @@ namespace emp {
     void Resize(size_t new_size) {
       states.resize(new_size);
       is_stop.resize(new_size, 0);
+      is_tc_stop.resize(new_size, 0);
+      is_tc_final.resize(new_size, 0);
       if (new_size > start) { states[start].free_to.Include(start); }
     }
 
@@ -202,6 +206,27 @@ namespace emp {
     /// Get any stop value associated with the provided state.
     stop_t GetStop(size_t state) const { return is_stop[state]; }
 
+    /// Set the specified state as a trailing-context r1 boundary for the given token.
+    template <typename T = stop_t>
+    void SetTCStop(size_t state, T stop_val = 1) {
+      is_tc_stop[state] = static_cast<stop_t>(stop_val);
+    }
+
+    /// Get the trailing-context boundary value for the provided state (0 = not a boundary).
+    stop_t GetTCStop(size_t state) const { return is_tc_stop[state]; }
+
+    /// Test if this state is a trailing-context r1 boundary.
+    bool IsTCStop(size_t state) const { return is_tc_stop[state]; }
+
+    /// Set the specified state as the r2-final accept state for a trailing-context token.
+    template <typename T = stop_t>
+    void SetTCFinal(size_t state, T stop_val = 1) {
+      is_tc_final[state] = static_cast<stop_t>(stop_val);
+    }
+
+    /// Get the TC-final value for the provided state (0 = not a TC-final accept state).
+    stop_t GetTCFinal(size_t state) const { return is_tc_final[state]; }
+
     /// Test if NFA begins at provided state (may have free transitions to other states)
     bool IsStart(size_t state) const { return state == start; }
 
@@ -209,7 +234,8 @@ namespace emp {
     bool IsStop(size_t state) const { return is_stop[state]; }
 
     ///  Test if this state has only empty transitions from it, and not stop state.
-    bool IsEmpty(size_t state) const { return !HasSymTransitions(state) && !IsStop(state); }
+    ///  TC-boundary states (is_tc_stop) are treated as non-empty so to_DFA() propagates them.
+    bool IsEmpty(size_t state) const { return !HasSymTransitions(state) && !IsStop(state) && !IsTCStop(state); }
 
     ///  Return a vector of all empty states.
     DynamicBits GetEmptyStates() const {
@@ -232,7 +258,9 @@ namespace emp {
           AddTransition(i + offset, t.first + offset, t.second.symbols);
         }
         for (auto to : nfa2.states[i].free_to) { AddFreeTransition(i + offset, to + offset); }
-        SetStop(i + offset, nfa2.is_stop[i]);  // Maintain the stop value for this state.
+        SetStop(i + offset, nfa2.is_stop[i]);        // Maintain the stop value for this state.
+        SetTCStop(i + offset, nfa2.is_tc_stop[i]);  // Maintain the trailing-context boundary.
+        SetTCFinal(i + offset, nfa2.is_tc_final[i]); // Maintain the TC-final accept marker.
       }
     }
 

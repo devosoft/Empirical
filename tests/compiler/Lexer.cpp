@@ -12,6 +12,7 @@
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include "emp/compiler/Lexer.hpp"
+#include "emp/io/CPPFile.hpp"
 
 TEST_CASE("Test Lexer", "[compiler]")
 {
@@ -262,6 +263,113 @@ TEST_CASE("Lexer Tokenize vector of strings", "[compiler]")
   CHECK(tokens.size() == 2);
   CHECK(tokens[0].lexeme == "hello");
   CHECK(tokens[1].lexeme == "world");
+}
+
+TEST_CASE("Lexer trailing context (/) operator - context disambiguation", "[compiler]")
+{
+  // The / operator lets the same identifier text return different token types depending
+  // on what follows.  Without /, all three patterns below would just return IdentName.
+  emp::Lexer lexer;
+  int declare_id = lexer.AddToken("DeclareName", "[a-zA-Z_][a-zA-Z0-9_]*/[ ]*:");
+  int scope_id   = lexer.AddToken("ScopeName",   "[a-zA-Z_][a-zA-Z0-9_]*/[ ]*\\{");
+  int id_id      = lexer.AddToken("IdentName",   "[a-zA-Z_][a-zA-Z0-9_]*");
+  lexer.IgnoreToken("WS",    "[ \\t]+");
+  int colon_id   = lexer.AddToken("Colon",   ":");
+  int lbrace_id  = lexer.AddToken("LBrace",  "\\{");
+  int rbrace_id  = lexer.AddToken("RBrace",  "\\}");
+
+  // "x :" → DeclareName; lookahead " :" consumed but not returned; only 'x' in lexeme.
+  {
+    std::string s = "x : int";
+    size_t pos = 0, line = 1;
+    auto tok = lexer.TokenizeNext(s, line, pos);
+    CHECK(tok.id     == declare_id);
+    CHECK(tok.lexeme == "x");
+    CHECK(pos        == 1);  // Only 'x' consumed; " : int" remains.
+  }
+
+  // "x {" → ScopeName; same r1 as DeclareName but different r2.
+  {
+    std::string s = "x {";
+    size_t pos = 0, line = 1;
+    auto tok = lexer.TokenizeNext(s, line, pos);
+    CHECK(tok.id     == scope_id);
+    CHECK(tok.lexeme == "x");
+    CHECK(pos        == 1);
+  }
+
+  // "x +" → IdentName; neither lookahead matches, falls through to plain identifier.
+  {
+    std::string s = "x + 1";
+    size_t pos = 0, line = 1;
+    auto tok = lexer.TokenizeNext(s, line, pos);
+    CHECK(tok.id     == id_id);
+    CHECK(tok.lexeme == "x");
+    CHECK(pos        == 1);
+  }
+
+  // Full tokenization: "var : int" → [DeclareName, Colon, IdentName].
+  {
+    auto tokens = lexer.Tokenize("var : int");
+    CHECK(tokens.size()    == 3);
+    CHECK(tokens[0].id     == declare_id);  CHECK(tokens[0].lexeme == "var");
+    CHECK(tokens[1].id     == colon_id);    CHECK(tokens[1].lexeme == ":");
+    CHECK(tokens[2].id     == id_id);       CHECK(tokens[2].lexeme == "int");
+  }
+
+  // Full tokenization: "scope { }" → [ScopeName, LBrace, RBrace].
+  {
+    auto tokens = lexer.Tokenize("scope { }");
+    CHECK(tokens.size()    == 3);
+    CHECK(tokens[0].id     == scope_id);    CHECK(tokens[0].lexeme == "scope");
+    CHECK(tokens[1].id     == lbrace_id);   CHECK(tokens[1].lexeme == "{");
+    CHECK(tokens[2].id     == rbrace_id);   CHECK(tokens[2].lexeme == "}");
+  }
+}
+
+TEST_CASE("Lexer trailing context (/) operator - istream", "[compiler]")
+{
+  emp::Lexer lexer;
+  int declare_id = lexer.AddToken("DeclareName", "[a-zA-Z_][a-zA-Z0-9_]*/[ ]*:");
+  int id_id      = lexer.AddToken("IdentName",   "[a-zA-Z_][a-zA-Z0-9_]*");
+  lexer.IgnoreToken("WS", "[ \\t]+");
+  int colon_id   = lexer.AddToken("Colon", ":");
+
+  // "a : b" → DeclareName "a", Colon ":", IdentName "b".
+  std::stringstream ss("a : b");
+  auto t1 = lexer.TokenizeNext(ss);
+  CHECK(t1.id == declare_id);  CHECK(t1.lexeme == "a");
+
+  auto t2 = lexer.TokenizeNext(ss);
+  CHECK(t2.id == colon_id);    CHECK(t2.lexeme == ":");
+
+  auto t3 = lexer.TokenizeNext(ss);
+  CHECK(t3.id == id_id);       CHECK(t3.lexeme == "b");
+}
+
+TEST_CASE("Lexer WriteCPP includes trailing-context support", "[compiler]")
+{
+  emp::Lexer lexer;
+  lexer.AddToken("DeclareName", "[a-zA-Z_][a-zA-Z0-9_]*/[ ]*:");
+  lexer.AddToken("IdentName",   "[a-zA-Z_][a-zA-Z0-9_]*");
+  lexer.IgnoreToken("WS", "[ \\t]+");
+  lexer.AddToken("Colon", ":");
+
+  emp::CPPFile file;
+  lexer.WriteCPP(file);
+
+  std::stringstream ss;
+  file.Write(ss);
+  const std::string code = ss.str();
+
+  // The generated DFA class must include TC tables.
+  CHECK(code.find("tc_stop_id")  != std::string::npos);
+  CHECK(code.find("tc_final_id") != std::string::npos);
+  CHECK(code.find("GetTCStop")   != std::string::npos);
+  CHECK(code.find("GetTCFinal")  != std::string::npos);
+
+  // The generated NextToken must track the r1 boundary and use it.
+  CHECK(code.find("tc_boundary_pos") != std::string::npos);
 }
 
 // Local settings for Empecable file checker.

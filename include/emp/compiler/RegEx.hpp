@@ -11,6 +11,7 @@
  *
  * Special chars:
  *  |       - or
+ *  /       - trailing context: r1/r2 matches r1 only when followed by r2 (lexeme = r1 only)
  *  *       - zero or more of previous
  *  +       - one or more of previous
  *  ?       - previous is optional
@@ -38,7 +39,7 @@
  *   static DFA to_DFA(const RegEx & regex);
  *
  *
- * @todo Implement / to separate a regex from another regex that must follow it
+ * @todo Consider restricting / to top-level use only (nested trailing context is undefined)
  * @todo Consider a separator (maybe backtick?) to divide up a regex expression;
  *       the result can be returned by each section as a vector of strings.
  * @todo Consolidate most errors to a single pre-processing checker (perhaps using a lexer?)
@@ -164,6 +165,7 @@ namespace emp {
       void Negate() {
         char_set.NOT_SELF();
         char_set.Clear(0, DFA::SYMBOL_MIN_INPUT);
+        char_set.Set(DFA::SYMBOL_STOP);  // End-of-line/input is not any specific character.
       }
 
       void Print(std::ostream & os) const override {
@@ -435,6 +437,37 @@ namespace emp {
         }
 
         nfa.AddFreeTransition(state1, stop);
+      }
+    };
+
+    /// Trailing context: r1/r2 matches r1 only when immediately followed by r2.
+    /// Only the r1 portion becomes the lexeme; r2 acts as a lookahead consumed but not returned.
+    /// Note: should only be used at the top level of a regex (not nested inside groups).
+    /// In a plain RegEx::Test() call, the full r1r2 string must match (boundary is ignored).
+    /// The boundary is only meaningful when used through the Lexer.
+    struct re_slash : public re_parent {
+
+      re_slash(Ptr<re_base> l, Ptr<re_base> r) { push(l); push(r); }
+
+      void Print(std::ostream & os) const override {
+        os << "/[";
+        nodes[0]->Print(os);
+        os << ",";
+        nodes[1]->Print(os);
+        os << "]";
+      }
+
+      virtual void AddToNFA(NFA & nfa, size_t start, size_t stop) const override {
+        size_t mid = nfa.AddNewState();
+        nodes[0]->AddToNFA(nfa, start, mid);
+        // Tag the r1 boundary; works because to_NFA() calls nfa.SetStop(stop, id) before
+        // AddToNFA(), so nfa.GetStop(stop) is already set to the token's ID.
+        nfa.SetTCStop(mid, nfa.GetStop(stop));
+        // Tag the r2-final accept state so the Lexer backtracks to the r1 boundary.
+        // Marking the final state (not the mid state) lets multiple TC tokens with the same r1
+        // each carry their own tc_final marker, fixing disambiguation when r2 patterns differ.
+        nfa.SetTCFinal(stop, nfa.GetStop(stop));
+        nodes[1]->AddToNFA(nfa, mid, stop);
       }
     };
 
@@ -722,6 +755,7 @@ namespace emp {
 
         // Error cases
         case '|':
+        case '/':
         case '*':
         case '+':
         case '?':
@@ -785,6 +819,7 @@ namespace emp {
         const char c = regex[pos++];
         switch (c) {
           case '|': cur_parent = NewPtr<re_or>(cur_parent, Process()); break;
+          case '/': cur_parent = NewPtr<re_slash>(cur_parent, Process()); break;
           case '*': cur_parent->push(NewPtr<re_star>(cur_parent->pop())); break;
           case '+': cur_parent->push(NewPtr<re_plus>(cur_parent->pop())); break;
           case '?': cur_parent->push(NewPtr<re_qm>(cur_parent->pop())); break;

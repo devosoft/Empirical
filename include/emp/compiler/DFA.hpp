@@ -29,7 +29,9 @@ namespace emp {
   class tDFA {
   private:
     emp::vector<emp::array < int, NUM_SYMBOLS> > transitions;  // -1 = no transition (default)
-    emp::vector<STOP_T> stop_id;  // 0=not stop; other values for STOP return value.
+    emp::vector<STOP_T> stop_id;      // 0=not stop; other values for STOP return value.
+    emp::vector<STOP_T> tc_stop_id;  // Non-zero = trailing-context r1 boundary for that token.
+    emp::vector<STOP_T> tc_final_id; // Non-zero = TC r2-final accept state (lexeme = r1 only).
 
     using this_t = tDFA<NUM_SYMBOLS, STOP_T>;
   public:
@@ -46,6 +48,8 @@ namespace emp {
       auto old_size = transitions.size();
       transitions.resize(new_size);
       stop_id.resize(new_size, 0);
+      tc_stop_id.resize(new_size, 0);
+      tc_final_id.resize(new_size, 0);
       for (auto i = old_size; i < new_size; i++) { transitions[i].fill(-1); }
     }
 
@@ -81,6 +85,32 @@ namespace emp {
       // If we are given a stop value and its higher than our previous stop, use it!
       if (stop_val > stop_id[state]) { stop_id[state] = stop_val; }
     }
+
+    /// Set the trailing-context boundary value for a state.
+    void SetTCStop(size_t state, stop_t val) {
+      emp_assert(state < transitions.size());
+      tc_stop_id[state] = val;
+    }
+
+    /// Set the trailing-context boundary only if the new value is higher.
+    void AddTCStop(size_t state, stop_t val) {
+      emp_assert(state < transitions.size());
+      if (val > tc_stop_id[state]) { tc_stop_id[state] = val; }
+    }
+
+    /// Get the trailing-context boundary value for a state (0 = not a boundary).
+    stop_t GetTCStop(int state) const { return (state == -1) ? 0 : tc_stop_id[(size_t) state]; }
+    stop_t GetTCStop(size_t state) const { return tc_stop_id[state]; }
+
+    /// Set the TC-final value only if the new value is higher (r2-completed accept state).
+    void AddTCFinal(size_t state, stop_t val) {
+      emp_assert(state < transitions.size());
+      if (val > tc_final_id[state]) { tc_final_id[state] = val; }
+    }
+
+    /// Get the TC-final value for a state (0 = not a TC-final accept state).
+    stop_t GetTCFinal(int state) const { return (state == -1) ? 0 : tc_final_id[(size_t) state]; }
+    stop_t GetTCFinal(size_t state) const { return tc_final_id[state]; }
 
     /// Get the stop value associated with a state.
     stop_t GetStop(int state) const { return (state == -1) ? 0 : stop_id[(size_t) state]; }
@@ -184,6 +214,20 @@ namespace emp {
         file.AppendCode(static_cast<size_t>(stop_id[state]));
       }
       file.AppendCode("};")
+        .AddCode("  // TC-boundary stop values (non-zero = r1 boundary for a trailing-context token)")
+        .AddCode("  static constexpr std::array<int, NUM_STATES> tc_stop_id = {");
+      for (size_t state = 0; state < GetSize(); ++state) {
+        if (state) { file.AppendCode(","); }
+        file.AppendCode(static_cast<size_t>(tc_stop_id[state]));
+      }
+      file.AppendCode("};")
+        .AddCode("  // TC-final values (non-zero = r2 accept state; backtrack lexeme to r1 boundary)")
+        .AddCode("  static constexpr std::array<int, NUM_STATES> tc_final_id = {");
+      for (size_t state = 0; state < GetSize(); ++state) {
+        if (state) { file.AppendCode(","); }
+        file.AppendCode(static_cast<size_t>(tc_final_id[state]));
+      }
+      file.AppendCode("};")
         .AddCode("")
         .AddCodeBlock(
           "public:",
@@ -195,6 +239,12 @@ namespace emp {
         .AddCodeBlock(
           "  static constexpr int GetStop(int state) {",
           "    return (state >= 0) ? stop_id[static_cast<size_t>(state)] : 0;",
+          "  }",
+          "  static constexpr int GetTCStop(int state) {",
+          "    return (state >= 0) ? tc_stop_id[static_cast<size_t>(state)] : 0;",
+          "  }",
+          "  static constexpr int GetTCFinal(int state) {",
+          "    return (state >= 0) ? tc_final_id[static_cast<size_t>(state)] : 0;",
           "  }",
           "  static constexpr int GetNext(int state, int sym) {",
           "    if (state < 0 || sym < 0) return -1;  // Invalid state or symbol.",

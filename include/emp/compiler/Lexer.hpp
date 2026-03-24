@@ -27,7 +27,7 @@
  *   TokenizeNext(in, &line) return the next token only, and updates the line number
  *   Process(in) returns the next token (even if it's normally ignored); does not track line
  *
- * Finally, GetLexeme() returns the lexeme from the most recent token found.
+ * Token objects carry the matched lexeme directly in their .lexeme member.
  */
 
 #pragma once
@@ -294,6 +294,12 @@ namespace emp {
       cur_state = lexer_dfa.Next(0, DFA::SYMBOL_START);
     }
 
+    // Track trailing-context r1 boundary position.  When we enter a DFA state tagged as
+    // the end of r1, save the current position.  Later, if the accept state is tagged as
+    // TC-final for the same token (GetTCFinal == cur_stop), we backtrack the lexeme to
+    // tc_boundary_pos instead of using the full r1r2 match position.
+    size_t tc_boundary_pos = start_pos;
+
     // Keep looking as long as:
     // 1: We may be able to continue the current lexeme, and
     // 2: We have not entered an invalid state, and
@@ -302,8 +308,12 @@ namespace emp {
       const char next_char = in[cur_pos++];
       cur_state            = lexer_dfa.Next(cur_state, static_cast<size_t>(next_char));
       cur_stop             = lexer_dfa.GetStop(cur_state);
-      if (cur_stop > 0) {
-        best_pos  = cur_pos;
+      const int tc_id      = lexer_dfa.GetTCStop(cur_state);
+      if (tc_id > 0) { tc_boundary_pos = cur_pos; }
+if (cur_stop > 0) {
+        const int tc_final = lexer_dfa.GetTCFinal(cur_state);
+        bool use_tc = (tc_final == cur_stop) && (tc_boundary_pos > start_pos);
+        best_pos  = use_tc ? tc_boundary_pos : cur_pos;
         best_stop = cur_stop;
       }
       // Look ahead to see if we are at the END OF A LINE that can finish a token.
@@ -311,7 +321,9 @@ namespace emp {
         int eol_state = lexer_dfa.Next(cur_state, static_cast<size_t>(DFA::SYMBOL_STOP));
         int eol_stop  = lexer_dfa.GetStop(eol_state);
         if (eol_stop > 0) {
-          best_pos  = cur_pos;
+          const int eol_tc_final = lexer_dfa.GetTCFinal(eol_state);
+          bool use_tc = (eol_tc_final == eol_stop) && (tc_boundary_pos > start_pos);
+          best_pos  = use_tc ? tc_boundary_pos : cur_pos;
           best_stop = eol_stop;
         }
       }
@@ -371,6 +383,9 @@ namespace emp {
     // If we are at the START OF A LINE, send a DFA::SYMBOL_START
     if (AtLineStart(is)) { cur_state = lexer_dfa.Next(0, DFA::SYMBOL_START); }
 
+    // Track trailing-context r1 boundary position (see string_view overload for explanation).
+    size_t tc_boundary_pos = 0;
+
     // Keep looking as long as:
     // 1: We may be able to continue the current lexeme, and
     // 2: We have not entered an invalid state, and
@@ -380,10 +395,14 @@ namespace emp {
       const char next_char = static_cast<char>(is.get());
       lexeme.push_back(next_char);
       ++cur_pos;
-      cur_state = lexer_dfa.Next(cur_state, static_cast<size_t>(next_char));
-      cur_stop  = lexer_dfa.GetStop(cur_state);
+      cur_state       = lexer_dfa.Next(cur_state, static_cast<size_t>(next_char));
+      cur_stop        = lexer_dfa.GetStop(cur_state);
+      const int tc_id = lexer_dfa.GetTCStop(cur_state);
+      if (tc_id > 0) { tc_boundary_pos = cur_pos; }
       if (cur_stop > 0) {
-        best_pos  = cur_pos;
+        const int tc_final = lexer_dfa.GetTCFinal(cur_state);
+        bool use_tc = (tc_final == cur_stop) && (tc_boundary_pos > 0);
+        best_pos  = use_tc ? tc_boundary_pos : cur_pos;
         best_stop = cur_stop;
       }
       // Look ahead to see if we are at the END OF A LINE that can finish a token.
@@ -391,7 +410,9 @@ namespace emp {
         int eol_state = lexer_dfa.Next(cur_state, static_cast<size_t>(DFA::SYMBOL_STOP));
         int eol_stop  = lexer_dfa.GetStop(eol_state);
         if (eol_stop > 0) {
-          best_pos  = cur_pos;
+          const int eol_tc_final = lexer_dfa.GetTCFinal(eol_state);
+          bool use_tc = (eol_tc_final == eol_stop) && (tc_boundary_pos > 0);
+          best_pos  = use_tc ? tc_boundary_pos : cur_pos;
           best_stop = eol_stop;
         }
       }
@@ -644,11 +665,12 @@ namespace emp {
     file.AppendCode(" };");
     file.AddCodeBlock(
       "",
-      "    int cur_pos = start_pos;  // Position in the input that we are actively analyzing",
-      "    int best_pos = start_pos; // Best look-ahead we've found so far",
-      "    int cur_state = 0;        // Next state for the DFA analysis",
-      "    int cur_stop = 0;         // Current \"stop\" state (or 0 if we can't stop here)",
-      "    int best_stop = -1;       // Best stop state found so far (longest match w/ max stop value)");
+      "    int cur_pos = start_pos;         // Position in the input that we are actively analyzing",
+      "    int best_pos = start_pos;        // Best look-ahead we've found so far",
+      "    int tc_boundary_pos = start_pos; // Position at end of r1 for trailing-context tokens",
+      "    int cur_state = 0;               // Next state for the DFA analysis",
+      "    int cur_stop = 0;                // Current \"stop\" state (or 0 if we can't stop here)",
+      "    int best_stop = -1;              // Best stop state found so far");
     file.AddCodeBlock(
       "",
       "    // If we are at the START OF A LINE, send a ${DFA_name}::SYMBOL_START",
@@ -664,13 +686,25 @@ namespace emp {
       "      if (next_char < 0) break; // Ignore invalid chars.",
       "      cur_state = ${DFA_name}::GetNext(cur_state, next_char);",
       "      cur_stop = ${DFA_name}::GetStop(cur_state);",
-      "      // If we found a valid stopping point, save it as a new best.",
-      "      if (cur_stop > 0) { best_pos = cur_pos; best_stop = cur_stop; }",
+      "      // Update trailing-context r1 boundary if we crossed one.",
+      "      if (${DFA_name}::GetTCStop(cur_state) > 0) { tc_boundary_pos = cur_pos; }",
+      "      // If we found a valid stopping point, account for trailing context.",
+      "      if (cur_stop > 0) {",
+      "        int tc_final = ${DFA_name}::GetTCFinal(cur_state);",
+      "        bool use_tc = (tc_final == cur_stop) && (tc_boundary_pos > start_pos);",
+      "        best_pos = use_tc ? tc_boundary_pos : cur_pos;",
+      "        best_stop = cur_stop;",
+      "      }",
       "      // Look ahead to see if we are at the END OF A LINE that can finish a token.",
       "      if (cur_pos == std::ssize(in) || in[cur_pos] == '\\n') {",
       "        int eol_state = ${DFA_name}::GetNext(cur_state, ${DFA_name}::SYMBOL_STOP);",
       "        int eol_stop = ${DFA_name}::GetStop(eol_state);",
-      "        if (eol_stop > 0) { best_pos = cur_pos; best_stop = eol_stop; }",
+      "        if (eol_stop > 0) {",
+      "          int eol_tc_final = ${DFA_name}::GetTCFinal(eol_state);",
+      "          bool use_tc = (eol_tc_final == eol_stop) && (tc_boundary_pos > start_pos);",
+      "          best_pos = use_tc ? tc_boundary_pos : cur_pos;",
+      "          best_stop = eol_stop;",
+      "        }",
       "      }",
       "    }",
       "",

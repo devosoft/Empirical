@@ -55,6 +55,10 @@ namespace emp {
 
       // Determine if this state should be a STOP state and always use HIGHEST stop value.
       for (auto s : cur_state) { dfa.AddStop(cur_id, nfa.GetStop(s)); }
+      // Propagate any trailing-context boundary markers.
+      for (auto s : cur_state) { dfa.AddTCStop(cur_id, nfa.GetTCStop(s)); }
+      // Propagate any trailing-context final-accept markers.
+      for (auto s : cur_state) { dfa.AddTCFinal(cur_id, nfa.GetTCFinal(s)); }
 
       // Account for all possible transitions
       DynamicBits non_empty_states = ~nfa.GetEmptyStates();
