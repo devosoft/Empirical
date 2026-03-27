@@ -19,3 +19,5 @@ A human must ultimately take responsibility for all aspects of library code.
 6. **Energy Safeguards for Agentic AI use:** Agentic AI should not be run automatically without first reaching a consensus among primary developers, and there should be restrictions added to ensure it stops promptly if it is not able to solve a problem.
 
 7. **In-code citations:** Any code that was added via an AI should be clearly marked and ideally include a link to the chat session that generated it.
+
+8. **Standard of oversight:** Contributors and reviewers are expected to have mentally stepped through the code and made sense of it before requesting or approving a review. Exemptions should be requested explicitly where the judged effort tradeoff is not worthwhile. This standard will be subject to further consideration and possible future adjustment.
