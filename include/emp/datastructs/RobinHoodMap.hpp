@@ -390,6 +390,13 @@ namespace emp {
       return *FindPtr(key);
     }
 
+    // If a value is guaranteed to be in a map already, Get is a const method to retrieve it.
+    const MAPPED_T & Get(const KEY_T & key) const {
+      MAPPED_T * val = FindPtr(key);
+      emp_assert(val);
+      return *val;
+    }
+
     // Standard-library compatible find()
     [[nodiscard]] iterator find(const KEY_T & key) {
       std::optional<size_t> index = FindIndex(key);
