@@ -709,6 +709,13 @@ namespace emp {
     /// @brief Return the position of the first zero; return npos if no zeroes in vector.
     [[nodiscard]] size_t FindZero() const;
 
+    /// @brief Find first one and toggle to zero; return its position or npos if none in vector.
+    [[nodiscard]] size_t ToggleOne();
+
+    /// @brief Find first zero and toggle to one; return its position or npos if none in vector.
+    [[nodiscard]] size_t ToggleZero();
+
+
     /// Deprecated: Return the position of the first one; return -1 if no ones in vector.
     [[deprecated("Renamed to more accurate FindOne()")]] [[nodiscard]] int FindBit() const {
       return FindOne();
@@ -2277,6 +2284,22 @@ namespace emp {
     const size_t result = find_bit(not_field) + (field_id * FIELD_BITS);
     emp_assert(result < GetSize());
     return result;
+  }
+
+  /// @brief Find first one and toggle to zero; return its position or npos if none in vector.
+  template <typename DATA_T, bool ZERO_LEFT>
+  size_t Bits<DATA_T, ZERO_LEFT>::ToggleOne() {
+    const size_t pos = FindOne();
+    if (pos != npos) Clear(pos);
+    return pos;
+  }
+
+  /// @brief Find first zero and toggle to one; return its position or npos if none in vector.
+  template <typename DATA_T, bool ZERO_LEFT>
+  size_t Bits<DATA_T, ZERO_LEFT>::ToggleZero() {
+    const size_t pos = FindZero();
+    if (pos != npos) Set(pos);
+    return pos;
   }
 
   /// Return the position of the first one after start_pos; return npos if no ones in vector.
