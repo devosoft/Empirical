@@ -392,6 +392,13 @@ namespace emp {
 
     // If a value is guaranteed to be in a map already, Get is a const method to retrieve it.
     const MAPPED_T & Get(const KEY_T & key) const {
+      const MAPPED_T * val = FindPtr(key);
+      emp_assert(val);
+      return *val;
+    }
+
+    // If a value is guaranteed to be in a map already, Get is a const method to retrieve it.
+    MAPPED_T & Get(const KEY_T & key) {
       MAPPED_T * val = FindPtr(key);
       emp_assert(val);
       return *val;
