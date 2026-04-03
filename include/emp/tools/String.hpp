@@ -133,10 +133,8 @@ namespace emp {
         return std::forward<T>(value);
       } else if constexpr (std::ranges::range<U>) {  // Break down containers with Join()
         return '{' + Join(value, ",") + '}';
-      } else {  // If all else fails, send through a stringstream.
-        std::stringstream ss;
-        ss << std::forward<T>(value);
-        return ss.str();
+      } else {  // If all else fails, send through std::format.
+        return std::format("{}", value);
       }
     }
 
@@ -2529,9 +2527,7 @@ namespace emp {
 
   /// Take a char and convert it to a C++-style literal.
   [[nodiscard]] String MakeLiteral(char value) {
-    std::stringstream ss;
-    ss << "'" << MakeEscaped(value) << "'";
-    return ss.str();
+    return std::format("'{}'", MakeEscaped(value).str());
   }
 
   /// Take a string or iterable and convert it to a C++-style literal.
@@ -2561,11 +2557,7 @@ namespace emp {
       }
       ss << " }";
     } else if constexpr (std::is_arithmetic_v<T>) {
-      ss << value;
-      String out = ss.str();
-      // If there is a decimal point, remove extra zeros at back (and point if needed)
-      if (out.Has('.')) { out.TrimBack('0').TrimBack('.'); }
-      return out;
+      return std::format("{}", value);
     } else {
       ss << value;
     }
