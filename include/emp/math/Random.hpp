@@ -132,154 +132,80 @@ namespace emp {
 
     // Random Number Generation /////////////////////////////////////////////////
 
-    /// @return A pseudo-random double value between [0.0, 1.0)
-    [[nodiscard]] double GetDouble() noexcept {
-      if constexpr (NATIVE64) {
-        return (Get64() >> 11) * VAL53_FRAC;  // Doubles have 53 bits of precision.
-      } else {
-        return Get32() * VAL32_FRAC;
+    template <typename T>
+    [[nodiscard]] T GetValue() noexcept {
+      if constexpr (std::same_as<T, double>) {
+        if constexpr (NATIVE64) return (Get64() >> 11) * VAL53_FRAC;  // 53 bits of precision.
+        else return Get32() * VAL32_FRAC;
       }
+      else if constexpr (std::floating_point<T>) return static_cast<T>(Get32() * VAL32_FRAC);
+      else if constexpr (std::integral<T> && sizeof(T) > 4) return static_cast<T>(Get64());
+      else if constexpr (std::integral<T>) return static_cast<T>(Get32());
     }
 
-    /// @return A pseudo-random double value between [0.0, max)
-    [[nodiscard]] double GetDouble(const double max) noexcept { return GetDouble() * max; }
+    /// @return A pseudo-random value from [0, max)
+    template <typename T>
+    [[nodiscard]] T GetValue(const T max) noexcept {
+      if constexpr (std::integral<T> && sizeof(T) > 4) {
+        if (max <= VAL32_CAP) { return GetValue<uint32_t>(max); }  // Don't need extra precision.
 
-    /// @return A pseudo-random double value between [min, max)
-    [[nodiscard]] double GetDouble(const double min, const double max) noexcept {
+        const uint64_t mask = emp::MaskUsed(max);     // Create a mask for just the bits we need.
+        uint64_t val = GetUInt64() & mask;            // Grab a value using just the current bits.
+        while (val >= max) val = GetUInt64() & mask;  // Grab new values until we find a valid one.
+
+        return static_cast<T>(val);
+      }
+      return static_cast<T>(GetValue<double>() * static_cast<double>(max));
+    }
+
+    /// @return A pseudo-random value from [min, max)
+    template <typename T>
+    [[nodiscard]] T GetValue(const T min, const T max) noexcept {
       emp_assert(min < max, min, max);
-      return GetDouble(max - min) + min;
+      return GetValue<T>(max-min) + min;
     }
 
-    /// @return A pseudo-random double in the provided range.
-    [[nodiscard]] double GetDouble(const Range<double> range) noexcept {
-      return GetDouble(range.GetLower(), range.GetUpper());
+    /// @return A pseudo-random value in the provided range.
+    /// The range element type U need not match the return type T; bounds are cast to T.
+    template <typename T, typename U>
+    [[nodiscard]] T GetValue(const Range<U> range) noexcept {
+      return GetValue<T>(static_cast<T>(range.GetLower()), static_cast<T>(range.GetUpper()));
+    }
+
+
+    // Specified type calls...
+
+    template <typename... Ts>
+    [[nodiscard]] double GetDouble(Ts... args) noexcept { return GetValue<double>(args...); }
+    
+    template <typename... Ts>
+    [[nodiscard]] uint64_t GetUInt(Ts... args) noexcept { return GetValue<uint64_t>(args...); }
+    
+    template <typename... Ts>
+    [[nodiscard]] uint32_t GetUInt32(Ts... args) noexcept { return GetValue<uint32_t>(args...); }
+
+    template <typename... Ts>
+    [[nodiscard]] uint64_t GetUInt64(Ts... args) noexcept { return GetValue<uint64_t>(args...); }
+    
+    template <typename... Ts>
+    [[nodiscard]] size_t GetSizeT(Ts... args) noexcept { return GetValue<size_t>(args...); }
+
+    template <typename... Ts>
+    [[nodiscard]] int GetInt(Ts... args) noexcept { return GetValue<int>(args...); }
+
+    /// @return A pseudo-random double value that will reject zeros.
+    template <typename T, typename... Ts>
+    [[nodiscard]] T GetNonZeroValue(Ts... args) noexcept {
+      T result = GetValue<T>(args...);
+      while (result == T{}) { result = GetValue<T>(args...); };
+      return result;
     }
 
     /// @return A pseudo-random double value between (0.0, 1.0)
     [[nodiscard]] double GetDoubleNonZero() noexcept {
-      double result;
-      do { result = GetDouble(); } while (result == 0.0);
-      return result;
+      return GetNonZeroValue<double>();
     }
 
-    /// @return A pseudo-random 64-bit (8 byte) unsigned int value.
-    [[nodiscard]] uint64_t GetUInt() noexcept { return Get64(); }
-
-    /// @return A pseudo-random 64-bit unsigned int value between [0, max)
-    [[nodiscard]] uint64_t GetUInt(const uint64_t max) noexcept {
-      return static_cast<uint64_t>(GetDouble() * static_cast<double>(max));
-    }
-
-    /// @return A pseudo-random 64-bit unsigned int value between [min, max)
-    [[nodiscard]] uint64_t GetUInt(const uint64_t min, const uint64_t max) noexcept {
-      return GetUInt(max - min) + min;
-    }
-
-    /// @return A pseudo-random 64-bit unsigned int value in the provided range.
-    template <typename T>
-    [[nodiscard]] uint64_t GetUInt(const Range<T> range) noexcept {
-      return GetUInt(range.GetLower(), range.GetUpper());
-    }
-
-    // == You can specify the number of bits in a UInt ==
-
-    /// @return A pseudo-random 32-bit (4 byte) unsigned int value.
-    [[nodiscard]] uint32_t GetUInt32() noexcept { return Get32(); }
-
-    /// @return A pseudo-random 32-bit unsigned int value between [0, max)
-    template <typename T>
-    [[nodiscard]] uint32_t GetUInt32(const T max) noexcept {
-      return static_cast<uint32_t>(GetDouble() * static_cast<double>(max));
-    }
-
-    /// @return A pseudo-random 32-bit unsigned int value between [min, max)
-    template <typename T1, typename T2>
-    [[nodiscard]] uint32_t GetUInt32(const T1 min, const T2 max) noexcept {
-      return GetUInt<uint32_t>((uint32_t) max - (uint32_t) min) + (uint32_t) min;
-    }
-
-    /// @return A pseudo-random 32-bit unsigned int value in the provided range.
-    template <typename T>
-    [[nodiscard]] uint32_t GetUInt32(const Range<T> range) noexcept {
-      return GetUInt(range.GetLower(), range.GetUpper());
-    }
-
-    /// @return A pseudo-random 64-bit (8 byte) unsigned int value.
-    [[nodiscard]] uint64_t GetUInt64() noexcept { return Get64(); }
-
-    /// @return A pseudo-random 64-bit unsigned int value between [0, max)
-    /// This is a high-precision accessor with perfectly even probabilities in the range.
-    inline uint64_t GetUInt64(const uint64_t max) noexcept {
-      if (max <= VAL32_CAP) { return GetUInt(max); }  // Don't need extra precision.
-
-      const uint64_t mask = emp::MaskUsed(max);  // Create a mask for just the bits we need.
-      uint64_t val        = GetUInt64() & mask;  // Grab a value using just the current bits.
-      while (val >= max) {
-        val = GetUInt64() & mask;  // Grab new values until we find a valid one.
-      }
-
-      return val;
-    }
-
-    /// @return A pseudo-random 64-bit unsigned int value between [min, max)
-    template <typename T1, typename T2>
-    [[nodiscard]] uint64_t GetUInt64(const T1 min, const T2 max) noexcept {
-      return GetUInt64(max - min) + min;
-    }
-
-    /// @return A pseudo-random 64-bit unsigned int value in the provided range.
-    template <typename T>
-    [[nodiscard]] uint64_t GetUInt64(const Range<T> range) noexcept {
-      return GetUInt64(range.GetLower(), range.GetUpper());
-    }
-
-    /// @return A pseudo-random value that fits perfectly in size_t.
-    [[nodiscard]] size_t GetSizeT() noexcept {
-      if constexpr (sizeof(size_t) == 4) {
-        return Get32();
-      } else {
-        return Get64();
-      }
-    }
-
-    /// @return A pseudo-random size_t value between [0, max)
-    /// This is a high-precision accessor with perfectly even probabilities in the range.
-    inline size_t GetSizeT(const size_t max) noexcept {
-      if constexpr (sizeof(size_t) == 4) {
-        return GetUInt32(max);
-      } else {
-        return GetUInt64(max);
-      }
-    }
-
-    /// @return A pseudo-random 64-bit unsigned int value between [min, max)
-    template <typename T1, typename T2>
-    [[nodiscard]] size_t GetSizeT(const T1 min, const T2 max) noexcept {
-      return GetSizeT(max - min) + min;
-    }
-
-    /// @return A pseudo-random 64-bit unsigned int value in the provided range.
-    template <typename T>
-    [[nodiscard]] size_t GetSizeT(const Range<T> range) noexcept {
-      return GetSizeT(range.GetLower(), range.GetUpper());
-    }
-
-    /// @return A pseudo-random int value in [0, max)
-    [[nodiscard]] int GetInt(const int max) noexcept {
-      emp_assert(max > 0, "If you want a random negative int, specify both min and max", max);
-      return static_cast<int>(GetUInt(static_cast<uint64_t>(max)));
-    }
-
-    /// @return A pseudo-random int value in [min, max)
-    [[nodiscard]] int GetInt(const int min, const int max) noexcept {
-      emp_assert(min < max, min, max);
-      return GetInt(max - min) + min;
-    }
-
-    /// @return A pseudo-random int value in range
-    [[nodiscard]] int GetInt(const Range<int> range) noexcept {
-      return GetInt(range.GetLower(), range.GetUpper());
-    }
 
     /// @return A pseudo-random 64 bits (unsigned int) with a 12.5% chance of each bit being 1.
     [[nodiscard]] uint64_t GetBits12_5() noexcept { return Get64() & Get64() & Get64(); }
@@ -305,14 +231,10 @@ namespace emp {
     /// Enumeration for common probabilities.
     /// (not class, so can be referred to as e.g., Random::PROB_50)
     enum Prob {
-      PROB_0    = 0,
-      PROB_12_5 = 125,
-      PROB_25   = 250,
-      PROB_37_5 = 375,
-      PROB_50   = 500,
-      PROB_62_5 = 625,
-      PROB_75   = 750,
-      PROB_87_5 = 875,
+      PROB_0    = 0,       PROB_12_5 = 125,
+      PROB_25   = 250,     PROB_37_5 = 375,
+      PROB_50   = 500,     PROB_62_5 = 625,
+      PROB_75   = 750,     PROB_87_5 = 875,
       PROB_100  = 1000
     };
 
