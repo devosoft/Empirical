@@ -1,5 +1,5 @@
 # Pull base image.
-FROM ubuntu:focal-20230412
+FROM ubuntu:jammy
 
 COPY . /opt/Empirical
 
@@ -30,7 +30,9 @@ RUN \
     && \
   for n in $(seq 1 5); do add-apt-repository -y ppa:ubuntu-toolchain-r/test && sleep 5 && break; done \
     && \
-  for n in $(seq 1 5); do add-apt-repository -y ppa:deadsnakes/ppa && sleep 5 && break; done \
+  for n in $(seq 1 5); do add-apt-repository -y ppa:mozillateam/ppa && sleep 5 && break; done \
+    && \
+  printf 'Package: firefox*\nPin: release o=LP-PPA-mozillateam\nPin-Priority: 1001\n' > /etc/apt/preferences.d/mozilla-firefox \
     && \
   for n in $(seq 1 5); do apt-get update -y && sleep 5 && break; done \
     && \
@@ -53,9 +55,7 @@ RUN \
     lsb-release \
     xdg-utils \
     cmake \
-    'python3\.10' \
-    'python3\.10-distutils' \
-    'python3\.10-venv' \
+    python3.10 \
     nodejs \
     npm \
     tar \
@@ -146,7 +146,7 @@ RUN \
     && \
   echo "make xvfb daemon script executable"
 
-ENV DISPLAY :99
+ENV DISPLAY=:99
 
 # magic from https://github.com/puppeteer/puppeteer/issues/3451#issuecomment-523961368
 RUN echo 'kernel.unprivileged_userns_clone=1' > /etc/sysctl.d/userns.conf
