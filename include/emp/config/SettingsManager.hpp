@@ -64,7 +64,7 @@
  *     cfg.AddSetting("robot2.speed", r2_speed, "Robot 2 speed");
  *
  *     cfg.Load("my_config.cfg");    // updates variables from file
- *     cfg.Save("my_config.cfg");    // writes current values with description comments
+ *     cfg.Save("my_config.cfg");    // writes default values with description comments
  *
  *     // Apply settings from command-line arguments (e.g. -S "reps = 5")
  *     emp::vector<emp::String> args(argv, argv + argc);
@@ -80,7 +80,8 @@
  *       '-x val' or '--setting val' set specified setting (registered with AddSetting)
  *       '-k arg...' or '--keyword arg...' trigger a keyword (registered with AddKeyword)
  *       '-S "cfg"' or '--set "cfg"' apply a bulk config string (built-in keyword).
- *  - Save(ostream&) or Save(filename) – write all settings as config file; return success.
+ *  - Save(ostream&) or Save(filename) – write all settings as config file using defaults; return success.
+ *  - SaveCurrent(ostream&) or SaveCurrent(filename) – same but uses current (live) values.
  *  - Get<T>(name) or Set(name, value) – programmatic get/set.
  *  - HasSetting(name) or HasKeyword(name) or HasIdentifier(name) – query if name is registered.
  *  - HasError() or GetError() – inspect the last error message.
@@ -95,6 +96,7 @@
 #ifndef INCLUDE_EMP_CONFIG_SETTINGS_MANAGER_HPP_GUARD
 #define INCLUDE_EMP_CONFIG_SETTINGS_MANAGER_HPP_GUARD
 
+#include <filesystem>
 #include <fstream>
 #include <functional>
 #include <map>
@@ -298,6 +300,7 @@ namespace emp {
 
     // === MEMBER VARIABLES ===
 
+    std::filesystem::path config_dir{"../config"};  // Directory with configuration files
     emp::String exe_name;
     std::map<emp::String, SettingInfo> setting_map;
     std::map<emp::String, KeywordInfo> keyword_map;
@@ -498,6 +501,17 @@ namespace emp {
       return LoadScope(it, name); // Unknown id must be a new scope.
     }
 
+    void SetupFlag(char flag, emp::String option_name) {
+      // Give a warning if we are trying to add the same flag twice (but allow run to continue).
+      if (HasFlag(flag)) {
+        emp::notify::Warning(
+          "Duplicate CLI flag in SettingsManager '", flag, "'; used as shortcut for both '--",
+          flag_map[flag], "' and '--", option_name, "'.");
+        flag = '\0';
+      }
+      if (flag != '\0') flag_map[flag] = option_name;
+    }
+
   public:
     SettingsManager()
       : bool_value_ID(lexer.AddToken("bool_val", "[Oo][Nn]|[Tt][Rr][Uu][Ee]|[Oo][Ff][Ff]|[Ff][Aa][Ll][Ss][Ee]"))
@@ -542,6 +556,7 @@ namespace emp {
       return GetSettingInfo(name).GetDescription();
     }
 
+    [[nodiscard]] bool HasFlag(char flag) const { return flag && flag_map.contains(flag); }
     [[nodiscard]] char GetFlag(const emp::String & name) const { return GetSettingInfo(name).GetFlag(); }
 
     template <typename T>
@@ -553,6 +568,9 @@ namespace emp {
 
     [[nodiscard]] const emp::String & GetError() const { return error_note; }
 
+    const std::filesystem::path & GetConfigDir() const { return config_dir; }
+    void SetConfigDir(const emp::String & in) { config_dir = in.str(); }
+
     template <typename T>
     SettingsManager & AddSetting(const emp::String & name,
                                  T & value,
@@ -561,11 +579,10 @@ namespace emp {
                                  emp::String default_val = "") {
       emp_assert(!HasIdentifier(name), "Trying to add SettingsManager identifier that already exists",
                  AppendScope(name));
-      emp_assert(flag == '\0' || !flag_map.contains(flag),
-                 "Duplicate CLI flag in SettingsManager", flag);
+
       const emp::String full_name = AppendScope(name);
+      SetupFlag(flag, full_name);
       setting_map.emplace(full_name, SettingInfo{full_name, value, desc, flag, default_val});
-      if (flag != '\0')    flag_map[flag] = full_name;
       return *this;
     }
 
@@ -581,11 +598,9 @@ namespace emp {
                                  emp::String default_val = "") {
       emp_assert(!HasIdentifier(name), "Trying to add SettingsManager identifier that already exists",
                  AppendScope(name));
-      emp_assert(flag == '\0' || !flag_map.contains(flag),
-                 "Duplicate CLI flag in SettingsManager", flag);
       const emp::String full_name = AppendScope(name);
+      SetupFlag(flag, full_name);
       setting_map.emplace(full_name, SettingInfo{full_name, getter, setter, desc, flag, default_val});
-      if (flag != '\0')    flag_map[flag] = full_name;
       return *this;
     }
 
@@ -597,10 +612,8 @@ namespace emp {
                                  char flag = '\0',
                                  size_t max_args = emp::MAX_SIZE_T) {
       emp_assert(!HasIdentifier(keyword), "Adding keyword with preexisting identifier", keyword);
-      emp_assert(flag == '\0' || !flag_map.contains(flag), "Duplicate CLI flag in SettingsManager",
-        keyword, flag);
+      SetupFlag(flag, keyword);
       keyword_map.emplace(keyword, KeywordInfo{keyword, fun, desc, flag, max_args});
-      if (flag != '\0') flag_map[flag] = keyword;
       return *this;
     }
 
@@ -618,9 +631,9 @@ namespace emp {
     void PrintSettings(std::ostream & os=std::cout) {
       std::println(os, "Available settings:");
       for (const auto & [name, info] : setting_map) {
-        std::print(os, "  {} : {} (Default: {}", name, info.GetDescription(), info.GetDefaultLiteral());
-        if (info.GetFlag()) std::println(os, "; setting flag: -{})", info.GetFlag());
-        else std::println(os, ")");
+        std::print(os, "  --{}", name);
+        if (info.GetFlag()) std::print(os, " or -{}", info.GetFlag());
+        std::println(os, " : {} (Default: {})", info.GetDescription(), info.GetDefaultLiteral());
       }
     }
 
@@ -636,73 +649,124 @@ namespace emp {
       }
 
       // Default to printing all current options that were given flags.
-      std::println(os, "Format: {} [flags ...]", exe_name);
-      std::println(os, "Allowed flags include:");
+      std::println(os, "Usage: {} [options...]", exe_name);
+      std::println(os, "\nFlag Options:");
 
       std::map<emp::String, emp::String> flag_map;
       for (const auto & [name, info] : keyword_map) {
         if (!info.flag) continue; // Only include keywords with flags.
-        flag_map[name] = std::format("  --{} (or -{}) : {}", name, info.flag, info.desc);
+        flag_map[name] = std::format("  -{} --{} : {}", info.flag, name, info.desc);
       }
       for (const auto & [name, info] : setting_map) {
         if (!info.GetFlag()) continue; // Only include settings with flags.
-        flag_map[name] = std::format("  --{} (or -{}) : {}", name, info.GetFlag(), info.GetDescription());
+        flag_map[name] = std::format("  -{} --{} : {}", info.GetFlag(), name, info.GetDescription());
       }
 
       for (auto [_, line] : flag_map) {
         std::println(os, "{}", line);
       }
 
+      std::println(os, "");
       std::println(os, "Use `{} --help settings` for a full list of variables to set", exe_name);
       std::println(os, "Use `{} --help options` for a full list of all other options", exe_name);
     }
 
-    bool Save(std::ostream & ofs) {
+    /// Write all settings to a config file, grouping dot-prefixed keys into scoped blocks.
+    /// @param value_fn  Optional lambda: (const SettingInfo &) -> emp::String.
+    ///   Defaults to returning each setting's registered default value.
+    ///   Pass a custom lambda to select a different value (e.g. the live value).
+    ///
+    /// Settings whose keys share a dot-separated prefix are grouped under a brace block.
+    /// For example, `grid.height` and `grid.width` produce:
+    /// @code
+    ///   grid {
+    ///     height = 100;
+    ///     width  = 100;
+    ///   }
+    /// @endcode
+    bool Save(std::ostream & ofs,
+              std::function<emp::String(const SettingInfo &)> value_fn =
+                  [](const SettingInfo & info) { return info.GetDefaultLiteral(); }) {
       emp_assert(ofs);
       error_note.clear();
 
+      emp::vector<emp::String> open_scopes;  // currently open scope names (outermost first)
+      bool pending_blank = false;            // whether to emit a blank line before the next item
+
+      auto emit_pending_blank = [&]() {
+        if (pending_blank) { ofs << "\n"; pending_blank = false; }
+      };
+
+      // Close scopes until only `keep` remain open.
+      auto close_scopes_to = [&](size_t keep) {
+        while (open_scopes.size() > keep) {
+          pending_blank = false;
+          std::string indent(( open_scopes.size() - 1) * 2, ' ');
+          ofs << indent << "}\n";
+          open_scopes.pop_back();
+          pending_blank = true;
+        }
+      };
+
       for (const auto & [key, info] : setting_map) {
+        // Split "a.b.c" into parts; last part is the local name, rest are scopes.
+        emp::vector<emp::String> parts = key.Slice(".");
+        emp::String local_name = parts.back();
+        parts.pop_back();  // parts is now the scope chain
+
+        // Find how many leading scopes are shared with the current open_scopes.
+        size_t common = 0;
+        while (common < open_scopes.size() && common < parts.size() &&
+               open_scopes[common] == parts[common]) {
+          ++common;
+        }
+
+        // Close diverging scopes.
+        close_scopes_to(common);
+
+        // Open any new scopes needed for this key.
+        for (size_t i = common; i < parts.size(); ++i) {
+          emit_pending_blank();
+          std::string indent(open_scopes.size() * 2, ' ');
+          ofs << indent << parts[i] << " {\n";
+          open_scopes.push_back(parts[i]);
+        }
+
+        // Write the setting entry.
+        emit_pending_blank();
+        std::string indent(open_scopes.size() * 2, ' ');
         const auto lines = info.GetDescription().Slice("\n");
-        for (const auto & line : lines) { ofs << "# " << line << "\n"; }
-        ofs << key << " = " << info.AsLiteral() << ";\n\n";
+        for (const auto & line : lines) { ofs << indent << "# " << line << "\n"; }
+        ofs << indent << local_name << " = " << value_fn(info) << ";\n";
+        pending_blank = true;
       }
+
+      // Close any scopes still open after the last setting.
+      close_scopes_to(0);
+      if (pending_blank) { ofs << "\n"; }
 
       return true;
     }
 
-    bool Save(const emp::String & filename) {
+    bool Save(const emp::String & filename,
+              std::function<emp::String(const SettingInfo &)> value_fn =
+                  [](const SettingInfo & info) { return info.GetDefaultLiteral(); }) {
       std::ofstream ofs{filename};
       if (!ofs) {
         error_note.Set("Failed to open config file for saving: ", filename);
         notify::Error(error_note);
         return false;
       }
-      return Save(ofs);
+      return Save(ofs, value_fn);
     }
 
-    /// Write a starter config file using each setting's default value.
-    /// Useful for distributing a template that users can customize.
-    bool SaveTemplate(std::ostream & ofs) {
-      emp_assert(ofs);
-      error_note.clear();
-
-      for (const auto & [key, info] : setting_map) {
-        const auto lines = info.GetDescription().Slice("\n");
-        for (const auto & line : lines) { ofs << "# " << line << "\n"; }
-        ofs << key << " = " << info.GetDefaultLiteral() << ";\n\n";
-      }
-
-      return true;
+    /// Write all settings using their current (live) values rather than defaults.
+    bool SaveCurrent(std::ostream & ofs) {
+      return Save(ofs, [](const SettingInfo & info) { return info.AsLiteral(); });
     }
 
-    bool SaveTemplate(const emp::String & filename) {
-      std::ofstream ofs{filename};
-      if (!ofs) {
-        error_note.Set("Failed to open config file for saving: ", filename);
-        notify::Error(error_note);
-        return false;
-      }
-      return SaveTemplate(ofs);
+    bool SaveCurrent(const emp::String & filename) {
+      return Save(filename, [](const SettingInfo & info) { return info.AsLiteral(); });
     }
 
     // Load settings from a stream; return success.
@@ -753,7 +817,7 @@ namespace emp {
         // Short flag: -x  (single character, registered via AddSetting or AddKeyword)
         if (test_arg.size() == 2 && test_arg[0] == '-' && test_arg[1] != '-') {
           const char flag_char = test_arg[1];
-          if (flag_map.contains(flag_char)) {
+          if (HasFlag(flag_char)) {
             args.erase(args.begin() + i); // Remove the used argument.
             const emp::String & id = flag_map.at(flag_char);
             if (setting_map.contains(id)) {
