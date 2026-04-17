@@ -393,15 +393,23 @@ TEST_CASE("Test SettingsManager", "[config]")
     REQUIRE(out.find("b = 1;\n")      != std::string::npos);
   }
 
-  // Save: scoped settings are saved with their full dotted key
+  // Save: scoped settings are grouped into brace blocks
   {
     emp::SettingsManager cfg;
     int speed = 10;
+    int count = 3;
     cfg.AddSetting("robot.speed", speed, "speed");
+    cfg.AddSetting("robot.count", count, "count");
 
     std::ostringstream os;
     REQUIRE(cfg.Save(os));
-    REQUIRE(os.str().find("robot.speed = 10;\n") != std::string::npos);
+    const std::string out = os.str();
+    REQUIRE(out.find("robot {") != std::string::npos);
+    REQUIRE(out.find("  speed = 10;\n") != std::string::npos);
+    REQUIRE(out.find("  count = 3;\n") != std::string::npos);
+    REQUIRE(out.find("}") != std::string::npos);
+    // The full dotted key should NOT appear in scoped output
+    REQUIRE(out.find("robot.speed") == std::string::npos);
   }
 
   // AddKeyword: callback receives all argument tokens
@@ -633,7 +641,7 @@ TEST_CASE("Test SettingsManager", "[config]")
     REQUIRE(args.size() == 1);
   }
 
-  // AddSetting(getter, setter): Save reads the current value through the getter
+  // Save uses the registered default; SaveCurrent reads the live value through the getter.
   {
     int x = 99;
     emp::SettingsManager cfg;
@@ -642,6 +650,7 @@ TEST_CASE("Test SettingsManager", "[config]")
       [&x](int v) { x = v; },
       "a value");
 
+    // Save always writes the default captured at AddSetting time.
     std::ostringstream os;
     REQUIRE(cfg.Save(os));
     REQUIRE(os.str().find("x = 99;\n") != std::string::npos);
@@ -649,7 +658,12 @@ TEST_CASE("Test SettingsManager", "[config]")
     x = 7;  // mutate directly, bypassing the setter
     std::ostringstream os2;
     REQUIRE(cfg.Save(os2));
-    REQUIRE(os2.str().find("x = 7;\n") != std::string::npos);
+    REQUIRE(os2.str().find("x = 99;\n") != std::string::npos);  // default unchanged
+
+    // SaveCurrent captures the live value.
+    std::ostringstream os3;
+    REQUIRE(cfg.SaveCurrent(os3));
+    REQUIRE(os3.str().find("x = 7;\n") != std::string::npos);
   }
 
   // AddSetting(getter, setter): getter can return a computed (non-stored) value
