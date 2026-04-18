@@ -1,6 +1,6 @@
 /**
  * This file is part of Empirical, https://github.com/devosoft/Empirical
- * Copyright (C) 2016-2023 Michigan State University
+ * Copyright (C) 2016-2026 Michigan State University
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/math/Range.hpp
@@ -27,8 +27,8 @@ namespace emp {
   template <typename T, bool INCLUDE_UPPER = true>
   class Range {
   private:
-    T lower = std::numeric_limits<T>::lowest();  ///< Beginning of range, inclusive.
-    T upper = std::numeric_limits<T>::max();     ///< End of range, (included if INCLUDE_UPPER)
+    T lower = MinLimit();  ///< Beginning of range, inclusive.
+    T upper = MaxLimit();  ///< End of range, (included if INCLUDE_UPPER)
 
     using this_t = Range<T, INCLUDE_UPPER>;
   public:
@@ -52,11 +52,11 @@ namespace emp {
 
     T GetUpper() const { return upper; }
 
-    T GetEpsilon() const {
+    static constexpr T GetEpsilon() {
       if constexpr (is_integral) {
         return 1;
       } else {
-        return upper * std::numeric_limits<T>::epsilon();
+        return std::numeric_limits<T>::epsilon();
       }
     }
 
@@ -70,9 +70,9 @@ namespace emp {
 
     T GetSize() const { return upper - lower + (INCLUDE_UPPER && is_integral); }
 
-    [[nodiscard]] static constexpr T MaxLimit() { return std::numeric_limits<T>::max(); }
-
     [[nodiscard]] static constexpr T MinLimit() { return std::numeric_limits<T>::lowest(); }
+
+    [[nodiscard]] static constexpr T MaxLimit() { return std::numeric_limits<T>::max(); }
 
     emp::String ToString() const {
       if constexpr (INCLUDE_UPPER) {
