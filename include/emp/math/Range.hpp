@@ -13,8 +13,9 @@
 #ifndef INCLUDE_EMP_MATH_RANGE_HPP_GUARD
 #define INCLUDE_EMP_MATH_RANGE_HPP_GUARD
 
+#include <cmath>
+#include <cstddef>
 #include <limits>
-#include <stddef.h>
 #include <type_traits>
 
 #include "../base/assert.hpp"
@@ -23,21 +24,27 @@
 
 namespace emp {
 
-  /// A range of values from a lower limit to and upper limit, of any provided type.
+  /// A range of values from a lower limit to an upper limit, of any provided type.
+  /// When INCLUDE_UPPER=true  (default), the range is [lower, upper] (both inclusive).
+  /// When INCLUDE_UPPER=false, the range is [lower, upper) (upper is exclusive).
+  /// Internally, `upper` always stores the exclusive boundary; GetMaxValue() returns
+  /// the largest *included* value.
   template <typename T, bool INCLUDE_UPPER = true>
   class Range {
   private:
     T lower = MinLimit();  ///< Beginning of range, inclusive.
-    T upper = MaxLimit();  ///< End of range, (included if INCLUDE_UPPER)
+    T upper = MaxLimit();  ///< End of range (exclusive if !INCLUDE_UPPER).
 
     using this_t = Range<T, INCLUDE_UPPER>;
+
   public:
-    static constexpr bool is_integral = std::is_integral<T>();
+    static constexpr bool is_integral = std::is_integral_v<T>;
 
     Range() = default;
 
+    /// Construct a single-value range containing exactly `val`.
     Range(T val) : lower(val), upper(val) {
-      if constexpr (!INCLUDE_UPPER) { upper += GetEpsilon(); }
+      if constexpr (!INCLUDE_UPPER) { upper = NextAbove(val); }
     }
 
     Range(T _l, T _u) : lower(_l), upper(_u) { emp_assert(_l <= _u, _l, _u); }
@@ -52,34 +59,44 @@ namespace emp {
 
     T GetUpper() const { return upper; }
 
-    static constexpr T GetEpsilon() {
-      if constexpr (is_integral) {
-        return 1;
-      } else {
-        return std::numeric_limits<T>::epsilon();
-      }
+    /// One step above val in type T (for advancing past the included maximum).
+    [[nodiscard]] static T NextAbove(T val) {
+      if constexpr (is_integral) return val + T{1};
+      else return std::nextafter(val, std::numeric_limits<T>::max());
     }
 
-    T GetMaxValue() const {  // What is the maximum included value?
-      if constexpr (INCLUDE_UPPER) {
-        return upper;
-      } else {
-        return upper - GetEpsilon();
-      }
+    /// One step below val in type T (for retreating from the exclusive upper).
+    [[nodiscard]] static T NextBelow(T val) {
+      if constexpr (is_integral) return val - T{1};
+      else return std::nextafter(val, std::numeric_limits<T>::lowest());
     }
 
-    T GetSize() const { return upper - lower + (INCLUDE_UPPER && is_integral); }
+    /// Smallest representable delta (useful for integral arithmetic; for floats
+    /// prefer NextAbove/NextBelow which are value-scaled).
+    [[nodiscard]] static constexpr T GetEpsilon() {
+      if constexpr (is_integral) return T{1};
+      else return std::numeric_limits<T>::epsilon();
+    }
+
+    /// The largest value that is considered *inside* the range.
+    [[nodiscard]] T GetMaxValue() const {
+      if constexpr (INCLUDE_UPPER) return upper;
+      else                         return NextBelow(upper);
+    }
+
+    /// Number of values in the range (count for integrals, length for floats).
+    [[nodiscard]] T GetSize() const {
+      if constexpr (INCLUDE_UPPER && is_integral) return upper - lower + T{1};
+      else                                        return upper - lower;
+    }
 
     [[nodiscard]] static constexpr T MinLimit() { return std::numeric_limits<T>::lowest(); }
 
     [[nodiscard]] static constexpr T MaxLimit() { return std::numeric_limits<T>::max(); }
 
-    emp::String ToString() const {
-      if constexpr (INCLUDE_UPPER) {
-        return emp::MakeString('[', lower, ',', upper, ']');
-      } else {
-        return emp::MakeString('[', lower, ',', upper, ')');
-      }
+    [[nodiscard]] emp::String ToString() const {
+      if constexpr (INCLUDE_UPPER) return emp::MakeString('[', lower, ',', upper, ']');
+      else                         return emp::MakeString('[', lower, ',', upper, ')');
     }
 
     void SetLower(T l) { lower = l; }
@@ -87,158 +104,152 @@ namespace emp {
     void SetUpper(T u) { upper = u; }
 
     void Set(T _l, T _u) {
-      emp_assert(_l < _u);
+      emp_assert(_l <= _u, _l, _u);
       lower = _l;
       upper = _u;
     }
 
     void ShiftDown(T shift) {
-      emp_assert(shift > 0);
+      emp_assert(shift > T{}, shift);
       emp_assert(lower <= upper, lower, upper);
-      // Guard against underflow
       upper = (MinLimit() + shift < upper) ? (upper - shift) : MinLimit();
       lower = (MinLimit() + shift < lower) ? (lower - shift) : MinLimit();
     }
 
     void ShiftUp(T shift) {
-      emp_assert(shift > 0);
+      emp_assert(shift > T{}, shift);
       emp_assert(lower <= upper, lower, upper);
-      // Guard against overflow
       upper = (MaxLimit() - shift > upper) ? (upper + shift) : MaxLimit();
       lower = (MaxLimit() - shift > lower) ? (lower + shift) : MaxLimit();
     }
 
     void Shift(T shift) {
-      if (shift > 0) {
-        ShiftUp(shift);
-      } else {
-        ShiftDown(-shift);
-      }
+      if      (shift > T{}) ShiftUp(shift);
+      else if (shift < T{}) ShiftDown(-shift);
+      // shift == T{}: no-op
     }
 
-    void SetMinLower() { lower = std::numeric_limits<T>::min(); }
+    void SetMinLower() { lower = std::numeric_limits<T>::lowest(); }
 
     void SetMaxUpper() { upper = std::numeric_limits<T>::max(); }
 
     void Grow(T amount = 1) {
-      if (amount > 0) {
-        upper += amount;
-      } else {
-        lower += amount;
-      }
+      if (amount > T{}) upper += amount;
+      else              lower += amount;
     }
 
-    // Flexible lower/upper accessor that can get and set.
-    T & Lower() { return lower; }
-
-    T & Upper() { return upper; }
-
+    // Flexible lower/upper accessors that can get and set.
+    T &       Lower()       { return lower; }
+    T &       Upper()       { return upper; }
     const T & Lower() const noexcept { return lower; }
-
     const T & Upper() const noexcept { return upper; }
 
-    /// Determine if a provided value is in the range INCLUSIVE of the endpoints.
-    bool Has(T value) const {
+    /// Returns true if `value` is within the range.
+    [[nodiscard]] bool Has(T value) const {
       return (value >= lower && value < upper) || (INCLUDE_UPPER && value == upper);
     }
 
     [[deprecated("Renamed to Has()")]] bool Valid(T value) const { return Has(value); }
 
-    bool HasRange(this_t in_range) { return Has(in_range.lower) && Has(in_range.upper); }
+    /// Returns true if every value in `in_range` is also in this range.
+    [[nodiscard]] bool HasRange(const this_t & in_range) const {
+      return Has(in_range.lower) && Has(in_range.GetMaxValue());
+    }
 
     /// Will identify if two ranges are next to each other or overlapping.
-    bool IsConnected(this_t in) const {
+    [[nodiscard]] bool IsConnected(this_t in) const {
       return (in.lower >= lower && in.lower <= upper) || (lower >= in.lower && lower <= in.upper);
     }
 
-    /// Determine if there is overlap between two range.
-    /// Similar to IsConnected, but cannot be merely adjacent.
-    bool HasOverlap(this_t in) const {
+    /// Determine if there is overlap between two ranges (not merely adjacent).
+    [[nodiscard]] bool HasOverlap(this_t in) const {
       return (in.lower >= lower && in.lower < upper) || (lower >= in.lower && lower < in.upper);
     }
 
-    /// Determine the amount of overlap between two range.
-    T CalcOverlap(this_t in) const {
+    /// Determine the amount of overlap between two ranges.
+    [[nodiscard]] T CalcOverlap(this_t in) const {
       const T combo_upper = std::min(upper, in.upper);
       const T combo_lower = std::max(lower, in.lower);
       return (combo_upper > combo_lower) ? (combo_upper - combo_lower) : T{};
     }
 
-    /// @brief  Expand this range to encompass a provided value.
-    /// @param val Value to expand through.
-    /// @return Whether the range has changed due to this expansion.
+    /// @brief Expand this range to encompass a provided value.
+    /// @param val Value to include in the range.
+    /// @return Whether the range changed.
     bool Expand(T val) {
       if (val < lower) {
         lower = val;
-      } else if (val > upper) {
-        upper = val;
-        if constexpr (INCLUDE_UPPER) { upper += GetEpsilon(); }
-      } else {
-        return false;
+        return true;
       }
-      return true;
+      if (!Has(val)) {
+        // val is at or beyond the upper bound; extend to include it.
+        upper = INCLUDE_UPPER ? val : NextAbove(val);
+        return true;
+      }
+      return false;
     }
 
     /// @brief Expand this range to encompass all provided values.
-    /// @return Whether the range has changed due to this expansion.
+    /// @return Whether the range changed at all.
     template <typename... Ts>
     bool Expand(T val1, T val2, Ts... args) {
       return Expand(val1) + Expand(val2, args...);  // Use + to avoid short-circuiting.
     }
 
-    /// Merge this range with another.  Must be adjacent or overlap (return false if not!)
+    /// Merge this range with another.  Must be adjacent or overlap (returns false if not).
     bool Merge(this_t in) {
       if (!IsConnected(in)) { return false; }
       Expand(in.lower, in.upper);
       return true;
     }
 
-    /// Add a specified value to the end of a range (or return false if failed).
+    /// Add the next consecutive value to the end of this range (integral ranges only).
+    /// Returns false if `val` is not the immediate successor of the current maximum.
     bool Append(T val) {
-      emp_assert(is_integral, "Only integral ranges can call Append() with a single value.");
+      static_assert(is_integral, "Only integral ranges can call Append() with a single value.");
       if (val != upper + INCLUDE_UPPER) { return false; }
       upper++;
       return true;
     }
 
-    /// Force a value into range
-    T Clamp(T _in) const { return (_in < lower) ? lower : ((_in >= upper) ? GetMaxValue() : _in); }
+    /// Clamp `_in` to the nearest included value in this range.
+    [[nodiscard]] T Clamp(T _in) const {
+      return (_in < lower) ? lower : ((_in >= upper) ? GetMaxValue() : _in);
+    }
 
     [[deprecated("Renamed to Clamp()")]] T LimitValue(T _in) const { return Clamp(_in); }
 
-    double ToFraction(T _in) const {
-      emp_assert(GetSize() != 0);
+    [[nodiscard]] double ToFraction(T _in) const {
+      emp_assert(GetSize() != T{});
       return static_cast<double>(_in - lower) / static_cast<double>(GetSize());
     }
 
-    T FromFraction(double frac) const { return frac * GetSize() + lower; }
+    [[nodiscard]] T FromFraction(double frac) const { return static_cast<T>(frac * GetSize()) + lower; }
 
     // Adjust the upper or lower if provided value is more limiting.
-    void LimitLower(T in) {
-      if (in > lower) { lower = in; }
-    }
+    void LimitLower(T in) { if (in > lower) { lower = in; } }
 
-    void LimitUpper(T in) {
-      if (in < upper) { upper = in; }
-    }
+    void LimitUpper(T in) { if (in < upper) { upper = in; } }
 
-    size_t CalcBin(T value, size_t num_bins) const {
+    [[nodiscard]] size_t CalcBin(T value, size_t num_bins) const {
       if (upper == lower) { return 0; }
-      return (size_t) (((double) (value - lower)) / ((double) (upper - lower)) * (double) num_bins);
+      return static_cast<size_t>(
+        static_cast<double>(value - lower) / static_cast<double>(upper - lower) * num_bins
+      );
     }
 
     /// Produce a vector that spreads values evenly across the range.
-    emp::vector<T> Spread(const size_t s) const {
+    [[nodiscard]] emp::vector<T> Spread(const size_t s) const {
       emp_assert(s >= 1);
       if (s == 1) {
-        return emp::vector<T>(1, lower / 2 + upper / 2);  // On point is in the middle of the range.
+        return emp::vector<T>(1, lower / 2 + upper / 2);  // midpoint
       }
       emp::vector<T> out(s);
-      out[0]  = lower;
-      T range = upper - lower;
+      out[0] = lower;
+      const T range = upper - lower;
       for (size_t i = 1; i < s; i++) {
-        double frac = static_cast<double>(i) / static_cast<double>(s - 1);
-        out[i]      = lower + static_cast<T>(frac * range);
+        const double frac = static_cast<double>(i) / static_cast<double>(s - 1);
+        out[i] = lower + static_cast<T>(frac * range);
       }
       return out;
     }
@@ -276,6 +287,7 @@ namespace emp {
     out << '[' << range.GetLower() << ',' << range.GetUpper() << (INCLUDE_UPPER ? ']' : ')');
     return out;
   }
+
 }  // namespace emp
 
 #endif  // #ifndef INCLUDE_EMP_MATH_RANGE_HPP_GUARD
