@@ -41,13 +41,10 @@ namespace emp {
       void PrintStats(std::ostream & os = std::cout) const {
         if (!stats.HasData()) { return; }
 
-        os << "Timer \"" << NAME.AsStringView() << "\": "
-           << stats.GetCount() << " sample" << (stats.GetCount() == 1 ? "" : "s")
-           << "; min " << stats.GetMin() << " ms"
-           << "; max " << stats.GetMax() << " ms"
-           << "; avg " << stats.GetAverage() << " ms"
-           << "; total " << stats.GetTotal() << " ms"
-           << std::endl;
+        std::println(os,
+          "Timer \"{}\": samples {}; min {} ms; max {} ms; avg {:.6} ms; total {:.6} s",
+          NAME.AsStringView(), stats.GetCount(),
+          stats.GetMin(), stats.GetMax(), stats.GetAverage(), stats.GetTotal()/1000.0);
       }
     };
 
