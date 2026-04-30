@@ -45,19 +45,19 @@ namespace emp {
 
     void Reset() { *this = StatsTracker{}; }
 
-    size_t GetCount() const { return count; }
+    [[nodiscard]] size_t GetCount() const { return count; }
 
-    VALUE_T GetTotal() const { return total; }
+    [[nodiscard]] VALUE_T GetTotal() const { return total; }
 
-    VALUE_T GetMin() const { return count ? min : VALUE_T{}; }
+    [[nodiscard]] VALUE_T GetMin() const { return count ? min : VALUE_T{}; }
 
-    VALUE_T GetMax() const { return count ? max : VALUE_T{}; }
+    [[nodiscard]] VALUE_T GetMax() const { return count ? max : VALUE_T{}; }
 
-    VALUE_T GetLast() const { return last; }
+    [[nodiscard]] VALUE_T GetLast() const { return last; }
 
-    double GetAverage() const { return count ? (double) total / (double) count : 0.0; }
+    [[nodiscard]] double GetAverage() const { return count ? (double) total / (double) count : 0.0; }
 
-    bool HasData() const { return count > 0; }
+    [[nodiscard]] bool HasData() const { return count > 0; }
 
     void Print(std::ostream & os, std::string_view label = "Stats") const {
       if (!HasData()) { return; }
