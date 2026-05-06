@@ -556,19 +556,63 @@ namespace emp {
       return k;
     }
 
+    /// Draw the number of Bernoulli failures before the next success (0-indexed geometric variate).
+    /// Requires log1p(-p) precomputed as log1mp for efficiency when called in a loop.
+    [[nodiscard]] double GeometricSkip(double log1mp) {
+      return std::floor(std::log(GetDoubleNonZero()) / log1mp);
+    }
+
     /// Generate a random variable drawn from a Binomial distribution.
     ///
-    /// This function is exact, but slow.
-    /// @see Random_Base::GetApproxRandBinomial
-    /// @see emp::Binomial in source/tools/Distribution.h
-    [[nodiscard]] uint64_t GetBinomial(const uint64_t n, const double p) {  // Exact
+    /// For small n (<= 30): Use direct Bernoulli sampling.
+    /// Otherwise use geometric skipping: instead of testing every Bernoulli trial,
+    /// draw the waiting time to the next success from a geometric distribution.
+    /// This is O(n*p) rather than O(n), giving a ~1/p speedup for small p.
+    /// Symmetry (p > 0.5 -> sample failures) keeps the effective p <= 0.5.
+    [[nodiscard]] uint64_t GetBinomial(const uint64_t n, const double p) {
       emp_assert(p >= 0.0 && p <= 1.0, p);
-      // Actually try n Bernoulli events, each with probability p
+
+      if (p == 0.0 || n == 0) return 0;
+      if (p == 1.0) return n;
+
+      // Symmetry: flip to count failures when p > 0.5 so effective p <= 0.5.
+      if (p > 0.5) return n - GetBinomial(n, 1.0 - p);
+
+      // For small n, direct Bernoulli sampling is fastest.
+      if (n <= 30) {
+        uint64_t k = 0;
+        for (uint64_t i = 0; i < n; ++i) { if (P(p)) { ++k; } }
+        return k;
+      }
+
+      // Geometric skipping: advance through n trials by success positions.
+      const double log1mp = std::log1p(-p);
       uint64_t k = 0;
-      for (uint64_t i = 0; i < n; ++i) {
-        if (P(p)) { k++; }
+      double pos = GeometricSkip(log1mp);
+      while (pos < static_cast<double>(n)) {
+        ++k;
+        pos += GeometricSkip(log1mp) + 1.0;
       }
       return k;
+    }
+
+    /// Generate a random variable drawn from a Negative Binomial distribution.
+    ///
+    /// Returns the number of failures before the r-th success in a sequence of
+    /// Bernoulli(p) trials.  Uses the same geometric skipping primitive as GetBinomial,
+    /// so it is O(r) regardless of the failure count.
+    [[nodiscard]] uint64_t GetNegativeBinomial(const uint64_t r, const double p) {
+      emp_assert(p > 0.0 && p <= 1.0, p);
+      emp_assert(r > 0, r);
+
+      if (p == 1.0) return 0;  // every trial succeeds; no failures
+
+      const double log1mp = std::log1p(-p);
+      uint64_t failures = 0;
+      for (uint64_t i = 0; i < r; ++i) {
+        failures += static_cast<uint64_t>(GeometricSkip(log1mp));
+      }
+      return failures;
     }
 
     /// Generate a random variable drawn from an exponential distribution.
