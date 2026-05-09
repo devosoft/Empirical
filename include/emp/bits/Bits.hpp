@@ -143,11 +143,9 @@ namespace emp {
     [[nodiscard]] emp::Ptr<const unsigned char> BytePtr() const { return _data.BytePtr(); }
 
     // Any bits past the last "real" bit in the last field should be zeros.
-    constexpr this_t & ClearExcessBits() {
-      if (_data.NumFields()) {
-        _data.bits[_data.LastField()] &= _data.EndMask();
-      }
-      return *this;
+    void ClearExcessBits() {
+      emp_assert(_data.NumFields());
+      _data.bits[_data.LastField()] &= _data.EndMask();
     }
 
     // Apply a transformation to each bit field in a specified range.
@@ -191,6 +189,7 @@ namespace emp {
     /// @brief Build a new Bits with specified bit count and initialization
     template <typename T>
     Bits(std::integral auto num_bits, T && init_val) : _data(static_cast<size_t>(num_bits)) {
+      if (num_bits == 0) return;
       if constexpr (std::invocable<T, size_t>) {
         SetIf(std::forward<T>(init_val));
         ClearExcessBits();
@@ -211,8 +210,10 @@ namespace emp {
 
     /// @brief Constructor to generate a Bits from a string of '0's and '1's or indices
     Bits(const emp::String & bitstring) : _data(static_cast<size_t>(bitstring.size())) {
-      Set(bitstring);
-      ClearExcessBits();
+      if (bitstring.size() > 0) {
+        Set(bitstring);
+        ClearExcessBits();
+      }
     }
 
     /// @brief Constructor to generate a Bits from a literal string of '0's and '1's.
@@ -1499,12 +1500,15 @@ namespace emp {
   template <typename DATA_T, bool ZERO_LEFT>
   template <size_t NUM_BITS>
   Bits<DATA_T, ZERO_LEFT> & Bits<DATA_T, ZERO_LEFT>::operator=(
-    const std::bitset<NUM_BITS> & bitset) & {
+    const std::bitset<NUM_BITS> & bitset
+  ) & {
+    static_assert(NUM_BITS > 0, "std::bitset should be non-zero in size.");
     _data.RawResize(NUM_BITS);
     for (size_t i = 0; i < NUM_BITS; i++) {
       Set(i, bitset[i]);  // Copy bits in.
     }
-    return ClearExcessBits();  // Set excess bits to zeros.
+    ClearExcessBits();  // Set excess bits to zeros.
+    return *this;
   }
 
   /// @brief Assignment from an unsigned int, optionally specifying size.
@@ -1672,7 +1676,8 @@ namespace emp {
   Bits<DATA_T, ZERO_LEFT> & Bits<DATA_T, ZERO_LEFT>::SetAll() {
     const size_t NUM_FIELDS = NumFields();
     for (size_t i = 0; i < NUM_FIELDS; i++) { _data.bits[i] = FIELD_ALL; }
-    return ClearExcessBits();
+    if (NUM_FIELDS) ClearExcessBits();
+    return *this;
   }
 
   /// Set all bits to 0.
@@ -1730,8 +1735,11 @@ namespace emp {
   /// Set all bits randomly, with a 50% probability of being a 0 or 1.
   template <typename DATA_T, bool ZERO_LEFT>
   Bits<DATA_T, ZERO_LEFT> & Bits<DATA_T, ZERO_LEFT>::Randomize(Random & random) {
-    random.RandFill(BytePtr(), GetNumBytes());
-    return ClearExcessBits();
+    if (GetNumBytes()) {
+      random.RandFill(BytePtr(), GetNumBytes());
+      ClearExcessBits();
+    }
+    return *this;
   }
 
   /// Set all bits randomly, with probability specified at compile time.
@@ -2090,7 +2098,8 @@ namespace emp {
     // @CAO For the moment, must fit inside bounds; eventually should pad with zeros.
     emp_assert((index + 1) * sizeof(T) <= _data.TotalBytes());
     std::memcpy(BytePtr().Raw() + index * sizeof(T), &in_value, sizeof(T));
-    return ClearExcessBits();
+    ClearExcessBits();
+    return *this;
   }
 
   /// Get the specified type starting from a given BIT position.
@@ -2122,7 +2131,8 @@ namespace emp {
     in_bits <<= index;                           // Shift new bits into place.
     OR_SELF(in_bits);                            // Place new bits into current Bits object.
 
-    return ClearExcessBits();
+    ClearExcessBits();
+    return *this;
   }
 
   // -------------------------  Other Analyses -------------------------
@@ -2572,8 +2582,11 @@ namespace emp {
   template <typename DATA_T, bool ZERO_LEFT>
   Bits<DATA_T, ZERO_LEFT> & Bits<DATA_T, ZERO_LEFT>::NOT_SELF() {
     const size_t NUM_FIELDS = NumFields();
-    for (size_t i = 0; i < NUM_FIELDS; i++) { _data.bits[i] = ~_data.bits[i]; }
-    return ClearExcessBits();
+    if (NUM_FIELDS) {
+      for (size_t i = 0; i < NUM_FIELDS; i++) { _data.bits[i] = ~_data.bits[i]; }
+      ClearExcessBits();
+    }
+    return *this;
   }
 
   /// Perform a Boolean AND with this Bits object, store result here, and return this object.
@@ -2613,10 +2626,12 @@ namespace emp {
   /// Perform a Boolean NAND with this Bits object, store result here, and return this object.
   template <typename DATA_T, bool ZERO_LEFT>
   Bits<DATA_T, ZERO_LEFT> & Bits<DATA_T, ZERO_LEFT>::NAND_SELF(
-    const Bits<DATA_T, ZERO_LEFT> & bits2) {
+    const Bits<DATA_T, ZERO_LEFT> & bits2
+  ) {
     if constexpr (IsAutoResize()) {
       if (GetSize() < bits2.GetSize()) { Resize(bits2.GetSize()); }
     }
+    if (GetSize() == 0) return *this;
     const size_t NUM_FIELDS  = NumFields();
     const size_t NUM_FIELDS2 = bits2.NumFields();
     emp_assert(GetSize() >= bits2.GetSize());
@@ -2625,16 +2640,19 @@ namespace emp {
     }
     // Assume all "missing" bits in bits2 (if any) are zeros.
     for (size_t i = NUM_FIELDS2; i < NUM_FIELDS; ++i) { _data.bits[i] = FIELD_ALL; }
-    return ClearExcessBits();
+    ClearExcessBits();
+    return *this;
   }
 
   /// Perform a Boolean NOR with this Bits object, store result here, and return this object.
   template <typename DATA_T, bool ZERO_LEFT>
   Bits<DATA_T, ZERO_LEFT> & Bits<DATA_T, ZERO_LEFT>::NOR_SELF(
-    const Bits<DATA_T, ZERO_LEFT> & bits2) {
+    const Bits<DATA_T, ZERO_LEFT> & bits2
+  ) {
     if constexpr (IsAutoResize()) {
       if (GetSize() < bits2.GetSize()) { Resize(bits2.GetSize()); }
     }
+    if (GetSize() == 0) return *this;
     const size_t NUM_FIELDS  = NumFields();
     const size_t NUM_FIELDS2 = bits2.NumFields();
     emp_assert(GetSize() >= bits2.GetSize());
@@ -2643,7 +2661,8 @@ namespace emp {
     }
     // Assume all "missing" bits in bits2 (if any) are zeros.
     for (size_t i = NUM_FIELDS2; i < NUM_FIELDS; ++i) { _data.bits[i] = ~_data.bits[i]; }
-    return ClearExcessBits();
+    ClearExcessBits();
+    return *this;
   }
 
   /// Perform a Boolean XOR with this Bits object, store result here, and return this object.
@@ -2669,6 +2688,7 @@ namespace emp {
     if constexpr (IsAutoResize()) {
       if (GetSize() < bits2.GetSize()) { Resize(bits2.GetSize()); }
     }
+    if (GetSize() == 0) return *this;
     const size_t NUM_FIELDS  = NumFields();
     const size_t NUM_FIELDS2 = bits2.NumFields();
     emp_assert(GetSize() >= bits2.GetSize());
@@ -2677,7 +2697,8 @@ namespace emp {
     }
     // Assume all "extra" bits in bits2 (if any) are zeros.
     for (size_t i = NUM_FIELDS2; i < NUM_FIELDS; ++i) { _data.bits[i] = ~(_data.bits[i] ^ 0); }
-    return ClearExcessBits();
+    ClearExcessBits();
+    return *this;
   }
 
   /// Positive shifts go right and negative go left (0 does nothing); return result.
