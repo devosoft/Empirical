@@ -371,6 +371,13 @@ namespace emp {
       return ApplyRange([](field_t) -> field_t { return FIELD_0; }, start, std::min(stop, GetSize()));
     }
 
+    /// @brief Test each set bit to see if it should be cleared.
+    template <typename TEST_FUN_T>
+    Bits & ClearIf(TEST_FUN_T test_fun) {
+      for (size_t id : *this) { if (test_fun(id)) Clear(id); }
+      return *this;
+    }
+
     /// @brief Const index operator -- return the bit at the specified position.
     [[nodiscard]] bool operator[](size_t index) const { return Get(index); }
 
@@ -753,6 +760,9 @@ namespace emp {
     /// @brief Find the most-significant set-bit.
     [[nodiscard]] size_t FindMaxOne() const;
 
+    /// @brief Find the Nth set bit.
+    [[nodiscard]] size_t FindNthOne(size_t N) const;
+
     /// @brief Return the position of the first one and change it to a zero.  Return npos if none.
     size_t PopOne();
 
@@ -800,9 +810,14 @@ namespace emp {
       }
     }
 
+    /// @brief Scan through all of the one indices to determine which one minimizes a function.
+    template <typename FUN_T>
+    size_t MinIndex(FUN_T && fun) const;
+
     /// @brief Scan through all of the one indices to determine which one maximizes a function.
     template <typename FUN_T>
     size_t MaxIndex(FUN_T && fun) const;
+
 
     /// @brief Find a one-index that makes a function true
     template <typename FUN_T>
@@ -2391,7 +2406,15 @@ namespace emp {
     return max_field * FIELD_BITS + offset;
   }
 
-  /// Return the position of the first one and change it to a zero.  Return npos if no ones.
+  /// Find the Nth set bit.
+  template <typename DATA_T, bool ZERO_LEFT>
+  size_t Bits<DATA_T, ZERO_LEFT>::FindNthOne(size_t N) const {
+    size_t out_pos = FindOne();
+    while (N > 0 && out_pos != npos) { out_pos = FindOne(out_pos+1); --N; }
+    return out_pos;
+  }
+
+    /// Return the position of the first one and change it to a zero.  Return npos if no ones.
   template <typename DATA_T, bool ZERO_LEFT>
   size_t Bits<DATA_T, ZERO_LEFT>::PopOne() {
     const size_t out_bit = FindOne();
@@ -2454,6 +2477,23 @@ namespace emp {
       if (_data.bits[i] & in_fields[i]) { return true; }
     }
     return false;
+  }
+
+  /// Scan through all of the one indices to determine which one minimizes a function.
+  template <typename DATA_T, bool ZERO_LEFT>
+  template <typename FUN_T>
+  size_t Bits<DATA_T, ZERO_LEFT>::MinIndex(FUN_T && fun) const {
+    size_t min_id = FindOne();
+    if (min_id == npos) { return npos; }
+    auto min_value = fun(min_id);
+    for (size_t i = FindOne(min_id + 1); i < GetSize(); i = FindOne(i + 1)) {
+      const auto cur_val = fun(i);
+      if (cur_val < min_value) {
+        min_value = cur_val;
+        min_id    = i;
+      }
+    }
+    return min_id;
   }
 
   /// Scan through all of the one indices to determine which one maximizes a function.
