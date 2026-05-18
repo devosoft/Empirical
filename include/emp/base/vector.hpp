@@ -381,9 +381,13 @@ namespace emp {
       return stdv_t::front();
     }
 
-    template <typename... PB_Ts>
-    constexpr void push_back(PB_Ts &&... args) {
-      stdv_t::push_back(std::forward<PB_Ts>(args)...);
+    constexpr void push_back(const T & value) {
+      stdv_t::push_back(value);
+      revision++;
+    }
+
+    constexpr void push_back(T && value) {
+      stdv_t::push_back(std::move(value));
       revision++;
     }
 
