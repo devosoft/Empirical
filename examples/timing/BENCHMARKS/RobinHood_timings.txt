@@ -154,3 +154,38 @@ start_size    10000000       10000000       10000000      10000000
 final_size    8000197        8000197        8000197       8000197                
 key_total%1M  691826         691826         691826        691826                 
 value_total   4.99844e+12    4.99844e+12    4.99844e+12   4.99844e+12
+
+==
+
+Separated out Caching into its own vector
+
+scope         std::          robin_hood::   emp::         emp::                  
+name          unordered_map  unordered_map  RobinHoodMap  RobinHoodMap<IMPROVE>  
+insert_time.  2.26891        0.374847       0.563733      0.613127               
+search_time   0.433077       0.161151       0.051628      0.309084               
+traverse_time 0.798807       0.042107       0.108529      0.114766               
+erase_time    0.627295       0.098692       0.036151      0.159767               
+found_count   4000528        4000528        4000528       4000528                
+erase_count   1999944        1999944        1999944       1999944                
+start_size    10000000       10000000       10000000      10000000               
+final_size    8000056        8000056        8000056       8000056                
+key_total%1M  791797         791797         791797        791797                 
+value_total   5.00133e+12    5.00133e+12    5.00133e+12   5.00133e+12
+
+
+==
+
+Refactored so that RobinHoodMap shares core functionality with RobinHoodSet
+
+scope         std::          robin_hood::   emp::         emp::                  
+name          unordered_map  unordered_map  RobinHoodMap  RobinHoodMap<IMPROVE>  
+insert_time.  2.141176       0.381569       0.407809      0.429061               
+search_time   0.430187       0.165238       0.052196      0.274788               
+traverse_time 0.789648       0.042229       0.124334      0.115046               
+erase_time    0.588322       0.10289        0.035659      0.169071               
+found_count   4000641        4000641        4000641       4000641                
+erase_count   2000614        2000614        2000614       2000614                
+start_size    10000000       10000000       10000000      10000000               
+final_size    7999386        7999386        7999386       7999386                
+key_total%1M  139379         139379         139379        139379                 
+value_total   4999997152153  4999997152152  4999997152151 4999997152151
