@@ -342,12 +342,12 @@ namespace emp {
     }
 
     auto & GetSettingInfo(this auto & self, const emp::String & name) {
-      emp_assert(self.HasSetting(name), "Invalid setting name", name);
+      if (!self.HasSetting(name)) emp::notify::Error("SettingsManager: unknown setting '", name, "'.");
       return self.setting_map.find(self.AppendScope(name))->second;
     }
 
     auto & GetKeywordInfo(this auto & self, const emp::String & name) {
-      emp_assert(self.HasKeyword(name), "Invalid setting name", name);
+      if (!self.HasKeyword(name)) emp::notify::Error("SettingsManager: unknown keyword '", name, "'.");
       return self.keyword_map.find(name)->second;
     }
 
@@ -372,8 +372,9 @@ namespace emp {
     bool LoadArgSetting(emp::vector<emp::String> & args, size_t & i,
                         SettingInfo & info, const emp::String & flag_desc) {
       if (i >= args.size()) {
-        return IOError("Expected value after '", flag_desc, "'.");
+        return IOError("Expected arg value after '", flag_desc, "'.");
       }
+      emp::notify::Message("Setting '", info.GetName(), "' to '", args[i], "'.");
       info.SetValue(args[i]);
       args.erase(args.begin() + i);
       --i;
@@ -397,10 +398,10 @@ namespace emp {
 
     [[nodiscard]] bool IsEndLine(int id) const { return id == ';' || id == '\n'; }
 
-    /// Trigger an error that prints of verbose and stores an error note.
+    /// Store an error note and always emit a warning.
     bool IOError(auto... args) {
       error_note = emp::MakeString(args...);
-      if (verbose) emp::PrintLn(error_note);
+      emp::notify::Warning(error_note);
       return false;
     }
 
@@ -408,7 +409,7 @@ namespace emp {
     [[nodiscard]] bool RequireToken(Iterator & it, int token_id, const emp::String & name) {
       const Token cur_token = it.Use();
       if (cur_token != token_id) {
-        return IOError("UnexpectedToken '", cur_token.lexeme, "'; expected ", name, ".");
+        return IOError("UnexpectedToken '", cur_token.lexeme, "' on line ", cur_token.line_id, "; expected ", name, ".");
       }
 
       return true;
@@ -530,7 +531,7 @@ namespace emp {
         emp::TokenStream tokens = lexer.Tokenize(kw_args[0]);
         Iterator it = tokens.begin();
         while (it.Any()) { if (!LoadLine(it)) return; }
-      }, "Apply a bulk config string", 'S', /*max_args=*/1);
+      }, "Apply a bulk config string", ':', /*max_args=*/1);
     }
 
     void SetVerbose(bool in=true) { verbose = in; }
@@ -829,6 +830,7 @@ namespace emp {
             }
             continue;
           }
+          return IOError("Unknown flag '", test_arg, "'.");
         }
 
         // Long option: --name  (setting value or keyword arguments)
@@ -843,6 +845,7 @@ namespace emp {
             if (!LoadArgKeyword(args, i, keyword_map.at(opt))) return false;
             continue;
           }
+          return IOError("Unknown option '", test_arg, "'.");
         }
       }
       return true;
