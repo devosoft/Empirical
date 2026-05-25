@@ -1,16 +1,19 @@
 /**
  * This file is part of Empirical, https://github.com/devosoft/Empirical
- * Copyright (C) 2022-2023 Michigan State University
+ * Copyright (C) 2022-2026 Michigan State University
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/tools/StaticString.hpp
- * @brief String substitute with a fixed max character count and always in place.
+ * @brief String substitute with a fixed max character count, always stored in-place.
  * @note Status: ALPHA
  *
- * A fixed number of chars are reserved for the string; errors will trigger for longer attempts.
- * The last allocated byte stores the number of unused positions in the string; this naturally
- * becomes zero (the final character in a string) when all positions are used.
+ * Stores up to MAX_CHARS = NUM_CHARS - 1 characters; the final slot is reserved for '\0'.
+ * The current length is tracked in a separate ss_size_t field (uint8_t for ≤256, uint16_t
+ * otherwise).  Asserts fire if an operation would exceed the capacity.
  *
+ * The entire class is constexpr: all operations can be evaluated at compile time.
+ * memcpy is replaced with std::copy and strlen with std::char_traits<CHAR_T>::length,
+ * both of which are constexpr since C++20 and C++17 respectively.
  */
 
 #pragma once
@@ -19,7 +22,9 @@
 #define INCLUDE_EMP_TOOLS_STATIC_STRING_HPP_GUARD
 
 #include <algorithm>
+#include <compare>
 #include <string>
+#include <string_view>
 
 #include "../base/array.hpp"
 #include "../base/assert.hpp"
@@ -30,178 +35,161 @@ namespace emp {
   template <size_t NUM_CHARS, typename CHAR_T = char>
   class StaticString {
   private:
-    static_assert(NUM_CHARS > 0, "StaticString must have at least one char available");
+    static_assert(NUM_CHARS > 0,      "StaticString must have at least one char available");
     static_assert(NUM_CHARS <= 65536, "StaticString size limited to 2 bytes (65536 chars).");
-    static constexpr const size_t MAX_CHARS = NUM_CHARS - 1;  // Save space for final '\0'
+    static constexpr size_t MAX_CHARS = NUM_CHARS - 1;  // One slot reserved for '\0'
 
-    emp::array<CHAR_T, NUM_CHARS> string;
-    using ss_size_t    = std::conditional_t<(NUM_CHARS <= 256), uint8_t, uint16_t>;
+    emp::array<CHAR_T, NUM_CHARS> string = {};  // zero-init so all elements are always initialized
+    using ss_size_t = std::conditional_t<(NUM_CHARS <= 256), uint8_t, uint16_t>;
     ss_size_t str_size = 0;
 
-    StaticString & CopyFrom(const CHAR_T * in, size_t len) {
+    constexpr StaticString & CopyFrom(const CHAR_T * in, size_t len) {
       emp_assert(len <= MAX_CHARS, len, MAX_CHARS);
       resize(len);
-      memcpy(string.data(), in, len);
+      std::copy(in, in + len, string.data());
       string[len] = '\0';
       return *this;
     }
 
-    // Compare this string to another.
-    // -1 means this is less, 0 means they are the same, +1 means this is greater.
-    int Compare(const CHAR_T * in, size_t len) const {
-      size_t min_len = std::min<size_t>(len, str_size);
-      for (size_t i = 0; i < min_len; ++i) {
-        if (string[i] != in[i]) {
-          if (string[i] < in[i]) { return -1; }
-          return 1;
-        }
-      }
-      if (str_size != len) {
-        if (str_size < len) { return -1; }
-        return 1;
-      }
-      return 0;
+    [[nodiscard]] constexpr std::string_view AsView() const noexcept {
+      return {string.data(), str_size};
     }
+
   public:
-    StaticString() : str_size(0) { string[0] = '\0'; }
+    constexpr StaticString() { string[0] = '\0'; }
 
-    StaticString(const StaticString &) = default;
+    constexpr StaticString(const StaticString &) = default;
 
-    StaticString(const std::string & in) { CopyFrom(in.data(), in.size()); }
-
-    StaticString(CHAR_T const * in) { CopyFrom(in, strlen(in)); }
-
-    template <size_t SIZE>
-    StaticString(CHAR_T in[SIZE]) {
-      CopyFrom(in, SIZE - 1);
+    constexpr StaticString(const std::string & in) { CopyFrom(in.data(), in.size()); }
+    constexpr StaticString(CHAR_T const * in) {
+      CopyFrom(in, std::char_traits<CHAR_T>::length(in));
     }
 
-    StaticString & operator=(const StaticString &) = default;
+    // Reference-to-array form: SIZE is deduced from the actual array, not a decayed pointer.
+    template <size_t SIZE>
+    constexpr StaticString(const CHAR_T (&in)[SIZE]) { CopyFrom(in, SIZE - 1); }
 
-    StaticString & operator=(const std::string & in) { return CopyFrom(in.data(), in.size()); }
+    constexpr StaticString & operator=(const StaticString &) = default;
 
-    StaticString & operator=(CHAR_T const * in) { return CopyFrom(in, strlen(in)); }
+    constexpr StaticString & operator=(const std::string & in) {
+      return CopyFrom(in.data(), in.size());
+    }
+    constexpr StaticString & operator=(CHAR_T const * in) {
+      return CopyFrom(in, std::char_traits<CHAR_T>::length(in));
+    }
 
     template <size_t SIZE>
-    StaticString & operator=(CHAR_T in[SIZE]) {
+    constexpr StaticString & operator=(const CHAR_T (&in)[SIZE]) {
       return CopyFrom(in, SIZE - 1);
     }
 
-    CHAR_T * data() { return string.data(); }
+    // --- Accessors ---
 
-    const CHAR_T * data() const { return string.data(); }
+    [[nodiscard]] constexpr CHAR_T *       data()    noexcept { return string.data(); }
+    [[nodiscard]] constexpr const CHAR_T * data()    const noexcept { return string.data(); }
+    [[nodiscard]] constexpr const CHAR_T * c_str()   const noexcept { return string.data(); }
 
-    size_t size() const { return str_size; }
+    [[nodiscard]] constexpr size_t size()     const noexcept { return str_size; }
+    [[nodiscard]] constexpr size_t max_size() const noexcept { return MAX_CHARS; }
+    [[nodiscard]] constexpr bool   empty()    const noexcept { return str_size == 0; }
 
-    void resize(size_t new_size) {
+    constexpr CHAR_T *       begin()       noexcept { return string.data(); }
+    constexpr CHAR_T *       end()         noexcept { return string.data() + str_size; }
+    constexpr const CHAR_T * begin() const noexcept { return string.data(); }
+    constexpr const CHAR_T * end()   const noexcept { return string.data() + str_size; }
+
+    constexpr void resize(size_t new_size) {
       emp_assert(new_size <= MAX_CHARS);
-      str_size         = new_size;
+      str_size         = static_cast<ss_size_t>(new_size);
       string[new_size] = '\0';
     }
 
-    void resize(size_t new_size, CHAR_T filler) {
+    constexpr void resize(size_t new_size, CHAR_T filler) {
       emp_assert(new_size <= MAX_CHARS);
       for (size_t i = str_size; i < new_size; ++i) { string[i] = filler; }
       resize(new_size);
     }
 
-    CHAR_T & operator[](size_t id) {
+    [[nodiscard]] constexpr CHAR_T & operator[](size_t id) {
       emp_assert(id < str_size);
       return string[id];
     }
 
-    CHAR_T operator[](size_t id) const {
+    [[nodiscard]] constexpr CHAR_T operator[](size_t id) const {
       emp_assert(id < str_size);
       return string[id];
     }
 
-    // Comparisons
+    // --- Comparisons ---
+    // Each type pair provides operator== (generates !=) and operator<=> (generates <, <=, >, >=).
 
-    template <typename T>
-    bool operator==(const T & in) const {
-      return Compare(in.data(), in.size()) == 0;
+    template <size_t NUM_CHARS2>
+    [[nodiscard]] constexpr bool operator==(const StaticString<NUM_CHARS2, CHAR_T> & rhs) const noexcept {
+      return AsView() == std::string_view{rhs.data(), rhs.size()};
+    }
+    template <size_t NUM_CHARS2>
+    [[nodiscard]] constexpr std::strong_ordering operator<=>(
+        const StaticString<NUM_CHARS2, CHAR_T> & rhs) const noexcept {
+      return AsView() <=> std::string_view{rhs.data(), rhs.size()};
     }
 
-    template <typename T>
-    bool operator!=(const T & in) const {
-      return Compare(in.data(), in.size()) != 0;
+    [[nodiscard]] constexpr bool operator==(const std::string & rhs) const noexcept {
+      return AsView() == std::string_view{rhs};
+    }
+    [[nodiscard]] constexpr std::strong_ordering operator<=>(const std::string & rhs) const noexcept {
+      return AsView() <=> std::string_view{rhs};
     }
 
-    template <typename T>
-    bool operator<(const T & in) const {
-      return Compare(in.data(), in.size()) < 0;
+    [[nodiscard]] constexpr bool operator==(const CHAR_T * rhs) const noexcept {
+      return AsView() == std::string_view{rhs};
+    }
+    [[nodiscard]] constexpr std::strong_ordering operator<=>(const CHAR_T * rhs) const noexcept {
+      return AsView() <=> std::string_view{rhs};
     }
 
-    template <typename T>
-    bool operator<=(const T & in) const {
-      return Compare(in.data(), in.size()) <= 0;
-    }
+    // --- Type conversions ---
 
-    template <typename T>
-    bool operator>(const T & in) const {
-      return Compare(in.data(), in.size()) > 0;
-    }
+    [[nodiscard]] constexpr operator CHAR_T *()              { return string.data(); }
+    [[nodiscard]] constexpr operator const CHAR_T *()  const noexcept { return string.data(); }
+    [[nodiscard]] constexpr operator std::string()     const { return {string.data(), str_size}; }
+    [[nodiscard]] constexpr operator std::string_view() const noexcept { return AsView(); }
 
-    template <typename T>
-    bool operator>=(const T & in) const {
-      return Compare(in.data(), in.size()) >= 0;
-    }
+    [[nodiscard]] constexpr std::string AsString() const { return {string.data(), str_size}; }
 
-    bool operator==(CHAR_T const * in) const { return Compare(in, strlen(in)) == 0; }
+    // --- Manipulations ---
 
-    bool operator!=(CHAR_T const * in) const { return Compare(in, strlen(in)) != 0; }
-
-    bool operator<(CHAR_T const * in) const { return Compare(in, strlen(in)) < 0; }
-
-    bool operator<=(CHAR_T const * in) const { return Compare(in, strlen(in)) <= 0; }
-
-    bool operator>(CHAR_T const * in) const { return Compare(in, strlen(in)) > 0; }
-
-    bool operator>=(CHAR_T const * in) const { return Compare(in, strlen(in)) >= 0; }
-
-    // Type conversions
-    operator CHAR_T *() { return string.data(); }
-
-    operator const CHAR_T *() const { return string.data(); }
-
-    operator std::string() const { return std::string(string.data()); }
-
-    std::string AsString() const { return string.data(); }
-
-    // Manipulations
-    StaticString & push_back(CHAR_T c) {
-      assert(str_size < MAX_CHARS);
+    constexpr StaticString & push_back(CHAR_T c) {
+      emp_assert(str_size < MAX_CHARS);
       string[str_size++] = c;
       string[str_size]   = '\0';
       return *this;
     }
 
-    StaticString & append(const CHAR_T * in_str, size_t len) {
-      assert(str_size + len <= MAX_CHARS);
-      memcpy(string.data() + str_size, in_str, len);
-      str_size += len;          // Update the string size.
-      string[str_size] = '\0';  // Make sure ends in '\0'
-
+    constexpr StaticString & append(const CHAR_T * in_str, size_t len) {
+      emp_assert(str_size + len <= MAX_CHARS);
+      std::copy(in_str, in_str + len, string.data() + str_size);
+      str_size         = static_cast<ss_size_t>(str_size + len);
+      string[str_size] = '\0';
       return *this;
     }
 
-    StaticString & append(const std::string & in_str) {
+    constexpr StaticString & append(const std::string & in_str) {
       return append(in_str.data(), in_str.size());
     }
 
     template <size_t SIZE>
-    StaticString & append(CHAR_T in_str[SIZE]) {
-      return append(in_str, SIZE);
+    constexpr StaticString & append(const CHAR_T (&in_str)[SIZE]) {
+      return append(in_str, SIZE - 1);
     }
 
     template <size_t NUM_CHARS2>
-    StaticString & append(StaticString<NUM_CHARS2, CHAR_T> in_str) {
+    constexpr StaticString & append(const StaticString<NUM_CHARS2, CHAR_T> & in_str) {
       return append(in_str.data(), in_str.size());
     }
   };
 
   using ShortString = emp::StaticString<31>;
-}  // namespace emp
 
+}  // namespace emp
 
 #endif  // #ifndef INCLUDE_EMP_TOOLS_STATIC_STRING_HPP_GUARD
