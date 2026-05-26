@@ -28,8 +28,8 @@ namespace emp {
   }
 
   /// Randomly reorder all of the elements in a vector.
-  /// If max_count is provided, just make sure that the first max_count entries are randomly
-  /// drawn from entire vector.
+  /// If max_count is provided, the first max_count entries are randomly
+  /// drawn from full vector.
 
   template <typename T, typename RAND_T>
   inline void Shuffle(RAND_T & random, emp::vector<T> & v, size_t max_count) {

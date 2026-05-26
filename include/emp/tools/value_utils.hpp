@@ -21,7 +21,7 @@ namespace emp {
 
   template <typename T>
   inline double ToDouble(const T & in) {
-    return (double) in;
+    return static_cast<double>(in);
   }
 
   template <>

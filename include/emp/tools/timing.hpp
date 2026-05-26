@@ -16,10 +16,6 @@
 #include <ctime>
 #include <functional>
 #include <iostream>
-#include <type_traits>
-
-#include "../base/assert.hpp"
-#include "../math/constants.hpp"
 
 /// A simple macro to time how long it takes for a function to complete.
 #define EMP_FUNCTION_TIMER(TEST_FUN) {                                       \
