@@ -159,6 +159,7 @@
 #include "math/combos.hpp"
 #include "math/constants.hpp"
 #include "math/distances.hpp"
+#include "math/Histogram.hpp"
 #include "math/info_theory.hpp"
 #include "math/math.hpp"
 #include "math/random_utils.hpp"
