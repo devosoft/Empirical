@@ -191,7 +191,6 @@
 #include "tools/SolveState.hpp"
 #include "tools/StaticString.hpp"
 #include "tools/String.hpp"
-#include "tools/TemplateString.hpp"
 #include "tools/Timer.hpp"
 #include "tools/TypeTracker.hpp"
 #include "tools/char_utils.hpp"
