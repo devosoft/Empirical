@@ -124,7 +124,7 @@ namespace emp {
   inline size_t pop_bit(T & val) {
     static_assert(std::is_unsigned_v<T>, "Bit manipulation requires unsigned values.");
     const size_t pos = find_bit(val);
-    val &= ~(1 << pos);
+    val &= ~(T{1} << pos);
     return pos;
   }
 
@@ -143,6 +143,7 @@ namespace emp {
   [[nodiscard]] inline constexpr TYPE MaskHigh(std::size_t num_bits) {
     static_assert(std::is_unsigned_v<TYPE>, "Bit manipulation requires unsigned values.");
     constexpr std::size_t MAX_BITS = 8 * sizeof(TYPE);
+    if (num_bits == 0) return TYPE{0};  // No bits=no mask (shifting by MAX_BITS would be UB.)
     return MaskLow<TYPE>(num_bits) << (MAX_BITS - num_bits);
   }
 
@@ -158,6 +159,18 @@ namespace emp {
       if (shift == 0) { return 0; }
     }
     return val;
+  }
+
+  template <typename TYPE>
+  [[nodiscard]] constexpr TYPE BitMask(size_t mask_size, size_t offset=0) {
+    static_assert(std::is_unsigned_v<TYPE>, "Bit manipulation requires unsigned values.");
+    constexpr std::size_t MAX_BITS = 8 * sizeof(TYPE);
+    emp_assert(offset + mask_size <= MAX_BITS, "Mask will not fit in provided type.");
+    if (mask_size == 0) return TYPE{0};
+    constexpr TYPE ONE{1};
+    constexpr TYPE ALL{static_cast<TYPE>(-1)};
+    const TYPE low_mask = (mask_size == MAX_BITS) ? ALL : ((ONE << mask_size) - 1);
+    return low_mask << offset;
   }
 
   template <typename T>
@@ -201,6 +214,7 @@ namespace emp {
     static_assert(std::is_unsigned_v<T>, "Bit manipulation requires unsigned values.");
     constexpr size_t FIELD_BITS = sizeof(T) * 8;
     rotate_size %= FIELD_BITS;  // Make sure rotate is in range.
+    if (rotate_size == 0) return in;  // No bits=no mask (shifting by MAX_BITS would be UB.)
     return (in << rotate_size) | (in >> (FIELD_BITS - rotate_size));
   }
 
@@ -209,30 +223,37 @@ namespace emp {
   [[nodiscard]] constexpr T RotateBitsLeft(T in, size_t rotate_size, size_t bit_count) {
     static_assert(std::is_unsigned_v<T>, "Bit manipulation requires unsigned values.");
     [[maybe_unused]] constexpr size_t FIELD_BITS = sizeof(T) * 8;
-    emp_assert(bit_count <= FIELD_BITS, "Cannot have more bits than can fit in field.");
+    emp_assert(bit_count > 0 && bit_count <= FIELD_BITS,
+               "bit_count must be between 1 and the field width.");
     rotate_size %= bit_count;  // Make sure rotate is in range.
-    const T out = (in << rotate_size) | (in >> (bit_count - rotate_size));
-    return out & MaskLow<T>(bit_count);  // Zero out excess bits.
+    const T masked = in & MaskLow<T>(bit_count);  // High bits must not bleed through right-shift.
+    if (rotate_size == 0) return masked;
+    const T out = (masked << rotate_size) | (masked >> (bit_count - rotate_size));
+    return out & MaskLow<T>(bit_count);  // Zero out any bits shifted above bit_count.
   }
 
-  // Rotate all bits to the left (looping around) in a provided field.
+  // Rotate all bits to the right (looping around) in a provided field.
   template <typename T>
   [[nodiscard]] constexpr T RotateBitsRight(T in, size_t rotate_size = 1) {
     static_assert(std::is_unsigned_v<T>, "Bit manipulation requires unsigned values.");
     constexpr size_t FIELD_BITS = sizeof(T) * 8;
     rotate_size %= FIELD_BITS;  // Make sure rotate is in range.
+    if (rotate_size == 0) return in;  // No rotation (shifting by MAX_BITS would be UB.).
     return (in >> rotate_size) | (in << (FIELD_BITS - rotate_size));
   }
 
-  // Rotate lowest "bit_count" bits to the left (looping around) in a provided field.
+  // Rotate lowest "bit_count" bits to the right (looping around) in a provided field.
   template <typename T>
   [[nodiscard]] constexpr T RotateBitsRight(T in, size_t rotate_size, size_t bit_count) {
     static_assert(std::is_unsigned_v<T>, "Bit manipulation requires unsigned values.");
     [[maybe_unused]] constexpr size_t FIELD_BITS = sizeof(T) * 8;
-    emp_assert(bit_count <= FIELD_BITS, "Cannot have more bits than can fit in field.");
+    emp_assert(bit_count > 0 && bit_count <= FIELD_BITS,
+               "bit_count must be between 1 and the field width.");
     rotate_size %= bit_count;  // Make sure rotate is in range.
-    const T out = (in >> rotate_size) | (in << (bit_count - rotate_size));
-    return out & MaskLow<T>(bit_count);  // Zero out excess bits.
+    const T masked = in & MaskLow<T>(bit_count);  // High bits must not bleed through left-shift.
+    if (rotate_size == 0) return masked;
+    const T out = (masked >> rotate_size) | (masked << (bit_count - rotate_size));
+    return out & MaskLow<T>(bit_count);  // Zero out any bits shifted above bit_count.
   }
 
   /// Count the number of bits ('0' or '1') found in a string.
