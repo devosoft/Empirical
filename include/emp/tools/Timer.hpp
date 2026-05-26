@@ -20,12 +20,12 @@
 
 #include "../base/assert.hpp"
 #include "../data/StatsTracker.hpp"
-#include "TemplateString.hpp"
+#include "StaticString.hpp"
 
 namespace emp {
 
   /// RAII timer for targeted profiling of named code sections.
-  template <TemplateString NAME>
+  template <StaticString NAME>
   class Timer {
   public:
     using clock_t    = std::chrono::steady_clock;
