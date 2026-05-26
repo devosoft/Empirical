@@ -1,6 +1,6 @@
 /**
  * This file is part of Empirical, https://github.com/devosoft/Empirical
- * Copyright (C) 2023-2024 Michigan State University
+ * Copyright (C) 2023-2026 Michigan State University
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/base/concepts.hpp
@@ -11,6 +11,13 @@
  *   canStreamTo<STREAM_T, OBJECT_T>
  *   canStreamFrom<STREAM_T, OBJECT_T>
  *
+ *   IsArrayContainer<C>   -- fixed-size sequential (e.g., std::array)
+ *   IsVectorContainer<C>  -- resizable sequential  (e.g., std::vector)
+ *   IsSetContainer<C>     -- single-key associative (e.g., std::set, std::unordered_set)
+ *   IsMapContainer<C>     -- key-value associative  (e.g., std::map, std::unordered_map)
+ *
+ *   AnyConst<Ts...>  -- Test if ANY of the Ts are const.
+ *   AllConst<Ts...>  -- Test if ALL of the Ts are const.
  */
 
 #pragma once
@@ -19,6 +26,7 @@
 #define INCLUDE_EMP_BASE_CONCEPTS_HPP_GUARD
 
 
+#include <concepts>
 #include <cstdint>  // uint8_t, uint16_t, etc.
 #include <functional>
 #include <span>
@@ -47,6 +55,61 @@ namespace emp {
 
   template <typename T>
   concept has_end = requires(T & v) { v.end(); };
+
+
+  // === Concepts to categorize container types ===
+
+  /// Fixed-size sequential container with no runtime resize (e.g., std::array, emp::array).
+  template <typename C>
+  concept IsArrayContainer =
+    requires { typename C::value_type; } &&
+    !requires { typename C::mapped_type; } &&
+    !requires(const C & cc) { cc.c_str(); } &&   // exclude string-like types
+    !has_resize<C> &&
+    requires(C & c, const C & cc) {
+      { c.size() } -> std::convertible_to<size_t>;
+      { c[size_t{}] };
+      cc.begin();
+      cc.end();
+    };
+
+  /// Resizable sequential container (e.g., std::vector, std::deque).
+  template <typename C>
+  concept IsVectorContainer =
+    requires { typename C::value_type; } &&
+    !requires { typename C::mapped_type; } &&
+    !requires(const C & cc) { cc.c_str(); } &&   // exclude string-like types
+    has_resize<C> &&
+    requires(C & c, const C & cc, typename C::value_type v) {
+      c.push_back(v);
+      { c.size() } -> std::convertible_to<size_t>;
+      cc.begin();
+      cc.end();
+    };
+
+  /// Single-key associative container (e.g., std::set, std::unordered_set, std::multiset).
+  template <typename C>
+  concept IsSetContainer =
+    requires { typename C::value_type; } &&
+    !requires { typename C::mapped_type; } &&
+    requires(C & c, const C & cc, typename C::value_type v) {
+      c.insert(v);
+      c.clear();
+      { c.size() } -> std::convertible_to<size_t>;
+      cc.begin();
+      cc.end();
+    };
+
+  /// Key-value associative container (e.g., std::map, std::unordered_map, std::multimap).
+  template <typename C>
+  concept IsMapContainer =
+    requires { typename C::key_type; typename C::mapped_type; } &&
+    requires(C & c, const C & cc) {
+      c.clear();
+      { c.size() } -> std::convertible_to<size_t>;
+      cc.begin();
+      cc.end();
+    };
 
 
   // === Concepts to determine if a type can be streamed ===
@@ -115,6 +178,16 @@ namespace emp {
   using is_emp_vector = is_template<T, emp::vector>;
   template <typename T>
   using is_span = is_template_tn<T, std::span>;
+
+  // ===== Concepts to check const-ness =====
+
+  /// True if any of Ts... is const (after stripping any reference qualifier).
+  template <typename... Ts>
+  concept AnyConst = (std::is_const_v<std::remove_reference_t<Ts>> || ...);
+
+  /// True if all Ts... are const (after stripping any reference qualifier).
+  template <typename... Ts>
+  concept AllConst = (std::is_const_v<std::remove_reference_t<Ts>> && ...);
 
   // ===== For backward compatibility only =====
 
