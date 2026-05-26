@@ -26,7 +26,7 @@
 #include <stddef.h>
 #include <vector>
 
-#include "../../../third-party/cereal/include/cereal/cereal.hpp"
+// #include "../../../third-party/cereal/include/cereal/cereal.hpp"
 
 #include "assert.hpp"
 
@@ -209,9 +209,9 @@ namespace emp {
 
     constexpr size_t size() const { return N; }
 
-    auto & data() { return _data; }
+    constexpr auto & data() { return _data; }
 
-    const auto & data() const { return _data; }
+    constexpr const auto & data() const { return _data; }
 
     iterator begin() noexcept { return iterator(_data, this); }
 
@@ -221,12 +221,12 @@ namespace emp {
 
     const_iterator end() const noexcept { return const_iterator(_data + N, this); }
 
-    T & operator[](size_t pos) {
+    constexpr T & operator[](size_t pos) {
       emp_assert(pos < N, pos, N);
       return _data[pos];
     }
 
-    const T & operator[](size_t pos) const {
+    constexpr const T & operator[](size_t pos) const {
       emp_assert(pos < N, pos, N);
       return _data[pos];
     }
