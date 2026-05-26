@@ -4,16 +4,14 @@
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/tools/StaticString.hpp
- * @brief String substitute with a fixed max character count, always stored in-place.
+ * @brief String substitute with fixed max character count; always stored in-place.
  * @note Status: ALPHA
  *
- * Stores up to MAX_CHARS = NUM_CHARS - 1 characters; the final slot is reserved for '\0'.
- * The current length is tracked in a separate ss_size_t field (uint8_t for ≤256, uint16_t
- * otherwise).  Asserts fire if an operation would exceed the capacity.
+ * Stores up to MAX_CHARS = NUM_CHARS - 1 characters w/ final slot reserved for '\0'.
+ * Current length is tracked in ss_size_t field (uint8_t for <256, uint16_t otherwise).
  *
- * The entire class is constexpr: all operations can be evaluated at compile time.
- * memcpy is replaced with std::copy and strlen with std::char_traits<CHAR_T>::length,
- * both of which are constexpr since C++20 and C++17 respectively.
+ * All operations are constexpr can be evaluated at compile time.  Class is a structural type
+ * (all data members are public) and can therefore be used as a non-type template parameter.
  */
 
 #pragma once
@@ -33,16 +31,18 @@
 namespace emp {
 
   template <size_t NUM_CHARS, typename CHAR_T = char>
-  class StaticString {
-  private:
+  struct StaticString {
     static_assert(NUM_CHARS > 0,      "StaticString must have at least one char available");
     static_assert(NUM_CHARS <= 65536, "StaticString size limited to 2 bytes (65536 chars).");
     static constexpr size_t MAX_CHARS = NUM_CHARS - 1;  // One slot reserved for '\0'
 
-    emp::array<CHAR_T, NUM_CHARS> string = {};  // zero-init so all elements are always initialized
     using ss_size_t = std::conditional_t<(NUM_CHARS <= 256), uint8_t, uint16_t>;
+
+    // Public data members — required for use as a non-type template parameter (C++20).
+    emp::array<CHAR_T, NUM_CHARS> string = {};  // zero-init so all elements are always initialized
     ss_size_t str_size = 0;
 
+  private:
     constexpr StaticString & CopyFrom(const CHAR_T * in, size_t len) {
       emp_assert(len <= MAX_CHARS, len, MAX_CHARS);
       resize(len);
@@ -56,7 +56,7 @@ namespace emp {
     }
 
   public:
-    constexpr StaticString() { string[0] = '\0'; }
+    constexpr StaticString() = default;
 
     constexpr StaticString(const StaticString &) = default;
 
@@ -149,12 +149,13 @@ namespace emp {
 
     // --- Type conversions ---
 
-    [[nodiscard]] constexpr operator CHAR_T *()              { return string.data(); }
-    [[nodiscard]] constexpr operator const CHAR_T *()  const noexcept { return string.data(); }
-    [[nodiscard]] constexpr operator std::string()     const { return {string.data(), str_size}; }
+    [[nodiscard]] constexpr operator CHAR_T *() { return string.data(); }
+    [[nodiscard]] constexpr operator const CHAR_T *() const noexcept { return string.data(); }
+    [[nodiscard]] constexpr operator std::string() const { return {string.data(), str_size}; }
     [[nodiscard]] constexpr operator std::string_view() const noexcept { return AsView(); }
 
     [[nodiscard]] constexpr std::string AsString() const { return {string.data(), str_size}; }
+    [[nodiscard]] constexpr std::string_view AsStringView() const noexcept { return AsView(); }
 
     // --- Manipulations ---
 
@@ -189,6 +190,10 @@ namespace emp {
   };
 
   using ShortString = emp::StaticString<31>;
+
+  // Deduction guide: StaticString("hello") deduces StaticString<6> (includes null terminator).
+  template <size_t N, typename CHAR_T>
+  StaticString(const CHAR_T (&)[N]) -> StaticString<N, CHAR_T>;
 
 }  // namespace emp
 
