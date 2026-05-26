@@ -269,6 +269,262 @@ TEST_CASE("Test SerialPod with standard library containers", "[serialize]")
   CHECK(vec2.size() == 7);
   CHECK(vec2[0] == 1);
   CHECK(vec2[6] == -10);
+
+  // Loading into a non-empty vector must replace, not append.
+  std::vector<int> vec3{100, 200, 300};
+  std::vector<int> vec4{1, 2, 3, 4, 5};
+
+  save_pod(vec3);
+  load_pod(vec4);  // vec4 had 5 elements; should be replaced by vec3's 3
+  CHECK(vec4.size() == 3);
+  CHECK(vec4[0] == 100);
+  CHECK(vec4[2] == 300);
+}
+
+TEST_CASE("Test SerialPod with set-like containers", "[serialize]")
+{
+  std::stringstream ss;
+  emp::SerialPod save_pod(ss, true);
+  emp::SerialPod load_pod(ss, false);
+
+  // std::set: elements are stored in sorted order; duplicates discarded on insert.
+  std::set<int> set1{3, 1, 4, 1, 5, 9, 2, 6};  // unique: {1,2,3,4,5,6,9}
+  std::set<int> set2;
+
+  save_pod(set1);
+  load_pod(set2);
+
+  CHECK(set1 == set2);
+  CHECK(set2.size() == 7);
+  CHECK(set2.count(9) == 1);
+  CHECK(set2.count(7) == 0);
+
+  // Loading into a non-empty set replaces its contents.
+  std::set<int> set3{10, 20, 30};
+  std::set<int> set4{1, 2, 3, 4, 5};
+
+  save_pod(set3);
+  load_pod(set4);
+
+  CHECK(set4 == set3);
+  CHECK(set4.size() == 3);
+
+  // std::unordered_set: order of iteration is not guaranteed, but equality works.
+  std::unordered_set<int> uset1{10, 20, 30, 40, 50};
+  std::unordered_set<int> uset2;
+
+  save_pod(uset1);
+  load_pod(uset2);
+
+  CHECK(uset1 == uset2);
+  CHECK(uset2.size() == 5);
+  CHECK(uset2.count(30) == 1);
+  CHECK(uset2.count(99) == 0);
+}
+
+TEST_CASE("Test SerialPod with map-like containers", "[serialize]")
+{
+  std::stringstream ss;
+  emp::SerialPod save_pod(ss, true);
+  emp::SerialPod load_pod(ss, false);
+
+  // std::map with string keys and int values.
+  std::map<std::string, int> map1{{"alpha", 1}, {"beta", 2}, {"gamma", 3}};
+  std::map<std::string, int> map2;
+
+  save_pod(map1);
+  load_pod(map2);
+
+  CHECK(map1 == map2);
+  CHECK(map2.size() == 3);
+  CHECK(map2["alpha"] == 1);
+  CHECK(map2["gamma"] == 3);
+
+  // Loading into a non-empty map replaces its contents.
+  std::map<int, int> map3{{1, 10}, {2, 20}};
+  std::map<int, int> map4{{5, 50}, {6, 60}, {7, 70}};
+
+  save_pod(map3);
+  load_pod(map4);
+
+  CHECK(map4 == map3);
+  CHECK(map4.size() == 2);
+  CHECK(map4.count(5) == 0);  // old entries gone
+
+  // std::unordered_map: order of iteration is not guaranteed, but equality works.
+  std::unordered_map<int, std::string> umap1{{1, "one"}, {2, "two"}, {3, "three"}};
+  std::unordered_map<int, std::string> umap2;
+
+  save_pod(umap1);
+  load_pod(umap2);
+
+  CHECK(umap1 == umap2);
+  CHECK(umap2.size() == 3);
+  CHECK(umap2[1] == "one");
+  CHECK(umap2[3] == "three");
+}
+
+TEST_CASE("Test SerialPod with std::pair", "[serialize]")
+{
+  std::stringstream ss;
+  emp::SerialPod save_pod(ss, true);
+  emp::SerialPod load_pod(ss, false);
+
+  std::pair<int, std::string> p1{42, "hello"};
+  std::pair<int, std::string> p2{0, ""};
+
+  save_pod(p1);
+  load_pod(p2);
+
+  CHECK(p2.first  == 42);
+  CHECK(p2.second == "hello");
+
+  // Pair nested inside a vector.
+  std::vector<std::pair<int, int>> vp1{{1, 10}, {2, 20}, {3, 30}};
+  std::vector<std::pair<int, int>> vp2;
+
+  save_pod(vp1);
+  load_pod(vp2);
+
+  CHECK(vp1 == vp2);
+}
+
+TEST_CASE("Test SerialPod with std::optional", "[serialize]")
+{
+  std::stringstream ss;
+  emp::SerialPod save_pod(ss, true);
+  emp::SerialPod load_pod(ss, false);
+
+  // With value present.
+  std::optional<int> a{99};
+  std::optional<int> b;
+
+  save_pod(a);
+  load_pod(b);
+
+  CHECK(b.has_value());
+  CHECK(*b == 99);
+
+  // Without value (nullopt).
+  std::optional<int> c;
+  std::optional<int> d{42};  // should be cleared on load
+
+  save_pod(c);
+  load_pod(d);
+
+  CHECK(!d.has_value());
+
+  // String optional.
+  std::optional<std::string> e{"world"};
+  std::optional<std::string> f;
+
+  save_pod(e);
+  load_pod(f);
+
+  CHECK(f.has_value());
+  CHECK(*f == "world");
+}
+
+TEST_CASE("Test SerialPod with std::array", "[serialize]")
+{
+  std::stringstream ss;
+  emp::SerialPod save_pod(ss, true);
+  emp::SerialPod load_pod(ss, false);
+
+  std::array<int, 5> arr1{10, 20, 30, 40, 50};
+  std::array<int, 5> arr2{};
+
+  save_pod(arr1);
+  load_pod(arr2);
+
+  CHECK(arr1 == arr2);
+
+  // Array of strings.
+  std::array<std::string, 3> sarr1{"alpha", "beta", "gamma"};
+  std::array<std::string, 3> sarr2{};
+
+  save_pod(sarr1);
+  load_pod(sarr2);
+
+  CHECK(sarr1 == sarr2);
+}
+
+TEST_CASE("Test SerialPod with std::tuple", "[serialize]")
+{
+  std::stringstream ss;
+  emp::SerialPod save_pod(ss, true);
+  emp::SerialPod load_pod(ss, false);
+
+  // Mixed-type tuple.
+  std::tuple<int, std::string, double> t1{7, "tuple", 3.14};
+  std::tuple<int, std::string, double> t2{0, "", 0.0};
+
+  save_pod(t1);
+  load_pod(t2);
+
+  CHECK(std::get<0>(t2) == 7);
+  CHECK(std::get<1>(t2) == "tuple");
+  CHECK(std::get<2>(t2) == 3.14);
+
+  // Single-element tuple.
+  std::tuple<int> t3{55};
+  std::tuple<int> t4{0};
+
+  save_pod(t3);
+  load_pod(t4);
+
+  CHECK(std::get<0>(t4) == 55);
+}
+
+TEST_CASE("Test SerialPod with std::variant", "[serialize]")
+{
+  std::stringstream ss;
+  emp::SerialPod save_pod(ss, true);
+  emp::SerialPod load_pod(ss, false);
+
+  using V = std::variant<int, std::string, double>;
+
+  // Active alternative: int.
+  V v1{42};
+  V v2{0};
+
+  save_pod(v1);
+  load_pod(v2);
+
+  CHECK(v2.index() == 0);
+  CHECK(std::get<int>(v2) == 42);
+
+  // Active alternative: string.
+  V v3{std::string{"variant"}};
+  V v4{0};
+
+  save_pod(v3);
+  load_pod(v4);
+
+  CHECK(v4.index() == 1);
+  CHECK(std::get<std::string>(v4) == "variant");
+
+  // Active alternative: double.
+  V v5{2.718};
+  V v6{0};
+
+  save_pod(v5);
+  load_pod(v6);
+
+  CHECK(v6.index() == 2);
+  CHECK(std::get<double>(v6) == 2.718);
+
+  // Variant with monostate.
+  using MV = std::variant<std::monostate, int, std::string>;
+
+  MV mv1{std::monostate{}};
+  MV mv2{99};
+
+  save_pod(mv1);
+  load_pod(mv2);
+
+  CHECK(mv2.index() == 0);
+  CHECK(std::holds_alternative<std::monostate>(mv2));
 }
 
 TEST_CASE("Test SerialPod with const creation from constructor", "[serialize]")
