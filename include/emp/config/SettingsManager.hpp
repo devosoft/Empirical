@@ -109,6 +109,7 @@
 #include "../base/vector.hpp"
 #include "../compiler/Lexer.hpp"
 #include "../io/io_utils.hpp"
+#include "../serialize/SerialPod.hpp"
 #include "../tools/String.hpp"
 
 namespace emp {
@@ -850,6 +851,35 @@ namespace emp {
       }
       return true;
     }
+
+    /// Save all current setting values to a SerialPod.
+    /// Only values are stored (not descriptions, defaults, or callbacks).
+    /// The full dotted key is saved alongside each value so that SerialLoad can
+    /// match them up even if the registration order later changes.
+    void SerialSave(emp::SerialPod & pod) const {
+      pod.Save(setting_map.size());
+      for (const auto & [key, info] : setting_map) {
+        pod.Save(key);
+        pod.Save(info.AsString());
+      }
+    }
+
+    /// Restore setting values from a SerialPod.
+    /// Settings present in the pod but not currently registered emit a warning and are skipped,
+    /// which allows save files to remain usable after settings are added or removed.
+    void SerialLoad(emp::SerialPod & pod) {
+      const size_t count = pod.LoadValue<size_t>();
+      for (size_t i = 0; i < count; ++i) {
+        emp::String key   = pod.LoadValue<emp::String>();
+        emp::String value = pod.LoadValue<emp::String>();
+        if (setting_map.contains(key)) {
+          setting_map.at(key).SetValue(value);
+        } else {
+          emp::notify::Warning("SettingsManager::SerialLoad: setting '", key, "' not found; skipping.");
+        }
+      }
+    }
+
   };
 
 }  // namespace emp
