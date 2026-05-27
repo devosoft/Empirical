@@ -80,6 +80,16 @@ namespace emp {
       return {iterator{this, pos}, is_new};
     }
 
+    /// Construct a key-value pair in-place from forwarded arguments.
+    /// Arguments are forwarded to construct std::pair<const KEY_T, MAPPED_T>.
+    /// @return {iterator-to-key, was-newly-inserted}
+    template <typename... ARGS>
+    std::pair<iterator, bool> emplace(ARGS &&... args) {
+      value_type kv(std::forward<ARGS>(args)...);
+      auto [pos, is_new] = Base::InsertEntry(Entry{std::move(kv.first), std::move(kv.second)});
+      return {iterator{this, pos}, is_new};
+    }
+
     // === VALUE ACCESS ===
 
     template <class Self>
