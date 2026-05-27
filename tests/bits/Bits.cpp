@@ -3966,5 +3966,75 @@ TEST_CASE("31: Dynamic Bits", "[tools]") {
 
 }
 
+TEST_CASE("32: Bits Serialize", "[bits][serialize]") {
+  // Helper: save then load into a fresh object and verify bit-for-bit equality.
+  auto check_roundtrip = [](auto original) {
+    std::stringstream ss;
+    emp::SerialPod save_pod(ss, true);
+    original.Serialize(save_pod);
+
+    auto restored = decltype(original)(original.GetSize()); // same size, all zero
+    emp::SerialPod load_pod(ss, false);
+    restored.Serialize(load_pod);
+
+    REQUIRE(original == restored);
+    REQUIRE(original.GetSize() == restored.GetSize());
+  };
+
+  // BitVector (dynamic size): empty, small, and large.
+  {
+    emp::BitVector bv("10110010110001");
+    check_roundtrip(bv);
+
+    emp::BitVector bv_large(200);
+    bv_large.Set(0); bv_large.Set(63); bv_large.Set(127); bv_large.Set(199);
+    check_roundtrip(bv_large);
+  }
+
+  // Size is restored correctly after serialization (initial size differs from saved size).
+  {
+    emp::BitVector bv(37);
+    bv.SetRange(10, 25);
+
+    std::stringstream ss;
+    emp::SerialPod save_pod(ss, true);
+    bv.Serialize(save_pod);
+
+    emp::BitVector restored(1); // wrong initial size — should be fixed on load
+    emp::SerialPod load_pod(ss, false);
+    restored.Serialize(load_pod);
+
+    REQUIRE(restored.GetSize() == 37);
+    REQUIRE(bv == restored);
+  }
+
+  // BitSet (fixed size): compile-time-sized type.
+  {
+    emp::BitSet<64> bs;
+    bs.Set(0); bs.Set(31); bs.Set(63);
+    check_roundtrip(bs);
+
+    emp::BitSet<128> bs128;
+    bs128.SetRange(50, 100);
+    check_roundtrip(bs128);
+  }
+
+  // Cross-object: save one BitVector, load into another of the same size.
+  {
+    emp::BitVector bv(64);
+    bv.SetRange(0, 32);
+
+    std::stringstream ss;
+    emp::SerialPod save_pod(ss, true);
+    bv.Serialize(save_pod);
+
+    emp::BitVector bv2(64);
+    emp::SerialPod load_pod(ss, false);
+    bv2.Serialize(load_pod);
+
+    REQUIRE(bv == bv2);
+  }
+}
+
 // Local settings for Empecable file checker.
 // empecable_words: bvl deser sbv sbvl iarchive bal svec sval oarchive

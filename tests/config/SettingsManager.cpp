@@ -243,7 +243,7 @@ TEST_CASE("Test SettingsManager", "[config]")
     cfg.AddSetting("x", x, "int")
        .AddSetting("d", d, "double");
 
-    emp::vector<emp::String> args = { "program", "-S", "x = 7; d = 3.5" };
+    emp::vector<emp::String> args = { "program", "-:", "x = 7; d = 3.5" };
     REQUIRE(cfg.LoadArgs(args));
     REQUIRE(x == 7);
     REQUIRE(d == 3.5);
@@ -294,10 +294,10 @@ TEST_CASE("Test SettingsManager", "[config]")
     int x = 0;
     cfg.AddSetting("x", x, "int", 'x');
 
-    emp::vector<emp::String> args = { "program", "--other", "stuff", "-x", "3" };
+    emp::vector<emp::String> args = { "program", "other", "stuff", "-x", "3" };
     REQUIRE(cfg.LoadArgs(args));
     REQUIRE(x == 3);
-    REQUIRE(args.size() == 3); // "program", "--other", "stuff" remain; "-x" and "3" consumed
+    REQUIRE(args.size() == 3); // "program", "other", "stuff" remain; "-x" and "3" consumed
   }
 
   // LoadArgs: processed short flags and their values are removed from args
@@ -323,7 +323,7 @@ TEST_CASE("Test SettingsManager", "[config]")
     int x = 0;
     cfg.AddSetting("x", x, "int");
 
-    emp::vector<emp::String> args = { "program", "-S", "x = 4", "leftover" };
+    emp::vector<emp::String> args = { "program", "-:", "x = 4", "leftover" };
     REQUIRE(cfg.LoadArgs(args));
     REQUIRE(x == 4);
     REQUIRE(args.size() == 2); // only "program" and "leftover" remain
@@ -679,5 +679,184 @@ TEST_CASE("Test SettingsManager", "[config]")
     REQUIRE(cfg.Get<int>("sum") == 7);
     a = 10;
     REQUIRE(cfg.Get<int>("sum") == 14);  // getter reflects live state
+  }
+}
+
+TEST_CASE("Test SettingsManager SerialSave and SerialLoad", "[config][serialize]")
+{
+  // Basic round-trip for all supported types
+  {
+    int64_t  i = 7;
+    uint64_t n = 100;
+    double   d = 3.14;
+    bool     b = true;
+    emp::String s = "hello world";
+
+    emp::SettingsManager cfg;
+    cfg.AddSetting("i", i, "int64_t")
+       .AddSetting("n", n, "uint64_t")
+       .AddSetting("d", d, "double")
+       .AddSetting("b", b, "bool")
+       .AddSetting("s", s, "string");
+
+    std::stringstream ss;
+    emp::SerialPod save_pod(ss, true);
+    cfg.SerialSave(save_pod);
+
+    int64_t  i2 = 0;
+    uint64_t n2 = 0;
+    double   d2 = 0.0;
+    bool     b2 = false;
+    emp::String s2 = "";
+
+    emp::SettingsManager cfg2;
+    cfg2.AddSetting("i", i2, "int64_t")
+        .AddSetting("n", n2, "uint64_t")
+        .AddSetting("d", d2, "double")
+        .AddSetting("b", b2, "bool")
+        .AddSetting("s", s2, "string");
+
+    emp::SerialPod load_pod(ss, false);
+    cfg2.SerialLoad(load_pod);
+
+    REQUIRE(i2 == 7);
+    REQUIRE(n2 == 100);
+    REQUIRE(d2 == 3.14);
+    REQUIRE(b2 == true);
+    REQUIRE(s2 == "hello world");
+  }
+
+  // SerialSave captures the live value, not the registered default
+  {
+    int x = 1;
+    emp::SettingsManager cfg;
+    cfg.AddSetting("x", x, "int");
+    cfg.Set("x", 999);
+    REQUIRE(x == 999);
+
+    std::stringstream ss;
+    emp::SerialPod save_pod(ss, true);
+    cfg.SerialSave(save_pod);
+
+    int x2 = 0;
+    emp::SettingsManager cfg2;
+    cfg2.AddSetting("x", x2, "int");
+
+    emp::SerialPod load_pod(ss, false);
+    cfg2.SerialLoad(load_pod);
+
+    REQUIRE(x2 == 999);
+  }
+
+  // Scoped (dotted) settings round-trip correctly
+  {
+    int speed = 10, count = 3;
+    emp::SettingsManager cfg;
+    cfg.AddSetting("robot.speed", speed, "speed")
+       .AddSetting("robot.count", count, "count");
+
+    std::stringstream ss;
+    emp::SerialPod save_pod(ss, true);
+    cfg.SerialSave(save_pod);
+
+    int speed2 = 0, count2 = 0;
+    emp::SettingsManager cfg2;
+    cfg2.AddSetting("robot.speed", speed2, "speed")
+        .AddSetting("robot.count", count2, "count");
+
+    emp::SerialPod load_pod(ss, false);
+    cfg2.SerialLoad(load_pod);
+
+    REQUIRE(speed2 == 10);
+    REQUIRE(count2 == 3);
+  }
+
+  // Getter/setter-based settings round-trip correctly
+  {
+    int speed = 55;
+    emp::SettingsManager cfg;
+    cfg.AddSetting("speed",
+      [&speed]() { return speed; },
+      [&speed](int v) { speed = v; },
+      "speed");
+
+    std::stringstream ss;
+    emp::SerialPod save_pod(ss, true);
+    cfg.SerialSave(save_pod);
+
+    int speed2 = 0;
+    emp::SettingsManager cfg2;
+    cfg2.AddSetting("speed",
+      [&speed2]() { return speed2; },
+      [&speed2](int v) { speed2 = v; },
+      "speed");
+
+    emp::SerialPod load_pod(ss, false);
+    cfg2.SerialLoad(load_pod);
+
+    REQUIRE(speed2 == 55);
+  }
+
+  // String with special characters round-trips correctly
+  {
+    emp::String s = "say \"hi\"\tthere";
+    emp::SettingsManager cfg;
+    cfg.AddSetting("s", s, "string");
+
+    std::stringstream ss;
+    emp::SerialPod save_pod(ss, true);
+    cfg.SerialSave(save_pod);
+
+    emp::String s2 = "";
+    emp::SettingsManager cfg2;
+    cfg2.AddSetting("s", s2, "string");
+
+    emp::SerialPod load_pod(ss, false);
+    cfg2.SerialLoad(load_pod);
+
+    REQUIRE(s2 == s);
+  }
+
+  // Settings absent from the pod keep their current values
+  {
+    int a = 10;
+    emp::SettingsManager cfg;
+    cfg.AddSetting("a", a, "a");  // "b" not registered here, so not serialized
+
+    std::stringstream ss;
+    emp::SerialPod save_pod(ss, true);
+    cfg.SerialSave(save_pod);
+
+    int a2 = 0, b2 = 77;
+    emp::SettingsManager cfg2;
+    cfg2.AddSetting("a", a2, "a")
+        .AddSetting("b", b2, "b");
+
+    emp::SerialPod load_pod(ss, false);
+    cfg2.SerialLoad(load_pod);
+
+    REQUIRE(a2 == 10);  // restored
+    REQUIRE(b2 == 77);  // not in pod; unchanged
+  }
+
+  // Settings in the pod but not registered emit a warning and are skipped
+  // (expected warning: "SettingsManager::SerialLoad: setting 'x' not found; skipping.")
+  {
+    int x = 5;
+    emp::SettingsManager cfg;
+    cfg.AddSetting("x", x, "int");
+
+    std::stringstream ss;
+    emp::SerialPod save_pod(ss, true);
+    cfg.SerialSave(save_pod);
+
+    int y = 99;
+    emp::SettingsManager cfg2;
+    cfg2.AddSetting("y", y, "int");  // "x" from the pod is unknown
+
+    emp::SerialPod load_pod(ss, false);
+    cfg2.SerialLoad(load_pod);  // warns about "x", skips it
+
+    REQUIRE(y == 99);  // unchanged
   }
 }

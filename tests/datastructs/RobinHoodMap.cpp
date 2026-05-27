@@ -68,4 +68,20 @@ TEST_CASE("Test RobinHoodMap", "[datastructs]")
   CHECK(test_map.contains("TWO"));
   CHECK(!test_map.contains("THREE"));
   CHECK(test_map.size() == 4);
+
+  // Test emplace
+  auto [it1, inserted1] = test_map.emplace("e", 2.71828);
+  CHECK(inserted1 == true);
+  CHECK(it1->second == 2.71828);
+  CHECK(test_map.size() == 5);
+
+  auto [it2, inserted2] = test_map.emplace("e", 0.0);  // duplicate key
+  CHECK(inserted2 == false);
+  CHECK(it2->second == 2.71828);  // existing value unchanged
+  CHECK(test_map.size() == 5);
+
+  auto [it3, inserted3] = test_map.emplace(std::piecewise_construct,
+    std::forward_as_tuple("tau"), std::forward_as_tuple(6.28318));
+  CHECK(inserted3 == true);
+  CHECK(test_map.FindValue("tau") == 6.28318);
 }

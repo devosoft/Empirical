@@ -407,5 +407,107 @@ TEST_CASE("Test 64bit outputs", "[Random]") {
   REQUIRE(high_ave < 95'100'000'000);
 }
 
+TEST_CASE("Test Random Serialize", "[Random]")
+{
+  // Helper: advance rng by n steps, serialize, record the next `len` doubles as the
+  // reference, restore from the serialized state, regenerate the same `len` doubles,
+  // and verify they are bit-identical.
+  auto check_roundtrip = [](auto & rng, size_t warmup, size_t len) {
+    for (size_t i = 0; i < warmup; ++i) (void) rng.GetDouble();
+
+    std::stringstream ss;
+    emp::SerialPod save_pod(ss, true);
+    rng.Serialize(save_pod);
+
+    emp::vector<double> expected(len);
+    for (double & x : expected) x = rng.GetDouble();
+
+    emp::SerialPod load_pod(ss, false);
+    rng.Serialize(load_pod);
+
+    emp::vector<double> actual(len);
+    for (double & x : actual) x = rng.GetDouble();
+
+    REQUIRE(expected == actual);
+  };
+
+  // All three engine types produce an exact continuation after save/load.
+  {
+    emp::RandomBest rng(1);   check_roundtrip(rng, 100, 50);  // Xoshiro256pp
+    emp::Random32   rng2(2);  check_roundtrip(rng2, 100, 50); // MSWS
+    emp::RandomFast rng3(3);  check_roundtrip(rng3, 100, 50); // Xorshift
+  }
+
+  // Serializing at different positions in the sequence all continue correctly.
+  {
+    emp::Random rng(42);
+    check_roundtrip(rng, 0,   20);  // serialize at the very start
+    check_roundtrip(rng, 1,   20);  // one step in
+    check_roundtrip(rng, 999, 20);  // deep in the sequence
+  }
+
+  // GetSeed() is preserved: after loading into a different object the seed matches.
+  {
+    emp::Random rng1(12345);
+    for (int i = 0; i < 50; ++i) (void) rng1.GetDouble();
+
+    std::stringstream ss;
+    emp::SerialPod save_pod(ss, true);
+    rng1.Serialize(save_pod);
+
+    emp::Random rng2(1);  // different seed
+    emp::SerialPod load_pod(ss, false);
+    rng2.Serialize(load_pod);
+
+    REQUIRE(rng2.GetSeed() == 12345);
+  }
+
+  // Cross-object save/load: rng2 loaded from rng1's state produces the same sequence.
+  {
+    emp::Random rng1(99);
+    for (int i = 0; i < 30; ++i) (void) rng1.GetDouble();
+
+    std::stringstream ss;
+    emp::SerialPod save_pod(ss, true);
+    rng1.Serialize(save_pod);
+
+    emp::vector<double> from_rng1(20);
+    for (double & x : from_rng1) x = rng1.GetDouble();
+
+    emp::Random rng2(1);  // different seed
+    emp::SerialPod load_pod(ss, false);
+    rng2.Serialize(load_pod);
+
+    emp::vector<double> from_rng2(20);
+    for (double & x : from_rng2) x = rng2.GetDouble();
+
+    REQUIRE(from_rng1 == from_rng2);
+    REQUIRE(rng2.GetSeed() == 99);
+  }
+
+  // expRV is serialized: GetNormal() continues bit-identically after load.
+  // expRV is the cached intermediate of the Box-Muller rejection step; without it
+  // the first GetNormal call after loading would consume different random values.
+  {
+    emp::Random rng(7);
+    for (int i = 0; i < 10; ++i) (void) rng.GetNormal();  // prime expRV
+
+    std::stringstream ss;
+    emp::SerialPod save_pod(ss, true);
+    rng.Serialize(save_pod);
+
+    emp::vector<double> expected(20);
+    for (double & x : expected) x = rng.GetNormal();
+
+    emp::SerialPod load_pod(ss, false);
+    rng.Serialize(load_pod);
+
+    emp::vector<double> actual(20);
+    for (double & x : actual) x = rng.GetNormal();
+
+    REQUIRE(expected == actual);
+  }
+}
+
 // Local settings for Empecable file checker.
 // empecable_words: nval observs randfill unif rnd
