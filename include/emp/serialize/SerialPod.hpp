@@ -216,7 +216,9 @@ namespace emp {
         std::stringstream ss(str);
         ss >> in;
       } else {
-        notify::Error("Invalid SerialPod::Load attempt.");
+        static_assert(emp::dependent_false<T>::value,
+          "SerialPod cannot load this type: no Serialize/SerialLoad member or overload found,\n"
+          "and type is not an enum or stream-extractable.");
       };
       return Load(extras...);
     }
@@ -246,7 +248,9 @@ namespace emp {
       } else if constexpr (canStreamTo<std::ostream, T>) {
         OStream() << in << '\n';
       } else {
-        notify::Error("Invalid SerialPod::Save attempt on type ", emp::GetTypeName<T>());
+        static_assert(emp::dependent_false<T>::value,
+          "SerialPod cannot save this type: no Serialize/SerialSave member or overload found,\n"
+          "and type is not an enum or streamable via operator<<.");
       }
       return Save(extras...);
     }
