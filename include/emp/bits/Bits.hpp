@@ -560,6 +560,21 @@ namespace emp {
 
     [[nodiscard]] size_t NumFields() const { return _data.NumFields(); }
 
+    /// @brief Save or restore all bits via a SerialPod.
+    /// The bit count is always serialized first.  On load, fixed-size types assert the
+    /// stored count matches; dynamic types resize to match before loading field data.
+    void Serialize(emp::SerialPod & pod) {
+      size_t num_bits = GetSize();
+      pod(num_bits);
+      if (pod.IsLoad()) {
+        if constexpr (DATA_T::IsFixedSize()) {
+          emp_assert(num_bits == GetSize(),
+            "Serialized bit count does not match fixed Bits size.", num_bits, GetSize());
+        } else Resize(num_bits);
+      }
+      for (auto & field : FieldSpan()) pod(field);
+    }
+
     /// @brief Return a pointer to the set of fields.
     [[nodiscard]] auto FieldPtr() { return _data.FieldPtr(); }
 
