@@ -81,6 +81,8 @@ namespace emp {
     //    }
 
 
+    void Serialize(emp::SerialPod & pod) { pod(value, weyl_state, value2, weyl_state2); }
+
     /// Starts a new sequence of pseudo random numbers.  Seed is guaranteed > 0.
     void ResetSeed(const uint64_t seed) noexcept {
       value = value2 = 0;

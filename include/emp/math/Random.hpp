@@ -25,6 +25,7 @@
 #include "../base/assert.hpp"
 #include "../base/Ptr.hpp"
 #include "../bits/bitset_utils.hpp"
+#include "../serialize/SerialPod.hpp"
 
 #include "constants.hpp"
 #include "Random_MSWS.hpp"
@@ -627,6 +628,11 @@ namespace emp {
       emp_assert(p > 0.0 && p <= 1.0, p);
       return static_cast<uint64_t>(GetExponential(p)) + 1;
     }
+
+    /// Save or restore the complete generator state, enabling exact continuation after load.
+    /// Saves original_seed (for GetSeed()), expRV (cached intermediate for GetNormal),
+    /// and the full engine state so the output sequence resumes exactly where it left off.
+    void Serialize(emp::SerialPod & pod) { pod(original_seed, expRV, engine); }
   };
 
   using RandomBest = Random_Base<emp::Random_Xoshiro256pp>;

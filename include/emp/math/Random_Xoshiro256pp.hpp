@@ -50,6 +50,8 @@ namespace emp {
       return result;
     }
 
+    void Serialize(emp::SerialPod & pod) { pod(state); }
+
     /// Starts a new sequence of pseudo random numbers; seed must be > 0.
     void ResetSeed(uint64_t seed) noexcept {
       emp_assert(seed > 0);
