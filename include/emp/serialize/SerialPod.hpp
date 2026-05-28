@@ -298,7 +298,7 @@ namespace emp {
   }
 
   template <typename T>
-  SerialPod & SerialSave(SerialPod & pod, const std::vector<T> & vec) {
+  SerialPod & SerialSave(SerialPod & pod, std::vector<T> & vec) {
     pod.Save(vec.size());
     for (auto & element : vec) { pod.Save(element); }
 
@@ -308,29 +308,29 @@ namespace emp {
 
   // --- Set-like containers (std::set, std::unordered_set, std::multiset, ...) ---
 
-  template <IsSetContainer C>
-  SerialPod & SerialLoad(SerialPod & pod, C & s) {
-    using T = typename C::value_type;
+  template <IsSetContainer SET_T>
+  SerialPod & SerialLoad(SerialPod & pod, SET_T & set) {
+    using value_t = typename SET_T::value_type;
     const size_t size = pod.LoadValue<size_t>();
-    s.clear();
-    for (size_t i = 0; i < size; ++i) { s.insert(pod.LoadValue<T>()); }
+    set.clear();
+    for (size_t i = 0; i < size; ++i) { set.insert(pod.LoadValue<value_t>()); }
     return pod;
   }
 
-  template <IsSetContainer C>
-  SerialPod & SerialSave(SerialPod & pod, const C & s) {
-    pod.Save(s.size());
-    for (const auto & element : s) { pod.Save(element); }
+  template <IsSetContainer SET_T>
+  SerialPod & SerialSave(SerialPod & pod, SET_T & set) {
+    pod.Save(set.size());
+    for (auto & element : set) { pod.Save(element); }
     return pod;
   }
 
 
   // --- Map-like containers (std::map, std::unordered_map, std::multimap, ...) ---
 
-  template <IsMapContainer C>
-  SerialPod & SerialLoad(SerialPod & pod, C & m) {
-    using K = typename C::key_type;
-    using V = typename C::mapped_type;
+  template <IsMapContainer MAP_T>
+  SerialPod & SerialLoad(SerialPod & pod, MAP_T & m) {
+    using K = typename MAP_T::key_type;
+    using V = typename MAP_T::mapped_type;
     const size_t size = pod.LoadValue<size_t>();
     m.clear();
     for (size_t i = 0; i < size; ++i) {
@@ -341,17 +341,15 @@ namespace emp {
     return pod;
   }
 
-  template <IsMapContainer C>
-  SerialPod & SerialSave(SerialPod & pod, const C & m) {
+  template <IsMapContainer MAP_T>
+  SerialPod & SerialSave(SerialPod & pod, MAP_T & m) {
     pod.Save(m.size());
-    for (const auto & [key, val] : m) { pod.Save(key); pod.Save(val); }
+    for (auto & [key, val] : m) { pod.Save(key); pod.Save(val); }
     return pod;
   }
 
 
   // --- std::pair ---
-  // PAIR_T may be const or non-const; when const, p.first/second are const and route to
-  // the save-only const operator() overload automatically.
 
   template <typename PAIR_T>
     requires requires { typename std::remove_cv_t<PAIR_T>::first_type; }
@@ -381,7 +379,7 @@ namespace emp {
   }
 
   template <typename T>
-  SerialPod & SerialSave(SerialPod & pod, const std::optional<T> & opt) {
+  SerialPod & SerialSave(SerialPod & pod, std::optional<T> & opt) {
     pod.Save(opt.has_value());
     if (opt.has_value()) { pod.Save(*opt); }
     return pod;
@@ -390,25 +388,23 @@ namespace emp {
 
   // --- Fixed-size array containers (std::array, emp::array) ---
 
-  template <IsArrayContainer C>
-  SerialPod & SerialLoad(SerialPod & pod, C & arr) {
-    const size_t size = pod.LoadValue<size_t>();
+  template <IsArrayContainer ARRAY_T>
+  SerialPod & SerialLoad(SerialPod & pod, ARRAY_T & arr) {
+    [[maybe_unused]] const size_t size = pod.LoadValue<size_t>();
     emp_assert(size == arr.size(), size, arr.size());
     for (auto & element : arr) { pod.Load(element); }
     return pod;
   }
 
-  template <IsArrayContainer C>
-  SerialPod & SerialSave(SerialPod & pod, const C & arr) {
+  template <IsArrayContainer ARRAY_T>
+  SerialPod & SerialSave(SerialPod & pod, ARRAY_T & arr) {
     pod.Save(arr.size());
-    for (const auto & element : arr) { pod.Save(element); }
+    for (auto & element : arr) { pod.Save(element); }
     return pod;
   }
 
 
   // --- std::tuple ---
-  // TUPLE_T may be const or non-const; std::apply preserves const, so elements of a
-  // const tuple are passed as const refs and route to the save-only operator() overload.
 
   template <typename TUPLE_T>
     requires (emp::is_template<std::remove_cv_t<TUPLE_T>, std::tuple>::value)
@@ -442,9 +438,9 @@ namespace emp {
   }
 
   template <typename... Ts>
-  SerialPod & SerialSave(SerialPod & pod, const std::variant<Ts...> & v) {
+  SerialPod & SerialSave(SerialPod & pod, std::variant<Ts...> & v) {
     pod.Save(v.index());
-    std::visit([&pod](const auto & val) {
+    std::visit([&pod](auto & val) {
       if constexpr (!std::is_same_v<std::decay_t<decltype(val)>, std::monostate>) {
         pod.Save(val);
       }
