@@ -83,6 +83,10 @@ struct Struct_Internal_Serialize {
   void Serialize(emp::SerialPod & pod) { pod(x, y, z); }
 
   bool operator==(const Struct_Internal_Serialize &) const = default;
+
+  friend std::ostream & operator<<(std::ostream & os, const Struct_Internal_Serialize & s) {
+    return os << "{" << s.x << "," << s.y << "," << s.z << "}";
+  }
 };
 
 struct Struct_External_Serialize {
@@ -525,6 +529,57 @@ TEST_CASE("Test SerialPod with std::variant", "[serialize]")
 
   CHECK(mv2.index() == 0);
   CHECK(std::holds_alternative<std::monostate>(mv2));
+}
+
+
+
+TEST_CASE("Test SerialPod with array of custom struct", "[serialize]")
+{
+  emp::array<Struct_Internal_Serialize, 100> test_arr;
+  int a = 0;
+  int b = 100000;
+  unsigned long long c = 0;
+  for (auto & x : test_arr) {
+    x = Struct_Internal_Serialize{a, b, c};
+    ++a;
+    --b;
+    c = (c << 2) + static_cast<uint16_t>(a);
+  }
+
+  CHECK(a == 100);
+
+  std::stringstream ss;
+  emp::SerialPod save_pod(ss, true);
+  emp::SerialPod load_pod(ss, false);
+
+  save_pod(test_arr);
+
+  emp::array<Struct_Internal_Serialize, 100> test_clone;
+
+  REQUIRE(test_arr != test_clone);
+
+  load_pod(test_clone);
+  REQUIRE(test_arr == test_clone);
+  REQUIRE(test_clone[1].x == 1);
+  REQUIRE(test_clone[1].y == 99999);
+  REQUIRE(test_clone[1].z == 1);
+}
+
+TEST_CASE("Test SerialPod with vectors of unsigned  char") {
+  emp::vector<unsigned char> test_v;
+  test_v.resize(10, 'x');
+  test_v[4] = 'a';
+
+  std::stringstream ss;
+  emp::SerialPod save_pod(ss, true);
+  emp::SerialPod load_pod(ss, false);
+
+  save_pod(test_v);
+  emp::vector<unsigned char> restore_v;
+
+  REQUIRE(test_v != restore_v);
+  load_pod(restore_v);
+  REQUIRE(test_v == restore_v);
 }
 
 TEST_CASE("Test SerialPod with const creation from constructor", "[serialize]")
