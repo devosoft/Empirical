@@ -59,13 +59,15 @@ namespace emp {
 
   // === Concepts to categorize container types ===
 
-  /// Fixed-size sequential container with no runtime resize (e.g., std::array, emp::array).
+  /// Fixed-size sequential container with compile-time known size (e.g., std::array, emp::array).
+  /// Uses tuple_size rather than !has_resize because some fixed-size containers define resize()
+  /// as a stub (e.g., emp::array defines it to assert-false on misuse).
   template <typename C>
   concept IsArrayContainer =
     requires { typename C::value_type; } &&
     !requires { typename C::mapped_type; } &&
     !requires(const C & cc) { cc.c_str(); } &&   // exclude string-like types
-    !has_resize<C> &&
+    requires { std::tuple_size<std::remove_cv_t<C>>::value; } &&
     requires(C & c, const C & cc) {
       { c.size() } -> std::convertible_to<size_t>;
       { c[size_t{}] };
@@ -88,10 +90,13 @@ namespace emp {
     };
 
   /// Single-key associative container (e.g., std::set, std::unordered_set, std::multiset).
+  /// !has_resize<C> excludes std::vector/emp::vector, whose variadic insert template
+  /// otherwise satisfies c.insert(v) syntactically.
   template <typename C>
   concept IsSetContainer =
     requires { typename C::value_type; } &&
     !requires { typename C::mapped_type; } &&
+    !has_resize<C> &&
     requires(C & c, const C & cc, typename C::value_type v) {
       c.insert(v);
       c.clear();
