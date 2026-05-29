@@ -100,9 +100,9 @@ namespace emp {
       Bits_Data_Size_Var & operator=(const Bits_Data_Size_Var &) = default;
 
       template <class Archive>
-      void serialize(Archive & ar) {
-        ar(num_bits);
-      }
+      void serialize(Archive & ar) { ar(num_bits); }
+
+      void Serialize(emp::SerialPod & pod) { pod(num_bits); }
 
       [[nodiscard]] constexpr bool OK() const { return true; }  // Nothing to check yet.
     };
@@ -171,6 +171,8 @@ namespace emp {
       template <class Archive>
       void serialize(Archive & /* ar */) { /* Nothing to do here. */ }
 
+      void Serialize(emp::SerialPod & /* pod */) { /* Nothing to do here */ }
+
       [[nodiscard]] constexpr bool OK() const { return true; }  // Nothing to check yet.
     };
 
@@ -228,6 +230,11 @@ namespace emp {
       void serialize(Archive & ar) {
         BASE_T::serialize(ar);  // Save size info.
         for (size_t i = 0; i < BASE_T::NumFields(); ++i) { ar(bits[i]); }
+      }
+
+      void Serialize(emp::SerialPod & pod) {
+        BASE_T::Serialize(pod);  // Save size info
+        for (size_t i = 0; i < BASE_T::NumFields(); ++i) { pod(bits[i]); }
       }
     };
 
@@ -350,6 +357,18 @@ namespace emp {
         }
         bits = NewArrayPtr<field_t>(base_t::NumFields());
         for (size_t i = 0; i < base_t::NumFields(); ++i) { ar(bits[i]); }
+      }
+
+      void SerialSave(emp::SerialPod & pod) {
+        base_t::Serialize(pod);  // Save size info.
+        for (size_t i = 0; i < base_t::NumFields(); ++i) { pod(bits[i]); }
+      }
+
+      void SerialLoad(emp::SerialPod & pod) {
+        base_t::Serialize(pod);  // Save size info.
+        if (bits) { bits.DeleteArray(); }  // Delete old memory if needed
+        bits = NewArrayPtr<field_t>(base_t::NumFields());
+        for (size_t i = 0; i < base_t::NumFields(); ++i) { pod(bits[i]); }
       }
 
       bool OK() const {
