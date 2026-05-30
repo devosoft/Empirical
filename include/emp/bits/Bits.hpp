@@ -169,6 +169,8 @@ namespace emp {
   public:
     static constexpr size_t npos = static_cast<size_t>(-1);
 
+    // ========= CONSTRUCTORS =========
+
     /// @brief Copy constructor of existing bits object.
     Bits(const Bits & in) = default;
 
@@ -250,6 +252,9 @@ namespace emp {
     /// @brief Destructor
     ~Bits() = default;
 
+
+    // ========= ASSIGNMENTS =========
+
     /// @brief Copy assignment operator.
     Bits & operator=(const Bits<DATA_T, ZERO_LEFT> & in) &;
 
@@ -270,6 +275,9 @@ namespace emp {
     /// @brief Assignment operator from a literal string of '0's and '1's.
     Bits & operator=(const char * bitstring) & { return Set(emp::String(bitstring)); }
 
+
+    // ========= IMPORT / EXPORT =========
+
     /// @brief Assignment from an unsigned int, optionally specifying size.
     Bits & Import(uint64_t from_bits, size_t new_size = emp::MAX_SIZE_T);
 
@@ -280,7 +288,7 @@ namespace emp {
                   size_t max_copy_bits        = emp::MAX_SIZE_T);
 
 
-                  /// @brief Convert to a Bits of a different size.
+    /// @brief Convert to a Bits of a different size.
     template <typename OUT_T = Bits<Bits_DynamicData, ZERO_LEFT>>
     [[nodiscard]] OUT_T Export(size_t out_size, size_t start_bit = 0) const;
 
@@ -297,7 +305,8 @@ namespace emp {
     // @brief Scan this bitvector to make sure that there are no internal problems.
     [[nodiscard]] bool OK() const { return _data.OK(); }
 
-    // =========  Type Status  ========= //
+
+    // =========  Type Status  =========
 
     [[nodiscard]] static constexpr bool ZeroLeft() { return ZERO_LEFT; }
 
@@ -306,6 +315,7 @@ namespace emp {
     [[nodiscard]] static constexpr bool IsAutoResize() { return DATA_T::IsAutoResize(); }
 
     [[nodiscard]] static constexpr size_t GetDefaultSize() { return DATA_T::GetDefaultSize(); }
+
 
     // =========  Accessors  ========= //
 
@@ -414,7 +424,9 @@ namespace emp {
       return *this;
     }
 
+
     // =========  Iterator Management  ========== //
+
     class Iterator {
     private:
       emp::Ptr<const Bits<DATA_T, ZERO_LEFT>> bits_ptr;
@@ -452,6 +464,7 @@ namespace emp {
 
     Iterator end() const { return Iterator(*this, npos); }
 
+  
     // =========  Randomization functions  ========= //
 
     /// @brief Set all bits randomly, with a 50% probability of being a 0 or 1.
@@ -501,7 +514,7 @@ namespace emp {
     Bits & ClearRandomCount(Random & random, const size_t target_bits);
 
 
-    // =========  Comparison Operators  ========= //
+    // =========  COMPARISONS  ========= //
 
     /// @brief Compare two bits objects, even with different template arguments.
     template <typename DATA2_T, bool ZL2>
@@ -530,7 +543,21 @@ namespace emp {
       return !(*this < in);
     }
 
-    // =========  Conversion Operators  ========= //
+    /// @brief Return true if any ones are in common with another Bits.
+    [[nodiscard]] bool HasOverlap(const Bits & in) const;
+
+    /// @brief Return a count of the number of sites that differ.
+    [[nodiscard]] size_t CalcDistance(const Bits & in) const { return (*this ^ in).CountOnes(); }
+
+    /// @brief Return the distance to the closest member of a set.
+    [[nodiscard]] size_t CalcMinDistance(std::span<Bits> in_bits) const {
+      size_t dist = emp::MAX_SIZE_T;
+      for (Bits & bits : in_bits) { dist = std::min(dist, CalcDistance(bits)); }
+      return dist;
+    }
+
+
+    // =========  CONVERSIONS  ========= //
 
     /// @brief Automatically convert Bits to other vector types.
     template <typename T>
@@ -539,7 +566,8 @@ namespace emp {
     /// @brief Casting a bit array to bool identifies if ANY bits are set to 1.
     explicit operator bool() const { return Any(); }
 
-    // =========  Access Groups of bits  ========= //
+
+    // =========  SUBSET ACCESS  ========= //
 
     /// @brief Retrieve the byte at the specified byte index.
     [[nodiscard]] uint8_t GetByte(size_t index) const;
@@ -559,21 +587,6 @@ namespace emp {
     }
 
     [[nodiscard]] size_t NumFields() const { return _data.NumFields(); }
-
-    /// @brief Save or restore all bits via a SerialPod.
-    /// The bit count is always serialized first.  On load, fixed-size types assert the
-    /// stored count matches; dynamic types resize to match before loading field data.
-    void Serialize(emp::SerialPod & pod) {
-      size_t num_bits = GetSize();
-      pod(num_bits);
-      if (pod.IsLoad()) {
-        if constexpr (DATA_T::IsFixedSize()) {
-          emp_assert(num_bits == GetSize(),
-            "Serialized bit count does not match fixed Bits size.", num_bits, GetSize());
-        } else Resize(num_bits);
-      }
-      for (auto & field : FieldSpan()) pod(field);
-    }
 
     /// @brief Return a pointer to the set of fields.
     [[nodiscard]] auto FieldPtr() { return _data.FieldPtr(); }
@@ -681,22 +694,8 @@ namespace emp {
     /// @brief By default, update the 32-bit uint at the specified uint index.
     void SetUIntAtBit(const size_t index, uint32_t value) { SetUInt32AtBit(index, value); }
 
-    // =========  Other Analyses  ========= //
-
-    /// @brief A simple hash function for bit vectors.
-    [[nodiscard]] std::size_t Hash(size_t start_field = 0) const;
-
-    /// @brief Count the number of ones in Bits.
-    [[nodiscard]] constexpr size_t CountOnes() const;
-
-    /// @brief Count the number of ones in a range within Bits.  [start, end)
-    [[nodiscard]] constexpr size_t CountOnes(size_t start, size_t end) const;
-
-    /// @brief Faster counting of ones for very sparse bit vectors.
-    [[nodiscard]] constexpr size_t CountOnes_Sparse() const;
-
-    /// @brief Count the number of zeros in Bits.
-    [[nodiscard]] constexpr size_t CountZeros() const { return GetSize() - CountOnes(); }
+  
+    // =========  INSERTION / DELETION  ========= //
 
     /// @brief Pop the last bit in the vector.
     /// @return value of the popped bit.
@@ -726,6 +725,30 @@ namespace emp {
     /// @param num number of bits to delete, default 1.
     void Delete(const size_t index, const size_t num = 1);
 
+    /// @brief Return the position of the first one and change it to a zero.  Return npos if none.
+    size_t PopOne();
+
+    /// Deprecated version of PopOne().
+    [[deprecated("Renamed to more accurate PopOne()")]] int PopBit() { return PopOne(); }
+
+
+    // =========  SELF-ANALYSIS TOOLS  ========= //
+
+    /// @brief A simple hash function for bit vectors.
+    [[nodiscard]] std::size_t Hash(size_t start_field = 0) const;
+
+    /// @brief Count the number of ones in Bits.
+    [[nodiscard]] constexpr size_t CountOnes() const;
+
+    /// @brief Count the number of ones in a range within Bits.  [start, end)
+    [[nodiscard]] constexpr size_t CountOnes(size_t start, size_t end) const;
+
+    /// @brief Faster counting of ones for very sparse bit vectors.
+    [[nodiscard]] constexpr size_t CountOnes_Sparse() const;
+
+    /// @brief Count the number of zeros in Bits.
+    [[nodiscard]] constexpr size_t CountZeros() const { return GetSize() - CountOnes(); }
+
     /// @brief Return the position of the first one; return npos if no ones in vector.
     [[nodiscard]] size_t FindOne() const;
 
@@ -737,7 +760,6 @@ namespace emp {
 
     /// @brief Find first zero and toggle to one; return its position or npos if none in vector.
     [[nodiscard]] size_t ToggleZero();
-
 
     /// Deprecated: Return the position of the first one; return -1 if no ones in vector.
     [[deprecated("Renamed to more accurate FindOne()")]] [[nodiscard]] int FindBit() const {
@@ -778,12 +800,6 @@ namespace emp {
     /// @brief Find the Nth set bit.
     [[nodiscard]] size_t FindNthOne(size_t N) const;
 
-    /// @brief Return the position of the first one and change it to a zero.  Return npos if none.
-    size_t PopOne();
-
-    /// Deprecated version of PopOne().
-    [[deprecated("Renamed to more accurate PopOne()")]] int PopBit() { return PopOne(); }
-
     /// @brief Return vector of positions of all ones.
     [[nodiscard]] emp::vector<size_t> GetOnes() const;
 
@@ -798,8 +814,8 @@ namespace emp {
     /// @return A vector of ranges that identify all ids of ones.
     [[nodiscard]] emp::vector < emp::Range < size_t >> GetRanges() const;
 
-    /// @brief Return true if any ones are in common with another Bits.
-    [[nodiscard]] bool HasOverlap(const Bits & in) const;
+
+    // =========  AUTOMATION TOOLS  ========= //
 
     /// @brief Run the provided function on each one index.
     template <typename FUN_T>
@@ -827,34 +843,41 @@ namespace emp {
 
     /// @brief Scan through all of the one indices to determine which one minimizes a function.
     template <typename FUN_T>
-    size_t MinIndex(FUN_T && fun) const;
+    [[nodiscard]] size_t MinIndex(FUN_T && fun) const;
 
     /// @brief Scan through all of the one indices to determine which one maximizes a function.
     template <typename FUN_T>
-    size_t MaxIndex(FUN_T && fun) const;
+    [[nodiscard]] size_t MaxIndex(FUN_T && fun) const;
 
+    /// @brief Scan through all of the one indices to determine minimize value of a function.
+    template <typename FUN_T>
+    [[nodiscard]] auto MinValue(FUN_T && fun) const { return fun(MinIndex(fun)); }
+
+    /// @brief Scan through all of the one indices to determine which one maximizes a function.
+    template <typename FUN_T>
+    [[nodiscard]] auto MaxValue(FUN_T && fun) const { return fun(MaxIndex(fun)); }
 
     /// @brief Find a one-index that makes a function true
     template <typename FUN_T>
-    size_t FindIndex(FUN_T && fun, size_t start_pos = 0) const {
+    [[nodiscard]] size_t FindIndex(FUN_T && fun, size_t start_pos = 0) const {
       for (size_t id = FindOne(start_pos); id < GetSize(); id = FindOne(id + 1)) {
         if (fun(id)) { return id; }
       }
       return npos;
     }
 
-    /// @brief Identifies if an index exists that makes a function true
+    /// @brief Test if ANY of the bit positions have a given property.
     template <typename FUN_T>
-    bool HasIndex(FUN_T && fun, size_t start_pos = 0) const {
-      for (size_t id = FindOne(start_pos); id < GetSize(); id = FindOne(id + 1)) {
-        if (fun(id)) { return true; }
+    [[nodiscard]] bool TestAny(FUN_T && fun) const {
+      for (size_t i = FindOne(); i < GetSize(); i = FindOne(i + 1)) {
+        if (fun(i)) { return true; }
       }
       return false;
     }
 
     /// @brief Identifies if an index pair exists that makes a function true
     template <typename FUN_T>
-    bool HasIndexPair(FUN_T && fun, size_t start_pos = 0) const {
+    [[nodiscard]] bool TestAnyPair(FUN_T && fun, size_t start_pos = 0) const {
       for (size_t i = FindOne(start_pos); i < GetSize(); i = FindOne(i + 1)) {
         for (size_t j = FindOne(i + 1); j < GetSize(); j = FindOne(j + 1)) {
           if (fun(i, j)) { return true; }
@@ -863,18 +886,20 @@ namespace emp {
       return false;
     }
 
-    /// @brief Test if ANY of the bit positions have a given property.
+    /// @brief Identifies if an index exists that makes a function true
     template <typename FUN_T>
-    bool TestAny(FUN_T && fun) {
-      for (size_t i = FindOne(); i < GetSize(); i = FindOne(i + 1)) {
-        if (fun(i)) { return true; }
-      }
-      return false;
+    [[nodiscard]] bool HasIndex(FUN_T && fun, size_t start_pos = 0) const {
+      return TestAny(std::forward<FUN_T>(fun), start_pos);
+    }
+
+    template <typename FUN_T>
+    [[nodiscard]] bool HasIndexPair(FUN_T && fun, size_t start_pos = 0) const {
+      return TestAnyPair(std::forward<FUN_T>(fun), start_pos);
     }
 
     /// @brief Test if ALL of the bit positions have a given property.
     template <typename FUN_T>
-    bool TestAll(FUN_T && fun) {
+    [[nodiscard]] bool TestAll(FUN_T && fun) const {
       for (size_t i = FindOne(); i < GetSize(); i = FindOne(i + 1)) {
         if (!fun(i)) { return false; }
       }
@@ -883,13 +908,9 @@ namespace emp {
 
     /// @brief Test if NONE of the bit positions have a given property.
     template <typename FUN_T>
-    bool TestNone(FUN_T && fun) {
-      for (size_t i = FindOne(); i < GetSize(); i = FindOne(i + 1)) {
-        if (fun(i)) { return false; }
-      }
-      return true;
-    }
+    [[nodiscard]] bool TestNone(FUN_T && fun) const { return !TestAny(std::forward<FUN_T>(fun)); }
 
+  
     /// Create a combination of one-bits to step through a series of combinations.
     Bits & SetFirstBitCombo(size_t k) {
       emp_assert(k < GetSize(),
@@ -933,6 +954,7 @@ namespace emp {
       SetRange(last1 - one_count - 1, last1);
       return true;
     }
+
 
     // =========  Print/String Functions  ========= //
 
@@ -1118,15 +1140,20 @@ namespace emp {
     /// @brief Compound operator minus...
     const Bits & operator-=(const Bits & ar2) { return SUB_SELF(ar2); }
 
-    // =========  Cereal Compatibility  ========= //
 
-    /// @brief Setup this bits object so that it can be stored in an archive and re-loaded.
+    // =========  SERIALIZATION  ========= //
+
+    /// @brief Save or restore all bits via the cereal library.
     template <class Archive>
     void serialize(Archive & ar) {
       ar(_data);
     }
 
-    // =========  Standard Library Compatibility  ========= //
+    /// @brief Save or restore all bits via an Empirical SerialPod.
+    void Serialize(emp::SerialPod & pod) { pod(_data); }
+
+
+    // =========  Standard Library COMPATIBILITY  ========= //
     // A set of functions to allow drop-in replacement with std::bitset.
 
     [[nodiscard]] constexpr size_t size() const { return GetSize(); }
@@ -1180,6 +1207,7 @@ namespace emp {
 
     auto data() const { return FieldSpan(); }
   };
+
 
   // ------------------------ Implementations for Internal Functions ------------------------
 
@@ -2051,6 +2079,18 @@ namespace emp {
     return false;  // Bit vectors are identical.
   }
 
+  /// Return true if any ones are in common with another Bits object.
+  template <typename DATA_T, bool ZERO_LEFT>
+  bool Bits<DATA_T, ZERO_LEFT>::HasOverlap(const Bits<DATA_T, ZERO_LEFT> & in) const {
+    const size_t num_fields = std::min(NumFields(), in.NumFields());
+    auto in_fields          = in.FieldSpan();
+    for (size_t i = 0; i < num_fields; ++i) {
+      // Short-circuit if we find any overlap.
+      if (_data.bits[i] & in_fields[i]) { return true; }
+    }
+    return false;
+  }
+
   /// Automatically convert Bits object to other vector types.
   template <typename DATA_T, bool ZERO_LEFT>
   template <typename T>
@@ -2480,18 +2520,6 @@ namespace emp {
       out_ranges.emplace_back(start_pos, end_pos);
     }
     return out_ranges;
-  }
-
-  /// Return true if any ones are in common with another Bits object.
-  template <typename DATA_T, bool ZERO_LEFT>
-  bool Bits<DATA_T, ZERO_LEFT>::HasOverlap(const Bits<DATA_T, ZERO_LEFT> & in) const {
-    const size_t num_fields = std::min(NumFields(), in.NumFields());
-    auto in_fields          = in.FieldSpan();
-    for (size_t i = 0; i < num_fields; ++i) {
-      // Short-circuit if we find any overlap.
-      if (_data.bits[i] & in_fields[i]) { return true; }
-    }
-    return false;
   }
 
   /// Scan through all of the one indices to determine which one minimizes a function.
