@@ -26,6 +26,10 @@ namespace emp {
     size_t num_vals = 0;
 
   public:
+    void Serialize(emp::SerialPod & pod ) {
+      pod(counts, num_vals);
+    }
+
     [[nodiscard]] size_t size()        const { return counts.size(); }
     [[nodiscard]] size_t GetNumBins()  const { return counts.size(); }
     [[nodiscard]] size_t GetNumVals()  const { return num_vals; }
