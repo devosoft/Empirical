@@ -31,8 +31,8 @@ namespace emp {
   /// If max_count is provided, the first max_count entries are randomly
   /// drawn from full vector.
 
-  template <typename T, typename RAND_T>
-  inline void Shuffle(RAND_T & random, emp::vector<T> & v, size_t max_count) {
+  template <typename VEC_T, typename RAND_T>
+  inline void Shuffle(RAND_T & random, VEC_T & v, size_t max_count) {
     emp_assert(max_count <= v.size());
     for (size_t i = 0; i < max_count; i++) {
       const size_t pos = random.GetUInt(i, v.size());
@@ -41,8 +41,8 @@ namespace emp {
     }
   }
 
-  template <typename T, typename RAND_T>
-  inline void Shuffle(RAND_T & random, emp::vector<T> & v) {
+  template <typename VEC_T, typename RAND_T>
+  inline void Shuffle(RAND_T & random, VEC_T & v) {
     Shuffle(random, v, v.size());
   }
 
