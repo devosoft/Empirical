@@ -852,6 +852,21 @@ namespace emp {
       return true;
     }
 
+    void PrintStatus(std::ostream & os = std::cout) {
+      bool any_changed = false;
+      for (const auto & [name, info] : setting_map) {
+        if (info.AsString() != info.GetDefault()) {
+          if (!any_changed) {
+            std::println(os, "Changed settings:");
+            any_changed = true;
+          }
+          std::println(os, "  {} = {}  (default: {})",
+                       name, info.AsLiteral(), info.GetDefaultLiteral());
+        }
+      }
+      if (!any_changed) std::println(os, "All settings are at their default values.");
+    }
+
     /// Save all current setting values to a SerialPod.
     /// Only values are stored (not descriptions, defaults, or callbacks).
     /// The full dotted key is saved alongside each value so that SerialLoad can
