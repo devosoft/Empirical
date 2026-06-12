@@ -1,6 +1,6 @@
 /**
  * This file is part of Empirical, https://github.com/devosoft/Empirical
- * Copyright (C) 2025 Michigan State University
+ * Copyright (C) 2025-2026 Michigan State University
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/datastructs/Vector.hpp
@@ -13,6 +13,7 @@
 #ifndef INCLUDE_EMP_DATASTRUCTS_VECTOR_HPP_GUARD
 #define INCLUDE_EMP_DATASTRUCTS_VECTOR_HPP_GUARD
 
+#include <algorithm>
 #include <initializer_list>
 #include <iterator>
 #include <stddef.h>
@@ -59,21 +60,21 @@ namespace emp {
 
     ~Vector() = default;
 
-    auto operator<=>(const this_t &) const = default;
+    [[nodiscard]] auto operator<=>(const this_t &) const = default;
 
-    VALUE_T & operator[](size_t pos) { return values[pos]; }
+    [[nodiscard]] VALUE_T & operator[](size_t pos) { return values[pos]; }
 
-    const VALUE_T & operator[](size_t pos) const { return values[pos]; }
+    [[nodiscard]] const VALUE_T & operator[](size_t pos) const { return values[pos]; }
 
-    size_t size() const { return values.size(); }
+    [[nodiscard]] size_t size() const { return values.size(); }
 
-    auto begin() noexcept { return values.begin(); }
+    [[nodiscard]] auto begin() noexcept { return values.begin(); }
 
-    auto begin() const noexcept { return values.begin(); }
+    [[nodiscard]] auto begin() const noexcept { return values.begin(); }
 
-    auto end() noexcept { return values.end(); }
+    [[nodiscard]] auto end() noexcept { return values.end(); }
 
-    auto end() const noexcept { return values.end(); }
+    [[nodiscard]] auto end() const noexcept { return values.end(); }
 
     this_t & Resize(size_t new_size) {
       values.resize(new_size);
@@ -86,7 +87,7 @@ namespace emp {
     }
 
     void reserve(size_t size_cap) {
-      static_assert(size_cap < MAX_SIZE || !IS_STATIC, "Static vector size too small for reserve.");
+      emp_assert(size_cap <= MAX_SIZE || !IS_STATIC, "Static vector size too small for reserve.");
       if constexpr (!IS_STATIC) { values.reserve(size_cap); }
     }
 
@@ -104,6 +105,7 @@ namespace emp {
     // 3 args -> also set count for fill.
     template <typename T>
     this_t & Fill(T && value, size_t start, size_t count) {
+      if (!count) return *this;  // Guard: --count below wraps unsigned zero to SIZE_MAX
       while (--count > 0) { values[start++] = value; }
       values[start] = std::forward<T>(value);  // Move last (or only) value by move, if applicable.
       return *this;
@@ -112,7 +114,7 @@ namespace emp {
     // Allow fill to have optional arguments, with no "count" meaning to end of vector.
     template <typename T>
     this_t & Fill(T && value, size_t start = 0) {
-      Fill(std::forward<T>(value, start, size() - start));
+      Fill(std::forward<T>(value), start, size() - start);
       return *this;
     }
 
@@ -133,29 +135,31 @@ namespace emp {
     }
 
     template <typename T>
-    void Insert(size_t pos, T && value, size_t count = 1) {
+    this_t & Insert(size_t pos, T && value, size_t count = 1) {
       if constexpr (IS_STATIC) {
         values.Insert(pos, std::forward<T>(value), count);
       } else {
         values.insert(values.begin() + pos, count, std::forward<T>(value));
       }
+      return *this;
     }
 
-    template <typename T>
-    void Erase(size_t pos, size_t count = 1) {
+    this_t & Erase(size_t pos, size_t count = 1) {
       if constexpr (IS_STATIC) {
         values.Erase(pos, count);
       } else {
-        values.erase(values.begin() + pos, count);
+        values.erase(values.begin() + pos, values.begin() + pos + count);
       }
+      return *this;
     }
 
-    // Remove [start_pos, end_pos) from this Vector and return it.
-    this_t Copy(size_t start_pos, size_t count) {
+    // Copy [start_pos, end_pos) from this Vector and return it.
+    [[nodiscard]] this_t Copy(size_t start_pos, size_t count) {
       size_t end_pos = start_pos + count;
       emp_assert(start_pos <= size() && count <= size() && end_pos <= size());
       this_t out;
       if constexpr (MAX_SIZE) {
+        out.Resize(count);
         std::copy(begin() + start_pos, begin() + end_pos, out.begin());
       } else {  // Variable size vector
         out.reserve(count);
@@ -165,10 +169,33 @@ namespace emp {
     }
 
     // Remove [start_pos, end_pos) from this Vector and return it.
-    this_t Extract(size_t start_pos, size_t count) {
+    [[nodiscard]] this_t Extract(size_t start_pos, size_t count) {
       this_t out(Copy(start_pos, count));
       Erase(start_pos, count);
       return out;
+    }
+
+
+    // === VECTOR ANALYSIS ===
+
+    // Add up all of the values in the vector.
+    [[nodiscard]] auto CalcSum() const {
+      value_type sum{};
+      for (const auto & x : values) sum += x;
+      return sum;
+    }
+
+
+    // === VECTOR MANIPULATION ===
+
+    this_t & Sort() {
+      std::sort(values.begin(), values.end());
+      return *this;
+    }
+
+    this_t & Sort(auto less_than_fun) {
+      std::sort(values.begin(), values.end(less_than_fun));
+      return *this;
     }
   };
 
