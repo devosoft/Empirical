@@ -1,6 +1,6 @@
 /**
  * This file is part of Empirical, https://github.com/devosoft/Empirical
- * Copyright (C) 2024-2025 Michigan State University
+ * Copyright (C) 2024-2026 Michigan State University
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/compiler/_Token.hpp
@@ -13,7 +13,7 @@
 #ifndef INCLUDE_EMP_COMPILER_TOKEN_HPP_impl_GUARD
 #define INCLUDE_EMP_COMPILER_TOKEN_HPP_impl_GUARD
 
-#include <vector>
+#include <concepts>
 
 #include "../tools/String.hpp"
 
@@ -37,11 +37,10 @@ namespace emp {
 
     operator const std::string &() const { return lexeme; }  // Convert to lexeme if used as string.
 
-    [[nodiscard]] bool IsOneOf(int test_id) const { return (id == test_id); }
-
-    template <std::same_as<int>... Ts>
-    [[nodiscard]] bool IsOneOf(int test_id, int test2, Ts... args) const {
-      return (id == test_id) || IsOneOf(test2, args...);
+    /// Test if this token's ID matches ANY of the provided IDs.
+    template <std::convertible_to<int>... Ts>
+    [[nodiscard]] bool IsOneOf(Ts... test_ids) const {
+      return ((id == static_cast<int>(test_ids)) || ...);
     }
   };
 
