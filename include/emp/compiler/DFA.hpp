@@ -1,6 +1,6 @@
 /**
  * This file is part of Empirical, https://github.com/devosoft/Empirical
- * Copyright (C) 2016-2024 Michigan State University
+ * Copyright (C) 2016-2026 Michigan State University
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/compiler/DFA.hpp
@@ -43,8 +43,10 @@ namespace emp {
     /// How many states is this DFA using?
     size_t GetSize() const { return transitions.size(); }
 
-    /// Add Additional empty states.
+    /// Add additional empty states.  (Shrinking is not supported: existing transitions
+    /// could be left targeting removed states.)
     void Resize(size_t new_size) {
+      emp_assert(new_size >= transitions.size(), new_size, transitions.size());
       auto old_size = transitions.size();
       transitions.resize(new_size);
       stop_id.resize(new_size, 0);
@@ -140,7 +142,7 @@ namespace emp {
     }
 
     /// Return the new state after a series of symbols.
-    int Next(int state, emp::String sym_set) const {
+    int Next(int state, const emp::String & sym_set) const {
       for (char x : sym_set) { state = Next(state, (size_t) x); }
       return state;
     }
@@ -185,6 +187,7 @@ namespace emp {
 
     // Print out this DFA as compilable C++ code.
     void WriteCPP(emp::CPPFile & file, emp::String object_name = "DFA") const {
+      file.Include("<algorithm>");
       file.Include("<array>");
       file.Include("<string>");
 
@@ -192,6 +195,7 @@ namespace emp {
         .AddCode("private:")
         .AddCode("  // DFA transition table")
         .AddCode("  static constexpr int NUM_STATES=", GetSize(), ";")
+        .AddCode("  static constexpr int NUM_SYMBOLS=", NUM_SYMBOLS, ";")
         .AddCode("  using row_t = std::array<int, ", NUM_SYMBOLS, ">;")
         .AddCode("  static constexpr std::array<row_t, NUM_STATES> table = {{");
       for (size_t state = 0; state < GetSize(); ++state) {
@@ -247,7 +251,7 @@ namespace emp {
           "    return (state >= 0) ? tc_final_id[static_cast<size_t>(state)] : 0;",
           "  }",
           "  static constexpr int GetNext(int state, int sym) {",
-          "    if (state < 0 || sym < 0) return -1;  // Invalid state or symbol.",
+          "    if (state < 0 || sym < 0 || sym >= NUM_SYMBOLS) return -1; // Invalid state or symbol.",
           "    int next_state = table[static_cast<size_t>(state)][static_cast<size_t>(sym)];",
           "    // If sym is an unused control symbol (line begin/end), keep old state.",
           "    return (sym < SYMBOL_MIN_INPUT && next_state == -1) ? state : next_state;",
