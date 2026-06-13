@@ -1,6 +1,6 @@
 /**
  * This file is part of Empirical, https://github.com/devosoft/Empirical
- * Copyright (C) 2016-2025 Michigan State University
+ * Copyright (C) 2016-2026 Michigan State University
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/compiler/Lexer.hpp
@@ -24,8 +24,8 @@
  *
  * Either strings or streams can be converted into their associated Tokens.
  *   Tokenize(in) returns the entire series of tokens as a TokenStream.
- *   TokenizeNext(in, &line) return the next token only, and updates the line number
- *   Process(in) returns the next token (even if it's normally ignored); does not track line
+ *   TokenizeNext(in, &line) returns the next token only, and updates the line number
+ *   ToToken(in) returns just the first token found in an input string
  *
  * Token objects carry the matched lexeme directly in their .lexeme member.
  */
@@ -37,6 +37,7 @@
 
 #include <cstdint>
 #include <fstream>
+#include <limits>
 #include <iostream>
 #include <iterator>
 #include <map>
@@ -57,6 +58,9 @@ namespace emp {
   /// MAX_ID determines the maximum number of allowed lexical rules.
   template <int MAX_ID>
   class Lexer_Base {
+    static_assert(MAX_ID > 0, "Lexer_Base requires a positive MAX_ID.");
+    static_assert(MAX_ID <= std::numeric_limits<DFA::stop_t>::max(),
+                  "Lexer_Base MAX_ID must fit in DFA::stop_t (token IDs are stored there).");
   private:
     emp::vector<TokenType> token_set{};   ///< List of all active tokens types.
     std::map<String, int> token_map{};    ///< Map of token names to id.
@@ -154,6 +158,10 @@ namespace emp {
     /// Load from a file and tokenize it.
     TokenStream TokenizeFile(String filename) const {
       std::ifstream file(filename);
+      if (!file) {
+        notify::Error("Lexer unable to open file '", filename, "'.");
+        return TokenStream{filename};
+      }
       return Tokenize(file, filename);
     }
 
@@ -173,7 +181,7 @@ namespace emp {
     /// @param save_lexeme Should lexemes be saved in tokens by default? (Default: true)
     /// @param save_line_id Should we save the line number for each token? (Default: true)
     /// @param save_col_id Should we save the column the token was found on? (Default: true)
-    /// @param use_emp Should we use Empirical classes? (Default: false) (Default: true)
+    /// @param use_emp Should we use Empirical classes? (Default: false)
     void WriteCPP(emp::CPPFile & file,
                   emp::String object_name = "Lexer",
                   emp::String DFA_name    = "DFA",
@@ -206,7 +214,8 @@ namespace emp {
                                    String desc) {
     int id = cur_token_id--;  // Grab the next available token id.
     emp_assert(id > 0, "Too many lexer rules added! Increase MAX_ID", name, regex, MAX_ID);
-    generate_lexer = true;  // Indicate the the lexer DFA needs to be rebuilt.
+    emp_assert(!token_map.contains(name), "Duplicate token name added to Lexer.", name);
+    generate_lexer = true;  // Indicate that the lexer DFA needs to be rebuilt.
     token_set.emplace_back(name, regex, id, save_lexeme, save_token, desc);
     token_map[name] = id;
     return id;
@@ -214,8 +223,10 @@ namespace emp {
 
   template <int MAX_ID>
   int Lexer_Base<MAX_ID>::IgnoreToken(String name, String regex, String desc) {
-    int id         = cur_token_id--;  // Grab the next available token id.
-    generate_lexer = true;            // Indicate the the lexer DFA needs to be rebuilt.
+    int id = cur_token_id--;  // Grab the next available token id.
+    emp_assert(id > 0, "Too many lexer rules added! Increase MAX_ID", name, regex, MAX_ID);
+    emp_assert(!token_map.contains(name), "Duplicate token name added to Lexer.", name);
+    generate_lexer = true;  // Indicate that the lexer DFA needs to be rebuilt.
     token_set.emplace_back(name, regex, id, false, false, desc);
     token_map[name] = id;
     return id;
@@ -305,12 +316,12 @@ namespace emp {
     // 2: We have not entered an invalid state, and
     // 3: Our input stream has more symbols.
     while (cur_stop >= 0 && cur_state >= 0 && cur_pos < in.size()) {
-      const char next_char = in[cur_pos++];
-      cur_state            = lexer_dfa.Next(cur_state, static_cast<size_t>(next_char));
+      const auto next_sym  = static_cast<unsigned char>(in[cur_pos++]);
+      cur_state            = lexer_dfa.Next(cur_state, static_cast<size_t>(next_sym));
       cur_stop             = lexer_dfa.GetStop(cur_state);
       const int tc_id      = lexer_dfa.GetTCStop(cur_state);
       if (tc_id > 0) { tc_boundary_pos = cur_pos; }
-if (cur_stop > 0) {
+      if (cur_stop > 0) {
         const int tc_final = lexer_dfa.GetTCFinal(cur_state);
         bool use_tc = (tc_final == cur_stop) && (tc_boundary_pos > start_pos);
         best_pos  = use_tc ? tc_boundary_pos : cur_pos;
@@ -331,7 +342,8 @@ if (cur_stop > 0) {
 
     // If we did not find any options, advance best_pos to return a single error char.
     if (best_pos == start_pos) {
-      best_stop = in[start_pos];
+      best_stop = static_cast<unsigned char>(in[start_pos]);
+      if (best_stop >= 128) { best_stop = ERROR_ID; }  // Out-of-range byte (e.g., UTF-8)
       ++best_pos;
     }
 
@@ -350,9 +362,9 @@ if (cur_stop > 0) {
     return {best_stop, lexeme};
   }
 
-  static bool AtEOF(std::istream & is) { return is.peek() == std::istream::traits_type::eof(); }
+  inline bool AtEOF(std::istream & is) { return is.peek() == std::istream::traits_type::eof(); }
 
-  static bool AtLineStart(std::istream & is) {
+  inline bool AtLineStart(std::istream & is) {
     if (!is.good()) {
       return false;  // If the stream is bad, not at start of line
     }
@@ -392,10 +404,10 @@ if (cur_stop > 0) {
     // 3: Our input stream has more symbols.
     String lexeme{};
     while (cur_stop >= 0 && cur_state >= 0 && !AtEOF(is)) {
-      const char next_char = static_cast<char>(is.get());
-      lexeme.push_back(next_char);
+      const int next_sym = is.get();  // (AtEOF check above ensures this is a valid char.)
+      lexeme.push_back(static_cast<char>(next_sym));
       ++cur_pos;
-      cur_state       = lexer_dfa.Next(cur_state, static_cast<size_t>(next_char));
+      cur_state       = lexer_dfa.Next(cur_state, static_cast<size_t>(next_sym));
       cur_stop        = lexer_dfa.GetStop(cur_state);
       const int tc_id = lexer_dfa.GetTCStop(cur_state);
       if (tc_id > 0) { tc_boundary_pos = cur_pos; }
@@ -422,6 +434,7 @@ if (cur_stop > 0) {
     if (best_pos == 0) {
       is.seekg(-static_cast<int>(cur_pos), std::ios::cur);
       best_stop = is.get();
+      if (best_stop >= 128) { best_stop = ERROR_ID; }  // Out-of-range byte (e.g., UTF-8)
       best_pos  = 1;
     }
 
@@ -457,8 +470,12 @@ if (cur_stop > 0) {
       token.line_id = cur_line;
       cur_line += token.lexeme.Count('\n');
       if (keep_all || GetSaveToken(token)) {
-        return token;  // Skip ignored tokens and try again.
+        // Honor per-token save_lexeme (newlines have already been counted above).
+        // In keep_all mode, keep everything -- including lexemes.
+        if (!keep_all && !GetTokenType(token.id).save_lexeme) { token.lexeme.resize(0); }
+        return token;
       }
+      // Otherwise this token is ignored; loop to try again.
     }
   }
 
@@ -472,7 +489,12 @@ if (cur_stop > 0) {
       token.line_id = cur_line;
       cur_line += token.lexeme.Count('\n');
       // Return only if the token should be kept.
-      if (keep_all || GetSaveToken(token)) return token;  
+      if (keep_all || GetSaveToken(token)) {
+        // Honor per-token save_lexeme (newlines have already been counted above).
+        // In keep_all mode, keep everything -- including lexemes.
+        if (!keep_all && !GetTokenType(token.id).save_lexeme) { token.lexeme.resize(0); }
+        return token;
+      }
     }
   }
 
@@ -560,7 +582,10 @@ if (cur_stop > 0) {
     file.Include("<algorithm>");
     file.Include("<array>");
     file.Include("<cctype>");
+    file.Include("<cstdlib>");
     file.Include("<iostream>");
+    file.Include("<iterator>");
+    file.Include("<string_view>");
     if (!use_emp) file.Include("<string>");
     file.Include("<unordered_map>");
     if (!use_emp) file.Include("<vector>");
@@ -627,14 +652,15 @@ if (cur_stop > 0) {
       file.AddCode("    case ID_", token.name, ": return ", token.name.AsLiteral(), ";");
     }
     file.AddCodeBlock("    default:",
-                      "      // If ID is a visible character print it, otherwise provide ID.",
-                      "      if (id > 0 && id < 128 && std::isprint(id)) {",
-                      "        return ${str_type}(\"'\") + static_cast<char>(id) + \"'\";",
-                      "      }",
+                      "      // Special characters get escaped versions of themselves.",
                       "      if (id == '\\n') return \"'\\\\n'\";",
                       "      if (id == '\\r') return \"'\\\\r'\";",
                       "      if (id == '\\t') return \"'\\\\t'\";",
                       "      if (id == '\\\\') return \"'\\\\\\\\'\";",
+                      "      // If ID is a visible character print it, otherwise provide ID.",
+                      "      if (id > 0 && id < 128 && std::isprint(id)) {",
+                      "        return ${str_type}(\"'\") + static_cast<char>(id) + \"'\";",
+                      "      }",
                       "      return ${str_type}(\"Token ID: \") + std::to_string(id);",
                       "    }; // End switch.",
                       "  }",
@@ -709,7 +735,11 @@ if (cur_stop > 0) {
       "    }",
       "",
       "    // If we did not find any options, peel off just one character and use it as id.",
-      "    if (best_pos == start_pos) { best_stop=in[start_pos]; ++best_pos;}",
+      "    if (best_pos == start_pos) {",
+      "      best_stop = static_cast<unsigned char>(in[start_pos]);",
+      "      if (best_stop >= 128) best_stop = -1;  // Out-of-range byte (e.g., UTF-8)",
+      "      ++best_pos;",
+      "    }",
       "",
       "    lexeme = in.substr(start_pos, best_pos-start_pos);",
       "    start_pos += std::ssize(lexeme);",
@@ -742,8 +772,9 @@ if (cur_stop > 0) {
       "    token_id = 0;",
       "    while (${token_name} token = NextToken(in)) {",
       "      if (!IgnoreToken(token.id)) tokens.push_back(token);",
-      "    }",
-      "    eof_token.line_id = cur_line;",
+      "    }");
+    if (save_line_id) { file.AddCode("    eof_token.line_id = cur_line;"); }
+    file.AddCodeBlock(
       "    return tokens;",
       "  }",
       "",
