@@ -1,6 +1,6 @@
 /**
  * This file is part of Empirical, https://github.com/devosoft/Empirical
- * Copyright (C) 2016-2024 Michigan State University
+ * Copyright (C) 2016-2026 Michigan State University
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/compiler/NFA.hpp
@@ -90,7 +90,7 @@ namespace emp {
     DynamicBits GetNext(size_t sym, size_t from_id = 0) const {
       DynamicBits to_states(states.size());
       // Loop through all possible next states.
-      for (auto [next_state, symbol_set] : states[from_id].trans) {
+      for (const auto & [next_state, symbol_set] : states[from_id].trans) {
         // If the current next_state can be reached with the provided symbol...
         if (symbol_set.symbols.Has(sym)) {
           // ...include both the next state and an free transitions from it.
@@ -102,12 +102,12 @@ namespace emp {
     }
 
     /// return the states reachable from the current set of states given the provided symbol.
-    DynamicBits GetNext(size_t sym, const DynamicBits from_set) const {
+    DynamicBits GetNext(size_t sym, const DynamicBits & from_set) const {
       DynamicBits to_set(states.size());
       // For each starting state...
       for (size_t from_id : from_set) {
         // ...loop through all possible next states.
-        for (auto [next_state, symbol_set] : states[from_id].trans) {
+        for (const auto & [next_state, symbol_set] : states[from_id].trans) {
           // If the current next_state can be reached with the provided symbol...
           if (symbol_set.symbols[sym]) {
             // ...include both the next state and an free transitions from it.
@@ -286,8 +286,8 @@ namespace emp {
     }
 
     /// Identify free moves in NFA (for debugging)
-    void PrintFreeMoves() {
-      for (int i = 0; i < states.size(); i++) {
+    void PrintFreeMoves() const {
+      for (size_t i = 0; i < states.size(); i++) {
         std::cout << "Free from ( ";
         for (auto x : states[i].free_from) { std::cout << x << " "; }
         std::cout << ") to " << i << std::endl;
