@@ -1,6 +1,6 @@
 /**
  * This file is part of Empirical, https://github.com/devosoft/Empirical
- * Copyright (C) 2016-2024 Michigan State University
+ * Copyright (C) 2016-2026 Michigan State University
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/compiler/RegEx.hpp
@@ -35,8 +35,8 @@
  *
  * Additional overloads for functions in lexer_utils.h:
  *
- *   static NFA to_NFA(const RegEx & regex, int stop_id=1);
- *   static DFA to_DFA(const RegEx & regex);
+ *   inline NFA to_NFA(const RegEx & regex, size_t stop_id=1);
+ *   inline DFA to_DFA(const RegEx & regex);
  *
  *
  * @todo Consider restricting / to top-level use only (nested trailing context is undefined)
@@ -626,9 +626,11 @@ namespace emp {
           if (pos >= regex.size()) { break; }
           c = regex[pos++];  // Identify the specific escape char.
           switch (c) {
+            case 'f': c = '\f'; break;
             case 'n': c = '\n'; break;
             case 'r': c = '\r'; break;
             case 't': c = '\t'; break;
+            case 'v': c = '\v'; break;
             // Any of these characters should just be themselves!
             case '\"':
             case '\\': break;
@@ -841,19 +843,30 @@ namespace emp {
     RegEx() = delete;
 
     RegEx(const emp::String & r) : regex(r) {
-      if (regex.size()) { head_ptr = Process(); }
+      head_ptr = Process();
       while (head_ptr->Simplify());
     }
 
     RegEx(const RegEx & r) : regex(r.regex) {
-      if (regex.size()) { head_ptr = Process(); }
+      head_ptr = Process();
       while (head_ptr->Simplify());
+    }
+
+    RegEx(RegEx && r) noexcept
+      : regex(std::move(r.regex))
+      , notes(std::move(r.notes))
+      , valid(r.valid)
+      , dfa(std::move(r.dfa))
+      , dfa_ready(r.dfa_ready)
+      , head_ptr(r.head_ptr) {
+      r.head_ptr = nullptr;
     }
 
     ~RegEx() { head_ptr.Delete(); }
 
     /// Set this RegEx equal to another.
     RegEx & operator=(const RegEx & r) {
+      if (this == &r) { return *this; }
       regex = r.regex;
       notes.resize(0);
       valid = true;
@@ -861,6 +874,21 @@ namespace emp {
       head_ptr.Delete();
       head_ptr = Process();
       while (head_ptr->Simplify());
+      return *this;
+    }
+
+    /// Move another RegEx into this one.
+    RegEx & operator=(RegEx && r) noexcept {
+      if (this == &r) { return *this; }
+      regex     = std::move(r.regex);
+      notes     = std::move(r.notes);
+      valid     = r.valid;
+      pos       = 0;
+      dfa       = std::move(r.dfa);
+      dfa_ready = r.dfa_ready;
+      if (head_ptr) { head_ptr.Delete(); }
+      head_ptr   = r.head_ptr;
+      r.head_ptr = nullptr;
       return *this;
     }
 
@@ -912,7 +940,7 @@ namespace emp {
   };
 
   /// Simple conversion of RegEx to NFA (mostly implemented in RegEx)
-  static NFA to_NFA(const RegEx & regex, size_t stop_id = 1) {
+  inline NFA to_NFA(const RegEx & regex, size_t stop_id = 1) {
     NFA nfa(2);  // State 0 = start, state 1 = stop.
     nfa.SetStop(1, stop_id);
     regex.AddToNFA(nfa, 0, 1);
@@ -922,9 +950,9 @@ namespace emp {
   }
 
   /// Conversion of RegEx to DFA, via NFA intermediate.
-  static DFA to_DFA(const RegEx & regex) { return to_DFA(to_NFA(regex)); }
+  inline DFA to_DFA(const RegEx & regex) { return to_DFA(to_NFA(regex)); }
 
-  void RegEx::Generate() const {
+  inline void RegEx::Generate() const {
     dfa       = to_DFA(*this);
     dfa_ready = true;
   }
