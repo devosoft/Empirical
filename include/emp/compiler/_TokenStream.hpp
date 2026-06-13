@@ -1,6 +1,6 @@
 /**
  * This file is part of Empirical, https://github.com/devosoft/Empirical
- * Copyright (C) 2024-2025 Michigan State University
+ * Copyright (C) 2024-2026 Michigan State University
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/compiler/_TokenStream.hpp
@@ -15,6 +15,7 @@
 
 #include <vector>
 
+#include "../base/notify.hpp"
 #include "../base/Ptr.hpp"
 #include "../tools/String.hpp"
 
@@ -64,7 +65,7 @@ namespace emp {
 
       [[nodiscard]] emp::Ptr<const Token> ToPtr() const { return ts->GetPtr(pos); }
 
-      [[nodiscard]] Token operator*() const { return ts->tokens[pos]; }
+      [[nodiscard]] const Token & operator*() const { return ts->tokens[pos]; }
 
       [[nodiscard]] const Token * operator->() const { return &(ts->tokens[pos]); }
 
@@ -117,7 +118,7 @@ namespace emp {
       // Get the current (or upcoming) token, but don't remove it from the queue.
       [[nodiscard]] const Token & Peek(size_t skip_count = 0) const {
         if (pos + skip_count >= ts->tokens.size()) { return ts->GetEOF(); }
-        return ts->tokens[pos];
+        return ts->tokens[pos + skip_count];
       }
 
       // Test if the current token is a specific type.
@@ -133,7 +134,13 @@ namespace emp {
       // (Use provided error if available, otherwise use default error)
       template <typename... Ts>
       const Token & Use(int id, Ts &&... message) {
-        if (!Is(id)) { notify::Error(std::forward<Ts>(message)...); }
+        if (!Is(id)) {
+          if constexpr (sizeof...(Ts) == 0) {
+            notify::Error("Expected token id ", id, ", but found id ", Peek().id, ".");
+          } else {
+            notify::Error(std::forward<Ts>(message)...);
+          }
+        }
         return Use();
       }
 
@@ -166,7 +173,7 @@ namespace emp {
 
     [[nodiscard]] const Token & operator[](size_t pos) const { return tokens[pos]; }
 
-    [[nodiscard]] emp::Ptr<const Token> GetPtr(size_t pos) const { return &(tokens.data()[pos]); }
+    [[nodiscard]] emp::Ptr<const Token> GetPtr(size_t pos) const { return tokens.data() + pos; }
 
     [[nodiscard]] const String & GetName() const { return name; }
 
