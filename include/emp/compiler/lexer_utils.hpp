@@ -1,6 +1,6 @@
 /**
  * This file is part of Empirical, https://github.com/devosoft/Empirical
- * Copyright (C) 2016-2024 Michigan State University
+ * Copyright (C) 2016-2026 Michigan State University
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/compiler/lexer_utils.hpp
@@ -37,7 +37,7 @@ namespace emp {
   static inline const NFA & to_NFA(const NFA & nfa) { return nfa; }
 
   /// Systematic conversion of NFA to DFA...
-  static inline DFA to_DFA(const NFA & nfa, int keep_invalid = false) {
+  static inline DFA to_DFA(const NFA & nfa, bool keep_invalid = false) {
     DFA dfa;
     dfa.AddState();
     std::map<DynamicBits, size_t> id_map;  // Map nfa "state sets" to dfa states.
@@ -46,22 +46,25 @@ namespace emp {
     state_stack.emplace_back(nfa.GetStart());  // Place the starting state in the state_stack.
     id_map[state_stack[0]] = 0;                // Give starting point ID 0.
 
-    // Loop through all states not full explored; remove top state and add new states.
+    // NFA states with ONLY free transitions can be removed from DFA state sets, since any
+    // free transitions out of them will already have been followed.  (Computed once, here.)
+    const DynamicBits non_empty_states = ~nfa.GetEmptyStates();
+
+    // Loop through all states not fully explored; remove top state and add new states.
     while (state_stack.size()) {
       // Get the next state to test.
       const DynamicBits cur_state = state_stack.back();
-      const size_t cur_id         = id_map[cur_state];
+      const size_t cur_id         = id_map.find(cur_state)->second;
       state_stack.pop_back();
 
-      // Determine if this state should be a STOP state and always use HIGHEST stop value.
-      for (auto s : cur_state) { dfa.AddStop(cur_id, nfa.GetStop(s)); }
-      // Propagate any trailing-context boundary markers.
-      for (auto s : cur_state) { dfa.AddTCStop(cur_id, nfa.GetTCStop(s)); }
-      // Propagate any trailing-context final-accept markers.
-      for (auto s : cur_state) { dfa.AddTCFinal(cur_id, nfa.GetTCFinal(s)); }
+      // Propagate stop values and trailing-context markers, always keeping the HIGHEST value.
+      for (auto s : cur_state) {
+        dfa.AddStop(cur_id, nfa.GetStop(s));        // Should this be a STOP state?
+        dfa.AddTCStop(cur_id, nfa.GetTCStop(s));    // ...a trailing-context r1 boundary?
+        dfa.AddTCFinal(cur_id, nfa.GetTCFinal(s));  // ...a trailing-context final accept?
+      }
 
       // Account for all possible transitions
-      DynamicBits non_empty_states = ~nfa.GetEmptyStates();
       for (size_t sym = 0; sym < NFA::NUM_SYMBOLS; sym++) {
         DynamicBits next_state = nfa.GetNext(sym, cur_state);
         if (next_state.None() && !keep_invalid) {
@@ -72,18 +75,25 @@ namespace emp {
         next_state &= non_empty_states;
 
         // If we need a new state in the DFA, add it and put it on the stack to explore.
-        if (!id_map.contains(next_state)) {
-          id_map[next_state] = dfa.AddState();
-          state_stack.emplace_back(next_state);
+        // (try_emplace does a single map lookup for both the test and the insertion.)
+        auto [it, inserted] = id_map.try_emplace(next_state, 0);
+        if (inserted) {
+          it->second = dfa.AddState();
+          state_stack.emplace_back(std::move(next_state));
         }
 
         // Set up the new connection in the DFA
-        const size_t next_id = id_map[next_state];
-        dfa.SetTransition(cur_id, next_id, sym);
+        dfa.SetTransition(cur_id, it->second, sym);
       }
     }
 
     return dfa;
+  }
+
+  /// \deprecated Use the bool version of keep_invalid instead of an int.
+  [[deprecated("to_DFA() now takes keep_invalid as a bool; pass true/false instead of an int.")]]
+  static inline DFA to_DFA(const NFA & nfa, int keep_invalid) {
+    return to_DFA(nfa, keep_invalid != 0);
   }
 
   /// Systematic up-conversion of DFA to NFA...
@@ -117,7 +127,8 @@ namespace emp {
   /// Merge multiple automata (DFA, NFA, RegEx) into one DFA.
   template <typename T1, typename T2, typename... Ts>
   static DFA MergeDFA(T1 && in1, T2 && in2, Ts &&... others) {
-    return to_DFA(MergeNFA(in1, in2, others...));
+    return to_DFA(
+      MergeNFA(std::forward<T1>(in1), std::forward<T2>(in2), std::forward<Ts>(others)...));
   }
 
   /// Structure to track the current status of a DFA.
@@ -129,7 +140,7 @@ namespace emp {
   };
 
   /// Method to find an example string that satisfies a DFA.
-  emp::String FindExample(const DFA & dfa, const size_t min_size = 1) {
+  static inline emp::String FindExample(const DFA & dfa, const size_t min_size = 1) {
     emp::vector<DFAStatus> traverse_set;
     traverse_set.emplace_back(0, "");
 
@@ -137,8 +148,8 @@ namespace emp {
       const emp::DFAStatus cur_status = traverse_set[next_id];  // pair: cur state and cur sequence
       const emp::array<int, 128> & t =
         dfa.GetTransitions(cur_status.state);  // Array of TO states (or -1 if none)
-      // Ignore symbols 0 through 8 since they are special characters and unprintable (plus beginning/end symbols)
-      for (size_t sym = 9; sym < 128; sym++) {
+      // Ignore control symbols (line begin/end and other unprintable specials).
+      for (size_t sym = DFA::SYMBOL_MIN_INPUT; sym < 128; sym++) {
         const int next_state = t[sym];
         if (next_state == -1) {
           continue;  // Ignore non-transitions
