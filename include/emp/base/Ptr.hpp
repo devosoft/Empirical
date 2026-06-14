@@ -683,7 +683,7 @@ namespace emp {
 
     /// Delete this pointer (must NOT be an array).
     constexpr void Delete() {
-      emp_assert(ptr, "Trying to delete null Ptr.");
+      if (!ptr) return;
       emp_assert(id < Tracker().GetNumIDs(),
                  id,
                  "Trying to delete Ptr that we are not responsible for.");
