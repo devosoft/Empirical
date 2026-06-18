@@ -86,6 +86,9 @@ namespace emp {
       using value_type        = typename std::iterator_traits<wrapped_t>::value_type;
       using pointer           = typename std::iterator_traits<wrapped_t>::pointer;
 
+      // Allow all specializations to access each other's members (needed for converting ctor).
+      template <typename> friend struct iterator_wrapper;
+
 /// What vector and revision was this iterator created from?
       const vec_t * v_ptr;
       int revision;
@@ -101,6 +104,13 @@ namespace emp {
       constexpr iterator_wrapper(const this_it_t &) = default;
       constexpr iterator_wrapper(this_it_t &&)      = default;
       constexpr iterator_wrapper()                  = default;
+
+      // Implicit conversion from mutable iterator to const_iterator wrapper.
+      // Mirrors the std::vector behavior where iterator is implicitly convertible to const_iterator.
+      template <typename OTHER_IT>
+        requires (!std::same_as<OTHER_IT, ITERATOR_T> && std::convertible_to<OTHER_IT, ITERATOR_T>)
+      constexpr iterator_wrapper(const iterator_wrapper<OTHER_IT> & other)
+        : ITERATOR_T(static_cast<const OTHER_IT &>(other)), v_ptr(other.v_ptr), revision(other.revision) {}
 
       constexpr ~iterator_wrapper() { ; }
 
