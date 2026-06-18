@@ -35,7 +35,6 @@
 
 #include "_assert_macros.hpp"
 #include "_assert_trigger.hpp"
-#include "_optional_throw.hpp"
 
 #if defined(__EMSCRIPTEN__)
 
@@ -62,6 +61,7 @@
 
 #elif defined(EMP_OPTIONAL_THROW_ON)  // #if defined(__EMSCRIPTEN__) : #elif defined(_MSC_VER)
 
+#include "_optional_throw.hpp"
 #define emp_always_assert_impl(...)                                       \
     do {                                                                  \
       if (!(emp_assert_GET_ARG_1(__VA_ARGS__, ~))) {                      \
