@@ -134,16 +134,16 @@ namespace emp::web {
       }
 
       for (std::string class_ : classes) {
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
         EM_ASM_ARGS(
           {
             var name = UTF8ToString($0);
             if (emp_i.cur_obj) { emp_i.cur_obj.classList.add(name); }
           },
           class_.c_str());
-#else   // #ifdef EMSCRIPTEN
+#else   // #ifdef __EMSCRIPTEN__
         std::cout << "Adding class to '" << widget_id << "': '" << class_;
-#endif  // #ifdef EMSCRIPTEN : #else
+#endif  // #ifdef __EMSCRIPTEN__ : #else
       }
     }
 
@@ -192,7 +192,7 @@ namespace emp::web {
     }
 
     static void ApplyClass(const std::string & widget_id, const std::string & css_class) {
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
       EM_ASM_ARGS(
         {
           var id      = UTF8ToString($0);
@@ -202,13 +202,13 @@ namespace emp::web {
         },
         widget_id.c_str(),
         css_class.c_str());
-#else   // #ifdef EMSCRIPTEN
+#else   // #ifdef __EMSCRIPTEN__
       std::cout << "Adding class to '" << widget_id << "': '" << css_class;
-#endif  // #ifdef EMSCRIPTEN : #else
+#endif  // #ifdef __EMSCRIPTEN__ : #else
     }
 
     static void ApplyRemoveClass(const std::string & widget_id, const std::string & css_class) {
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
       EM_ASM_ARGS(
         {
           var id      = UTF8ToString($0);
@@ -218,9 +218,9 @@ namespace emp::web {
         },
         widget_id.c_str(),
         css_class.c_str());
-#else   // #ifdef EMSCRIPTEN
+#else   // #ifdef __EMSCRIPTEN__
       std::cout << "Adding class to '" << widget_id << "': '" << css_class;
-#endif  // #ifdef EMSCRIPTEN : #else
+#endif  // #ifdef __EMSCRIPTEN__ : #else
     }
 
     /// Have any settings be set?
