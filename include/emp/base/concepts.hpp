@@ -11,10 +11,12 @@
  *   canStreamTo<STREAM_T, OBJECT_T>
  *   canStreamFrom<STREAM_T, OBJECT_T>
  *
- *   IsArrayContainer<C>   -- fixed-size sequential (e.g., std::array)
- *   IsVectorContainer<C>  -- resizable sequential  (e.g., std::vector)
- *   IsSetContainer<C>     -- single-key associative (e.g., std::set, std::unordered_set)
- *   IsMapContainer<C>     -- key-value associative  (e.g., std::map, std::unordered_map)
+ *   IsContainer<C>           -- any container with value_type, size(), begin(), end()
+ *   IsArrayContainer<C>      -- fixed-size sequential (e.g., std::array)
+ *   IsVectorContainer<C>     -- resizable sequential  (e.g., std::vector)
+ *   IsIndexableContainer<C>  -- either of the above; any indexable sequential container
+ *   IsSetContainer<C>        -- single-key associative (e.g., std::set, std::unordered_set)
+ *   IsMapContainer<C>        -- key-value associative  (e.g., std::map, std::unordered_map)
  *
  *   AnyConst<Ts...>  -- Test if ANY of the Ts are const.
  *   AllConst<Ts...>  -- Test if ALL of the Ts are const.
@@ -68,6 +70,36 @@ namespace emp {
     !requires { typename C::mapped_type; } &&
     !requires(const C & cc) { cc.c_str(); } &&   // exclude string-like types
     requires { std::tuple_size<std::remove_cv_t<C>>::value; } &&
+    requires(C & c, const C & cc) {
+      { c.size() } -> std::convertible_to<size_t>;
+      { c[size_t{}] };
+      cc.begin();
+      cc.end();
+    };
+
+  /// Any container: has value_type, size(), begin(), end(), and is not string-like.
+  /// Covers arrays, vectors, sets, and maps.  The standard library has no equivalent concept;
+  /// std::ranges::range is the closest but is broader (includes views, generators, etc.)
+  /// and does not require value_type.  Strings are excluded because they are typically
+  /// serialized/processed as atomic values rather than as sequences of characters.
+  template <typename C>
+  concept IsContainer =
+    requires { typename C::value_type; } &&
+    !requires(const C & cc) { cc.c_str(); } &&   // exclude string-like types
+    requires(const C & cc) {
+      { cc.size() } -> std::convertible_to<size_t>;
+      cc.begin();
+      cc.end();
+    };
+
+  /// Sequential container supporting index-based access, fixed- or resizable
+  /// (e.g., std::array, std::vector, emp::array, emp::Vector).
+  /// This is the superset of IsArrayContainer and IsVectorContainer.
+  template <typename C>
+  concept IsIndexableContainer =
+    requires { typename C::value_type; } &&
+    !requires { typename C::mapped_type; } &&
+    !requires(const C & cc) { cc.c_str(); } &&   // exclude string-like types
     requires(C & c, const C & cc) {
       { c.size() } -> std::convertible_to<size_t>;
       { c[size_t{}] };
