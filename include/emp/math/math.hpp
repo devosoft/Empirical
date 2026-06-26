@@ -27,6 +27,27 @@
 
 namespace emp {
 
+  // Special version of Add that guarantees that signed values will wrap on over/underflow
+  template <typename T>
+  [[nodiscard]] static constexpr T WrapAdd(T a, T b) {
+    using uT = std::make_unsigned_t<T>;   // e.g., int32_t -> uint32_t
+    return static_cast<T>(static_cast<uT>(a) + static_cast<uT>(b));
+  }
+
+  // Special version of Subtract that guarantees that signed values will wrap on over/underflow
+  template <typename T>
+  [[nodiscard]] static constexpr T WrapSub(T a, T b) {
+    using uT = std::make_unsigned_t<T>;   // e.g., int32_t -> uint32_t
+    return static_cast<T>(static_cast<uT>(a) - static_cast<uT>(b));
+  }
+
+  // Special version of Multiply that guarantees that signed values will wrap on over/underflow
+  template <typename T>
+  [[nodiscard]] static constexpr T WrapMult(T a, T b) {
+    using uT = std::make_unsigned_t<T>;   // e.g., int32_t -> uint32_t
+    return static_cast<T>(static_cast<uT>(a) * static_cast<uT>(b));
+  }
+
   template <size_t N>
   inline constexpr std::array<size_t, N> MakeSequenceArray(size_t start = 0) {
     std::array<size_t, N> out;
