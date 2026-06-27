@@ -19,6 +19,7 @@
 #include <stddef.h>
 
 #include "../base/vector.hpp"
+#include "../datastructs/vector_utils.hpp"
 
 namespace emp {
 
@@ -139,6 +140,10 @@ namespace emp {
 
     /// What is the probability of the specified index being selected?
     double GetProb(size_t id) const { return RawProb(id + num_nodes); }
+
+    void Serialize(emp::SerialPod & pod ) {
+      pod(num_items, num_nodes, needs_refresh, weights);
+    }
 
     /// Change the number of indices in the map.
     void Resize(size_t new_size, double def_value = 0.0) {
