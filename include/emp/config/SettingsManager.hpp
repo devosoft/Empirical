@@ -402,7 +402,7 @@ namespace emp {
     /// Store an error note and always emit a warning.
     bool IOError(auto... args) {
       error_note = emp::MakeString(args...);
-      emp::notify::Warning(error_note);
+      emp::notify::Error(error_note);
       return false;
     }
 
