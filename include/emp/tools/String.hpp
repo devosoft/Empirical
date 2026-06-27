@@ -939,7 +939,7 @@ namespace emp {
     // data structure is provided and one where it must be generated.
 
     template <typename T>
-    T ConvertTo();
+    T ConvertTo() const;
 
     template <typename DELIM_T = emp::String>
     inline void Slice(emp::vector<String> & out_set,
@@ -2083,7 +2083,7 @@ namespace emp {
   // ------ Transformations into non-Strings ------
 
   template <typename T>
-  T String::ConvertTo() {
+  T String::ConvertTo() const {
     // Is it already a string?
     if constexpr (std::same_as<T, std::string> || std::same_as<T, emp::String>) {
       return *this;
