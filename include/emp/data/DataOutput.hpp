@@ -95,19 +95,31 @@ namespace emp {
 
     /// Print a row of data.  Opens the file and prints headers on the first call.
     void DoOutput() {
-      emp_assert(output_names.size() == output_funs.size());
       if (fp.IsNull()) PrintHeaders();
+      OutputLine(*fp);
+    }
 
+    /// Output the next line to the terminal; print labels with each output.
+    void DoTerminalOutput() {
+      OutputLine(std::cout, true, "; ");
+    }
+
+    // Output a single line to the provided stream.
+    // Indicate if the labels should be included on THIS line (vs. only at top)
+    void OutputLine(std::ostream & os, bool include_labels=false, emp::String separator=",") {
+      emp_assert(output_names.size() == output_funs.size());
       for (size_t i = 0; i < output_funs.size(); ++i) {
-        if (i) *fp << ',';
+        if (i) os << separator;
+
+        if (include_labels) os << output_names[i] << ":";
 
         // Quote non-numeric values as CSV string literals.
         emp::String output = output_funs[i]();
         if (!output.IsNumber()) output.SetLiteral();
 
-        *fp << output;
+        os << output;
       }
-      *fp << std::endl;
+      os << std::endl;
     }
   };
 
