@@ -13,7 +13,7 @@ CFLAGS_nat_debug := -g $(CFLAGS_all)
 # Emscripten compiler information
 CXX_web := emcc
 EMP_METHODS = EXPORTED_RUNTIME_METHODS="['ccall', 'cwrap', 'UTF8ToString', 'stringToUTF8', 'lengthBytesUTF8']"
-EMP_FUNCTIONS = EXPORTED_FUNCTIONS="['_main', "_malloc", "_free", '_empCppCallback']"
+EMP_FUNCTIONS = EXPORTED_FUNCTIONS="['_main', '_malloc', '_free', '_empCppCallback']"
 JS_LIB = --js-library $(EMP_DIR)/emp/web/library_emp.js
 OFLAGS_web_all := -s $(EMP_METHODS) -s TOTAL_MEMORY=67108864 $(JS_LIB) -s $(EMP_FUNCTIONS) -s DISABLE_EXCEPTION_CATCHING=1 -s NO_EXIT_RUNTIME=1
 OFLAGS_web := -Oz -DNDEBUG
