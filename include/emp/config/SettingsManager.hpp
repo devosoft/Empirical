@@ -18,11 +18,13 @@
  * Settings can be organized into scopes using dot-notation names (e.g. `"robot1.speed"`), which
  * simplifies configuring multiple objects of the same type without name collisions.
  * (Internally all settings are stored with their full dotted key.)
+ * Each name component must begin with a letter or underscore and contain only letters, digits,
+ * and underscores. A name cannot be both a setting and a scope containing other settings.
  *
  * In addition to settings, users can also specify "Keywords", which trigger an arbitrary callback,
  * receiving the remaining tokens on the line as arguments.  They are useful for arbitrary
  * directives that do not follow the `name = value` pattern (e.g. `include other_file.cfg;`).
- * Keywords are always global; they are not affected by the current scope.
+ * Keywords are always global and are recognized only at the top level, outside any scope.
  *
  * === Config-file format ===
  *
@@ -44,6 +46,7 @@
  * Dot notation and brace-block notation may be freely mixed in the same file.
  * A trailing '\' at the end of a line continues onto the next line (the newline is ignored).
  * Booleans accept 'On', 'Off', 'True', 'False', '1', or '0' (case-insensitive).
+ * Numbers accept optional signs, decimal points, and scientific notation.
  * Strings may be single- or double-quoted literals with standard C escape sequences.
  * Lines may be terminated by ';' or a newline; blank lines and comment-only lines are skipped.
  *
@@ -95,9 +98,12 @@
 #ifndef INCLUDE_EMP_CONFIG_SETTINGS_MANAGER_HPP_GUARD
 #define INCLUDE_EMP_CONFIG_SETTINGS_MANAGER_HPP_GUARD
 
+#include <cerrno>
+#include <cmath>
 #include <filesystem>
 #include <fstream>
 #include <functional>
+#include <limits>
 #include <map>
 #include <print>
 #include <cstdint>
@@ -152,23 +158,80 @@ namespace emp {
         else return Type::ERROR;
       }
 
+      template <typename T>
+      [[nodiscard]] static T ParseNumber(const emp::String & in,
+                                         const emp::String & setting_name) {
+        if (!in.IsNumber(std::floating_point<T>)) {
+          emp::notify::Error(
+            "Invalid numeric value '", in, "' for setting '", setting_name, "'."
+          );
+        }
+
+        emp::String unparsed = in;
+        errno = 0;
+
+        if constexpr (std::signed_integral<T>) {
+          const long long value = unparsed.PopSigned();
+          if (unparsed.size() || errno == ERANGE ||
+              value < std::numeric_limits<T>::lowest() ||
+              value > std::numeric_limits<T>::max()) {
+            emp::notify::Error(
+              "Invalid or out-of-range value '", in, "' for setting '", setting_name, "'."
+            );
+          }
+          return static_cast<T>(value);
+        } else if constexpr (std::unsigned_integral<T>) {
+          const unsigned long long value = unparsed.PopUnsigned();
+          if (unparsed.size() || errno == ERANGE || value > std::numeric_limits<T>::max()) {
+            emp::notify::Error(
+              "Invalid or out-of-range value '", in, "' for setting '", setting_name, "'."
+            );
+          }
+          return static_cast<T>(value);
+        } else {
+          const double value = unparsed.PopFloat();
+          const double magnitude = std::abs(value);
+          if (unparsed.size() || errno == ERANGE ||
+              value < std::numeric_limits<T>::lowest() ||
+              value > std::numeric_limits<T>::max() ||
+              (value != 0.0 && magnitude < std::numeric_limits<T>::denorm_min())) {
+            emp::notify::Error(
+              "Invalid or out-of-range value '", in, "' for setting '", setting_name, "'."
+            );
+          }
+          return static_cast<T>(value);
+        }
+      }
+
       // Dynamic conversion from a STRING type.
       template <typename TO_T>
-      [[nodiscard]] static TO_T Convert(const emp::String & in) {
+      [[nodiscard]] static TO_T Convert(const emp::String & in,
+                                        const emp::String & setting_name = "") {
         constexpr Type to_type = ToTypeEnum<TO_T>();
 
         if constexpr (to_type == Type::STRING) return in;
-        else if constexpr (to_type == Type::BOOL) return !in.AsLower().IsOneOf("off", "false", "0");
-        else if constexpr (to_type == Type::INT64) return static_cast<TO_T>(std::stoll(in));
-        else if constexpr (to_type == Type::UINT64) return static_cast<TO_T>(in.AsULL());
-        else if constexpr (to_type == Type::DOUBLE) return static_cast<TO_T>(in.AsDouble());
+        else if constexpr (to_type == Type::BOOL) {
+          const emp::String lower = in.AsLower();
+          if (lower.IsOneOf("on", "true", "1")) return true;
+          if (lower.IsOneOf("off", "false", "0")) return false;
+          emp::notify::Error(
+            "Invalid boolean value '", in, "' for setting '", setting_name,
+            "'. Expected On, Off, True, False, 1, or 0."
+          );
+        }
+        else if constexpr (to_type == Type::INT64 ||
+                           to_type == Type::UINT64 ||
+                           to_type == Type::DOUBLE) {
+          return ParseNumber<TO_T>(in, setting_name);
+        }
         else static_assert(false, "Cannot convert from string to unknown type.");
       }
 
       // Allow conversions from std::string.
       template <typename TO_T>
-      [[nodiscard]] static TO_T Convert(const std::string & in) {
-        return Convert<TO_T>(emp::String{in});
+      [[nodiscard]] static TO_T Convert(const std::string & in,
+                                        const emp::String & setting_name = "") {
+        return Convert<TO_T>(emp::String{in}, setting_name);
       }
 
       // Dynamic conversion from a NUMERICAL type.
@@ -193,7 +256,9 @@ namespace emp {
         : name(name), desc(desc)
         , default_val(explicit_default.empty() ? Convert<emp::String>(var) : explicit_default)
         , flag(flag), type(ToTypeEnum<VAR_T>())
-        , set_string([&var](const emp::String & in){ var = Convert<VAR_T>(in); })
+        , set_string([&var, setting_name=name](const emp::String & in){
+            var = Convert<VAR_T>(in, setting_name);
+          })
         , set_bool(  [&var](bool in)               { var = Convert<VAR_T>(in); })
         , set_int64( [&var](int64_t in)            { var = Convert<VAR_T>(in); })
         , set_uint64([&var](uint64_t in)           { var = Convert<VAR_T>(in); })
@@ -213,7 +278,9 @@ namespace emp {
         : name(name), desc(desc)
         , default_val(explicit_default.empty() ? Convert<emp::String>(getter()) : explicit_default)
         , flag(flag), type(ToTypeEnum<T>())
-        , set_string([setter](const emp::String & in){ setter(Convert<T>(in)); })
+        , set_string([setter, setting_name=name](const emp::String & in){
+            setter(Convert<T>(in, setting_name));
+          })
         , set_bool(  [setter](bool in)               { setter(Convert<T>(in)); })
         , set_int64( [setter](int64_t in)            { setter(Convert<T>(in)); })
         , set_uint64([setter](uint64_t in)           { setter(Convert<T>(in)); })
@@ -258,6 +325,8 @@ namespace emp {
 
       /// Set the value from a string (parsed to the setting's native type).
       void SetValue(const emp::String & val) { set_string(val); }
+      void SetValue(const std::string & val) { set_string(val); }
+      void SetValue(const char * val) { set_string(val); }
 
       /// Set the value from a typed argument; dispatches by concept like GetValue.
       template <typename T>
@@ -474,12 +543,82 @@ namespace emp {
         );
       }
       const emp::String name = name_token.lexeme;
-      if (HasKeyword(name)) { LoadKeyword(it, name); }
+      if (cur_scopes.empty() && HasKeyword(name)) { LoadKeyword(it, name); }
       else if (HasSetting(name)) { LoadSetting(it, name); }
       else { LoadScope(it, name); } // Unknown id must be a new scope.
     }
 
-    void SetupFlag(char flag, emp::String option_name) {
+    /// Is prefix a complete scope prefix of name? (For example, "robot" of "robot.speed".)
+    [[nodiscard]] static bool IsScopePrefix(const emp::String & prefix,
+                                            const emp::String & name) {
+      return prefix.size() < name.size()
+        && name.compare(0, prefix.size(), prefix) == 0
+        && name[prefix.size()] == '.';
+    }
+
+    /// Validate and fully qualify a new setting name before registration.
+    [[nodiscard]] emp::String ValidateSettingName(const emp::String & name) const {
+      if (!name.IsIdentifierChain()) {
+        emp::notify::Error(
+          "SettingsManager: invalid setting name '", name,
+          "'. Expected dot-separated identifiers containing only letters, digits, and underscores."
+        );
+      }
+
+      const emp::String full_name = AppendScope(name);
+      if (setting_map.contains(full_name) || keyword_map.contains(full_name)) {
+        emp::notify::Error("SettingsManager: identifier '", full_name, "' is already registered.");
+      }
+
+      for (const auto & [other_name, info] : setting_map) {
+        (void) info;
+        if (IsScopePrefix(full_name, other_name) || IsScopePrefix(other_name, full_name)) {
+          emp::notify::Error(
+            "SettingsManager: setting names '", full_name, "' and '", other_name,
+            "' are structurally ambiguous; a name cannot be both a setting and a scope."
+          );
+        }
+      }
+
+      for (const auto & [keyword, info] : keyword_map) {
+        (void) info;
+        if (keyword.find('.') == emp::String::npos && IsScopePrefix(keyword, full_name)) {
+          emp::notify::Error(
+            "SettingsManager: global keyword '", keyword,
+            "' conflicts with the first component of setting name '", full_name, "'."
+          );
+        }
+      }
+
+      return full_name;
+    }
+
+    /// Validate a new global keyword name before registration.
+    void ValidateKeywordName(const emp::String & keyword) const {
+      if (!keyword.IsIdentifierChain()) {
+        emp::notify::Error(
+          "SettingsManager: invalid keyword name '", keyword,
+          "'. Expected dot-separated identifiers containing only letters, digits, and underscores."
+        );
+      }
+      if (keyword_map.contains(keyword) || setting_map.contains(keyword)) {
+        emp::notify::Error("SettingsManager: identifier '", keyword, "' is already registered.");
+      }
+
+      if (keyword.find('.') == emp::String::npos) {
+        for (const auto & [setting_name, info] : setting_map) {
+          (void) info;
+          if (IsScopePrefix(keyword, setting_name)) {
+            emp::notify::Error(
+              "SettingsManager: global keyword '", keyword,
+              "' conflicts with the first component of setting name '", setting_name, "'."
+            );
+          }
+        }
+      }
+    }
+
+    void SetupFlag(char & flag, emp::String option_name) {
       // Give a warning if we are trying to add the same flag twice (but allow run to continue).
       if (HasFlag(flag)) {
         emp::notify::Warning(
@@ -494,8 +633,11 @@ namespace emp {
     SettingsManager()
       : bool_value_ID(lexer.AddToken("bool_val", "[Oo][Nn]|[Tt][Rr][Uu][Ee]|[Oo][Ff][Ff]|[Ff][Aa][Ll][Ss][Ee]"))
       , ident_ID(lexer.AddToken("identifier", "[a-zA-Z_][a-zA-Z0-9_.]*"))
-      , int_ID(lexer.AddToken("int", "[0-9]+"))
-      , double_ID(lexer.AddToken("double", "[0-9]+\\.[0-9]+"))
+      , int_ID(lexer.AddToken("int", "[-+]?[0-9]+"))
+      , double_ID(lexer.AddToken(
+          "double",
+          "[-+]?([0-9]+(\\.[0-9]+)?|\\.[0-9]+)([eE][-+]?[0-9]+)?"
+        ))
       , string_ID(lexer.AddToken("string", "(\\\"([^\"\\\\]|(\\\\.))*\\\")|(\\'([^'\\\\]|(\\\\.))*\\')"))
     {
       lexer.IgnoreToken("whitespace", "[ \\t\\r]+");
@@ -543,10 +685,7 @@ namespace emp {
                                  emp::String desc,
                                  char flag = '\0',
                                  emp::String default_val = "") {
-      emp_assert(!HasIdentifier(name), "Trying to add SettingsManager identifier that already exists",
-                 AppendScope(name));
-
-      const emp::String full_name = AppendScope(name);
+      const emp::String full_name = ValidateSettingName(name);
       SetupFlag(flag, full_name);
       setting_map.emplace(full_name, SettingInfo{full_name, value, desc, flag, default_val});
       return *this;
@@ -562,9 +701,7 @@ namespace emp {
                                  emp::String desc,
                                  char flag = '\0',
                                  emp::String default_val = "") {
-      emp_assert(!HasIdentifier(name), "Trying to add SettingsManager identifier that already exists",
-                 AppendScope(name));
-      const emp::String full_name = AppendScope(name);
+      const emp::String full_name = ValidateSettingName(name);
       SetupFlag(flag, full_name);
       setting_map.emplace(full_name, SettingInfo{full_name, getter, setter, desc, flag, default_val});
       return *this;
@@ -577,7 +714,7 @@ namespace emp {
                                  emp::String desc,
                                  char flag = '\0',
                                  size_t max_args = emp::MAX_SIZE_T) {
-      emp_assert(!HasIdentifier(keyword), "Adding keyword with preexisting identifier", keyword);
+      ValidateKeywordName(keyword);
       SetupFlag(flag, keyword);
       keyword_map.emplace(keyword, KeywordInfo{keyword, fun, desc, flag, max_args});
       return *this;
