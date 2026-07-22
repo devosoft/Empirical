@@ -75,20 +75,20 @@
  *  - AddSetting(name, var, desc [, flag ]) – register a setting bound to 'var';
  *     'flag' is a one-character CLI flag (optional).
  *  - AddKeyword(keyword, fun, desc) – register a keyword that invokes 'fun' with its args.
- *  - Load(istream&) or Load(filename) – parse settings; return success (true/false)
+ *  - Load(istream&) or Load(filename) – parse settings; errors are immediately fatal.
  *  - LoadArgs(args) – scan a 'vector<emp::String>' of command-line arguments, deleting those used:
  *       '-x val' or '--setting val' set specified setting (registered with AddSetting)
  *       '-k arg...' or '--keyword arg...' trigger a keyword (registered with AddKeyword)
  *       '-S "cfg"' or '--set "cfg"' apply a bulk config string (built-in keyword).
- *  - Save(ostream&) or Save(filename) – write all settings as config file using defaults; return success.
+ *  - Save(ostream&) or Save(filename) – write all settings as config file using defaults.
  *  - SaveCurrent(ostream&) or SaveCurrent(filename) – same but uses current (live) values.
  *  - Get<T>(name) or Set(name, value) – programmatic get/set.
  *  - HasSetting(name) or HasKeyword(name) or HasIdentifier(name) – query if name is registered.
- *  - HasError() or GetError() – inspect the last error message.
  *  - SetVerbose() – enable diagnostic printing during Load/Save.
  *
  * DEVELOPER NOTES:
  * - Consider allowing types to be more dynamic, perhaps set in a template.
+ * - Consider collecting multiple errors before aborting.
  */
 
 #pragma once
@@ -100,7 +100,6 @@
 #include <fstream>
 #include <functional>
 #include <map>
-#include <optional>
 #include <print>
 #include <cstdint>
 #include <stddef.h>
@@ -307,7 +306,6 @@ namespace emp {
     std::map<emp::String, KeywordInfo> keyword_map;
     std::map<char, emp::String> flag_map;  ///< Flag char -> setting/keyword name
     emp::vector<emp::String> cur_scopes{};
-    emp::String error_note;
     bool verbose = false;
 
     // Build the lexer to load the file.
@@ -370,22 +368,20 @@ namespace emp {
 
     /// Apply a setting value at args[i]
     /// Called after the flag/option token itself has already been consumed.
-    bool LoadArgSetting(emp::vector<emp::String> & args, size_t & i,
+    void LoadArgSetting(emp::vector<emp::String> & args, size_t & i,
                         SettingInfo & info, const emp::String & flag_desc) {
       if (i >= args.size()) {
-        return IOError("Expected arg value after '", flag_desc, "'.");
+        emp::notify::Error("Expected arg value after '", flag_desc, "'.");
       }
       emp::notify::Message("Setting '", info.GetName(), "' to '", args[i], "'.");
       info.SetValue(args[i]);
       args.erase(args.begin() + i);
       --i;
-      return true;
     }
 
     /// Apply a keyword at args[i..]
     /// Called after the flag/option token itself has already been consumed.
-    /// Returns false if the keyword callback set an error.
-    bool LoadArgKeyword(emp::vector<emp::String> & args, size_t & i, const KeywordInfo & info) {
+    void LoadArgKeyword(emp::vector<emp::String> & args, size_t & i, const KeywordInfo & info) {
       size_t args_found = CountFlagArgs(args, i, info.max_args);
       emp::vector<emp::String> keyword_vars(args_found);
       for (size_t arg_id = 0; arg_id < args_found; ++arg_id) {
@@ -394,30 +390,23 @@ namespace emp {
       info.fun(keyword_vars);
       args.erase(args.begin()+i, args.begin()+i+args_found);
       --i;
-      return !HasError();
     }
 
     [[nodiscard]] bool IsEndLine(int id) const { return id == ';' || id == '\n'; }
 
-    /// Store an error note and always emit a warning.
-    bool IOError(auto... args) {
-      error_note = emp::MakeString(args...);
-      emp::notify::Error(error_note);
-      return false;
-    }
-
-    /// Use the next token if it's the right type; return false if not.
-    [[nodiscard]] bool RequireToken(Iterator & it, int token_id, const emp::String & name) {
+    /// Use the next token if it's the right type; abort if not.
+    void RequireToken(Iterator & it, int token_id, const emp::String & name) {
       const Token cur_token = it.Use();
       if (cur_token != token_id) {
-        return IOError("UnexpectedToken '", cur_token.lexeme, "' on line ", cur_token.line_id, "; expected ", name, ".");
+        emp::notify::Error(
+          "UnexpectedToken '", cur_token.lexeme, "' on line ", cur_token.line_id,
+          "; expected ", name, "."
+        );
       }
-
-      return true;
     }
 
     /// We found a keyword during a load; load all arguments and trigger it.
-    [[nodiscard]] bool LoadKeyword(Iterator & it, const emp::String & keyword) {
+    void LoadKeyword(Iterator & it, const emp::String & keyword) {
       if (verbose) emp::PrintLn("...identified as keyword!");
       // Grab the rest of the line.
       emp::vector<emp::String> keyword_vars;
@@ -425,10 +414,9 @@ namespace emp {
         keyword_vars.push_back(it.Use().lexeme);
       }
       GetKeywordInfo(keyword).fun(keyword_vars);
-      return true;
     }
 
-    std::optional<emp::String> TokenToStringValue(const Token & token) {
+    emp::String TokenToStringValue(const Token & token) {
       // If numeric literal value, use it directly.
       if (token.IsOneOf(bool_value_ID, int_ID, double_ID)) {
         return token.lexeme;
@@ -444,63 +432,52 @@ namespace emp {
         if (HasSetting(token.lexeme)) {
           return GetSettingInfo(token.lexeme).AsLiteral();
         }
-        IOError("Identifier '", token.lexeme, "' UNKNOWN!");
-        return std::nullopt;
+        emp::notify::Error("Identifier '", token.lexeme, "' UNKNOWN!");
       }
 
       // If we made it this far, we don't know how to do the conversion.
-      IOError("UnexpectedToken '", token.lexeme, "'; expected value.");
-      return std::nullopt;
+      emp::notify::Error("UnexpectedToken '", token.lexeme, "'; expected value.");
     }
 
     // We have found a setting name at the beginning of a line; load it!
-    [[nodiscard]] bool LoadSetting(Iterator & it, const emp::String & name) {
+    void LoadSetting(Iterator & it, const emp::String & name) {
       if (verbose) emp::PrintLn("...identified as setting!");
 
       // setting name must be followed by an '='
-      if (!RequireToken(it, '=', "assignment")) return false;
-
-      std::optional<emp::String> string_val = TokenToStringValue(it.Use());
-      if (string_val) {
-        GetSettingInfo(name).SetValue(*string_val);
-        return true;
-      }
-      return false;
+      RequireToken(it, '=', "assignment");
+      GetSettingInfo(name).SetValue(TokenToStringValue(it.Use()));
     }
 
-    [[nodiscard]] bool LoadScope(Iterator & it, const emp::String & name) {
+    void LoadScope(Iterator & it, const emp::String & name) {
       // Scopes must be opened with a '{'
-      if (!RequireToken(it, '{', "open scope")) return false;
+      RequireToken(it, '{', "open scope");
       PushScope(name);
 
       while (it.Any() && it.Peek() != '}') {
-        if (!LoadLine(it)) {
-          PopScope();
-          return false;
-        }
+        LoadLine(it);
       }
 
       PopScope();
-      if (!RequireToken(it, '}', "close scope")) return false;
-
-      return true;
+      RequireToken(it, '}', "close scope");
     }
 
     // Load a single line starting from the current token iterator.
-    bool LoadLine(Iterator & it) {
+    void LoadLine(Iterator & it) {
       // Skip any extra lines.
-      if (IsEndLine(it.Peek())) { ++it; return true; }
+      if (IsEndLine(it.Peek())) { ++it; return; }
 
       const Token name_token = it.Use();
       if (verbose) emp::PrintLn("Found initial line token '", name_token.lexeme, "'.");
 
       if (name_token != ident_ID) {
-        return IOError("UnexpectedToken '", name_token.lexeme, "'; expected keyword or parameter name.");
+        emp::notify::Error(
+          "UnexpectedToken '", name_token.lexeme, "'; expected keyword or parameter name."
+        );
       }
       const emp::String name = name_token.lexeme;
-      if (HasKeyword(name)) { return LoadKeyword(it, name); }
-      if (HasSetting(name)) { return LoadSetting(it, name); }
-      return LoadScope(it, name); // Unknown id must be a new scope.
+      if (HasKeyword(name)) { LoadKeyword(it, name); }
+      else if (HasSetting(name)) { LoadSetting(it, name); }
+      else { LoadScope(it, name); } // Unknown id must be a new scope.
     }
 
     void SetupFlag(char flag, emp::String option_name) {
@@ -528,10 +505,10 @@ namespace emp {
 
       // Built-in keyword: applies a bulk config string (same as a config file fragment).
       AddKeyword("set", [this](emp::vector<emp::String> kw_args) {
-        if (kw_args.empty()) { IOError("Expected config string after '--set'."); return; }
+        if (kw_args.empty()) emp::notify::Error("Expected config string after '--set'.");
         emp::TokenStream tokens = lexer.Tokenize(kw_args[0]);
         Iterator it = tokens.begin();
-        while (it.Any()) { if (!LoadLine(it)) return; }
+        while (it.Any()) LoadLine(it);
       }, "Apply a bulk config string", ':', /*max_args=*/1);
     }
 
@@ -565,10 +542,6 @@ namespace emp {
     void Set(const emp::String & name, T && value) {
       GetSettingInfo(name).SetValue(std::forward<T>(value));
     }
-
-    [[nodiscard]] bool HasError() const { return error_note.size(); }
-
-    [[nodiscard]] const emp::String & GetError() const { return error_note; }
 
     const std::filesystem::path & GetConfigDir() const { return config_dir; }
     void SetConfigDir(const emp::String & in) { config_dir = in.str(); }
@@ -690,7 +663,6 @@ namespace emp {
               std::function<emp::String(const SettingInfo &)> value_fn =
                   [](const SettingInfo & info) { return info.GetDefaultLiteral(); }) {
       emp_assert(ofs);
-      error_note.clear();
 
       emp::vector<emp::String> open_scopes;  // currently open scope names (outermost first)
       bool pending_blank = false;            // whether to emit a blank line before the next item
@@ -755,9 +727,7 @@ namespace emp {
                   [](const SettingInfo & info) { return info.GetDefaultLiteral(); }) {
       std::ofstream ofs{filename};
       if (!ofs) {
-        error_note.Set("Failed to open config file for saving: ", filename);
-        notify::Error(error_note);
-        return false;
+        notify::Error("Failed to open config file for saving: ", filename);
       }
       return Save(ofs, value_fn);
     }
@@ -771,23 +741,19 @@ namespace emp {
       return Save(filename, [](const SettingInfo & info) { return info.AsLiteral(); });
     }
 
-    // Load settings from a stream; return success.
+    // Load settings from a stream; return true on success and abort on error.
     bool Load(std::istream & is) {
       emp::TokenStream tokens = lexer.Tokenize(is);
       Iterator it = tokens.begin();
-      error_note.clear();
-
-      while (it.Any()) {
-        if (!LoadLine(it)) return false;
-      }
+      while (it.Any()) LoadLine(it);
 
       return true;
     }
 
-    // Load settings from a file; return success.
+    // Load settings from a file; return true on success and abort on error.
     bool Load(const emp::String & filename) {
       std::ifstream is(filename);
-      if (!is) return IOError("Failed to open config file for loading: ", filename);
+      if (!is) emp::notify::Error("Failed to open config file for loading: ", filename);
       return Load(is);
     }
     
@@ -807,12 +773,11 @@ namespace emp {
     ///
     /// Each matched flag/option and its value are removed from `args`;
     /// all other arguments are left untouched.
-    /// Returns false (and sets the error note) on the first parse error.
+    /// Errors are immediately fatal; returns true on success.
     bool LoadArgs(emp::vector<emp::String> & args) {
       if (args.size() == 0) return true;
       exe_name = args[0];
 
-      error_note.clear();
       for (size_t i = 1; i < args.size(); ++i) {
         const emp::String test_arg = args[i];
 
@@ -823,15 +788,13 @@ namespace emp {
             args.erase(args.begin() + i); // Remove the used argument.
             const emp::String & id = flag_map.at(flag_char);
             if (setting_map.contains(id)) {
-              if (!LoadArgSetting(args, i, setting_map.at(id), emp::MakeString('-',flag_char))) {
-                return false;
-              }
+              LoadArgSetting(args, i, setting_map.at(id), emp::MakeString('-',flag_char));
             } else {
-              if (!LoadArgKeyword(args, i, keyword_map.at(id))) return false;
+              LoadArgKeyword(args, i, keyword_map.at(id));
             }
             continue;
           }
-          return IOError("Unknown flag '", test_arg, "'.");
+          emp::notify::Error("Unknown flag '", test_arg, "'.");
         }
 
         // Long option: --name  (setting value or keyword arguments)
@@ -839,14 +802,14 @@ namespace emp {
           const emp::String opt = test_arg.substr(2);
           if (setting_map.contains(opt)) {
             args.erase(args.begin() + i); // Remove the used argument.
-            if (!LoadArgSetting(args, i, setting_map.at(opt), "--"+opt)) return false;
+            LoadArgSetting(args, i, setting_map.at(opt), "--"+opt);
             continue;
           } else if (keyword_map.contains(opt)) {
             args.erase(args.begin() + i); // Remove the used argument.
-            if (!LoadArgKeyword(args, i, keyword_map.at(opt))) return false;
+            LoadArgKeyword(args, i, keyword_map.at(opt));
             continue;
           }
-          return IOError("Unknown option '", test_arg, "'.");
+          emp::notify::Error("Unknown option '", test_arg, "'.");
         }
       }
       return true;
