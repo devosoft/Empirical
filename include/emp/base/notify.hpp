@@ -41,7 +41,7 @@
  * - emp::Alert(...) is a shortcut to emp::notify::Warning(...)
  *
  * NOTES:
- * - Whenever possible, Exception() should be preferred over Error().  They are can be responded
+ * - Whenever relevant, Exception() should be preferred over Error().  They are can be responded
  *   to or selectively disabled, rather than always automatically halting execution.
  * - Warning() should ideally detail what should be done differently to avoid that warning.
  */
@@ -297,7 +297,7 @@ namespace emp::notify {
   }
 
   /// Generic exit handler that calls all of the provided functions.
-  [[maybe_unused]] static void Exit(int exit_code) {
+  [[noreturn]] static void Exit(int exit_code) {
     NotifyData & data = GetData();
 
     // Run any cleanup functions.
@@ -341,8 +341,7 @@ namespace emp::notify {
     for (size_t i = 0; i < data.pause_queue.size(); ++i) {
       auto & notice = data.pause_queue[i];
       bool result   = data.handler_map[notice.id].Trigger(notice);
-      if (!result) {  // Failed; move to exception queue or exit if error.
-        if (notice.id == "ERROR") { Exit(1); }
+      if (!result) {  // Failed; move to exception queue (errors would have exited)
         data.except_queue.push_back(notice);
       }
     }
@@ -370,18 +369,18 @@ namespace emp::notify {
     return Notify(Type::WARNING, std::forward<Ts>(args)...);
   }
 
-  /// Send out a notification of an ERROR.
+  /// Send out a notification of an ERROR and end the run.
   template <typename... Ts>
-  static bool Error(Ts... args) {
-    bool success = Notify(Type::ERROR, std::forward<Ts>(args)...);
-    if (!success) {
+  [[noreturn]] static void Error(Ts... args) {
+    // Report the error.
+    Notify(Type::ERROR, std::forward<Ts>(args)...);
+
+    // Exit this run.
 #ifdef NDEBUG
-      Exit(1);
+    Exit(1);
 #else   // #ifdef NDEBUG
-      abort();
+    abort();
 #endif  // #ifdef NDEBUG : #else
-    }
-    return success;
   }
 
   // Print a message only if a specified condition is true.
@@ -408,7 +407,7 @@ namespace emp::notify {
   // Trigger an error only if a specified condition is true.
   template <typename... Ts>
   static bool TestError(bool test, Ts... args) {
-    if (test) { return Error(std::forward<Ts>(args)...); }
+    if (test) { Error(std::forward<Ts>(args)...); }
     return true;
   }
 
