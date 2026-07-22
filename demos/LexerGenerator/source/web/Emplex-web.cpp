@@ -116,12 +116,12 @@ private:
 
   void UpdateErrors() {
     if (errors.size()) {
+      // Clear any stale generated code and remove access to it.
       output_text.Clear();
+      doc.Button("download_icon").Hide();
+      doc.Button("copy_icon").Hide();
+      doc.Button("close_icon").Hide();
       output_div.Redraw();
-      doc.Button("download_but")
-         .SetBackground(emp::Color("#606060"))
-         .SetDisabled()
-         .SetTitle("Generate code to activate this button.");
     }
 
     error_div.Clear();
@@ -212,7 +212,7 @@ private:
     }
     // Remove last row
     token_info[id].Clear();
-    auto new_row = token_table.RemoveRow();
+    token_table.RemoveRow();
   }
 
   // Remove all rows in the table.
@@ -279,11 +279,16 @@ private:
       }
     }
     doc.Div("token_div").Redraw();
+
+    // Now that the new table is in place, rebuild the lexer and refresh the sandbox.
+    GenerateLexer();
+    UpdateSandbox();
   }
 
   template <typename... Ts>
-  void Error(size_t line_num, Ts &&... args) {
-    errors.push_back(emp::MakeString("Error (line ", line_num, ") - ", args...));
+  void Error(size_t row_num, Ts &&... args) {
+    // Rows are reported 1-based, matching what the user sees in the table.
+    errors.push_back(emp::MakeString("Error (row ", row_num + 1, ") - ", args...));
   }
 
   // Make sure that the token table contains only valid information.
@@ -320,7 +325,6 @@ private:
       emp::RegEx regex_text(regex);
       for (const auto & note : regex_text.GetNotes()) {
         Error(line_num, "Invalid Regular expression: ", note);
-        continue;
       }
     }
 
@@ -381,11 +385,6 @@ private:
     doc.Button("download_icon").Hide(false);
     doc.Button("copy_icon").Hide(false);
     doc.Button("close_icon").Hide(false);
-
-    doc.Button("download_but")
-       .SetDisabled(false)
-       .SetBackground(emp::Color{"#330066"})
-       .SetTitle("Click to download the generated code.");
 
     return true;
   }
@@ -508,12 +507,12 @@ private:
         "</table></p>\n"
         "<p>Then if we were parsing \"<code>set formula_id 5</code>\", "
         "the first token would be \"set\" and it would be type KEYWORD because while both "
-        "KEYWORD and IDENTIFIER could match this series fo characters, KEYWORD comes first in the list. "
+        "KEYWORD and IDENTIFIER could match this series of characters, KEYWORD comes first in the list. "
         "The next token would be a single space of type WHITESPACE, though if we marked the "
         "WHITESPACE token as 'ignore' then its characters would be skipped over and the token would "
         "not be included in the returned vector. "
         "After that the characters \"for\" could be matched by KEYWORD, but IDENTIFIER would be able "
-        "to match the longer \"formula_id\", and as such it would be chosen next.<p>\n"
+        "to match the longer \"formula_id\", and as such it would be chosen next.</p>\n"
         "<p>See the next tab if you want to learn about writing regular expressions in Emplex.</p>\n";
     } else if (mode == "regex") {
       doc.Button("regex_but").SetBackground(active_color);
@@ -588,7 +587,7 @@ private:
         "<p><table border=\"2\" cellpadding=\"3\" style=\"background: white; color: black\">\n"
         "<tr><td><code>.*</code></td> <td>Match all characters until the end of the current line.</td></tr>\n"
         "<tr><td><code>\"if\"|\"while\"|\"for\"</code></td> <td>Match common keywords.</td></tr>\n"
-        "<tr><td><code>x0[0-9a-fA-F]+</code></td> <td>Match hexadecimal values</td></tr>\n"
+        "<tr><td><code>0x[0-9a-fA-F]+</code></td> <td>Match hexadecimal values</td></tr>\n"
         "<tr><td><code>(http(s?)\"://\")?\\w+([./]\\w+)+</code></td> <td>A simple URL matcher</td></tr>\n"
         "</table></p>\n"
 
@@ -626,7 +625,7 @@ private:
         "will either match one of the \"ID_\" values defined in the lexer, "
         "or it will be an ASCII code (for a single-character token with a default match.) "
         "For example, if the source file has the number 100, the token's lexeme would be "
-        "\"100\" and it's ID would be the value of <code>emplex::ID_INT</code>.</p>"
+        "\"100\" and its ID would be the value of <code>emplex::Lexer::ID_INT</code>.</p>"
         "The <code>line_id</code> and <code>col_id</code> fields give the position in the file "
         "where the token was found, which can be useful for error reporting.</p>\n"
         "<p>Finally, if you need a token's type name, you can use: "
@@ -647,7 +646,7 @@ private:
         "<tr><td><code>Token Use(int type_id, [message])</code>"
         "    <td>Use the current token; give an error if is not the expected type (custom error message is optional)</tr>"
         "<tr><td><code>bool UseIf(int type_id, ...)</code>"
-        "    <td>Use the current token only if it is one of the provided types; return the token's type ID if was used or 0 if it remains unused.</tr>"
+        "    <td>Use the current token only if it is one of the provided types; return the token's type ID if it was used or 0 if it remains unused.</tr>"
         "<tr><td><code>void Rewind(int steps=1)</code>"
         "    <td>Mark a previous token as current again.</tr>"
         "</table>"
@@ -682,7 +681,7 @@ private:
         "    ASTNode * action = Parse_Statement();\n"
         "\n"
         "    // If we have an 'else' branch, parse it.\n"
-        "    ASTNode * alt = tokens.UseIf(Lexer::ID_ELSE) ? Parse_Statement() : nullptr\n"
+        "    ASTNode * alt = tokens.UseIf(Lexer::ID_ELSE) ? Parse_Statement() : nullptr;\n"
         "\n"
         "    return MakeASTNodeIf(condition, action, alt);\n"
         "  }\n"
@@ -817,9 +816,8 @@ private:
     }, "load_input").SetCSS("display", "none");
 
     token_div << UI::Button([this](){
+      // Just open the dialog; loading is async and LoadTable() handles the refresh.
       doc.FileInput("load_input").DoClick();
-      GenerateLexer();
-      UpdateSandbox();
     }, "Load Token Types", "load_but")
       .SetCSS(button_style)
       .SetTitle("Load previously saved token types from file.");
@@ -1051,7 +1049,7 @@ private:
     if (tokens.size() == 0) {
       sandbox_text << "NO VISIBLE TOKENS.";
     }
-    for (auto token : tokens) {
+    for (const auto & token : tokens) {
       // Print information about the next token, if needed.
       if (sandbox_show_token_info) {
         sandbox_text << "[";
