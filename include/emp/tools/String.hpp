@@ -437,6 +437,17 @@ namespace emp {
       return !empty() && !HasDigitAt(0) && IDCharSet().Has(*this);
     }
 
+    /// Is string a valid chain of identifiers like base.next.val123
+    [[nodiscard]] bool IsIdentifierChain(char chain_char='.') const {
+      bool at_start = true;
+      for (char cur : *this) {
+        if (at_start && (is_digit(cur) || cur == chain_char)) return false;
+        if (!is_idchar(cur) && cur != chain_char) return false;
+        at_start = (cur == chain_char);
+      }
+      return !at_start;
+    }
+
     [[nodiscard]] bool OnlyLower() const { return LowerCharSet().Has(*this); }
 
     [[nodiscard]] bool OnlyUpper() const { return UpperCharSet().Has(*this); }
@@ -594,15 +605,24 @@ namespace emp {
     inline String PopParen(const Syntax & syntax = Syntax::Parens());
     inline String PopLiteralSigned();
 
-    long long PopSigned() { return std::stoll(PopLiteralSigned()); }
+    long long PopSigned() {
+      const String literal = PopLiteralSigned();
+      return std::strtoll(literal.c_str(), nullptr, 10);
+    }
 
     inline String PopLiteralUnsigned();
 
-    unsigned long long PopUnsigned() { return std::stoull(PopLiteralUnsigned()); }
+    unsigned long long PopUnsigned() {
+      const String literal = PopLiteralUnsigned();
+      return std::strtoull(literal.c_str(), nullptr, 10);
+    }
 
     inline String PopLiteralFloat();
 
-    double PopFloat() { return std::stod(PopLiteralFloat()); }
+    double PopFloat() {
+      const String literal = PopLiteralFloat();
+      return std::strtod(literal.c_str(), nullptr);
+    }
 
     String PopLiteralChar(const Syntax & syntax = Syntax::CharQuotes()) { return PopQuote(syntax); }
 
@@ -2015,7 +2035,7 @@ namespace emp {
 
   String String::PopLiteralSigned() {
     size_t int_size = 0;
-    if (HasCharAt(0, '-') || HasCharAt(0, '+')) { ++int_size; }
+    if (HasCharAt('-', 0) || HasCharAt('+', 0)) { ++int_size; }
     while (HasDigitAt(int_size)) { ++int_size; }
     return PopFixed(int_size);
   }
