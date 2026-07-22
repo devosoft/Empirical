@@ -871,6 +871,7 @@ namespace emp {
       notes.resize(0);
       valid = true;
       pos   = 0;
+      dfa_ready = false;
       head_ptr.Delete();
       head_ptr = Process();
       while (head_ptr->Simplify());
