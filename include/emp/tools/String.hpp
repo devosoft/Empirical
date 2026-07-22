@@ -2095,7 +2095,7 @@ namespace emp {
       return std::stoll(*this);
     } else if constexpr (std::same_as<T, unsigned long>) {
       return std::stoul(*this);
-    } else if constexpr (std::same_as<T, unsigned long long>) {
+    } else if constexpr (std::same_as<T, unsigned long long> || std::same_as<T, size_t>) {
       return std::stoull(*this);
     } else if constexpr (std::same_as<T, float>) {
       return std::stof(*this);
