@@ -280,6 +280,11 @@ namespace emp {
     return cs;
   }
 
+  static const CharSet & IDStartSet() {
+    static CharSet cs = LetterCharSet() + '_';
+    return cs;
+  }
+
   static const CharSet & IDCharSet() {
     static CharSet cs = AlphanumericCharSet() + '_';
     return cs;
