@@ -66,7 +66,7 @@
  *     cfg.Load("my_config.cfg");    // updates variables from file
  *     cfg.Save("my_config.cfg");    // writes default values with description comments
  *
- *     // Apply settings from command-line arguments (e.g. -S "reps = 5")
+ *     // Apply settings from command-line arguments (e.g. --reps 5)
  *     emp::vector<emp::String> args(argv, argv + argc);
  *     cfg.LoadArgs(args);
  *
@@ -79,7 +79,6 @@
  *  - LoadArgs(args) – scan a 'vector<emp::String>' of command-line arguments, deleting those used:
  *       '-x val' or '--setting val' set specified setting (registered with AddSetting)
  *       '-k arg...' or '--keyword arg...' trigger a keyword (registered with AddKeyword)
- *       '-S "cfg"' or '--set "cfg"' apply a bulk config string (built-in keyword).
  *  - Save(ostream&) or Save(filename) – write all settings as config file using defaults.
  *  - SaveCurrent(ostream&) or SaveCurrent(filename) – same but uses current (live) values.
  *  - Get<T>(name) or Set(name, value) – programmatic get/set.
@@ -430,7 +429,7 @@ namespace emp {
       // If identifier, look it up.
       if (token == ident_ID) {
         if (HasSetting(token.lexeme)) {
-          return GetSettingInfo(token.lexeme).AsLiteral();
+          return GetSettingInfo(token.lexeme).AsString();
         }
         emp::notify::Error("Identifier '", token.lexeme, "' UNKNOWN!");
       }
@@ -502,14 +501,6 @@ namespace emp {
       lexer.IgnoreToken("whitespace", "[ \\t\\r]+");
       lexer.IgnoreToken("comment", "#.+");
       lexer.IgnoreToken("continue_line", "\\\\[ ]*\\n");
-
-      // Built-in keyword: applies a bulk config string (same as a config file fragment).
-      AddKeyword("set", [this](emp::vector<emp::String> kw_args) {
-        if (kw_args.empty()) emp::notify::Error("Expected config string after '--set'.");
-        emp::TokenStream tokens = lexer.Tokenize(kw_args[0]);
-        Iterator it = tokens.begin();
-        while (it.Any()) LoadLine(it);
-      }, "Apply a bulk config string", ':', /*max_args=*/1);
     }
 
     void SetVerbose(bool in=true) { verbose = in; }
@@ -768,8 +759,6 @@ namespace emp {
     ///  - `--setting val` – same as `setting = val` in a config file.
     ///  - `--keyword arg ...` – triggers a keyword by name with the following
     ///                      non-option arguments.
-    ///  - `-S "cfg"` / `--set "cfg"` – built-in "set" keyword; tokenizes the
-    ///                      string and loads it exactly as a config file.
     ///
     /// Each matched flag/option and its value are removed from `args`;
     /// all other arguments are left untouched.
