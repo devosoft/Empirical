@@ -82,9 +82,10 @@ TEST_CASE("Test notifications", "[base]")
   // CHECK(warning_results.size() == 6);
   // CHECK(warning_results.back() == "Capped TWO");
 
-  emp::notify::Error("ERROR!!!");
-  CHECK(error_results.size() == 1);
-  CHECK(error_results.back() == "ERROR!!!");
+  // Error will always terminate...
+  // emp::notify::Error("ERROR!!!");
+  // CHECK(error_results.size() == 1);
+  // CHECK(error_results.back() == "ERROR!!!");
 
   emp::notify::Exception("UNKNOWN", "This is a first test of an unknown exception.");
   emp::notify::Exception("PASS", "This is an exception that will be repaired.");
