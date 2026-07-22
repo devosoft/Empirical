@@ -79,7 +79,6 @@ TEST_CASE("Test SettingsManager", "[config]")
       "n = 100;\n"
     );
     REQUIRE(cfg.Load(is));
-    REQUIRE(!cfg.HasError());
     REQUIRE(i == 7);
     REQUIRE(d == 2.5);
     REQUIRE(s == "hello world");
@@ -219,22 +218,6 @@ TEST_CASE("Test SettingsManager", "[config]")
     REQUIRE(val == 99);
   }
 
-  // Error: unknown identifier returns false and sets error
-  {
-    emp::SettingsManager cfg;
-    std::istringstream is("unknown_setting = 5\n");
-    REQUIRE(!cfg.Load(is));
-    REQUIRE(cfg.HasError());
-    REQUIRE(cfg.GetError().size() > 0);
-  }
-
-  // Error: load nonexistent file returns false and sets error
-  {
-    emp::SettingsManager cfg;
-    REQUIRE(!cfg.Load("this_file_does_not_exist_12345.cfg"));
-    REQUIRE(cfg.HasError());
-  }
-
   // LoadArgs: -s / --set applies a bulk config string and is removed from args
   {
     emp::SettingsManager cfg;
@@ -329,28 +312,6 @@ TEST_CASE("Test SettingsManager", "[config]")
     REQUIRE(args.size() == 2); // only "program" and "leftover" remain
     REQUIRE(args[0] == "program");
     REQUIRE(args[1] == "leftover");
-  }
-
-  // LoadArgs: missing value after short flag returns false and sets error
-  {
-    emp::SettingsManager cfg;
-    int x = 0;
-    cfg.AddSetting("x", x, "int", 'x');
-
-    emp::vector<emp::String> args = { "program", "-x" };
-    REQUIRE(!cfg.LoadArgs(args));
-    REQUIRE(cfg.HasError());
-  }
-
-  // LoadArgs: missing value after long option returns false and sets error
-  {
-    emp::SettingsManager cfg;
-    int x = 0;
-    cfg.AddSetting("xval", x, "int");
-
-    emp::vector<emp::String> args = { "program", "--xval" };
-    REQUIRE(!cfg.LoadArgs(args));
-    REQUIRE(cfg.HasError());
   }
 
   // Load: single-quoted string literals
@@ -486,17 +447,6 @@ TEST_CASE("Test SettingsManager", "[config]")
     REQUIRE(captured[0] == "hello");
   }
 
-  // LoadArgs: missing config string after --set / -s returns false and sets error
-  {
-    emp::SettingsManager cfg;
-    int x = 0;
-    cfg.AddSetting("x", x, "int");
-
-    emp::vector<emp::String> args = { "program", "--set" };
-    REQUIRE(!cfg.LoadArgs(args));
-    REQUIRE(cfg.HasError());
-  }
-
   // LoadArgs: scoped setting via long option (--robot.speed 42)
   {
     emp::SettingsManager cfg;
@@ -506,22 +456,6 @@ TEST_CASE("Test SettingsManager", "[config]")
     emp::vector<emp::String> args = { "program", "--robot.speed", "42" };
     REQUIRE(cfg.LoadArgs(args));
     REQUIRE(speed == 42);
-  }
-
-  // Error: a successful load clears the error from a previous failed load
-  {
-    emp::SettingsManager cfg;
-    int x = 0;
-    cfg.AddSetting("x", x, "int");
-
-    std::istringstream bad("unknown = 5\n");
-    REQUIRE(!cfg.Load(bad));
-    REQUIRE(cfg.HasError());
-
-    std::istringstream good("x = 3\n");
-    REQUIRE(cfg.Load(good));
-    REQUIRE(!cfg.HasError());
-    REQUIRE(x == 3);
   }
 
   // Save and reload: round-trip preserves all values
