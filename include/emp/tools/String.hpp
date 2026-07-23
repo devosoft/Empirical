@@ -27,11 +27,13 @@
 #include <format>            // std::format
 #include <functional>        // std::function
 #include <initializer_list>  // std::initializer_list
+#include <limits>            // std::numeric_limits
 #include <map>               // std::map
 #include <ranges>            // std::ranges::range<T>
 #include <sstream>           // std::stringstream
 #include <string>            // std::string
 #include <string_view>       // std::string_view
+#include <type_traits>       // std::remove_cvref_t
 #include <utility>           // std::move
 
 #include "../base/assert.hpp"
@@ -114,7 +116,7 @@ namespace emp {
     using Syntax = StringSyntax;
 
     static char & NoChar() {
-      static char no_char;
+      static thread_local char no_char;
       return no_char = '\0';  // Always reset NoChar() in case it was changed.
     }
 
@@ -129,6 +131,8 @@ namespace emp {
         return emp::String(1, value);
       } else if constexpr (std::is_same_v<U, bool>) {
         return value ? "1" : "0";
+      } else if constexpr (std::is_same_v<U, std::string_view>) {
+        return std::string_view(value);
       } else if constexpr (std::convertible_to<U, std::string>) {  // If convertible, do so!
         return std::forward<T>(value);
       } else if constexpr (std::ranges::range<U>) {  // Break down containers with Join()
@@ -143,8 +147,8 @@ namespace emp {
 
     // Retrieve an iterator for a given position.
     [[nodiscard]] auto Iterator_(size_t pos) const {
-      AssertPos_(pos);
-      return begin() + static_cast<int>(pos);
+      emp_assert(pos <= size(), pos, size());
+      return begin() + static_cast<difference_type>(pos);
     }
 
   public:
@@ -303,18 +307,21 @@ namespace emp {
 
     [[nodiscard]] String substr(size_t pos = 0, size_t count = npos) const {
       emp_assert(pos <= size(), pos, size());
-      emp_assert(count == npos || pos + count <= size(), pos, count, size());
+      emp_assert(count == npos || count <= size() - pos, pos, count, size());
       return std::string::substr(pos, count);
     }
 
     [[nodiscard]] String GetRange(size_t start_pos, size_t end_pos) const {
+      emp_assert(start_pos <= end_pos, start_pos, end_pos, size());
+      emp_assert(end_pos <= size(), start_pos, end_pos, size());
       return std::string::substr(start_pos, end_pos - start_pos);
     }
 
     [[nodiscard]] std::string_view View(size_t start = 0, size_t out_size = npos) const {
       if (start == npos) { start = size(); }                // For failed find; return empty.
+      emp_assert(start <= size(), start, size());
       if (out_size == npos) { out_size = size() - start; }  // npos size => View to end.
-      emp_assert(start + out_size <= size());
+      emp_assert(out_size <= size() - start, start, out_size, size());
       return {data() + start, out_size};
     }
 
@@ -334,7 +341,8 @@ namespace emp {
     [[nodiscard]] std::string_view ViewTo(CharSet stop_chars,
                                           size_t start          = 0,
                                           const Syntax & syntax = Syntax::None()) const {
-      return ViewFront(Find(stop_chars, start, syntax));
+      const size_t end = Find(stop_chars, start, syntax);
+      return ViewRange(start, end == npos ? size() : end);
     }
 
     [[nodiscard]] std::string_view ViewBackTo(CharSet stop_chars,
@@ -378,7 +386,10 @@ namespace emp {
     //  size_t capacity() const;
     //  void reserve(size_t new_cap);
     //  void shrink_to_fit();
-    [[nodiscard]] int ssize() const { return static_cast<int>(size()); }
+    [[nodiscard]] int ssize() const {
+      emp_assert(size() <= static_cast<size_t>(std::numeric_limits<int>::max()), size());
+      return static_cast<int>(size());
+    }
 
     // ------ Classification and Comparisons ------
     // Inherited functions from std::string:
@@ -388,7 +399,7 @@ namespace emp {
     //  bool contains(...) const noexcept;
 
     [[nodiscard]] bool HasAt(const String & test, size_t pos) const {
-      return (size() <= pos + test.size()) && View(pos, test.size()) == test;
+      return pos <= size() && test.size() <= size() - pos && View(pos, test.size()) == test;
     }
 
     [[nodiscard]] bool HasPrefix(const String & prefix) const { return starts_with(prefix); }
@@ -401,11 +412,12 @@ namespace emp {
 
     // Count the number of occurrences of a specific character.
     [[nodiscard]] size_t Count(char c, size_t start = 0) const {
-      return empty() ? 0 : static_cast<size_t>(std::count(Iterator_(start), end(), c));
+      return static_cast<size_t>(std::count(Iterator_(start), end(), c));
     }
 
     // Count the number of occurrences of a specific character within a range.
     [[nodiscard]] size_t Count(char c, size_t start, size_t end) const {
+      emp_assert(start <= end, start, end, size());
       return static_cast<size_t>(std::count(Iterator_(start), Iterator_(end), c));
     }
 
@@ -626,7 +638,9 @@ namespace emp {
 
     String PopLiteralChar(const Syntax & syntax = Syntax::CharQuotes()) { return PopQuote(syntax); }
 
-    char PopChar() { return PopFixed(1)[0]; }
+    char PopChar() {
+      return empty() ? '\0' : PopFixed(1)[0];
+    }
 
     template <typename T>
     inline String PopLiteral(const Syntax & syntax = Syntax::Quotes());
@@ -654,7 +668,7 @@ namespace emp {
     }
 
     template <typename... ARG_Ts>
-    String & insert(const_iterator pos, ARG_Ts &&... args) {
+    auto insert(const_iterator pos, ARG_Ts &&... args) {
       return std::string::insert(pos, std::forward<ARG_Ts>(args)...);
     }
 
@@ -686,7 +700,7 @@ namespace emp {
     }
 
     String & PadFront(char padding, size_t target_size) {
-      if (size() < target_size) { *this = std::string(target_size - size(), padding) + *this; }
+      if (size() < target_size) { std::string::insert(0, target_size - size(), padding); }
       return *this;
     }
 
@@ -725,6 +739,8 @@ namespace emp {
     inline String & ReplaceSet(CharSet from, char to, size_t start = 0);
 
     String & ReplaceRange(size_t start, size_t end, const String & value) {
+      emp_assert(start <= end, start, end, size());
+      emp_assert(end <= size(), start, end, size());
       return replace(start, end - start, value);
     }
 
@@ -883,13 +899,17 @@ namespace emp {
 
     // ------ Other Views ------
     [[nodiscard]] std::string_view ViewNestedBlock(size_t start          = 0,
-                                                   const Syntax & syntax = Syntax::Quotes()) const {
-      return ViewRange(start + 1, FindParenMatch(start, syntax) - 1);
+                                                   const Syntax & syntax = Syntax::Full()) const {
+      const size_t match = FindParenMatch(start, syntax);
+      emp_assert(match != npos, start, *this);
+      return match == npos ? std::string_view{} : ViewRange(start + 1, match);
     }
 
     [[nodiscard]] std::string_view ViewQuote(size_t start          = 0,
                                              const Syntax & syntax = Syntax::Quotes()) const {
-      return ViewRange(start, syntax.IsQuote(Get(start)) ? FindQuoteMatch(start) : start);
+      if (!syntax.IsQuote(Get(start))) { return {}; }
+      const size_t match = FindQuoteMatch(start);
+      return match == npos ? std::string_view{} : ViewRange(start, match + 1);
     }
 
     // Return string_view starting at a specified position, and advance that position
@@ -911,7 +931,10 @@ namespace emp {
     //   return out;
     // }
 
-    char ScanChar(size_t & pos) const { return Get(pos++); }
+    char ScanChar(size_t & pos) const {
+      emp_assert(pos < size(), pos, size());
+      return Get(pos++);
+    }
 
     std::string_view ScanWhitespace(size_t & pos) const {
       return ScanWhile(pos, WhitespaceCharSet());
@@ -930,9 +953,11 @@ namespace emp {
     }
 
     std::string_view ScanNestedBlock(size_t & pos) const {
-      auto out = ViewNestedBlock(pos);
-      pos += out.size();
-      return out;
+      const size_t start = pos;
+      const size_t match = FindParenMatch(start, Syntax::Full());
+      if (match == npos) { return {}; }
+      pos = match + 1;
+      return ViewRange(start + 1, match);
     }
 
     std::string_view ScanQuote(size_t & pos) const {
@@ -950,7 +975,7 @@ namespace emp {
     }
 
     // Additional scanning that also converts type.
-    char ScanAsChar(size_t & pos) const { return Get(pos++); }
+    char ScanAsChar(size_t & pos) const { return ScanChar(pos); }
 
     inline int ScanAsInt(size_t & pos) const;
 
@@ -1004,7 +1029,12 @@ namespace emp {
 
     template <typename T>
     [[nodiscard]] String operator+(T && in) const {
-      if constexpr (std::derived_from<T, std::string> || std::same_as<T, std::string_view>) {
+      using U = std::remove_cvref_t<T>;
+      if constexpr (std::same_as<U, std::string_view>) {
+        String out = *this;
+        out.append(in);
+        return out;
+      } else if constexpr (std::derived_from<U, std::string>) {
         return str() + std::forward<T>(in);
       } else {
         return str() + Make(in);
@@ -1013,6 +1043,7 @@ namespace emp {
 
     [[nodiscard]] String operator*(size_t count) const {
       String out;
+      emp_assert(empty() || count <= out.max_size() / size(), size(), count);
       out.reserve(size() * count);
       for (size_t i = 0; i < count; ++i) { out += *this; }
       return out;
@@ -1025,7 +1056,7 @@ namespace emp {
     // Most also have stand-alone Make* versions where the core implementation is found.
 
     template <typename... Ts>
-    String & Set(Ts... args) {
+    String & Set(Ts &&... args) {
       return *this = Make(std::forward<Ts>(args)...);
     }
 
@@ -1033,13 +1064,14 @@ namespace emp {
     [[nodiscard]] T As() const {
       std::stringstream ss;
       ss << *this;
-      T out;
+      T out{};
       ss >> out;
+      emp_assert(!ss.fail(), *this);
       return out;
     }
 
     template <typename... Ts>
-    String & Append(Ts... args) {
+    String & Append(Ts &&... args) {
       return *this += Make(std::forward<Ts>(args)...);
     }
 
@@ -1138,7 +1170,8 @@ namespace emp {
     String & SetUpper() { return (*this = MakeUpper(*this)); }
 
     String & SetUpperAt(size_t pos) {
-      Get(pos) = static_cast<char>(std::toupper(Get(pos)));
+      AssertPos_(pos);
+      Get(pos) = static_cast<char>(std::toupper(static_cast<unsigned char>(Get(pos))));
       return *this;
     }
 
@@ -1151,7 +1184,8 @@ namespace emp {
     String & SetLower() { return (*this = MakeLower(*this)); }
 
     String & SetLowerAt(size_t pos) {
-      Get(pos) = static_cast<char>(std::tolower(Get(pos)));
+      AssertPos_(pos);
+      Get(pos) = static_cast<char>(std::tolower(static_cast<unsigned char>(Get(pos))));
       return *this;
     }
 
@@ -1197,32 +1231,32 @@ namespace emp {
     String & SetRoman(int val) { return (*this = MakeRoman(val)); }
 
     template <typename... Ts>
-    String & AppendList(const Ts &... args) {
+    String & AppendList(Ts &&... args) {
       return (*this += MakeList(std::forward<Ts>(args)...));
     }
 
     template <typename... Ts>
-    String & SetList(const Ts &... args) {
+    String & SetList(Ts &&... args) {
       return (*this = MakeList(std::forward<Ts>(args)...));
     }
 
     template <typename... Ts>
-    String & AppendArgList(const Ts &... args) {
+    String & AppendArgList(Ts &&... args) {
       return (*this += MakeArgList(std::forward<Ts>(args)...));
     }
 
     template <typename... Ts>
-    String & SetArgList(const Ts &... args) {
+    String & SetArgList(Ts &&... args) {
       return (*this = MakeArgList(std::forward<Ts>(args)...));
     }
 
     template <typename... Ts>
-    String & AppendEnglishList(const Ts &... args) {
+    String & AppendEnglishList(Ts &&... args) {
       return (*this += MakeEnglishList(std::forward<Ts>(args)...));
     }
 
     template <typename... Ts>
-    String & SetEnglishList(const Ts &... args) {
+    String & SetEnglishList(Ts &&... args) {
       return (*this = MakeEnglishList(std::forward<Ts>(args)...));
     }
 
@@ -1237,12 +1271,12 @@ namespace emp {
     }
 
     template <typename... ARG_Ts>
-    String & AppendFormatted(const std::format_string<ARG_Ts...> & format, ARG_Ts... args) {
+    String & AppendFormatted(const std::format_string<ARG_Ts...> & format, ARG_Ts &&... args) {
       return *this += MakeFormatted(format, std::forward<ARG_Ts>(args)...);
     }
 
     template <typename... ARG_Ts>
-    String & SetFormatted(const std::format_string<ARG_Ts...> & format, ARG_Ts... args) {
+    String & SetFormatted(const std::format_string<ARG_Ts...> & format, ARG_Ts &&... args) {
       return *this = MakeFormatted(format, std::forward<ARG_Ts>(args)...);
     }
 
@@ -1704,12 +1738,16 @@ namespace emp {
 
     size_t pos = 0;
     if (HasOneOfAt("+-", pos)) { ++pos; }        // Allow leading +/-
+    const size_t digit_start = pos;
     while (HasDigitAt(pos)) { ++pos; }           // Any number of digits (none is okay)
+    bool has_mantissa = pos != digit_start;
     if (allow_float && HasCharAt('.', pos)) {    // If a DECIMAL PLACE, look for more digits.
       ++pos;                                     // Skip over the dot.
       if (!HasDigitAt(pos++)) { return false; }  // Must have at least one digit after '.'
+      has_mantissa = true;
       while (HasDigitAt(pos)) { ++pos; }         // Any number of digits is okay.
     }
+    if (!has_mantissa) { return false; }
     if (allow_float && HasOneOfAt("eE", pos)) {  // If there's an e... SCIENTIFIC NOTATION!
       ++pos;                                     // Skip over the e.
       if (HasOneOfAt("+-", pos)) { ++pos; }      // skip leading +/-
@@ -1763,6 +1801,7 @@ namespace emp {
         if (--open_count == 0) { return pos; }
       } else if (syntax.IsQuote(c)) {
         pos = FindQuoteMatch(pos);
+        if (pos == npos) { return npos; }
       }
     }
 
@@ -1785,7 +1824,8 @@ namespace emp {
       } else if (c == close) {
         if (--open_count == 0) { return pos; }
       } else if (syntax.IsQuote(c)) {
-        pos = FindQuoteMatch(pos);
+        pos = RFindQuoteMatch(pos);
+        if (pos == npos) { return npos; }
       }
     }
 
@@ -1812,8 +1852,10 @@ namespace emp {
       if (Get(pos) == target) { return pos; }
       if (syntax.IsQuote(Get(pos))) {
         pos = FindQuoteMatch(pos);
+        if (pos == npos) { return npos; }
       } else if (syntax.IsParen(Get(pos))) {
         pos = FindParenMatch(pos, syntax);
+        if (pos == npos) { return npos; }
       }
     }
 
@@ -1828,8 +1870,10 @@ namespace emp {
       if (Get(pos) == target) { return pos; }
       if (syntax.IsQuote(Get(pos))) {
         pos = RFindQuoteMatch(pos);
+        if (pos == npos) { return npos; }
       } else if (syntax.IsParen(Get(pos))) {
         pos = RFindParenMatch(pos, syntax);
+        if (pos == npos) { return npos; }
       }
     }
 
@@ -1846,9 +1890,11 @@ namespace emp {
       // Skip quotes, if needed...
       if (syntax.IsQuote(Get(scan_pos))) {
         scan_pos = FindQuoteMatch(scan_pos);
+        if (scan_pos == npos) { return npos; }
         if (found_pos < scan_pos) { found_pos = find(target, scan_pos); }
       } else if (syntax.IsParen(Get(scan_pos))) {
         scan_pos = FindParenMatch(scan_pos, syntax);
+        if (scan_pos == npos) { return npos; }
         if (found_pos < scan_pos) { found_pos = find(target, scan_pos); }
       }
     }
@@ -1867,9 +1913,11 @@ namespace emp {
       // Skip quotes, if needed...
       if (syntax.IsQuote(Get(scan_pos))) {
         scan_pos = RFindQuoteMatch(scan_pos);
+        if (scan_pos == npos) { return npos; }
         if (found_pos > scan_pos) { found_pos = rfind(target, scan_pos); }
       } else if (syntax.IsParen(Get(scan_pos))) {
-        scan_pos = RFindParenMatch(scan_pos);
+        scan_pos = RFindParenMatch(scan_pos, syntax);
+        if (scan_pos == npos) { return npos; }
         if (found_pos > scan_pos) { found_pos = rfind(target, scan_pos); }
       }
     }
@@ -1884,8 +1932,10 @@ namespace emp {
       if (char_set.Has(Get(pos))) { return pos; }
       if (syntax.IsQuote(Get(pos))) {
         pos = FindQuoteMatch(pos);
+        if (pos == npos) { return npos; }
       } else if (syntax.IsParen(Get(pos))) {
         pos = FindParenMatch(pos, syntax);
+        if (pos == npos) { return npos; }
       }
     }
 
@@ -1900,8 +1950,10 @@ namespace emp {
       if (char_set.Has(Get(pos))) { return pos; }
       if (syntax.IsQuote(Get(pos))) {
         pos = RFindQuoteMatch(pos);
+        if (pos == npos) { return npos; }
       } else if (syntax.IsParen(Get(pos))) {
         pos = RFindParenMatch(pos, syntax);
+        if (pos == npos) { return npos; }
       }
     }
 
@@ -1916,8 +1968,10 @@ namespace emp {
       // Skip quotes, if needed...
       if (syntax.IsQuote(Get(pos))) {
         pos = FindQuoteMatch(pos);
+        if (pos == npos) { return; }
       } else if (syntax.IsParen(Get(pos))) {
         pos = FindParenMatch(pos, syntax);
+        if (pos == npos) { return; }
       }
     }
   }
@@ -1951,6 +2005,7 @@ namespace emp {
 
   // Find an whole identifier (same as find, but cannot have letter, digit or '_' before or after.)
   size_t String::FindID(const String & target, size_t start, const Syntax & syntax) const {
+    if (target.empty()) { return npos; }
     size_t pos = Find(target, start, syntax);
     while (pos != npos) {
       const bool before_ok   = (pos == 0) || !is_idchar(Get(pos - 1));
@@ -1975,6 +2030,7 @@ namespace emp {
   }
 
   bool String::PopIf(const String & in) {
+    if (in.empty()) { return false; }
     if (HasPrefix(in)) {
       PopFixed(in.size());
       return true;
@@ -2000,7 +2056,10 @@ namespace emp {
 
   /// Pop a segment from the beginning of a string as another string, shortening original.
   String String::PopFixed(size_t end_pos, size_t delim_size) {
-    if (end_pos == 0) { return ""; }             // Not popping anything!
+    if (end_pos == 0) {
+      erase(0, std::min(delim_size, size()));
+      return "";
+    }
     if (end_pos >= size()) { return PopAll(); }  // Popping everything!
 
     String out = substr(0, end_pos);  // Copy up to the delimiter for output
@@ -2019,6 +2078,7 @@ namespace emp {
   /// Remove a prefix of the string (up to a specified delimiter) and return it.  If the
   /// delimiter is not found, return the entire string and clear it.
   String String::PopTo(const String & delim, const Syntax & syntax) {
+    if (delim.empty()) { return ""; }
     return PopFixed(Find(delim, 0, syntax), delim.size());
   }
 
@@ -2036,7 +2096,9 @@ namespace emp {
   String String::PopLiteralSigned() {
     size_t int_size = 0;
     if (HasCharAt('-', 0) || HasCharAt('+', 0)) { ++int_size; }
+    const size_t digit_start = int_size;
     while (HasDigitAt(int_size)) { ++int_size; }
+    if (int_size == digit_start) { return ""; }
     return PopFixed(int_size);
   }
 
@@ -2050,12 +2112,16 @@ namespace emp {
     if (empty()) { return ""; }  // If string is empty, not a number!
     size_t pos = 0;
     if (HasOneOfAt("+-", pos)) { ++pos; }     // Allow leading +/-
+    const size_t digit_start = pos;
     while (HasDigitAt(pos)) { ++pos; }        // Any number of digits (none is okay)
+    bool has_mantissa = pos != digit_start;
     if (HasCharAt('.', pos)) {                // If DECIMAL POINT, look for more digits.
       ++pos;                                  // Skip over the dot.
       if (!HasDigitAt(pos++)) { return ""; }  // Must have at least one digit after '.'
+      has_mantissa = true;
       while (HasDigitAt(pos)) { ++pos; }      // Any number of digits is okay.
     }
+    if (!has_mantissa) { return ""; }
     if (HasOneOfAt("eE", pos)) {              // If e or E... SCIENTIFIC NOTATION!
       ++pos;                                  // Skip over the e.
       if (HasOneOfAt("+-", pos)) { ++pos; }   // skip leading +/-
@@ -2070,7 +2136,7 @@ namespace emp {
     if constexpr (std::is_same_v<char, T>) {
       return PopLiteralChar(syntax);
     } else if constexpr (std::is_base_of_v<std::string, T>) {
-      PopQuote(syntax);
+      return PopQuote(syntax);
     } else if constexpr (std::is_floating_point_v<T>) {
       return PopLiteralFloat();
     } else if constexpr (std::is_unsigned_v<T>) {
@@ -2094,7 +2160,13 @@ namespace emp {
     int result         = 0;
     constexpr int BASE = 10;
     while (pos < size() && is_digit(Get(pos))) {
-      result = result * BASE + (Get(pos) - '0');
+      const int digit = Get(pos) - '0';
+      const bool overflow = result > (std::numeric_limits<int>::max() - digit) / BASE;
+      if (overflow) {
+        while (pos < size() && is_digit(Get(pos))) { ++pos; }
+        return std::numeric_limits<int>::max();
+      }
+      result = result * BASE + digit;
       ++pos;
     }
     return result;
@@ -2129,8 +2201,9 @@ namespace emp {
     else {
       std::stringstream ss;
       ss << *this;
-      T out_val;
+      T out_val{};
       ss >> out_val;
+      emp_assert(!ss.fail(), *this);
       return out_val;
     }
   }
@@ -2145,23 +2218,29 @@ namespace emp {
                      const DELIM_T & delim,
                      const Syntax & syntax,
                      bool trim_whitespace) const {
+    out_set.clear();
     if (empty()) {
       return;  // Nothing to set!
     }
 
+    size_t delim_size = 1;
+    if constexpr (!std::same_as<std::remove_cvref_t<DELIM_T>, char>
+                  && !std::same_as<std::remove_cvref_t<DELIM_T>, CharSet>) {
+      const std::string_view delim_view{delim};
+      if (delim_view.empty()) { return; }
+      delim_size = delim_view.size();
+    }
+
     size_t start_pos = 0;
     size_t found_pos = Find(delim, 0, syntax);
-    while (found_pos < size()) {
+    while (found_pos != npos) {
       out_set.push_back(GetRange(start_pos, found_pos));
       if (trim_whitespace) { out_set.back().Trim(); }
-      if constexpr (std::derived_from<DELIM_T, std::string>) {
-        start_pos = found_pos + delim.size();
-      } else {
-        start_pos = found_pos + 1;  // Just a char.
-      }
-      found_pos = Find(delim, found_pos + 1, syntax);
+      start_pos = found_pos + delim_size;
+      found_pos = Find(delim, start_pos, syntax);
     }
-    out_set.push_back(GetRange(start_pos, found_pos));
+    out_set.push_back(GetRange(start_pos, size()));
+    if (trim_whitespace) { out_set.back().Trim(); }
   }
 
   /// @brief Slice a String on a delimiter; return a vector of results.
@@ -2186,6 +2265,7 @@ namespace emp {
                           const String & delim,
                           const Syntax & syntax) const {
     out_set.resize(0);
+    if (delim.empty()) { return; }
     if (empty()) {
       return;  // Nothing to set!
     }
@@ -2195,7 +2275,7 @@ namespace emp {
     while (found_pos < size()) {
       out_set.push_back(ViewRange(start_pos, found_pos));
       start_pos = found_pos + delim.size();
-      found_pos = Find(delim, found_pos + 1, syntax);
+      found_pos = Find(delim, start_pos, syntax);
     }
     out_set.push_back(View(start_pos));
   }
@@ -2271,6 +2351,7 @@ namespace emp {
   // Replace all instance of one string with another, from starting point.
   // Return number of changes made.
   size_t String::ReplaceAll(const String & from, const String & to, size_t start) {
+    if (from.empty()) { return 0; }
     size_t count = 0;
     for (size_t pos = find(from, start); pos != npos; pos = find(from, pos + to.size())) {
       replace(pos, from.size(), to);
@@ -2302,15 +2383,18 @@ namespace emp {
   String & String::SetReplaceVars(const MAP_T & var_map,
                                   const String & symbol,
                                   const Syntax & syntax) {
-    for (size_t pos = Find(symbol, 0, syntax);
-         pos < size() - 3;  // Need room for a replacement tag.
-         pos = Find(symbol, pos + symbol.size(), syntax)) {
+    if (symbol.empty()) { return *this; }
+
+    size_t pos = Find(symbol, 0, syntax);
+    while (pos != npos) {
       const size_t symbol_end = pos + symbol.size();
       if (HasAt(symbol, symbol_end)) {  // Compress two symbols (e.g., "$$") into one (e.g. "$")
         erase(pos, symbol.size());
+        pos = Find(symbol, pos + symbol.size(), syntax);
         continue;
       }
       if (Get(symbol_end) != '{') {
+        pos = Find(symbol, symbol_end, syntax);
         continue;  // Eval must be surrounded by braces.
       }
 
@@ -2332,7 +2416,7 @@ namespace emp {
         break;
       }
       ReplaceRange(pos, end_pos + 1, replacement_it->second);  // Put into place.
-      pos += replacement_it->second.size();                    // Continue at the next position...
+      pos = Find(symbol, pos + replacement_it->second.size(), syntax);
     }
 
     return *this;
@@ -2350,6 +2434,7 @@ namespace emp {
                                 const String & end_str,
                                 const FUN_T & macro_fun,
                                 const String::Syntax & syntax) {
+    if (start_str.empty() || end_str.empty()) { return *this; }
     // We need to identify the comparator and divide up arguments in macro.
     size_t macro_count = 0;  // Count of the number of hits for this macro.
     size_t line_num    = 0;  // Line number where current macro hit was found.
@@ -2363,6 +2448,7 @@ namespace emp {
 
       // Isolate this macro instance and call the conversion function.
       const size_t end_pos    = Find(end_str, macro_pos + start_str.size(), syntax);
+      if (end_pos == npos) { break; }
       const String macro_body = GetRange(macro_pos + start_str.size(), end_pos);
 
       String new_str = macro_fun(macro_body, line_num, macro_count);
@@ -2376,9 +2462,8 @@ namespace emp {
 
   /// Test if an input string is properly formatted as a literal character.
   bool String::IsLiteralChar() const {
-    // @CAO: Need to add special types of numerical escapes here (e.g., ascii codes!)
     // Must contain a representation of a character, surrounded by single quotes.
-    if (size() < 3 || size() > 4) { return false; }
+    if (size() < 3 || size() > 6) { return false; }
     if (Get(0) != '\'' || back() != '\'') { return false; }
 
     // If there's only a single character in the quotes, it's USUALLY legal.
@@ -2387,7 +2472,13 @@ namespace emp {
     // Multiple chars must begin with a backslash.
     if (Get(1) != '\\') { return false; }
 
-    return CharSet{"nrt0\\\'"}.Has(Get(2));
+    const size_t escape_size = size() - 3;
+    const bool is_octal      = Get(2) >= '0' && Get(2) <= '7';
+    if (!is_octal) { return escape_size == 1 && is_escape_code(Get(2)); }
+    for (size_t pos = 2; pos < size() - 1; ++pos) {
+      if (Get(pos) < '0' || Get(pos) > '7') { return false; }
+    }
+    return escape_size <= 3;
   }
 
   /// Test if an input string is properly formatted as a literal string.
@@ -2405,7 +2496,12 @@ namespace emp {
           return false;  // Backslash must have char to escape.
         }
         pos++;  // Skip past escaped character.
-        if (!is_escape_code(Get(pos))) {
+        if (Get(pos) >= '0' && Get(pos) <= '7') {
+          for (size_t count = 1; count < 3 && pos + 1 < size() - 1 && Get(pos + 1) >= '0'
+               && Get(pos + 1) <= '7'; ++count) {
+            ++pos;
+          }
+        } else if (!is_escape_code(Get(pos))) {
           return false;  // Illegal escaped character.
         }
       }
@@ -2431,7 +2527,14 @@ namespace emp {
           return "Cannot escape the final quote.";  // Backslash must have char to escape.
         }
         pos++;
-        if (!is_escape_code(Get(pos))) { return "Unknown escape character."; }
+        if (Get(pos) >= '0' && Get(pos) <= '7') {
+          for (size_t count = 1; count < 3 && pos + 1 < size() - 1 && Get(pos + 1) >= '0'
+               && Get(pos + 1) <= '7'; ++count) {
+            ++pos;
+          }
+        } else if (!is_escape_code(Get(pos))) {
+          return "Unknown escape character.";
+        }
       }
     }
 
@@ -2504,7 +2607,10 @@ namespace emp {
   /// @param inc_visible Should we convert visible character that are often escaped (like " or \)
   /// @return A string representing the escaped sequence of chars
   String MakeEscaped(const String & in, bool include_visible) {
-    return {in, [include_visible](char c) { return MakeEscaped(c, include_visible); }};
+    String out;
+    out.reserve(in.size());
+    for (char c : in) { out += MakeEscaped(c, include_visible); }
+    return out;
   }
 
   String MakeCSVSafe(const String & in) {
@@ -2512,7 +2618,7 @@ namespace emp {
     if (!needsEscape) { return in; }
 
     String out;
-    out.reserve(in.size() + 2);  // Reserve space for quotes and the string content
+    out.reserve(in.size() + 2 + static_cast<size_t>(std::count(in.begin(), in.end(), '"')));
 
     out.push_back('\"');
     for (const char c : in) {
@@ -2537,7 +2643,7 @@ namespace emp {
         case '>':  out += "&gt;"; break;
         case '\'': out += "&apos;"; break;
         case '"':  out += "&quot;"; break;
-        case ' ':  out += convert_space ? "&nbsp" : " "; break;
+        case ' ':  out += convert_space ? "&nbsp;" : " "; break;
         case '\n': out += convert_space ? "<br>" : "\n"; break;
         default:   out += c;
       }
@@ -2589,20 +2695,25 @@ namespace emp {
   /// Convert a literal character representation to an actual string.
   /// (i.e., 'A', ';', or '\n')
   [[nodiscard]] char MakeCharFromLiteral(const String & value) {
-    emp_assert(value.IsLiteralChar());
+    const bool is_literal = value.IsLiteralChar();
+    if (!is_literal) { return '\0'; }
     // Given the assert, we can assume the string DOES contain a literal representation,
     // and we just need to convert it.
 
     if (value.size() == 3) { return value[1]; }
-    if (value.size() == 4) { return emp::ToEscapeChar(value[2]); }
+    if (value[2] < '0' || value[2] > '7') { return emp::ToEscapeChar(value[2]); }
 
-    return '\0';  // Error!
+    unsigned char out = 0;
+    for (size_t pos = 2; pos < value.size() - 1; ++pos) {
+      out = static_cast<unsigned char>(out * 8 + static_cast<unsigned char>(value[pos] - '0'));
+    }
+    return static_cast<char>(out);
   }
 
   /// Convert a literal string representation to an actual string.
   [[nodiscard]] String MakeStringFromLiteral(const String & value,
                                              [[maybe_unused]] CharSet quotes) {
-    emp_assert(value.IsLiteralString(quotes), value, value.DiagnoseLiteralString(quotes));
+    if (!value.IsLiteralString(quotes)) { return ""; }
     // Given the assert, we can assume string DOES contain a literal string representation.
 
     String out_string;
@@ -2613,7 +2724,19 @@ namespace emp {
       if (value[pos] != '\\') {
         out_string.push_back(value[pos]);
       } else {
-        out_string.push_back(emp::ToEscapeChar(value[++pos]));
+        ++pos;
+        if (value[pos] < '0' || value[pos] > '7') {
+          out_string.push_back(emp::ToEscapeChar(value[pos]));
+          continue;
+        }
+
+        unsigned char out = 0;
+        for (size_t count = 0; count < 3 && pos < value.size() - 1 && value[pos] >= '0'
+             && value[pos] <= '7'; ++count, ++pos) {
+          out = static_cast<unsigned char>(out * 8 + static_cast<unsigned char>(value[pos] - '0'));
+        }
+        --pos;
+        out_string.push_back(static_cast<char>(out));
       }
     }
 
@@ -2642,12 +2765,20 @@ namespace emp {
 
   /// Convert a string to all uppercase.
   [[nodiscard]] String MakeUpper(const String & value) {
-    return {value, [](char c) { return std::toupper(c); }};
+    String out = value;
+    for (char & c : out) {
+      c = static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
+    }
+    return out;
   }
 
   /// Convert a string to all lowercase.
   [[nodiscard]] String MakeLower(const String & value) {
-    return {value, [](char c) { return std::tolower(c); }};
+    String out = value;
+    for (char & c : out) {
+      c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+    }
+    return out;
   }
 
   /// Make first letter of each word upper case
@@ -2673,7 +2804,7 @@ namespace emp {
     for (size_t i = 0; i < value.size(); ++i) {
       char & ch = value[i];
       if (is_lower_letter(ch)) {
-        ch         = static_cast<char>(std::toupper(ch));
+        ch = static_cast<char>(std::toupper(static_cast<unsigned char>(ch)));
         last_lower = true;
       } else if (is_upper_letter(ch)) {
         if (last_lower) {
@@ -2691,7 +2822,7 @@ namespace emp {
   /// Make a string with the correct pluralization of the item being counted.  For example,
   /// MakeCount(1, "cow") would produce "1 cow", but MakeCount(2, "cow") would produce "2 cows".
   [[nodiscard]] String MakeCount(int val, const String & item, const String & plural_suffix) {
-    if (std::abs(val) == 1) { return MakeString(val, ' ', item); }
+    if (val == 1 || val == -1) { return MakeString(val, ' ', item); }
     return MakeString(val, " ", item, plural_suffix);
   }
 
@@ -2714,8 +2845,11 @@ namespace emp {
 
   /// Allow hex strings to be generated from signed values as well.
   [[nodiscard]] String MakeHexString(std::signed_integral auto  value, size_t min_width) {
-    if (value < 0) return "-" + MakeHexString(static_cast<uint64_t>(-value), min_width);
-    return MakeHexString(static_cast<uint64_t>(value), min_width);
+    using value_t    = decltype(value);
+    using unsigned_t = std::make_unsigned_t<value_t>;
+    const unsigned_t unsigned_value = static_cast<unsigned_t>(value);
+    if (value < 0) { return "-" + MakeHexString(unsigned_t{0} - unsigned_value, min_width); }
+    return MakeHexString(unsigned_value, min_width);
   }
 
   /// Convert an integer to a roman numeral string.
@@ -2728,6 +2862,8 @@ namespace emp {
     constexpr int VALUE_L   = 50;
     constexpr int VALUE_X   = 10;
     constexpr int VALUE_V   = 5;
+
+    if (val == std::numeric_limits<int>::min()) { return ""; }
 
     String out;
     if (val < 0) {
@@ -2830,10 +2966,10 @@ namespace emp {
       return MakeString(fun(*container.begin()), " and ", fun(*back_it));
     }
 
-    String out;
-    ;
-    for (auto it = container.begin(); it != back_it; ++it) { out += MakeString(", ", fun(*it)); }
-    out += MakeString("and ", fun(*back_it));
+    auto it    = container.begin();
+    String out = MakeString(fun(*it));
+    for (++it; it != back_it; ++it) { out += MakeString(", ", fun(*it)); }
+    out += MakeString(", and ", fun(*back_it));
 
     return out;
   }
@@ -2843,13 +2979,18 @@ namespace emp {
   //  The strings {"one", "two", "three"} would become "one, two, and three"
   template <typename CONTAINER_T>
   String MakeEnglishList(const CONTAINER_T & container) {
-    return MakeEnglishList(container, [](typename CONTAINER_T::value_type x) { return x; });
+    return MakeEnglishList(
+      container,
+      [](const typename CONTAINER_T::value_type & x) -> const typename CONTAINER_T::value_type & {
+        return x;
+      });
   }
 
   template <typename CONTAINER_T>
   String MakeQuotedList(const CONTAINER_T & container) {
-    return MakeEnglishList(container,
-                           [](typename CONTAINER_T::value_type x) { return MakeLiteral(x); });
+    return MakeEnglishList(container, [](const typename CONTAINER_T::value_type & x) {
+      return MakeLiteral(x);
+    });
   }
 
   template <typename... Args>
@@ -2860,6 +3001,7 @@ namespace emp {
   /// Concatenate n copies of a string.
   String MakeRepeat(const String & base, size_t n) {
     String out;
+    emp_assert(base.empty() || n <= out.max_size() / base.size(), base.size(), n);
     out.reserve(n * base.size());
     for (size_t i = 0; i < n; ++i) { out += base; }
     return out;
