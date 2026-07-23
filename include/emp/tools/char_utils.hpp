@@ -297,7 +297,7 @@ namespace emp {
 
   /// Which characters can come after a backslash in a string?
   static const CharSet & EscapeCodeCharSet() {
-    static CharSet cs("bfnrtv0\\\"\'`");
+    static CharSet cs("abfnrtv0\\\"\'`");
     return cs;
   }
 
