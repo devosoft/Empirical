@@ -8,8 +8,11 @@
  */
 
 #include <iostream>
+#include <limits>
+#include <map>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
@@ -133,6 +136,16 @@ TEST_CASE("Test Accessors", "[tools]")
   CHECK(str.Get(10) == '\0');
   CHECK(str.Get(emp::String::npos) == '\0');
 
+  CHECK(str.HasAt("ghi", 0));
+  CHECK(str.HasAt("jkl", 3));
+  CHECK(str.HasAt("", str.size()));
+  CHECK(!str.HasAt("gh", str.size()));
+  CHECK(!str.HasAt("ghi", emp::String::npos));
+
+  const emp::String view_test = "aa bb";
+  CHECK(view_test.ViewTo(" ", 3) == "bb");
+  CHECK(view_test.Count('b', view_test.size()) == 0);
+
   // Get should allow setting.
   str.Get(2) = 'm';
   CHECK(str == "ghmjkl");
@@ -192,6 +205,24 @@ TEST_CASE("Test String Composition-ID Functions", "[tools]")
   CHECK(!emp::String(".").IsNumber());
   CHECK(emp::String(".1").IsNumber());
   CHECK(!emp::String("1.").IsNumber());
+  CHECK(!emp::String("e2").IsNumber());
+  CHECK(!emp::String("+e2").IsNumber());
+
+  emp::String signed_value = "-42tail";
+  CHECK(signed_value.PopSigned() == -42);
+  CHECK(signed_value == "tail");
+
+  emp::String unsigned_value = "42tail";
+  CHECK(unsigned_value.PopUnsigned() == 42);
+  CHECK(unsigned_value == "tail");
+
+  emp::String negative_unsigned = "-1";
+  CHECK(negative_unsigned.PopUnsigned() == 0);
+  CHECK(negative_unsigned == "-1");
+
+  emp::String float_value = "-2.5e2tail";
+  CHECK(float_value.PopFloat() == -250.0);
+  CHECK(float_value == "tail");
 
   CHECK(emp::String("39adg18af3tj05ykty81734").OnlyAlphanumeric());
   CHECK(!emp::String("39adg18af?3tj05ykty81734").OnlyAlphanumeric());
@@ -299,6 +330,12 @@ TEST_CASE("Test String Find Functions", "[tools]")
   CHECK( quotes.RFindQuoteMatch(15) == 14 );
   CHECK( quotes.RFindQuoteMatch(25) == 16 );
 
+  const emp::String unterminated_quote = "\"abc";
+  CHECK(unterminated_quote.Find('z', 0, emp::StringSyntax::Quotes()) == emp::String::npos);
+  CHECK(unterminated_quote.Find(emp::CharSet("z"), 0, emp::StringSyntax::Quotes())
+        == emp::String::npos);
+  CHECK(unterminated_quote.FindAll('z', emp::StringSyntax::Quotes()).empty());
+
   // Do some tests on parentheses matching...
   emp::String parens = "(()(()()))((())\")))))()\")";
   CHECK( parens.FindParenMatch() == 9 );
@@ -320,6 +357,7 @@ TEST_CASE("Test String Find Functions", "[tools]")
   CHECK( parens.RFindParenMatch(16) == 10 );
   CHECK( parens.RFindParenMatch(14) == 11 );
   CHECK( parens.RFindParenMatch(22) == 21 ); // Works inside a quote if start there.
+  CHECK(emp::String("(\"x\")").RFindParenMatch(4, {"\"", ")("}) == 0);
 
   // Extra tests with braces and single quotes.
   emp::String braces = "{{}{}}{'{}}'}";
@@ -349,11 +387,42 @@ TEST_CASE("Test String Pop and Slice Functions", "[tools]")
   CHECK(start.PopFixed(9) == "a string.");
   CHECK(start == "");
 
+  start = ",a";
+  CHECK(start.Pop(',') == "");
+  CHECK(start == "a");
+
+  start = "\"hi\"tail";
+  CHECK(start.PopLiteral<emp::String>() == "\"hi\"");
+  CHECK(start == "tail");
+
   start = "This is a slightly longer string";
   auto split = start.Slice(" ");
   CHECK(split.size() == 6);
   CHECK(split[0] == "This");
   CHECK(split[5] == "string");
+
+  split = emp::String("a::b::").Slice("::");
+  REQUIRE(split.size() == 3);
+  CHECK(split[0] == "a");
+  CHECK(split[1] == "b");
+  CHECK(split[2] == "");
+
+  split = emp::String("aaaa").Slice(emp::String("aa"));
+  REQUIRE(split.size() == 3);
+  CHECK(split[0] == "");
+  CHECK(split[1] == "");
+  CHECK(split[2] == "");
+
+  split = emp::String(" a , b ").Slice(',', emp::StringSyntax::None(), true);
+  REQUIRE(split.size() == 2);
+  CHECK(split[0] == "a");
+  CHECK(split[1] == "b");
+
+  split = {"stale"};
+  emp::String("x,y").Slice(split);
+  REQUIRE(split.size() == 2);
+  CHECK(split[0] == "x");
+  CHECK(split[1] == "y");
 
   start = "This string has \"internal quotes\" that shouldn't be split.";
   split = start.Slice(" ", {"\""}); // Slice, but keep quotes as one unit.
@@ -378,6 +447,41 @@ TEST_CASE("Test String Removal Functions", "[tools]")
 
 TEST_CASE("Test String Conversion Functions", "[tools]")
 {
+  CHECK(emp::String("123").As<int>() == 123);
+  CHECK(emp::String("+123").As<long>() == 123L);
+  CHECK(emp::String("-123").As<long long>() == -123LL);
+  CHECK(emp::String(" 123 ").As<unsigned int>() == 123U);
+  CHECK(emp::String(std::to_string(std::numeric_limits<int>::min())).As<int>()
+        == std::numeric_limits<int>::min());
+  CHECK(emp::String(std::to_string(std::numeric_limits<int>::max())).As<int>()
+        == std::numeric_limits<int>::max());
+  CHECK(emp::String(std::to_string(std::numeric_limits<unsigned long long>::max()))
+          .As<unsigned long long>()
+        == std::numeric_limits<unsigned long long>::max());
+  CHECK(emp::String("0.125").As<float>() == 0.125F);
+  CHECK(emp::String("+0.125").As<double>() == 0.125);
+  CHECK(emp::String("-0.125").As<long double>() == -0.125L);
+  CHECK(emp::String("two words").As<std::string>() == "two words");
+  CHECK(emp::String("two words").As<emp::String>() == "two words");
+  CHECK(emp::String("x").As<char>() == 'x');
+
+  CHECK(emp::String("").As<int>() == 0);
+  CHECK(emp::String("not a number").As<int>() == 0);
+  CHECK(emp::String("+-12").As<int>() == 0);
+  CHECK(emp::String("12 trailing").As<int>() == 0);
+  CHECK(emp::String("999999999999999999999999").As<int>() == 0);
+  CHECK(emp::String("-1").As<unsigned int>() == 0U);
+  CHECK(emp::String(" 0.125 ").As<double>() == 0.125);
+  CHECK(emp::String("0.125 trailing").As<double>() == 0.0);
+  CHECK(emp::String("1e9999").As<double>() == 0.0);
+
+  CHECK(emp::String("123").AsInt() == 123);
+  CHECK(emp::String("0.125").AsDouble() == 0.125);
+  CHECK(emp::String("123").AsULL() == 123ULL);
+  CHECK_NOTHROW(emp::String("not a number").AsInt());
+  CHECK_NOTHROW(emp::String("not a number").AsDouble());
+  CHECK_NOTHROW(emp::String("not a number").AsULL());
+
   // Test conversion to an escaped string.
   const emp::String special_string = "This\t5tr1ng\nis\non THREE (3) \"lines\".";
   emp::String escaped_string = emp::MakeEscaped(special_string);
@@ -398,6 +502,18 @@ TEST_CASE("Test String Conversion Functions", "[tools]")
   CHECK(emp::MakeSlugify(base_string) == "this-is-an-okay-string-this-is-my-very-best-str1ng");
 
   emp::String first_line = base_string.PopLine();
+
+  const emp::String nested = "(abc)tail";
+  CHECK(nested.ViewNestedBlock() == "abc");
+  size_t scan_pos = 0;
+  CHECK(nested.ScanNestedBlock(scan_pos) == "abc");
+  CHECK(scan_pos == 5);
+
+  const emp::String quoted = "\"abc\"tail";
+  CHECK(quoted.ViewQuote() == "\"abc\"");
+  scan_pos = 0;
+  CHECK(quoted.ScanQuote(scan_pos) == "\"abc\"");
+  CHECK(scan_pos == 5);
 
   CHECK(first_line == "This is an okay string.");
   CHECK(first_line.ViewWord() == "This");
@@ -421,11 +537,49 @@ TEST_CASE("Test String Conversion Functions", "[tools]")
   CHECK(base_string.TrimFront() == "This\nis   -MY-    very best str1ng!!!!   ");
   CHECK(base_string.TrimBack() == "This\nis   -MY-    very best str1ng!!!!");
   CHECK(base_string.Compress() == "This is -MY- very best str1ng!!!!");
+
+  std::string_view string_view = "abc";
+  CHECK(emp::MakeString(string_view) == "abc");
+  CHECK((emp::String("x") + string_view) == "xabc");
+
+  const std::vector<std::string> words{"one", "two", "three"};
+  CHECK(emp::MakeEnglishList(words) == "one, two, and three");
+  emp::String list_wrapper;
+  CHECK(list_wrapper.AppendList(words, ";") == "one;two;three");
+
+  emp::String inserted = "bc";
+  const auto insert_it = inserted.insert(inserted.begin(), 'a');
+  CHECK(inserted == "abc");
+  CHECK(insert_it == inserted.begin());
+
+  int formatted_value = 42;
+  CHECK(inserted.SetFormatted("{}", formatted_value) == "42");
+  CHECK(inserted.AppendFormatted(" {}", 43) == "42 43");
+
+  CHECK(emp::MakeWebSafe("a b", true) == "a&nbsp;b");
+  CHECK(emp::MakeHexString(std::numeric_limits<int>::min()) == "-80000000");
+
+  for (int value = 0; value < 32; ++value) {
+    const emp::String literal = emp::MakeLiteral(static_cast<char>(value));
+    CHECK(literal.IsLiteralChar());
+    CHECK(emp::MakeCharFromLiteral(literal) == static_cast<char>(value));
+  }
+
+  const emp::String control_chars{"\001\002\003", 3};
+  CHECK(emp::MakeStringFromLiteral(emp::MakeLiteral(control_chars)) == control_chars);
 }
 
 
 TEST_CASE("Test String assign and Macro functions", "[tools]")
 {
+  emp::String vars = "${x}${y}";
+  vars.SetReplaceVars(std::map<emp::String, emp::String>{{"x", "A"}, {"y", "B"}});
+  CHECK(vars == "AB");
+
+  vars = "$$ ${x}";
+  vars.SetReplaceVars(std::map<emp::String, emp::String>{{"x", "A"}});
+  CHECK(vars == "$ A");
+
   emp::String test = "TIMES(abc,3) + TIMES(def,2) + TIMES(g, 8)";
   test.ReplaceMacro("TIMES(", ")",
     [](emp::String check_body, size_t, size_t) {
