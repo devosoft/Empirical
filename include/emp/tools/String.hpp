@@ -20,6 +20,8 @@
 #define INCLUDE_EMP_TOOLS_STRING_HPP_GUARD
 
 #include <algorithm>         // std::count
+#include <cerrno>            // errno, ERANGE
+#include <charconv>          // std::from_chars
 #include <cctype>            // std::toupper and std::tolower
 #include <concepts>          // std::same_as<>
 #include <cstddef>           // size_t, nullptr_t
@@ -984,7 +986,10 @@ namespace emp {
     // data structure is provided and one where it must be generated.
 
     template <typename T>
-    T ConvertTo() const;
+    [[deprecated("Use As<T>() instead.")]]
+    T ConvertTo() const {
+      return As<T>();
+    }
 
     template <typename DELIM_T = emp::String>
     inline void Slice(emp::vector<String> & out_set,
@@ -1060,14 +1065,65 @@ namespace emp {
       return *this = Make(std::forward<Ts>(args)...);
     }
 
+    // Arithmetic conversions accept surrounding whitespace, require all other characters to
+    // participate in the conversion, and return a default value if conversion fails.
     template <typename T>
     [[nodiscard]] T As() const {
-      std::stringstream ss;
-      ss << *this;
-      T out{};
-      ss >> out;
-      emp_assert(!ss.fail(), *this);
-      return out;
+      using value_t = std::remove_cv_t<T>;
+
+      if constexpr (std::same_as<value_t, std::string>
+                    || std::same_as<value_t, emp::String>) {
+        return *this;
+      } else if constexpr (
+        std::integral<value_t> && !std::same_as<value_t, bool>
+        && !std::same_as<value_t, char> && !std::same_as<value_t, signed char>
+        && !std::same_as<value_t, unsigned char>) {
+        value_t out{};
+        const char * begin = data();
+        const char * end = begin + size();
+        while (begin != end && std::isspace(static_cast<unsigned char>(*begin))) { ++begin; }
+        while (begin != end && std::isspace(static_cast<unsigned char>(end[-1]))) { --end; }
+
+        // Unlike the other signs, from_chars does not accept a leading '+'.
+        if (begin != end && *begin == '+') {
+          ++begin;
+          if (begin == end || *begin == '+' || *begin == '-') { return value_t{}; }
+        }
+
+        const auto [ptr, error] = std::from_chars(begin, end, out);
+        return begin != end && error == std::errc{} && ptr == end ? out : value_t{};
+      } else if constexpr (std::floating_point<value_t>) {
+        const char * const string_end = data() + size();
+        const char * content_begin = data();
+        while (content_begin != string_end
+               && std::isspace(static_cast<unsigned char>(*content_begin))) {
+          ++content_begin;
+        }
+        if (content_begin == string_end) { return value_t{}; }
+
+        char * end_ptr = nullptr;
+        errno = 0;
+        value_t out{};
+        if constexpr (std::same_as<value_t, float>) {
+          out = std::strtof(c_str(), &end_ptr);
+        } else if constexpr (std::same_as<value_t, double>) {
+          out = std::strtod(c_str(), &end_ptr);
+        } else {
+          out = std::strtold(c_str(), &end_ptr);
+        }
+        const bool range_error = errno == ERANGE;
+        while (end_ptr != string_end && std::isspace(static_cast<unsigned char>(*end_ptr))) {
+          ++end_ptr;
+        }
+        const bool success = end_ptr == string_end && !range_error;
+        return success ? out : value_t{};
+      } else {
+        std::stringstream ss;
+        ss << *this;
+        value_t out{};
+        ss >> out;
+        return ss.fail() ? value_t{} : out;
+      }
     }
 
     template <typename... Ts>
@@ -1075,11 +1131,11 @@ namespace emp {
       return *this += Make(std::forward<Ts>(args)...);
     }
 
-    [[nodiscard]] double AsDouble() const { return std::stod(*this); }
+    [[nodiscard]] double AsDouble() const { return As<double>(); }
 
-    [[nodiscard]] int AsInt() const { return std::stoi(*this); }
+    [[nodiscard]] int AsInt() const { return As<int>(); }
 
-    [[nodiscard]] unsigned long long AsULL() const { return std::stoull(*this); }
+    [[nodiscard]] unsigned long long AsULL() const { return As<unsigned long long>(); }
 
     [[nodiscard]] bool AsBool() const { return !(*this == "0" || this->AsLower() == "false"); }
 
@@ -2173,40 +2229,6 @@ namespace emp {
   }
 
   // ------ Transformations into non-Strings ------
-
-  template <typename T>
-  T String::ConvertTo() const {
-    // Is it already a string?
-    if constexpr (std::same_as<T, std::string> || std::same_as<T, emp::String>) {
-      return *this;
-    } else if constexpr (std::same_as<T, int>) {
-      return std::stoi(*this);
-    } else if constexpr (std::same_as<T, long>) {
-      return std::stol(*this);
-    } else if constexpr (std::same_as<T, long long>) {
-      return std::stoll(*this);
-    } else if constexpr (std::same_as<T, unsigned long>) {
-      return std::stoul(*this);
-    } else if constexpr (std::same_as<T, unsigned long long> || std::same_as<T, size_t>) {
-      return std::stoull(*this);
-    } else if constexpr (std::same_as<T, float>) {
-      return std::stof(*this);
-    } else if constexpr (std::same_as<T, double>) {
-      return std::stod(*this);
-    } else if constexpr (std::same_as<T, long double>) {
-      return std::stold(*this);
-    }
-
-    // All other printable cases:
-    else {
-      std::stringstream ss;
-      ss << *this;
-      T out_val{};
-      ss >> out_val;
-      emp_assert(!ss.fail(), *this);
-      return out_val;
-    }
-  }
 
   /// @brief Cut up a string based on the provided delimiter; fill them in to the provided vector.
   /// @param out_set destination vector
