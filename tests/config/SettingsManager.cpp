@@ -10,6 +10,7 @@
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include <cstdint>
+#include <limits>
 #include <sstream>
 
 #include "emp/config/SettingsManager.hpp"
@@ -25,27 +26,27 @@ TEST_CASE("Test SettingsManager", "[config]")
     emp::String s = "hello";
     uint64_t n = 10;
 
-    cfg.AddSetting("i-val", i, "an int64_t", 'i')
-       .AddSetting("d-val", d, "a double")
-       .AddSetting("b-val", b, "a bool")
-       .AddSetting("s-val", s, "a string")
-       .AddSetting("n-val", n, "a uint64_t");
+    cfg.AddSetting("i_val", i, "an int64_t", 'i')
+       .AddSetting("d_val", d, "a double")
+       .AddSetting("b_val", b, "a bool")
+       .AddSetting("s_val", s, "a string")
+       .AddSetting("n_val", n, "a uint64_t");
 
-    REQUIRE(cfg.HasSetting("i-val"));
-    REQUIRE(cfg.HasSetting("d-val"));
-    REQUIRE(cfg.HasSetting("b-val"));
-    REQUIRE(cfg.HasSetting("s-val"));
-    REQUIRE(cfg.HasSetting("n-val"));
+    REQUIRE(cfg.HasSetting("i_val"));
+    REQUIRE(cfg.HasSetting("d_val"));
+    REQUIRE(cfg.HasSetting("b_val"));
+    REQUIRE(cfg.HasSetting("s_val"));
+    REQUIRE(cfg.HasSetting("n_val"));
     REQUIRE(!cfg.HasSetting("missing"));
 
-    REQUIRE(cfg.Get<int64_t>("i-val")     == 3);
-    REQUIRE(cfg.Get<double>("d-val")      == 1.5);
-    REQUIRE(cfg.Get<bool>("b-val")        == true);
-    REQUIRE(cfg.Get<emp::String>("s-val") == "hello");
-    REQUIRE(cfg.Get<uint64_t>("n-val")    == 10);
+    REQUIRE(cfg.Get<int64_t>("i_val")     == 3);
+    REQUIRE(cfg.Get<double>("d_val")      == 1.5);
+    REQUIRE(cfg.Get<bool>("b_val")        == true);
+    REQUIRE(cfg.Get<emp::String>("s_val") == "hello");
+    REQUIRE(cfg.Get<uint64_t>("n_val")    == 10);
 
-    REQUIRE(cfg.GetDesc("i-val")   == "an int64_t");
-    REQUIRE(cfg.GetFlag("i-val")   == 'i');
+    REQUIRE(cfg.GetDesc("i_val")   == "an int64_t");
+    REQUIRE(cfg.GetFlag("i_val")   == 'i');
   }
 
   // Set() updates both the internal value and the bound variable
@@ -85,6 +86,71 @@ TEST_CASE("Test SettingsManager", "[config]")
     REQUIRE(n == 100);
   }
 
+  // Load: signed numbers, flexible decimal notation, and scientific notation
+  {
+    emp::SettingsManager cfg;
+    int64_t neg_int = 0;
+    double neg_double = 0.0;
+    double positive_exp = 0.0;
+    double negative_exp = 0.0;
+    double leading_decimal = 0.0;
+    int64_t min_int = 0;
+    int64_t max_int = 0;
+    uint64_t max_uint = 0;
+
+    cfg.AddSetting("neg_int", neg_int, "negative integer")
+       .AddSetting("neg_double", neg_double, "negative double")
+       .AddSetting("positive_exp", positive_exp, "positive exponent")
+       .AddSetting("negative_exp", negative_exp, "negative exponent")
+       .AddSetting("leading_decimal", leading_decimal, "leading decimal")
+       .AddSetting("min_int", min_int, "minimum signed integer")
+       .AddSetting("max_int", max_int, "maximum signed integer")
+       .AddSetting("max_uint", max_uint, "maximum unsigned integer");
+
+    std::istringstream is(
+      "neg_int = -42\n"
+      "neg_double = -3.5\n"
+      "positive_exp = 6.02E+23\n"
+      "negative_exp = -2.5e-4\n"
+      "leading_decimal = -.5\n"
+      "min_int = -9223372036854775808\n"
+      "max_int = 9223372036854775807\n"
+      "max_uint = 18446744073709551615\n"
+    );
+    REQUIRE(cfg.Load(is));
+    REQUIRE(neg_int == -42);
+    REQUIRE(neg_double == -3.5);
+    REQUIRE(positive_exp == 6.02E+23);
+    REQUIRE(negative_exp == -2.5e-4);
+    REQUIRE(leading_decimal == -0.5);
+    REQUIRE(min_int == std::numeric_limits<int64_t>::min());
+    REQUIRE(max_int == std::numeric_limits<int64_t>::max());
+    REQUIRE(max_uint == std::numeric_limits<uint64_t>::max());
+  }
+
+  // SaveCurrent and Load round-trip values serialized in signed and scientific notation
+  {
+    int64_t saved_int = -42;
+    double saved_double = 1.0e100;
+    emp::SettingsManager writer;
+    writer.AddSetting("i", saved_int, "integer")
+          .AddSetting("d", saved_double, "double");
+
+    std::ostringstream os;
+    REQUIRE(writer.SaveCurrent(os));
+
+    int64_t loaded_int = 0;
+    double loaded_double = 0.0;
+    emp::SettingsManager reader;
+    reader.AddSetting("i", loaded_int, "integer")
+          .AddSetting("d", loaded_double, "double");
+
+    std::istringstream is(os.str());
+    REQUIRE(reader.Load(is));
+    REQUIRE(loaded_int == saved_int);
+    REQUIRE(loaded_double == saved_double);
+  }
+
   // Load: boolean literals (On/Off/True/False/1/0, case-insensitive)
   {
     emp::SettingsManager cfg;
@@ -118,6 +184,19 @@ TEST_CASE("Test SettingsManager", "[config]")
     std::istringstream is("b = a\n");
     REQUIRE(cfg.Load(is));
     REQUIRE(b == 99);
+  }
+
+  // Load: string-to-string copy uses the semantic value, not a quoted config literal
+  {
+    emp::SettingsManager cfg;
+    emp::String source = "hello \"quoted\" \\\\ tab\tline\nbreak";
+    emp::String dest;
+    cfg.AddSetting("source", source, "source")
+       .AddSetting("dest", dest, "dest");
+
+    std::istringstream is("dest = source\n");
+    REQUIRE(cfg.Load(is));
+    REQUIRE(dest == source);
   }
 
   // Load: comments and blank lines are skipped
@@ -166,6 +245,30 @@ TEST_CASE("Test SettingsManager", "[config]")
     std::istringstream is("greet world\n");
     REQUIRE(cfg.Load(is));
     REQUIRE(captured == "world");
+  }
+
+  // Global keywords may share non-leading components with scoped setting names
+  {
+    emp::SettingsManager cfg;
+    int robot_speed = 0;
+    emp::String captured;
+    cfg.AddKeyword("speed", [&captured](emp::vector<emp::String> args) {
+      captured = args.empty() ? "" : args[0];
+    }, "global speed keyword");
+    cfg.AddSetting("robot.speed", robot_speed, "robot speed");
+
+    std::istringstream is("robot { speed = 42; }\nspeed fast\n");
+    REQUIRE(cfg.Load(is));
+    REQUIRE(robot_speed == 42);
+    REQUIRE(captured == "fast");
+
+    // The reverse registration order should be valid as well.
+    emp::SettingsManager reverse_cfg;
+    int reverse_speed = 0;
+    reverse_cfg.AddSetting("robot.speed", reverse_speed, "robot speed");
+    reverse_cfg.AddKeyword("speed", [](emp::vector<emp::String>) {}, "global speed keyword");
+    REQUIRE(reverse_cfg.HasSetting("robot.speed"));
+    REQUIRE(reverse_cfg.HasKeyword("speed"));
   }
 
   // Scopes: dot-notation registers and loads scoped settings
@@ -218,7 +321,7 @@ TEST_CASE("Test SettingsManager", "[config]")
     REQUIRE(val == 99);
   }
 
-  // LoadArgs: -s / --set applies a bulk config string and is removed from args
+  // LoadArgs: multiple long setting options are applied and removed from args
   {
     emp::SettingsManager cfg;
     int x = 0;
@@ -226,16 +329,11 @@ TEST_CASE("Test SettingsManager", "[config]")
     cfg.AddSetting("x", x, "int")
        .AddSetting("d", d, "double");
 
-    emp::vector<emp::String> args = { "program", "-:", "x = 7; d = 3.5" };
+    emp::vector<emp::String> args = { "program", "--x", "7", "--d", "3.5" };
     REQUIRE(cfg.LoadArgs(args));
     REQUIRE(x == 7);
     REQUIRE(d == 3.5);
     REQUIRE(args.size() == 1); // only "program" remains
-
-    emp::vector<emp::String> args2 = { "program", "--set", "x = 99" };
-    REQUIRE(cfg.LoadArgs(args2));
-    REQUIRE(x == 99);
-    REQUIRE(args2.size() == 1);
   }
 
   // LoadArgs: per-setting short flag sets the bound variable and is removed from args
@@ -298,20 +396,6 @@ TEST_CASE("Test SettingsManager", "[config]")
     REQUIRE(args.size() == 2); // only "program" and "other" remain
     REQUIRE(args[0] == "program");
     REQUIRE(args[1] == "other");
-  }
-
-  // LoadArgs: -s / --set and its config string are removed from args
-  {
-    emp::SettingsManager cfg;
-    int x = 0;
-    cfg.AddSetting("x", x, "int");
-
-    emp::vector<emp::String> args = { "program", "-:", "x = 4", "leftover" };
-    REQUIRE(cfg.LoadArgs(args));
-    REQUIRE(x == 4);
-    REQUIRE(args.size() == 2); // only "program" and "leftover" remain
-    REQUIRE(args[0] == "program");
-    REQUIRE(args[1] == "leftover");
   }
 
   // Load: single-quoted string literals
