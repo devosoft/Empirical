@@ -199,6 +199,119 @@ TEST_CASE("Test SettingsManager", "[config]")
     REQUIRE(dest == source);
   }
 
+  // AddValue: fixed values are readable and usable on the right-hand side.
+  {
+    emp::SettingsManager cfg;
+    double result = 0.0;
+    emp::String label;
+    cfg.AddValue("PI", 3.141592653589793, "circle constant")
+       .AddValue("LABEL", "ready", "fixed string")
+       .AddSetting("result", result, "result")
+       .AddSetting("label", label, "label");
+
+    REQUIRE(cfg.HasValue("PI"));
+    REQUIRE(cfg.HasValue("LABEL"));
+    REQUIRE(cfg.HasValue("result"));       // Every setting is also a value.
+    REQUIRE(!cfg.HasSetting("PI"));
+    REQUIRE(cfg.HasSetting("result"));
+    REQUIRE(cfg.HasIdentifier("PI"));
+    REQUIRE(cfg.Get<double>("PI") == 3.141592653589793);
+    REQUIRE(cfg.Get<emp::String>("LABEL") == "ready");
+
+    std::istringstream is("result = PI\nlabel = LABEL\n");
+    REQUIRE(cfg.Load(is));
+    REQUIRE(result == 3.141592653589793);
+    REQUIRE(label == "ready");
+  }
+
+  // AddValue: getter values are dynamic and are not evaluated during registration.
+  {
+    emp::SettingsManager cfg;
+    int current_time = 10;
+    int getter_calls = 0;
+    int observed = 0;
+    cfg.AddValue("time", [&]() {
+      ++getter_calls;
+      return current_time;
+    }, "current time");
+    cfg.AddSetting("observed", observed, "observed time");
+
+    REQUIRE(getter_calls == 0);
+    REQUIRE(cfg.Get<int>("time") == 10);
+    REQUIRE(getter_calls == 1);
+    current_time = 25;
+
+    std::istringstream is("observed = time\n");
+    REQUIRE(cfg.Load(is));
+    REQUIRE(observed == 25);
+    REQUIRE(getter_calls == 2);
+  }
+
+  // AddValue: writable values may be assigned but remain hidden from setting output.
+  {
+    emp::SettingsManager cfg;
+    int hidden = 1;
+    int visible = 2;
+    cfg.AddValue(
+      "hidden",
+      [&hidden]() { return hidden; },
+      [&hidden](int value) { hidden = value; },
+      "hidden writable value"
+    );
+    cfg.AddSetting("visible", visible, "visible setting");
+
+    std::istringstream is("hidden = 7\n");
+    REQUIRE(cfg.Load(is));
+    REQUIRE(hidden == 7);
+    cfg.Set("hidden", 9);
+    REQUIRE(hidden == 9);
+    cfg.Set("hidden", "10");
+    REQUIRE(hidden == 10);
+    cfg.Set("hidden", std::string{"11"});
+    REQUIRE(hidden == 11);
+
+    std::ostringstream saved;
+    REQUIRE(cfg.SaveCurrent(saved));
+    REQUIRE(saved.str().find("visible") != std::string::npos);
+    REQUIRE(saved.str().find("hidden") == std::string::npos);
+
+    std::ostringstream settings_help;
+    cfg.PrintSettings(settings_help);
+    REQUIRE(settings_help.str().find("visible") != std::string::npos);
+    REQUIRE(settings_help.str().find("hidden") == std::string::npos);
+
+    std::ostringstream status;
+    cfg.PrintStatus(status);
+    REQUIRE(status.str().find("hidden") == std::string::npos);
+  }
+
+  // RHS lookup is lexical: nearest scope first, then parents, then global scope.
+  {
+    emp::SettingsManager cfg;
+    int global_result = 0;
+    int outer_result = 0;
+    int inner_result = 0;
+    int fallback_result = 0;
+    cfg.AddValue("PI", 1)
+       .AddValue("outer.PI", 2)
+       .AddValue("outer.inner.PI", 3)
+       .AddSetting("global_result", global_result, "global")
+       .AddSetting("outer.result", outer_result, "outer")
+       .AddSetting("outer.inner.result", inner_result, "inner")
+       .AddSetting("other.result", fallback_result, "fallback");
+
+    std::istringstream is(
+      "global_result = PI\n"
+      "outer { result = PI; inner { result = PI; } }\n"
+      "other { result = PI; }\n"
+    );
+    REQUIRE(cfg.Load(is));
+    REQUIRE(global_result == 1);
+    REQUIRE(outer_result == 2);
+    REQUIRE(inner_result == 3);
+    REQUIRE(fallback_result == 1);
+  }
+
   // Load: comments and blank lines are skipped
   {
     emp::SettingsManager cfg;
@@ -833,6 +946,42 @@ TEST_CASE("Test SettingsManager SerialSave and SerialLoad", "[config][serialize]
     cfg2.SerialLoad(load_pod);
 
     REQUIRE(s2 == s);
+  }
+
+  // Named values are not included in serialized setting state.
+  {
+    int setting = 42;
+    int writable_value = 7;
+    emp::SettingsManager cfg;
+    cfg.AddSetting("setting", setting, "setting")
+       .AddValue("constant", 100)
+       .AddValue(
+         "writable_value",
+         [&writable_value]() { return writable_value; },
+         [&writable_value](int value) { writable_value = value; }
+       );
+
+    std::stringstream ss;
+    emp::SerialPod save_pod(ss, true);
+    cfg.SerialSave(save_pod);
+
+    int loaded_setting = 0;
+    int loaded_value = -1;
+    emp::SettingsManager cfg2;
+    cfg2.AddSetting("setting", loaded_setting, "setting")
+        .AddValue("constant", 200)
+        .AddValue(
+          "writable_value",
+          [&loaded_value]() { return loaded_value; },
+          [&loaded_value](int value) { loaded_value = value; }
+        );
+
+    emp::SerialPod load_pod(ss, false);
+    cfg2.SerialLoad(load_pod);
+
+    REQUIRE(loaded_setting == 42);
+    REQUIRE(cfg2.Get<int>("constant") == 200);
+    REQUIRE(loaded_value == -1);
   }
 
   // Settings absent from the pod keep their current values
