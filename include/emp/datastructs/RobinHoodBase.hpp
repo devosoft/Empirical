@@ -75,7 +75,7 @@ namespace emp {
       void Next(size_t mask) noexcept {
         pos = (pos + 1) & mask;
         ++dist;
-        emp_assert(dist < 255);
+        emp_assert(dist < 255, dist);
       }
       operator size_t() const noexcept { return pos; }
     };
