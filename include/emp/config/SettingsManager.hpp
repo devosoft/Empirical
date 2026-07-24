@@ -587,13 +587,14 @@ namespace emp {
       const Token name_token = it.Use();
       if (verbose) emp::PrintLn("Found initial line token '", name_token.lexeme, "'.");
 
-      if (name_token != ident_ID) {
+      const emp::String name = name_token.lexeme;
+      const bool is_keyword = cur_scopes.empty() && HasKeyword(name);
+      if (name_token != ident_ID && !is_keyword) {
         emp::notify::Error(
           "UnexpectedToken '", name_token.lexeme, "'; expected keyword or parameter name."
         );
       }
-      const emp::String name = name_token.lexeme;
-      if (cur_scopes.empty() && HasKeyword(name)) { LoadKeyword(it, name); }
+      if (is_keyword) { LoadKeyword(it, name); }
       else if (HasValue(name)) { LoadAssignment(it, name); }
       else { LoadScope(it, name); } // Unknown id must be a new scope.
     }
