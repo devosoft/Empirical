@@ -586,6 +586,22 @@ TEST_CASE("Test SettingsManager", "[config]")
     REQUIRE(captured[2] == "baz");
   }
 
+  // Registered keywords take precedence over bool-like tokens at the start of a line.
+  {
+    emp::SettingsManager cfg;
+    emp::vector<emp::String> captured;
+    bool enabled = false;
+    cfg.AddKeyword("on", [&captured](emp::vector<emp::String> args) {
+      captured = args;
+    }, "event keyword");
+    cfg.AddSetting("enabled", enabled, "bool setting");
+
+    std::istringstream is("on update 10\nenabled = On\n");
+    REQUIRE(cfg.Load(is));
+    REQUIRE(captured == emp::vector<emp::String>{"update", "10"});
+    REQUIRE(enabled);
+  }
+
   // LoadArgs: processed long option and its value are removed from args
   {
     emp::SettingsManager cfg;
