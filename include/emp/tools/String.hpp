@@ -1068,7 +1068,7 @@ namespace emp {
     // Arithmetic conversions accept surrounding whitespace, require all other characters to
     // participate in the conversion, and return a default value if conversion fails.
     template <typename T>
-    [[nodiscard]] T As() const {
+    [[nodiscard]] T As(const T & fallback_val=T{}) const {
       using value_t = std::remove_cv_t<T>;
 
       if constexpr (std::same_as<value_t, std::string>
@@ -1087,11 +1087,11 @@ namespace emp {
         // Unlike the other signs, from_chars does not accept a leading '+'.
         if (begin != end && *begin == '+') {
           ++begin;
-          if (begin == end || *begin == '+' || *begin == '-') { return value_t{}; }
+          if (begin == end || *begin == '+' || *begin == '-') { return fallback_val; }
         }
 
         const auto [ptr, error] = std::from_chars(begin, end, out);
-        return begin != end && error == std::errc{} && ptr == end ? out : value_t{};
+        return begin != end && error == std::errc{} && ptr == end ? out : fallback_val;
       } else if constexpr (std::floating_point<value_t>) {
         const char * const string_end = data() + size();
         const char * content_begin = data();
@@ -1099,7 +1099,7 @@ namespace emp {
                && std::isspace(static_cast<unsigned char>(*content_begin))) {
           ++content_begin;
         }
-        if (content_begin == string_end) { return value_t{}; }
+        if (content_begin == string_end) { return fallback_val; }
 
         char * end_ptr = nullptr;
         errno = 0;
@@ -1116,13 +1116,13 @@ namespace emp {
           ++end_ptr;
         }
         const bool success = end_ptr == string_end && !range_error;
-        return success ? out : value_t{};
+        return success ? out : fallback_val;
       } else {
         std::stringstream ss;
         ss << *this;
         value_t out{};
         ss >> out;
-        return ss.fail() ? value_t{} : out;
+        return ss.fail() ? fallback_val : out;
       }
     }
 
