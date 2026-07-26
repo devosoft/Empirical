@@ -87,6 +87,7 @@
  *  - AddValue(name, getter, setter [, desc ]) – register a writable value that is omitted from
  *     generated configuration, command-line options, help, status, and serialized setting state.
  *  - AddKeyword(keyword, fun, desc) – register a keyword that invokes 'fun' with its args.
+ *  - AddOutputKeyword(keyword, fun, desc) – register a keyword whose ostream can be redirected.
  *  - Load(istream&) or Load(filename) – parse settings; errors are immediately fatal.
  *  - LoadArgs(args) – scan a 'vector<emp::String>' of command-line arguments, deleting those used:
  *       '-x val' or '--setting val' set specified setting (registered with AddSetting)
@@ -96,6 +97,7 @@
  *  - Get<T>(name) or Set(name, value) – programmatic get/set; setting a read-only value is fatal.
  *  - HasValue(name), HasSetting(name), HasKeyword(name), or HasIdentifier(name) – query names.
  *  - SetVerbose() – enable diagnostic printing during Load/Save.
+ *  - SetOutputPathResolver(fun) – customize paths used by output-keyword redirection.
  *
  * DEVELOPER NOTES:
  * - Consider allowing types to be more dynamic, perhaps set in a template.
@@ -114,10 +116,12 @@
 #include <filesystem>
 #include <fstream>
 #include <functional>
+#include <iostream>
 #include <limits>
 #include <map>
 #include <print>
 #include <stddef.h>
+#include <system_error>
 #include <type_traits>
 #include <utility>
 
@@ -134,6 +138,9 @@ namespace emp {
   private:
     using keyword_fun_arg_t = emp::vector<emp::String>;
     using keyword_fun_t = std::function<void(keyword_fun_arg_t)>;
+    using output_keyword_fun_t = std::function<void(keyword_fun_arg_t, std::ostream &)>;
+    using output_path_resolver_t =
+      std::function<std::filesystem::path(const std::filesystem::path &)>;
     using Iterator = emp::TokenStream::Iterator;
 
     /// Class to manage a named value, including user-facing settings.
@@ -410,6 +417,8 @@ namespace emp {
     std::map<char, emp::String> flag_map;  ///< Flag char -> setting/keyword name
     emp::vector<emp::String> cur_scopes{};
     bool verbose = false;
+    output_path_resolver_t output_path_resolver =
+      [](const std::filesystem::path & path) { return path; };
 
     // Build the lexer to load the file.
     Lexer lexer;
@@ -698,6 +707,14 @@ namespace emp {
 
     void SetVerbose(bool in=true) { verbose = in; }
 
+    /// Control how filenames from output redirection are resolved.  By default paths are used
+    /// unchanged.  Applications can use this hook to place relative paths in a data directory.
+    SettingsManager & SetOutputPathResolver(output_path_resolver_t resolver) {
+      emp_assert(resolver, "SettingsManager output path resolver cannot be empty.");
+      output_path_resolver = std::move(resolver);
+      return *this;
+    }
+
     /// Does this scope contain a named value? Settings are also values.
     [[nodiscard]] bool HasValue(const emp::String & name) const {
       return setting_map.contains(AppendScope(name));
@@ -823,6 +840,85 @@ namespace emp {
       SetupFlag(flag, keyword);
       keyword_map.emplace(keyword, KeywordInfo{keyword, fun, desc, flag, max_args});
       return *this;
+    }
+
+    /// Register a keyword whose output can be redirected with a trailing `> filename` or
+    /// `>> filename`.  Redirection is opt-in so ordinary keywords can preserve a nested command's
+    /// redirection tokens for later execution.
+    SettingsManager & AddOutputKeyword(const emp::String & keyword,
+                                       output_keyword_fun_t fun,
+                                       emp::String desc,
+                                       char flag = '\0',
+                                       size_t max_args = emp::MAX_SIZE_T) {
+      return AddKeyword(
+        keyword,
+        [this, keyword, fun=std::move(fun)](keyword_fun_arg_t args) {
+          size_t redirect_pos = args.size();
+          bool append = false;
+
+          const bool missing_filename = !args.empty() && (
+            args.back() == ">" || args.back() == ">>" ||
+            (args.size() >= 2 && args[args.size()-2] == ">" && args.back() == ">")
+          );
+          if (missing_filename) {
+            emp::notify::Error(keyword, " output redirection is missing its filename.");
+          }
+
+          // The config lexer produces two `>` tokens, while CLI parsing may preserve `>>`.
+          if (args.size() >= 3 && args[args.size()-3] == ">" && args[args.size()-2] == ">") {
+            redirect_pos = args.size() - 3;
+            append = true;
+          } else if (args.size() >= 2 && args[args.size()-2] == ">>") {
+            redirect_pos = args.size() - 2;
+            append = true;
+          } else if (args.size() >= 2 && args[args.size()-2] == ">") {
+            redirect_pos = args.size() - 2;
+          }
+
+          if (redirect_pos == args.size()) {
+            fun(std::move(args), std::cout);
+            return;
+          }
+
+          emp::String filename = args.back();
+          if (filename.IsLiteralString("\"'")) {
+            filename = filename.ConvertStringFromLiteral("\"'");
+          }
+          if (filename.empty()) {
+            emp::notify::Error(keyword, " output redirection requires a non-empty filename.");
+          }
+          args.resize(redirect_pos);
+
+          const std::filesystem::path output_path = output_path_resolver(filename.str());
+          const std::filesystem::path parent_path = output_path.parent_path();
+          if (!parent_path.empty()) {
+            std::error_code error;
+            std::filesystem::create_directories(parent_path, error);
+            if (error) {
+              emp::notify::Error(
+                "Unable to create output directory '", parent_path.string(), "' for ", keyword,
+                ": ", error.message(), "."
+              );
+            }
+          }
+
+          const auto mode = std::ios::out | (append ? std::ios::app : std::ios::trunc);
+          std::ofstream output{output_path, mode};
+          if (!output) {
+            emp::notify::Error(
+              "Unable to open '", output_path.string(), "' for ", keyword, " output."
+            );
+          }
+          fun(std::move(args), output);
+          output.flush();
+          if (!output) {
+            emp::notify::Error(
+              "Failed while writing ", keyword, " output to '", output_path.string(), "'."
+            );
+          }
+        },
+        std::move(desc), flag, max_args
+      );
     }
 
     // Print out all info on the currently known settings.
