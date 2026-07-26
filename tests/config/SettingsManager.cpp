@@ -10,6 +10,8 @@
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 #include <cstdint>
+#include <filesystem>
+#include <fstream>
 #include <limits>
 #include <sstream>
 
@@ -382,6 +384,80 @@ TEST_CASE("Test SettingsManager", "[config]")
     reverse_cfg.AddKeyword("speed", [](emp::vector<emp::String>) {}, "global speed keyword");
     REQUIRE(reverse_cfg.HasSetting("robot.speed"));
     REQUIRE(reverse_cfg.HasKeyword("speed"));
+  }
+
+  // Output-aware keywords use the supplied stream and support file overwrite/append redirection.
+  {
+    emp::SettingsManager cfg;
+    emp::vector<emp::String> captured;
+    bool used_cout = false;
+    std::error_code filesystem_error;
+    const std::filesystem::path temp_dir =
+      std::filesystem::temp_directory_path(filesystem_error);
+    REQUIRE(!filesystem_error);
+    const std::filesystem::path output_dir = temp_dir / "emp_settings_manager_output_test";
+    std::filesystem::remove_all(output_dir, filesystem_error);
+    REQUIRE(!filesystem_error);
+
+    cfg.SetOutputPathResolver([&output_dir](const std::filesystem::path & path) {
+      return path.is_absolute() ? path : output_dir / path;
+    });
+    cfg.AddOutputKeyword(
+      "emit",
+      [&captured, &used_cout](emp::vector<emp::String> args, std::ostream & os) {
+        captured = std::move(args);
+        used_cout = &os == &std::cout;
+        if (!captured.empty()) os << captured[0] << '\n';
+      },
+      "emit text"
+    );
+
+    std::istringstream console_command("emit console\n");
+    REQUIRE(cfg.Load(console_command));
+    REQUIRE(used_cout);
+    REQUIRE(captured == emp::vector<emp::String>{"console"});
+
+    std::istringstream overwrite_command("emit first > \"nested/output.txt\"\n");
+    REQUIRE(cfg.Load(overwrite_command));
+    REQUIRE(!used_cout);
+    REQUIRE(captured == emp::vector<emp::String>{"first"});
+
+    std::istringstream replace_command("emit second > \"nested/output.txt\"\n");
+    REQUIRE(cfg.Load(replace_command));
+
+    std::istringstream append_command("emit third >> \"nested/output.txt\"\n");
+    REQUIRE(cfg.Load(append_command));
+
+    emp::vector<emp::String> cli_args = {
+      "program", "--emit", "fourth", ">>", "nested/output.txt"
+    };
+    REQUIRE(cfg.LoadArgs(cli_args));
+    REQUIRE(cli_args == emp::vector<emp::String>{"program"});
+
+    std::ifstream output{output_dir / "nested/output.txt"};
+    REQUIRE(output);
+    std::stringstream contents;
+    contents << output.rdbuf();
+    REQUIRE(contents.str() == "second\nthird\nfourth\n");
+    output.close();
+
+    std::filesystem::remove_all(output_dir, filesystem_error);
+    REQUIRE(!filesystem_error);
+  }
+
+  // Ordinary keywords preserve redirection belonging to a nested command.
+  {
+    emp::SettingsManager cfg;
+    emp::vector<emp::String> captured;
+    cfg.AddKeyword("on", [&captured](emp::vector<emp::String> args) {
+      captured = std::move(args);
+    }, "schedule a command");
+
+    std::istringstream is("on update 10 emit value >> \"output.txt\"\n");
+    REQUIRE(cfg.Load(is));
+    REQUIRE(captured == emp::vector<emp::String>{
+      "update", "10", "emit", "value", ">", ">", "\"output.txt\""
+    });
   }
 
   // Scopes: dot-notation registers and loads scoped settings
