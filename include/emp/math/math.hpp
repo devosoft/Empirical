@@ -302,9 +302,11 @@ namespace emp {
   }
 
   /// A version of Min that allows a variable number of inputs to be compared.
+  /// Returns by value: the backing array of a braced list ends its lifetime at
+  /// the end of the full expression, so a reference into it would dangle.
   template <typename T>
-  const T & Min(std::initializer_list<const T &> lst) {
-    emp_assert(lst.size > 0);  // Nothing to return if nothing in the list!
+  T Min(std::initializer_list<T> lst) {
+    emp_assert(lst.size() > 0);  // Nothing to return if nothing in the list!
     auto min_found = lst.begin();
     for (auto it = lst.begin() + 1; it < lst.end(); it++) {
       if (*it < *min_found) { min_found = it; }
@@ -313,9 +315,10 @@ namespace emp {
   }
 
   /// A version of Max that allows a variable number of inputs to be compared.
+  /// Returns by value, for the same reason as Min above.
   template <typename T>
-  const T & Max(std::initializer_list<const T &> lst) {
-    emp_assert(lst.size > 0);  // Nothing to return if nothing in the list!
+  T Max(std::initializer_list<T> lst) {
+    emp_assert(lst.size() > 0);  // Nothing to return if nothing in the list!
     auto max_found = lst.begin();
     for (auto it = lst.begin() + 1; it < lst.end(); it++) {
       if (*it > *max_found) { max_found = it; }
