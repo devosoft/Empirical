@@ -117,10 +117,12 @@
 #include <fstream>
 #include <functional>
 #include <iostream>
+#include <iterator>
 #include <limits>
 #include <map>
 #include <print>
 #include <stddef.h>
+#include <string>
 #include <system_error>
 #include <type_traits>
 #include <utility>
@@ -1076,7 +1078,13 @@ namespace emp {
 
     // Load settings from a stream; return true on success and abort on error.
     bool Load(std::istream & is) {
-      emp::TokenStream tokens = lexer.Tokenize(is);
+      // The stream lexer depends on seekg()/peek() behavior that is not portable to Emscripten's
+      // standard-library streams. Materialize the input and use the string-view lexer instead.
+      const std::string config_text{
+        std::istreambuf_iterator<char>{is},
+        std::istreambuf_iterator<char>{}
+      };
+      emp::TokenStream tokens = lexer.Tokenize(config_text);
       Iterator it = tokens.begin();
       while (it.Any()) LoadLine(it);
 
