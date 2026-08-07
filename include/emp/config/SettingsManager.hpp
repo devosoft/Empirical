@@ -68,6 +68,10 @@
  *     cfg.AddSetting("verbose",      verbose,  "Enable verbose mode",'v');
  *     cfg.AddSetting("robot1.speed", r1_speed, "Robot 1 speed");
  *     cfg.AddSetting("robot2.speed", r2_speed, "Robot 2 speed");
+ *     cfg.Metadata("reps")
+ *        .SetRange(1, 1000)
+ *        .SetScale(emp::SettingsManager::SettingScale::EXPONENTIAL)
+ *        .AddTag("advanced");
  *     cfg.AddValue("PI", 3.141592653589793);              // fixed, read-only value
  *     cfg.AddValue("time", [] { return GetTime(); });     // dynamic, read-only value
  *
@@ -96,6 +100,8 @@
  *  - SaveCurrent(ostream&) or SaveCurrent(filename) – same but uses current (live) values.
  *  - Get<T>(name) or Set(name, value) – programmatic get/set; setting a read-only value is fatal.
  *  - HasValue(name), HasSetting(name), HasKeyword(name), or HasIdentifier(name) – query names.
+ *  - Metadata(name) – configure or inspect optional GUI hints (range, choices, scale,
+ *    and application-defined tags).
  *  - SetVerbose() – enable diagnostic printing during Load/Save.
  *  - SetOutputPathResolver(fun) – customize paths used by output-keyword redirection.
  *
@@ -116,13 +122,13 @@
 #include <filesystem>
 #include <fstream>
 #include <functional>
+#include <initializer_list>
 #include <iostream>
 #include <iterator>
 #include <limits>
 #include <map>
 #include <print>
 #include <stddef.h>
-#include <string>
 #include <system_error>
 #include <type_traits>
 #include <utility>
@@ -137,6 +143,160 @@
 namespace emp {
 
   class SettingsManager {
+  public:
+    /// How a GUI should map a setting's numeric range onto a control such as a slider.
+    enum class SettingScale { LINEAR, EXPONENTIAL };
+
+    /// Optional presentation metadata for a user-facing setting.
+    ///
+    /// Values are stored as strings so this class remains independent of the setting's native
+    /// type.  The metadata guides interfaces such as GUIs; it does not add validation or overhead
+    /// to ordinary Get(), Set(), or configuration-file operations.
+    class SettingMetadata {
+    private:
+      emp::String min_value;
+      emp::String max_value;
+      emp::vector<emp::String> options;
+      emp::vector<emp::String> tags;
+      SettingScale scale = SettingScale::LINEAR;
+      bool has_min = false;
+      bool has_max = false;
+      bool allow_other_options = false;
+
+      template <typename T>
+      [[nodiscard]] static emp::String ToString(T && value) {
+        return emp::MakeString(std::forward<T>(value));
+      }
+
+    public:
+      [[nodiscard]] bool HasMinimum() const { return has_min; }
+      [[nodiscard]] bool HasMaximum() const { return has_max; }
+      [[nodiscard]] const emp::String & GetMinimum() const { return min_value; }
+      [[nodiscard]] const emp::String & GetMaximum() const { return max_value; }
+
+      template <typename T>
+      SettingMetadata & SetMinimum(T && value) {
+        min_value = ToString(std::forward<T>(value));
+        has_min = true;
+        return *this;
+      }
+
+      template <typename T>
+      SettingMetadata & SetMaximum(T && value) {
+        max_value = ToString(std::forward<T>(value));
+        has_max = true;
+        return *this;
+      }
+
+      template <typename MIN_T, typename MAX_T>
+      SettingMetadata & SetRange(MIN_T && min, MAX_T && max) {
+        return SetMinimum(std::forward<MIN_T>(min)).SetMaximum(std::forward<MAX_T>(max));
+      }
+
+      SettingMetadata & ClearMinimum() {
+        min_value.clear();
+        has_min = false;
+        return *this;
+      }
+
+      SettingMetadata & ClearMaximum() {
+        max_value.clear();
+        has_max = false;
+        return *this;
+      }
+
+      [[nodiscard]] const emp::vector<emp::String> & GetOptions() const { return options; }
+      [[nodiscard]] bool AllowsOtherOptions() const { return allow_other_options; }
+
+      /// Replace the options shown by a GUI. If allow_other is false, the GUI should restrict the
+      /// user to these choices; if true, they are suggestions and a custom value is permitted.
+      template <typename T>
+      SettingMetadata & SetOptions(std::initializer_list<T> values, bool allow_other = false) {
+        options.clear();
+        options.reserve(values.size());
+        for (const auto & value : values) options.emplace_back(ToString(value));
+        allow_other_options = allow_other;
+        return *this;
+      }
+
+      template <typename T>
+      SettingMetadata & SetOptions(const emp::vector<T> & values, bool allow_other = false) {
+        options.clear();
+        options.reserve(values.size());
+        for (const auto & value : values) options.emplace_back(ToString(value));
+        allow_other_options = allow_other;
+        return *this;
+      }
+
+      /// Replace the options with suggestions while explicitly permitting a custom value.
+      template <typename T>
+      SettingMetadata & SetSuggestedOptions(std::initializer_list<T> values) {
+        return SetOptions(values, true);
+      }
+
+      template <typename T>
+      SettingMetadata & SetSuggestedOptions(const emp::vector<T> & values) {
+        return SetOptions(values, true);
+      }
+
+      template <typename T>
+      SettingMetadata & AddOption(T && value) {
+        options.emplace_back(ToString(std::forward<T>(value)));
+        return *this;
+      }
+
+      SettingMetadata & SetAllowsOtherOptions(bool allow = true) {
+        allow_other_options = allow;
+        return *this;
+      }
+
+      SettingMetadata & ClearOptions() {
+        options.clear();
+        allow_other_options = false;
+        return *this;
+      }
+
+      [[nodiscard]] SettingScale GetScale() const { return scale; }
+
+      SettingMetadata & SetScale(SettingScale new_scale) {
+        scale = new_scale;
+        return *this;
+      }
+
+      [[nodiscard]] const emp::vector<emp::String> & GetTags() const { return tags; }
+
+      [[nodiscard]] bool HasTag(const emp::String & tag) const {
+        for (const emp::String & cur_tag : tags) if (cur_tag == tag) return true;
+        return false;
+      }
+
+      SettingMetadata & AddTag(emp::String tag) {
+        if (!HasTag(tag)) tags.emplace_back(std::move(tag));
+        return *this;
+      }
+
+      SettingMetadata & RemoveTag(const emp::String & tag) {
+        for (auto it = tags.begin(); it != tags.end(); ++it) {
+          if (*it == tag) {
+            tags.erase(it);
+            break;
+          }
+        }
+        return *this;
+      }
+
+      SettingMetadata & ClearTags() {
+        tags.clear();
+        return *this;
+      }
+
+      SettingMetadata & SetTags(std::initializer_list<emp::String> new_tags) {
+        tags.clear();
+        for (const emp::String & tag : new_tags) AddTag(tag);
+        return *this;
+      }
+    };
+
   private:
     using keyword_fun_arg_t = emp::vector<emp::String>;
     using keyword_fun_t = std::function<void(keyword_fun_arg_t)>;
@@ -414,9 +574,10 @@ namespace emp {
 
     std::filesystem::path config_dir{"../config"};  // Directory with configuration files
     emp::String exe_name;
-    std::map<emp::String, SettingInfo> setting_map;  ///< All named values, including settings
-    std::map<emp::String, KeywordInfo> keyword_map;
-    std::map<char, emp::String> flag_map;  ///< Flag char -> setting/keyword name
+    std::map<emp::String, SettingInfo> setting_map;      ///< All named values, including settings
+    std::map<emp::String, SettingMetadata> metadata_map; ///< Separate from setting_map to reduce overhead
+    std::map<emp::String, KeywordInfo> keyword_map;      ///< Keywords to trigger config functions
+    std::map<char, emp::String> flag_map;                ///< Flag char -> setting/keyword name
     emp::vector<emp::String> cur_scopes{};
     bool verbose = false;
     output_path_resolver_t output_path_resolver =
@@ -742,6 +903,46 @@ namespace emp {
 
     [[nodiscard]] const emp::String & GetDesc(const emp::String & name) const {
       return GetValueInfo(name).GetDescription();
+    }
+
+    [[nodiscard]] std::string GetTypeName(const emp::String & name) const {
+      return GetValueInfo(name).GetTypeName();
+    }
+
+    /// Return all registered user-facing setting names, including their full scope prefixes.
+    [[nodiscard]] emp::vector<emp::String> GetSettingNames() const {
+      emp::vector<emp::String> names;
+      for (const auto & [name, info] : setting_map) {
+        if (info.IsSetting()) names.emplace_back(name);
+      }
+      return names;
+    }
+
+    /// Has optional presentation metadata been explicitly configured for this setting?
+    [[nodiscard]] bool HasMetadata(const emp::String & name) const {
+      const emp::String full_name = AppendScope(name);
+      return HasSetting(name) && metadata_map.contains(full_name);
+    }
+
+    /// Configure optional presentation metadata for a setting.
+    SettingMetadata & Metadata(const emp::String & name) {
+      const emp::String full_name = AppendScope(name);
+      if (!HasSetting(name)) {
+        emp::notify::Error("SettingsManager: unknown setting '", name, "'.");
+      }
+      return metadata_map[full_name];
+    }
+
+    /// Inspect presentation metadata. Unconfigured settings share an immutable default object.
+    [[nodiscard]] const SettingMetadata & Metadata(const emp::String & name) const {
+      const emp::String full_name = AppendScope(name);
+      if (!HasSetting(name)) {
+        emp::notify::Error("SettingsManager: unknown setting '", name, "'.");
+      }
+      const auto it = metadata_map.find(full_name);
+      if (it != metadata_map.end()) return it->second;
+      static const SettingMetadata default_metadata;
+      return default_metadata;
     }
 
     [[nodiscard]] bool HasFlag(char flag) const { return flag && flag_map.contains(flag); }
@@ -1078,9 +1279,9 @@ namespace emp {
 
     // Load settings from a stream; return true on success and abort on error.
     bool Load(std::istream & is) {
-      // The stream lexer depends on seekg()/peek() behavior that is not portable to Emscripten's
-      // standard-library streams. Materialize the input and use the string-view lexer instead.
-      const std::string config_text{
+      // For now, convert stream to String.
+      // @CAO: Fix lexer's seekg()/peek() to use standard-library streams.
+      const emp::String config_text{
         std::istreambuf_iterator<char>{is},
         std::istreambuf_iterator<char>{}
       };
