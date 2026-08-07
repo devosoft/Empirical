@@ -51,6 +51,63 @@ TEST_CASE("Test SettingsManager", "[config]")
     REQUIRE(cfg.GetFlag("i_val")   == 'i');
   }
 
+  // Optional setting metadata supplies GUI constraints without changing ordinary setting access.
+  {
+    emp::SettingsManager cfg;
+    int64_t count = 10;
+    emp::String color = "red";
+    double rate = 1.0;
+
+    cfg.AddSetting("count", count, "Number of items")
+       .AddSetting("color", color, "Display color")
+       .AddSetting("rate", rate, "Update rate");
+
+    const emp::SettingsManager & const_cfg = cfg;
+    REQUIRE(!const_cfg.HasMetadata("count"));
+    REQUIRE(
+      const_cfg.Metadata("count").GetScale()
+      == emp::SettingsManager::SettingScale::LINEAR
+    );
+
+    cfg.Metadata("count")
+      .SetRange(1, 100)
+      .SetOptions({1, 10, 25, 50, 100})
+      .SetScale(emp::SettingsManager::SettingScale::EXPONENTIAL)
+      .SetTags({"advanced", "simulation"});
+
+    const auto & count_metadata = const_cfg.Metadata("count");
+    REQUIRE(const_cfg.HasMetadata("count"));
+    REQUIRE(count_metadata.HasMinimum());
+    REQUIRE(count_metadata.HasMaximum());
+    REQUIRE(count_metadata.GetMinimum() == "1");
+    REQUIRE(count_metadata.GetMaximum() == "100");
+    REQUIRE(
+      count_metadata.GetOptions()
+      == emp::vector<emp::String>{"1", "10", "25", "50", "100"}
+    );
+    REQUIRE(!count_metadata.AllowsOtherOptions());
+    REQUIRE(count_metadata.GetScale() == emp::SettingsManager::SettingScale::EXPONENTIAL);
+    REQUIRE(count_metadata.HasTag("advanced"));
+    REQUIRE(count_metadata.HasTag("simulation"));
+
+    cfg.Metadata("color")
+      .SetSuggestedOptions({"red", "green", "blue"})
+      .AddTag("appearance")
+      .AddTag("appearance");
+    const auto & color_metadata = const_cfg.Metadata("color");
+    REQUIRE(color_metadata.AllowsOtherOptions());
+    REQUIRE(color_metadata.GetOptions() == emp::vector<emp::String>{"red", "green", "blue"});
+    REQUIRE(color_metadata.GetTags() == emp::vector<emp::String>{"appearance"});
+
+    cfg.Metadata("rate").SetMinimum(0.01).SetMaximum(1000.0);
+    cfg.Set("rate", 2.5);
+    REQUIRE(rate == 2.5);
+    REQUIRE(cfg.Get<double>("rate") == 2.5);
+
+    REQUIRE(cfg.GetTypeName("count") == "int64_t");
+    REQUIRE(cfg.GetSettingNames() == emp::vector<emp::String>{"color", "count", "rate"});
+  }
+
   // Set() updates both the internal value and the bound variable
   {
     emp::SettingsManager cfg;
