@@ -295,6 +295,14 @@ namespace emp {
         for (const emp::String & tag : new_tags) AddTag(tag);
         return *this;
       }
+
+      /// True if no presentation hints have been configured (i.e. this object still matches a
+      /// freshly-constructed default).  Used so HasMetadata() can ignore entries that the mutable
+      /// Metadata() accessor created but never populated.
+      [[nodiscard]] bool IsEmpty() const {
+        return !has_min && !has_max && options.empty() && tags.empty()
+          && scale == SettingScale::LINEAR && !allow_other_options;
+      }
     };
 
   private:
@@ -306,7 +314,7 @@ namespace emp {
     using Iterator = emp::TokenStream::Iterator;
 
     /// Class to manage a named value, including user-facing settings.
-    class SettingInfo {
+    class ValueInfo {
     private:
       emp::String name;            ///< Label for this value in config files
       emp::String desc   = "";     ///< Description of value
@@ -427,14 +435,14 @@ namespace emp {
 
 
     public:
-      SettingInfo()                    = delete;
-      SettingInfo(const SettingInfo &) = default;
-      SettingInfo(SettingInfo &&)      = default;
+      ValueInfo()                    = delete;
+      ValueInfo(const ValueInfo &) = default;
+      ValueInfo(ValueInfo &&)      = default;
 
       // Create from a bound variable.
       template <typename VAR_T>
         requires (!std::invocable<VAR_T>)
-      SettingInfo(emp::String name, VAR_T & var, emp::String desc, char flag = '\0',
+      ValueInfo(emp::String name, VAR_T & var, emp::String desc, char flag = '\0',
                   emp::String explicit_default = "")
         : name(name), desc(desc)
         , default_val(explicit_default.empty() ? Convert<emp::String>(var) : explicit_default)
@@ -456,7 +464,7 @@ namespace emp {
       template <typename GETTER_T, typename SETTER_T,
                 typename T = std::remove_cvref_t<std::invoke_result_t<GETTER_T>>>
         requires std::invocable<GETTER_T>
-      SettingInfo(emp::String name, GETTER_T getter, SETTER_T setter,
+      ValueInfo(emp::String name, GETTER_T getter, SETTER_T setter,
                   emp::String desc, char flag = '\0', emp::String explicit_default = "",
                   bool is_setting = true)
         : name(name), desc(desc)
@@ -481,7 +489,7 @@ namespace emp {
       template <typename GETTER_T,
                 typename T = std::remove_cvref_t<std::invoke_result_t<GETTER_T>>>
         requires std::invocable<GETTER_T>
-      SettingInfo(emp::String name, GETTER_T getter, emp::String desc)
+      ValueInfo(emp::String name, GETTER_T getter, emp::String desc)
         : name(name), desc(desc), default_val(""), flag('\0'), is_setting(false)
         , type(ToTypeEnum<T>())
         , get_string([getter]() { return Convert<emp::String>(getter()); })
@@ -560,7 +568,7 @@ namespace emp {
           default: return "error";
         }
       }
-    }; // END OF SettingInfo definition
+    }; // END OF ValueInfo definition
 
     struct KeywordInfo {
       emp::String name;                  ///< Label for this keyword in config files
@@ -574,8 +582,8 @@ namespace emp {
 
     std::filesystem::path config_dir{"../config"};  // Directory with configuration files
     emp::String exe_name;
-    std::map<emp::String, SettingInfo> setting_map;      ///< All named values, including settings
-    std::map<emp::String, SettingMetadata> metadata_map; ///< Separate from setting_map to reduce overhead
+    std::map<emp::String, ValueInfo> value_map;      ///< All named values, including settings
+    std::map<emp::String, SettingMetadata> metadata_map; ///< Separate from value_map to reduce overhead
     std::map<emp::String, KeywordInfo> keyword_map;      ///< Keywords to trigger config functions
     std::map<char, emp::String> flag_map;                ///< Flag char -> setting/keyword name
     emp::vector<emp::String> cur_scopes{};
@@ -623,7 +631,7 @@ namespace emp {
     [[nodiscard]] emp::String ResolveValueName(const emp::String & name) const {
       for (size_t scope_count = cur_scopes.size(); ; --scope_count) {
         const emp::String candidate = AppendScope(name, scope_count);
-        if (setting_map.contains(candidate)) return candidate;
+        if (value_map.contains(candidate)) return candidate;
         if (scope_count == 0) break;
       }
       return "";
@@ -631,7 +639,7 @@ namespace emp {
 
     auto & GetValueInfo(this auto & self, const emp::String & name) {
       if (!self.HasValue(name)) emp::notify::Error("SettingsManager: unknown value '", name, "'.");
-      return self.setting_map.find(self.AppendScope(name))->second;
+      return self.value_map.find(self.AppendScope(name))->second;
     }
 
     auto & GetKeywordInfo(this auto & self, const emp::String & name) {
@@ -658,7 +666,7 @@ namespace emp {
     /// Apply a setting value at args[i]
     /// Called after the flag/option token itself has already been consumed.
     void LoadArgSetting(emp::vector<emp::String> & args, size_t & i,
-                        SettingInfo & info, const emp::String & flag_desc) {
+                        ValueInfo & info, const emp::String & flag_desc) {
       if (i >= args.size()) {
         emp::notify::Error("Expected arg value after '", flag_desc, "'.");
       }
@@ -720,7 +728,7 @@ namespace emp {
       if (token == ident_ID) {
         const emp::String resolved_name = ResolveValueName(token.lexeme);
         if (resolved_name.size()) {
-          return setting_map.at(resolved_name).AsString();
+          return value_map.at(resolved_name).AsString();
         }
         emp::notify::Error("Identifier '", token.lexeme, "' UNKNOWN!");
       }
@@ -789,11 +797,11 @@ namespace emp {
       }
 
       const emp::String full_name = AppendScope(name);
-      if (setting_map.contains(full_name) || keyword_map.contains(full_name)) {
+      if (value_map.contains(full_name) || keyword_map.contains(full_name)) {
         emp::notify::Error("SettingsManager: identifier '", full_name, "' is already registered.");
       }
 
-      for (const auto & [other_name, info] : setting_map) {
+      for (const auto & [other_name, info] : value_map) {
         (void) info;
         if (IsScopePrefix(full_name, other_name) || IsScopePrefix(other_name, full_name)) {
           emp::notify::Error(
@@ -824,12 +832,12 @@ namespace emp {
           "'. Expected dot-separated identifiers containing only letters, digits, and underscores."
         );
       }
-      if (keyword_map.contains(keyword) || setting_map.contains(keyword)) {
+      if (keyword_map.contains(keyword) || value_map.contains(keyword)) {
         emp::notify::Error("SettingsManager: identifier '", keyword, "' is already registered.");
       }
 
       if (keyword.find('.') == emp::String::npos) {
-        for (const auto & [value_name, info] : setting_map) {
+        for (const auto & [value_name, info] : value_map) {
           (void) info;
           if (IsScopePrefix(keyword, value_name)) {
             emp::notify::Error(
@@ -880,12 +888,12 @@ namespace emp {
 
     /// Does this scope contain a named value? Settings are also values.
     [[nodiscard]] bool HasValue(const emp::String & name) const {
-      return setting_map.contains(AppendScope(name));
+      return value_map.contains(AppendScope(name));
     }
 
     [[nodiscard]] bool HasSetting(const emp::String & name) const {
-      const auto it = setting_map.find(AppendScope(name));
-      return it != setting_map.end() && it->second.IsSetting();
+      const auto it = value_map.find(AppendScope(name));
+      return it != value_map.end() && it->second.IsSetting();
     }
 
     [[nodiscard]] bool HasKeyword(const emp::String & name) const {
@@ -912,16 +920,20 @@ namespace emp {
     /// Return all registered user-facing setting names, including their full scope prefixes.
     [[nodiscard]] emp::vector<emp::String> GetSettingNames() const {
       emp::vector<emp::String> names;
-      for (const auto & [name, info] : setting_map) {
+      for (const auto & [name, info] : value_map) {
         if (info.IsSetting()) names.emplace_back(name);
       }
       return names;
     }
 
     /// Has optional presentation metadata been explicitly configured for this setting?
+    /// A bare Metadata(name) call (e.g. to inspect via the mutable accessor) may leave an empty
+    /// record behind, so we report true only when that record actually carries hints.
     [[nodiscard]] bool HasMetadata(const emp::String & name) const {
       const emp::String full_name = AppendScope(name);
-      return HasSetting(name) && metadata_map.contains(full_name);
+      if (!HasSetting(name)) return false;
+      const auto it = metadata_map.find(full_name);
+      return it != metadata_map.end() && !it->second.IsEmpty();
     }
 
     /// Configure optional presentation metadata for a setting.
@@ -964,7 +976,7 @@ namespace emp {
                                  emp::String default_val = "") {
       const emp::String full_name = ValidateValueName(name);
       SetupFlag(flag, full_name);
-      setting_map.emplace(full_name, SettingInfo{full_name, value, desc, flag, default_val});
+      value_map.emplace(full_name, ValueInfo{full_name, value, desc, flag, default_val});
       return *this;
     }
 
@@ -984,7 +996,7 @@ namespace emp {
                                  emp::String default_val = "") {
       const emp::String full_name = ValidateValueName(name);
       SetupFlag(flag, full_name);
-      setting_map.emplace(full_name, SettingInfo{full_name, getter, setter, desc, flag, default_val});
+      value_map.emplace(full_name, ValueInfo{full_name, getter, setter, desc, flag, default_val});
       return *this;
     }
 
@@ -1009,7 +1021,7 @@ namespace emp {
                                GETTER_T getter,
                                emp::String desc = "") {
       const emp::String full_name = ValidateValueName(name);
-      setting_map.emplace(full_name, SettingInfo{full_name, getter, desc});
+      value_map.emplace(full_name, ValueInfo{full_name, getter, desc});
       return *this;
     }
 
@@ -1025,9 +1037,9 @@ namespace emp {
                                SETTER_T setter,
                                emp::String desc = "") {
       const emp::String full_name = ValidateValueName(name);
-      setting_map.emplace(
+      value_map.emplace(
         full_name,
-        SettingInfo{full_name, getter, setter, desc, '\0', "", false}
+        ValueInfo{full_name, getter, setter, desc, '\0', "", false}
       );
       return *this;
     }
@@ -1137,7 +1149,7 @@ namespace emp {
     // Print out all info on the currently known settings.
     void PrintSettings(std::ostream & os=std::cout) {
       std::println(os, "Available settings:");
-      for (const auto & [name, info] : setting_map) {
+      for (const auto & [name, info] : value_map) {
         if (!info.IsSetting()) continue;
         std::print(os, "  --{}", name);
         if (info.GetFlag()) std::print(os, " or -{}", info.GetFlag());
@@ -1165,7 +1177,7 @@ namespace emp {
         if (!info.flag) continue; // Only include keywords with flags.
         flag_map[name] = std::format("  -{} --{} : {}", info.flag, name, info.desc);
       }
-      for (const auto & [name, info] : setting_map) {
+      for (const auto & [name, info] : value_map) {
         if (!info.IsSetting()) continue;
         if (!info.GetFlag()) continue; // Only include settings with flags.
         flag_map[name] = std::format("  -{} --{} : {}", info.GetFlag(), name, info.GetDescription());
@@ -1181,7 +1193,7 @@ namespace emp {
     }
 
     /// Write all settings to a config file, grouping dot-prefixed keys into scoped blocks.
-    /// @param value_fn  Optional lambda: (const SettingInfo &) -> emp::String.
+    /// @param value_fn  Optional lambda: (const ValueInfo &) -> emp::String.
     ///   Defaults to returning each setting's registered default value.
     ///   Pass a custom lambda to select a different value (e.g. the live value).
     ///
@@ -1194,8 +1206,8 @@ namespace emp {
     ///   }
     /// @endcode
     bool Save(std::ostream & ofs,
-              std::function<emp::String(const SettingInfo &)> value_fn =
-                  [](const SettingInfo & info) { return info.GetDefaultLiteral(); }) {
+              std::function<emp::String(const ValueInfo &)> value_fn =
+                  [](const ValueInfo & info) { return info.GetDefaultLiteral(); }) {
       emp_assert(ofs);
 
       emp::vector<emp::String> open_scopes;  // currently open scope names (outermost first)
@@ -1216,7 +1228,7 @@ namespace emp {
         }
       };
 
-      for (const auto & [key, info] : setting_map) {
+      for (const auto & [key, info] : value_map) {
         if (!info.IsSetting()) continue;
 
         // Split "a.b.c" into parts; last part is the local name, rest are scopes.
@@ -1259,8 +1271,8 @@ namespace emp {
     }
 
     bool Save(const emp::String & filename,
-              std::function<emp::String(const SettingInfo &)> value_fn =
-                  [](const SettingInfo & info) { return info.GetDefaultLiteral(); }) {
+              std::function<emp::String(const ValueInfo &)> value_fn =
+                  [](const ValueInfo & info) { return info.GetDefaultLiteral(); }) {
       std::ofstream ofs{filename};
       if (!ofs) {
         notify::Error("Failed to open config file for saving: ", filename);
@@ -1270,11 +1282,11 @@ namespace emp {
 
     /// Write all settings using their current (live) values rather than defaults.
     bool SaveCurrent(std::ostream & ofs) {
-      return Save(ofs, [](const SettingInfo & info) { return info.AsLiteral(); });
+      return Save(ofs, [](const ValueInfo & info) { return info.AsLiteral(); });
     }
 
     bool SaveCurrent(const emp::String & filename) {
-      return Save(filename, [](const SettingInfo & info) { return info.AsLiteral(); });
+      return Save(filename, [](const ValueInfo & info) { return info.AsLiteral(); });
     }
 
     // Load settings from a stream; return true on success and abort on error.
@@ -1327,8 +1339,8 @@ namespace emp {
           if (HasFlag(flag_char)) {
             args.erase(args.begin() + i); // Remove the used argument.
             const emp::String & id = flag_map.at(flag_char);
-            if (setting_map.contains(id) && setting_map.at(id).IsSetting()) {
-              LoadArgSetting(args, i, setting_map.at(id), emp::MakeString('-',flag_char));
+            if (value_map.contains(id) && value_map.at(id).IsSetting()) {
+              LoadArgSetting(args, i, value_map.at(id), emp::MakeString('-',flag_char));
             } else {
               LoadArgKeyword(args, i, keyword_map.at(id));
             }
@@ -1340,9 +1352,9 @@ namespace emp {
         // Long option: --name  (setting value or keyword arguments)
         if (test_arg.size() > 2 && test_arg[0] == '-' && test_arg[1] == '-') {
           const emp::String opt = test_arg.substr(2);
-          if (setting_map.contains(opt) && setting_map.at(opt).IsSetting()) {
+          if (value_map.contains(opt) && value_map.at(opt).IsSetting()) {
             args.erase(args.begin() + i); // Remove the used argument.
-            LoadArgSetting(args, i, setting_map.at(opt), "--"+opt);
+            LoadArgSetting(args, i, value_map.at(opt), "--"+opt);
             continue;
           } else if (keyword_map.contains(opt)) {
             args.erase(args.begin() + i); // Remove the used argument.
@@ -1357,7 +1369,7 @@ namespace emp {
 
     void PrintStatus(std::ostream & os = std::cout) {
       bool any_changed = false;
-      for (const auto & [name, info] : setting_map) {
+      for (const auto & [name, info] : value_map) {
         if (!info.IsSetting()) continue;
         if (info.AsString() != info.GetDefault()) {
           if (!any_changed) {
@@ -1377,13 +1389,13 @@ namespace emp {
     /// match them up even if the registration order later changes.
     void SerialSave(emp::SerialPod & pod) const {
       size_t setting_count = 0;
-      for (const auto & [key, info] : setting_map) {
+      for (const auto & [key, info] : value_map) {
         (void) key;
         if (info.IsSetting()) ++setting_count;
       }
 
       pod.Save(setting_count);
-      for (const auto & [key, info] : setting_map) {
+      for (const auto & [key, info] : value_map) {
         if (!info.IsSetting()) continue;
         pod.Save(key);
         pod.Save(info.AsString());
@@ -1398,8 +1410,8 @@ namespace emp {
       for (size_t i = 0; i < count; ++i) {
         emp::String key   = pod.LoadValue<emp::String>();
         emp::String value = pod.LoadValue<emp::String>();
-        if (setting_map.contains(key) && setting_map.at(key).IsSetting()) {
-          setting_map.at(key).SetValue(value);
+        if (value_map.contains(key) && value_map.at(key).IsSetting()) {
+          value_map.at(key).SetValue(value);
         } else {
           emp::notify::Warning("SettingsManager::SerialLoad: setting '", key, "' not found; skipping.");
         }
