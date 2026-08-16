@@ -157,6 +157,7 @@ namespace emp {
     int num_orgs;          ///<  How many organisms currently exist of this group?
     int tot_orgs;          ///<  How many organisms have ever existed of this group?
     int num_offspring;     ///<  How many direct offspring groups exist from this one.
+    int num_offspring_ever; ///< How many direct offspring groups have ever been produced from this one
     int total_offspring;   ///<  How many total extant offspring taxa exist from this one (i.e. including indirect)
     size_t depth;             ///<  How deep in tree is this node? (Root is 0)
     double origination_time;  ///<  When did this taxon first appear in the population?
@@ -169,7 +170,7 @@ namespace emp {
 
     Taxon(uint64_t _id, const info_t & _info, Ptr<this_t> _parent=nullptr)
      : id (_id), info(_info), parent(_parent)
-     , num_orgs(0), tot_orgs(0), num_offspring(0), total_offspring(0)
+     , num_orgs(0), tot_orgs(0), num_offspring(0), num_offspring_ever(0), total_offspring(0)
      , depth(parent ? (parent->depth+1) : 0)
      , destruction_time(std::numeric_limits<double>::infinity()) { ; }
     // Taxon(const Taxon &) = delete;
@@ -207,6 +208,9 @@ namespace emp {
     /// Get the number of taxa that were produced by organisms from this Taxon.
     size_t GetNumOff() const { return num_offspring; }
 
+    /// Get the number of taxa that have ever been produced by organisms from this Taxon.
+    size_t GetNumOffEver() const {return num_offspring_ever;}
+
     /// Get the number of taxanomic steps since the ancestral organism was injected into the World.
     size_t GetDepth() const { return depth; }
 
@@ -237,6 +241,7 @@ namespace emp {
     /// Add a new offspring Taxon to this one.
     void AddOffspring(Ptr<this_t> offspring_tax) {
       ++num_offspring;
+      ++num_offspring_ever;
       offspring.insert(offspring_tax);
       AddTotalOffspring();
     }
@@ -707,7 +712,10 @@ namespace emp {
     /// Warning: this function invalidates most measurements you could make about tree topology.
     /// It is useful in select situations where you need to store ancestors for some period of time,
     /// but cannot computationally afford to store all ancestors for your entire run.
-    void RemoveBefore(int ud);
+    void RemoveAncestorsBefore(int ud);
+
+    /// Remove outside taxa that went extinct before specified update
+    void RemoveOutsideBefore(int ud);
 
     /// Run the given function on every active taxon (const version)
     /// @param fun the function to run on each taxon
@@ -1696,7 +1704,7 @@ namespace emp {
   // It is useful in select situations where you need to store ancestors for some period of time,
   // but cannot computationally afford to store all ancestors for your entire run.
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
-  void Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveBefore(int ud) {
+  void Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveAncestorsBefore(int ud) {
 
     std::set<Ptr<taxon_t>> to_remove;
     for (Ptr<taxon_t> tax : ancestor_taxa) {
@@ -1733,6 +1741,29 @@ namespace emp {
     return true;
   }
   #endif // #DOXYGEN_SHOULD_SKIP_THIS
+
+  // Remove all taxa that are not ancestors to anything and went extinct before 
+  // specified update
+  template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
+  void Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveOutsideBefore(int ud) {
+
+    std::set<Ptr<taxon_t>> to_remove;
+    for (Ptr<taxon_t> tax : outside_taxa) {
+      if (tax->GetDestructionTime() < ud ) {
+        to_remove.insert(tax);
+      }
+    }
+
+    for (Ptr<taxon_t> tax : to_remove) {
+        for (Ptr<taxon_t> off : tax->GetOffspring()) {
+          off->NullifyParent();
+        }
+        outside_taxa.erase(tax);
+        tax.Delete();
+    }
+
+  }
+
 
   // ======= Functions for getting information from the systematics manager
 
