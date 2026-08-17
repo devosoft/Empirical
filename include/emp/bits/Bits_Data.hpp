@@ -365,9 +365,9 @@ namespace emp {
       }
 
       void SerialLoad(emp::SerialPod & pod) {
-        base_t::Serialize(pod);  // Save size info.
+        base_t::Serialize(pod);  // Load size info.
         if (bits) { bits.DeleteArray(); }  // Delete old memory if needed
-        bits = NewArrayPtr<field_t>(base_t::NumFields());
+        bits = base_t::NumFields() ? NewArrayPtr<field_t>(base_t::NumFields()) : nullptr;
         for (size_t i = 0; i < base_t::NumFields(); ++i) { pod(bits[i]); }
       }
 
@@ -466,6 +466,11 @@ namespace emp {
       template <class Archive>
       void load(Archive & ar) {
         base_t::load(ar);
+        field_capacity = base_t::NumFields();  // Use loaded size as capacity.
+      }
+
+      void SerialLoad(emp::SerialPod & pod) {
+        base_t::SerialLoad(pod);
         field_capacity = base_t::NumFields();  // Use loaded size as capacity.
       }
 
