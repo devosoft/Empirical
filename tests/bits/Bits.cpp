@@ -70,6 +70,44 @@ void TestBasics(const T & bits, size_t _size, std::string vals="") {
   }
 }
 
+template <typename BITS_T>
+BITS_T MakeWatermarkPattern(const size_t num_bits) {
+  BITS_T bits(num_bits);
+  for (size_t i = 0; i < num_bits; ++i) {
+    if ((i % 3 == 0) != (i % 7 == 1)) { bits.Set(i); }
+  }
+  return bits;
+}
+
+template <typename BITS_T>
+BITS_T SerialPodRoundTrip(const BITS_T & original) {
+  std::stringstream ss;
+  BITS_T serializable(original);
+  emp::SerialPod save_pod(ss, true);
+  serializable.Serialize(save_pod);
+
+  BITS_T restored(1);
+  emp::SerialPod load_pod(ss, false);
+  restored.Serialize(load_pod);
+  return restored;
+}
+
+template <typename BITS_T>
+bool BitsMatchThrough(const BITS_T & actual, const BITS_T & expected, const size_t stop) {
+  for (size_t i = 0; i < stop; ++i) {
+    if (actual.Get(i) != expected.Get(i)) { return false; }
+  }
+  return true;
+}
+
+template <typename BITS_T>
+bool BitsAreClear(const BITS_T & bits, const size_t start) {
+  for (size_t i = start; i < bits.GetSize(); ++i) {
+    if (bits.Get(i)) { return false; }
+  }
+  return true;
+}
+
 TEST_CASE("0: Diagnosing current problems", "[bits]"){
   // Feel free to delete or change anything here; it's just to diagnose issues with CI.
   // std::string init("10011001010000011101");
@@ -4034,6 +4072,85 @@ TEST_CASE("32: Bits Serialize", "[bits][serialize]") {
 
     REQUIRE(bv == bv2);
   }
+}
+
+TEST_CASE("33: SerialPod restores watermark metadata", "[bits][serialize]") {
+  using WatermarkBitValue = emp::Bits<emp::Bits_WatermarkData, false>;
+
+  const size_t field_bits = emp::NUM_FIELD_BITS;
+  const size_t original_size = 2 * field_bits + 11;
+  const size_t within_capacity_size = 3 * field_bits;
+  const size_t beyond_capacity_size = 3 * field_bits + 9;
+
+  auto test_watermark_type = [&](auto type_tag) {
+    using bits_t = decltype(type_tag);
+
+    // Empty SerialPod round trips restore the logical value and can subsequently grow.
+    {
+      const bits_t original;
+      auto restored = SerialPodRoundTrip(original);
+      REQUIRE(restored.GetSize() == 0);
+      REQUIRE(restored == original);
+      restored.Resize(field_bits + 1);
+      REQUIRE(BitsAreClear(restored, 0));
+    }
+
+    const bits_t original = MakeWatermarkPattern<bits_t>(original_size);
+
+    // Nonempty, multi-field round trips preserve every bit.
+    {
+      const auto restored = SerialPodRoundTrip(original);
+      REQUIRE(restored.GetSize() == original_size);
+      REQUIRE(BitsMatchThrough(restored, original, original_size));
+    }
+
+    // Growth within the loaded allocation preserves all original bits and clears new bits.
+    {
+      auto restored = SerialPodRoundTrip(original);
+      restored.Resize(within_capacity_size);
+      REQUIRE(BitsMatchThrough(restored, original, original_size));
+      REQUIRE(BitsAreClear(restored, original_size));
+    }
+
+    // Growth beyond the loaded allocation also preserves every original bit.
+    {
+      auto restored = SerialPodRoundTrip(original);
+      restored.Resize(beyond_capacity_size);
+      REQUIRE(BitsMatchThrough(restored, original, original_size));
+      REQUIRE(BitsAreClear(restored, original_size));
+    }
+
+    // Shrinking retains the watermark allocation; regrowth preserves the remaining prefix.
+    {
+      const size_t shrunken_size = field_bits + 7;
+      auto restored = SerialPodRoundTrip(original);
+      restored.Resize(shrunken_size);
+      restored.Resize(beyond_capacity_size);
+      REQUIRE(BitsMatchThrough(restored, original, shrunken_size));
+      REQUIRE(BitsAreClear(restored, shrunken_size));
+    }
+
+    // Copy and move construction and assignment retain valid watermark metadata after loading.
+    {
+      auto restored = SerialPodRoundTrip(original);
+      bits_t copied(restored);
+      bits_t copy_assigned;
+      copy_assigned = restored;
+      bits_t moved(std::move(copied));
+      bits_t move_assigned;
+      move_assigned = std::move(copy_assigned);
+
+      restored.Resize(beyond_capacity_size);
+      moved.Resize(beyond_capacity_size);
+      move_assigned.Resize(beyond_capacity_size);
+      REQUIRE(BitsMatchThrough(restored, original, original_size));
+      REQUIRE(BitsMatchThrough(moved, original, original_size));
+      REQUIRE(BitsMatchThrough(move_assigned, original, original_size));
+    }
+  };
+
+  test_watermark_type(emp::BitVector{});
+  test_watermark_type(WatermarkBitValue{});
 }
 
 // Local settings for Empecable file checker.
