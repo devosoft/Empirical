@@ -49,12 +49,15 @@
 #define INCLUDE_EMP_SERIALIZE_SERIAL_POD_HPP_GUARD
 
 #include <array>
+#include <concepts>
+#include <functional>
 #include <iostream>
 #include <map>
 #include <optional>
 #include <set>
 #include <sstream>
 #include <tuple>
+#include <type_traits>
 #include <unordered_map>
 #include <unordered_set>
 #include <variant>
@@ -277,6 +280,28 @@ namespace emp {
     SerialPod & operator()(const T & in, const EXTRA_Ts &... extras) {
       emp_assert(IsSave(), "Trying to deserialize a const value.");
       Save(in, extras...);
+      return *this;
+    }
+
+    /// Serialize through an accessor pair rather than a directly-referenced variable.
+    /// On save, `get_fun()` supplies the value to write; on load, a value is read back and
+    /// handed to `set_fun(value)`.  The serialized type is the decayed return type of
+    /// `get_fun`, so `set_fun` must accept a value of that type.  This lets a class expose a
+    /// computed or indirectly-stored quantity for serialization without a backing variable.
+    ///
+    /// Example:
+    ///   pod.UseAccessors([&]{ return v.size(); }, [&](size_t n){ v.resize(n); });
+    template <typename GET_FUN, typename SET_FUN>
+      requires std::invocable<GET_FUN> &&
+               (!std::is_void_v<std::invoke_result_t<GET_FUN>>) &&
+               std::invocable<SET_FUN, std::invoke_result_t<GET_FUN>>
+    SerialPod & UseAccessors(GET_FUN && get_fun, SET_FUN && set_fun) {
+      using value_t = std::decay_t<std::invoke_result_t<GET_FUN>>;
+      if (IsSave()) {
+        Save(std::invoke(std::forward<GET_FUN>(get_fun)));
+      } else {
+        std::invoke(std::forward<SET_FUN>(set_fun), LoadValue<value_t>());
+      }
       return *this;
     }
   };
