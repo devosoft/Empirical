@@ -531,6 +531,46 @@ TEST_CASE("Test SerialPod with std::variant", "[serialize]")
   CHECK(std::holds_alternative<std::monostate>(mv2));
 }
 
+TEST_CASE("Test SerialPod with UseAccessors", "[serialize]")
+{
+  std::stringstream ss;
+  emp::SerialPod save_pod(ss, true);
+  emp::SerialPod load_pod(ss, false);
+
+  // Round-trip a value through a get/set pair rather than a direct variable reference.
+  int stored = 314;
+  int restored = 0;
+
+  save_pod.UseAccessors([&]{ return stored; }, [&](int v){ restored = v; });
+  load_pod.UseAccessors([&]{ return restored; }, [&](int v){ restored = v; });
+
+  CHECK(restored == 314);
+
+  // The motivating case: serialize a container's size (no backing size variable) and use the
+  // setter to reconstruct the container's shape on load.  The serialized type follows the
+  // getter's return type (size_t here).
+  std::vector<int> vec_in{1, 2, 3, 4, 5, 6, 7};
+  std::vector<int> vec_out;  // starts empty; should be resized to 7 on load.
+
+  save_pod.UseAccessors([&]{ return vec_in.size(); },
+                        [&](size_t n){ vec_in.resize(n); });
+  load_pod.UseAccessors([&]{ return vec_out.size(); },
+                        [&](size_t n){ vec_out.resize(n); });
+
+  CHECK(vec_out.size() == 7);
+
+  // A getter that returns by reference should still round-trip (return type is decayed).
+  std::string name_in = "accessor";
+  std::string name_out;
+
+  save_pod.UseAccessors([&]() -> const std::string & { return name_in; },
+                        [&](std::string s){ name_in = std::move(s); });
+  load_pod.UseAccessors([&]() -> const std::string & { return name_out; },
+                        [&](std::string s){ name_out = std::move(s); });
+
+  CHECK(name_out == "accessor");
+}
+
 
 
 TEST_CASE("Test SerialPod with array of custom struct", "[serialize]")
