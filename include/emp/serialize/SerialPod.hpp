@@ -275,7 +275,7 @@ namespace emp {
       return *this;
     }
 
-    // Const overload: save-only.  Any const argument routes here.
+    /// Const overload: save-only.  Any const argument routes here.
     template <typename T, typename... EXTRA_Ts>
     SerialPod & operator()(const T & in, const EXTRA_Ts &... extras) {
       emp_assert(IsSave(), "Trying to deserialize a const value.");
@@ -283,6 +283,15 @@ namespace emp {
       return *this;
     }
 
+    /// Serialize a value as a type that may be different from itself.
+    /// For example, an int8_t would save as a char, but you may want to save it as an int.
+    template <typename SAVE_T, typename VAR_T>
+      requires std::convertible_to<VAR_T, SAVE_T> && std::convertible_to<SAVE_T, VAR_T>
+    SerialPod & SerializeAs(VAR_T & in) {
+      return UseAccessors([&in]{ return static_cast<SAVE_T>(in); },
+                          [&in](SAVE_T v){ in = static_cast<VAR_T>(v); });
+    }
+    
     /// Serialize through an accessor pair rather than a directly-referenced variable.
     /// On save, `get_fun()` supplies the value to write; on load, a value is read back and
     /// handed to `set_fun(value)`.  The serialized type is the decayed return type of
@@ -307,7 +316,14 @@ namespace emp {
 
     /// A specialized version of UseAccessors for containers to maintain container size.
     /// On save, writes `in.size()`; on load, calls `in.resize()` to restore the element count.
-    SerialPod & UseSizeAccessors(auto & in) {
+    /// Constrained to types that expose a size()-and-resize() interface (e.g. std::vector,
+    /// std::string, emp::vector) so misuse fails cleanly at the call site.
+    SerialPod & UseSizeAccessors(auto & in)
+      requires requires(size_t s) {
+        { in.size() } -> std::convertible_to<size_t>;
+        in.resize(s);
+      }
+    {
       return UseAccessors([&in]{ return in.size(); }, [&in](size_t s){ in.resize(s); });
     }
   };
