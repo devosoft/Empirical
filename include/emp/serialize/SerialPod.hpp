@@ -304,6 +304,12 @@ namespace emp {
       }
       return *this;
     }
+
+    /// A specialized version of UseAccessors for containers to maintain container size.
+    /// On save, writes `in.size()`; on load, calls `in.resize()` to restore the element count.
+    SerialPod & UseSizeAccessors(auto & in) {
+      return UseAccessors([&in]{ return in.size(); }, [&in](size_t s){ in.resize(s); });
+    }
   };
 
   template <typename T>
