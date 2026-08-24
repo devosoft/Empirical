@@ -559,6 +559,15 @@ TEST_CASE("Test SerialPod with UseAccessors", "[serialize]")
 
   CHECK(vec_out.size() == 7);
 
+  // UseSizeAccessors is the container-size shorthand for the pattern above.
+  std::vector<int> sz_in{9, 8, 7};
+  std::vector<int> sz_out;
+
+  save_pod.UseSizeAccessors(sz_in);
+  load_pod.UseSizeAccessors(sz_out);
+
+  CHECK(sz_out.size() == 3);
+
   // A getter that returns by reference should still round-trip (return type is decayed).
   std::string name_in = "accessor";
   std::string name_out;
@@ -569,6 +578,80 @@ TEST_CASE("Test SerialPod with UseAccessors", "[serialize]")
                         [&](std::string s){ name_out = std::move(s); });
 
   CHECK(name_out == "accessor");
+}
+
+TEST_CASE("Test SerialPod SerializeAs", "[serialize]")
+{
+  // The motivating case: an int8_t whose value IS the newline character (10).  Saved directly,
+  // int8_t streams as a raw character, so this would emit a literal '\n' and corrupt the
+  // line-delimited format on load.  SerializeAs<int> stores it as a readable integer instead,
+  // so it round-trips correctly.
+  {
+    std::stringstream ss;
+    emp::SerialPod save_pod(ss, true);
+    emp::SerialPod load_pod(ss, false);
+
+    int8_t in = '\n';  // == 10
+    REQUIRE(static_cast<int>(in) == 10);
+
+    save_pod.SerializeAs<int>(in);
+
+    // The stream should hold the readable integer "10", not a lone newline byte.
+    CHECK(ss.str().find("10") != std::string::npos);
+
+    int8_t out = 0;
+    load_pod.SerializeAs<int>(out);
+    CHECK(static_cast<int>(out) == 10);
+    CHECK(in == out);
+  }
+
+  // Boundary int8_t values (including a negative one) round-trip as ints.
+  {
+    std::stringstream ss;
+    emp::SerialPod save_pod(ss, true);
+    emp::SerialPod load_pod(ss, false);
+
+    int8_t lo = -128;
+    int8_t hi = 127;
+    save_pod.SerializeAs<int>(lo);
+    save_pod.SerializeAs<int>(hi);
+
+    int8_t lo2 = 0, hi2 = 0;
+    load_pod.SerializeAs<int>(lo2);
+    load_pod.SerializeAs<int>(hi2);
+
+    CHECK(lo == lo2);
+    CHECK(hi == hi2);
+  }
+
+  // uint8_t serialized as unsigned int (would otherwise stream as a character).
+  {
+    std::stringstream ss;
+    emp::SerialPod save_pod(ss, true);
+    emp::SerialPod load_pod(ss, false);
+
+    uint8_t u = 200;
+    save_pod.SerializeAs<unsigned int>(u);
+
+    uint8_t u2 = 0;
+    load_pod.SerializeAs<unsigned int>(u2);
+    CHECK(u == u2);
+  }
+
+  // Widening conversion: a float value serialized as a double round-trips exactly when the
+  // value is representable in both (1.5 is).
+  {
+    std::stringstream ss;
+    emp::SerialPod save_pod(ss, true);
+    emp::SerialPod load_pod(ss, false);
+
+    float f = 1.5f;
+    save_pod.SerializeAs<double>(f);
+
+    float f2 = 0.0f;
+    load_pod.SerializeAs<double>(f2);
+    CHECK(f == f2);
+  }
 }
 
 
