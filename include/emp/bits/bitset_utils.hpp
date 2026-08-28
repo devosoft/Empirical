@@ -43,7 +43,8 @@ namespace emp {
   }
 
   /// @brief Convert a series of bit fields to a string.
-  /// @param field A single bit field to convert to a string.
+  /// @param bits The bit fields to convert to a string.
+  /// @param count How many bit fields to read.
   [[maybe_unused]] [[nodiscard]] std::string BitFieldsToString(bits_field_t * bits, size_t count) {
     std::stringstream ss;
     for (size_t i = 0; i < count; ++i) {
