@@ -16,6 +16,8 @@
 #include "emp/base/vector.hpp"
 #include "emp/compiler/Lexer.hpp"
 #include "emp/io/CPPFile.hpp"
+#include "emp/io/JSFile.hpp"
+#include "emp/io/PythonFile.hpp"
 #include "emp/tools/String.hpp"
 #include "emp/web/web.hpp"
 
@@ -29,7 +31,7 @@ private:
   static constexpr size_t MAX_TOKENS = 100;
 
   UI::Document doc{"emp_base"};
-  emp::CPPFile file;
+  emp::String generated_code;
   emp::vector<emp::String> errors;
   emp::Lexer lexer;
 
@@ -37,7 +39,11 @@ private:
   emp::vector<TokenInput> token_info;
   size_t active_token = 1024;
 
-  // Lexer C++ Output Configuration
+  enum class Language { CPP, Python, JavaScript };
+  Language language = Language::CPP;
+  UI::Selector language_selector{"output_language"};
+
+  // Lexer output configuration
   emp::String out_filename{"lexer.hpp"};
   emp::String lexer_name{"Lexer"};
   emp::String token_name{"Token"};
@@ -117,6 +123,7 @@ private:
   void UpdateErrors() {
     if (errors.size()) {
       // Clear any stale generated code and remove access to it.
+      generated_code.clear();
       output_text.Clear();
       doc.Button("download_icon").Hide();
       doc.Button("copy_icon").Hide();
@@ -226,6 +233,7 @@ private:
     ss << "# This is an auto-generated Emplex configuration file.\n\n";
 
     ss << "# Configuration settings (lines starting with ':' are config options)\n"
+       << ":language " << LanguageKey() << '\n'
        << ":out_filename " << out_filename << '\n'
        << ":lexer_name " << lexer_name << '\n'
        << ":token_name " << token_name << '\n'
@@ -255,6 +263,18 @@ private:
     file.RemoveIfBegins("#");  // Remove all lines that are comments
     file.RemoveEmpty();        // Remove all blank lines
     ClearTable();              // Remove all table fields
+    ClearOutput();
+    // Old configurations without a language entry remain C++ configurations.
+    // Read the language first so a saved custom filename is restored unchanged.
+    Language loaded_language = Language::CPP;
+    for (emp::String line : file) {
+      if (!line.PopIf(':')) continue;
+      if (line.PopWord() != "language") continue;
+      const emp::String value = line.Trim();
+      if (value == "python") loaded_language = Language::Python;
+      else if (value == "javascript") loaded_language = Language::JavaScript;
+    }
+    SetLanguage(loaded_language, false);
 
     for (emp::String line : file) {
       bool config = line.PopIf(':');
@@ -263,16 +283,17 @@ private:
       emp::String setting = line.Trim();    // Regex is remainder, minus start & end whitespace.
 
       if (config) {
-        if (name == "alert") emp::Alert(setting);  // For debugging
+        if (name == "language") {} // Already applied above.
+        else if (name == "alert") emp::Alert(setting);  // For debugging
         else if (name == "out_filename") { out_filename = setting; doc.TextArea("set_filename").SetText(out_filename); }
         else if (name == "lexer_name") { lexer_name = setting; doc.TextArea("set_lexer_class").SetText(lexer_name); }
         else if (name == "token_name") { token_name = setting; doc.TextArea("set_token_class").SetText(token_name); }
         else if (name == "dfa_name")   { dfa_name = setting; doc.TextArea("set_dfa_class").SetText(dfa_name); }
         else if (name == "inc_guards") { inc_guards = setting; doc.TextArea("set_includes").SetText(inc_guards); }
         else if (name == "name_space") { name_space = setting; doc.TextArea("set_namespace").SetText(name_space); }
-        else if (name == "use_token_lexemes") { use_token_lexemes = setting.AsBool(); doc.CheckBox("checkbox_lexemes").SetChecked(use_token_lexemes); }
-        else if (name == "use_token_line_num") { use_token_line_num = setting.AsBool(); doc.CheckBox("checkbox_line_nums").SetChecked(use_token_line_num); }
-        else if (name == "use_token_column") { use_token_column = setting.AsBool(); doc.CheckBox("checkbox_cols").SetChecked(use_token_column); }
+        else if (name == "use_token_lexemes") { use_token_lexemes = setting.AsBool(); doc.CheckBox("checkbox_lexemes").SetChecked(use_token_lexemes).Redraw(); }
+        else if (name == "use_token_line_num") { use_token_line_num = setting.AsBool(); doc.CheckBox("checkbox_line_nums").SetChecked(use_token_line_num).Redraw(); }
+        else if (name == "use_token_column") { use_token_column = setting.AsBool(); doc.CheckBox("checkbox_cols").SetChecked(use_token_column).Redraw(); }
 
       } else { // Must be a token entry.
         AddTableRow(name, setting, ignore);
@@ -355,41 +376,86 @@ private:
     return true;
   }
 
-  /// Try to generate CPP code based on the current regular expressions.
-  /// @return success
-  bool GenerateCPP() {
+  emp::String LanguageKey() const {
+    if (language == Language::Python) return "python";
+    if (language == Language::JavaScript) return "javascript";
+    return "cpp";
+  }
+
+  emp::String LanguageLabel() const {
+    if (language == Language::Python) return "Python";
+    if (language == Language::JavaScript) return "JavaScript";
+    return "C++";
+  }
+
+  void SetLanguage(Language value, bool regenerate = true) {
+    const bool had_output = !generated_code.empty();
+    language = value;
+    const emp::String extension = language == Language::CPP ? ".hpp"
+      : language == Language::Python ? ".py" : ".mjs";
+    const size_t dot = out_filename.rfind('.');
+    if (dot != emp::String::npos) {
+      const emp::String old_extension = out_filename.substr(dot);
+      if (old_extension == ".hpp" || old_extension == ".h" || old_extension == ".cpp"
+          || old_extension == ".py" || old_extension == ".js" || old_extension == ".mjs") {
+        out_filename.resize(dot);
+        out_filename += extension;
+      }
+    }
+    language_selector.SelectID(static_cast<size_t>(language)).Redraw();
+    doc.TextArea("set_filename").SetText(out_filename);
+    doc.TextArea("set_includes").SetDisabled(language != Language::CPP);
+    doc.TextArea("set_namespace").SetDisabled(language != Language::CPP);
+    doc.Button("generate_but").SetLabel("Generate " + LanguageLabel() + " Code");
+    ClearOutput();
+    if (regenerate && had_output) GenerateCode();
+  }
+
+  /// Generate the selected language; preview, clipboard, and download share this exact source.
+  bool GenerateCode() {
     if (!GenerateLexer()) return false;
 
-    file.Clear();
-    file.SetGuards(inc_guards);
-    file.SetNamespace(name_space);
-    lexer.WriteCPP(file, lexer_name, dfa_name, token_name,
-                   use_token_lexemes, use_token_line_num, use_token_column);
-
     std::stringstream ss;
-    ss << "/**************************************************************************\n"
-          " * This file was autogenerated by Emplex on "
-       << std::format("{:%B %d, %Y}", std::chrono::system_clock::now()) << ".\n"
-          " * You may freely use, modify, and distribute this code under the terms of\n"
-          " * the MIT Public License (see https://opensource.org/licenses/MIT).\n"
-          " * Emplex was developed at Michigan State University by Dr. Charles Ofria.\n"
-          " * To use Emplex, go to https://www.cse.msu.edu/~cse450/Emplex.html\n"
-          " **************************************************************************/\n"
-          "\n";
-    file.Write(ss);
+    const auto generate = [&ss](auto & file) {
+      file.AddHeader("This file was autogenerated by Emplex on ",
+                     std::format("{:%B %d, %Y}", std::chrono::system_clock::now()), ".");
+      file.AddHeader("You may freely use, modify, and distribute this code under the terms of");
+      file.AddHeader("the MIT Public License (see https://opensource.org/licenses/MIT).");
+      file.AddHeader("Emplex was developed at Michigan State University by Dr. Charles Ofria.");
+      file.AddHeader("To use Emplex, go to https://www.cse.msu.edu/~cse450/Emplex.html");
+      file.Write(ss);
+    };
+    if (language == Language::CPP) {
+      emp::CPPFile file;
+      file.SetGuards(inc_guards).SetNamespace(name_space);
+      lexer.WriteCPP(file, lexer_name, dfa_name, token_name,
+                     use_token_lexemes, use_token_line_num, use_token_column);
+      generate(file);
+    } else if (language == Language::Python) {
+      emp::PythonFile file;
+      lexer.WritePython(file, lexer_name, dfa_name, token_name,
+                        use_token_lexemes, use_token_line_num, use_token_column);
+      generate(file);
+    } else {
+      emp::JSFile file;
+      lexer.WriteJS(file, lexer_name, dfa_name, token_name,
+                    use_token_lexemes, use_token_line_num, use_token_column);
+      generate(file);
+    }
+    generated_code = ss.str();
     output_text.Clear();
     output_text.SetBorder("20px");
-    output_text << "<pre style=\"padding: 10px; border-radius: 5px; overflow-x: auto;\">\n" << emp::MakeWebSafe(ss.str()) << "\n</pre>\n";
+    output_text << "<pre style=\"padding: 10px; border-radius: 5px; overflow-x: auto;\">\n"
+                << emp::MakeWebSafe(generated_code) << "\n</pre>\n";
     output_div.Redraw();
-
     doc.Button("download_icon").Hide(false);
     doc.Button("copy_icon").Hide(false);
     doc.Button("close_icon").Hide(false);
-
     return true;
   }
 
   void ClearOutput() {
+    generated_code.clear();
     output_text.Clear();
     doc.Button("download_icon").Hide();
     doc.Button("copy_icon").Hide();
@@ -398,9 +464,8 @@ private:
   }
 
   void CopyCode() {
-    std::stringstream ss;
-    file.Write(ss);
-    emp::CopyText(ss.str());
+    if (generated_code.empty()) return;
+    emp::CopyText(generated_code);
     doc.Button("copy_icon").SetLabel("<img src=\"Icons/ICON-Copied.png\" width=\"50px\">").Redraw();
     emp::DelayCall([this](){
       doc.Button("copy_icon").SetLabel("<img src=\"Icons/ICON-Copy.png\" width=\"50px\">").Redraw();
@@ -408,9 +473,7 @@ private:
   }
 
   void DownloadCode() {
-    std::stringstream ss;
-    file.Write(ss);
-    emp::DownloadFile(out_filename, ss.str());
+    if (!generated_code.empty()) emp::DownloadFile(out_filename, generated_code);
   }
 
   void ToggleSandbox() {
@@ -469,7 +532,7 @@ private:
         MakeTrigger("<b>load an example</b>", [this](){ LoadExampleLexer(); });
       intro_div << HeadingName("Overview") <<
           "<p>Emplex uses a set of <b>token names</b> and associated <b>regular expressions</b> to "
-          "generate C++ code for a fast, table-driven lexer for ASCII input. "
+          "generate C++, Python, or JavaScript code for a fast, table-driven lexer for ASCII input. "
           "Click on the buttons above to learn more or " << trigger_text << ".</p>";
     } else if (mode == "lexer") {
       doc.Button("lexer_but").SetBackground(active_color);
@@ -598,7 +661,25 @@ private:
         ;
     } else if (mode == "cpp") {
       doc.Button("cpp_but").SetBackground(active_color);
-      intro_div << HeadingName("User Guide: Working with the Generated C++ Code") <<
+      intro_div << HeadingName("User Guide: Working with Generated Code") <<
+        "<p>Select C++, Python, or JavaScript beside the Generate button. The language is saved "
+        "with your token definitions. Class names and optional token fields apply to all targets; "
+        "include guards and namespaces apply only to C++.</p>"
+        "<h3>Python</h3><p>Download <code>lexer.py</code>, then use:</p>"
+        "<pre>from lexer import Lexer\nlexer = Lexer()\ntokens = lexer.Tokenize(\"your input\")</pre>"
+        "<p>Python also accepts an open text file in <code>Tokenize</code>. Token fields and "
+        "helper methods follow the C++ API below, except <code>None_()</code> replaces "
+        "<code>None()</code>, which is a Python keyword. <code>Error</code> raises "
+        "<code>RuntimeError</code>.</p>"
+        "<h3>JavaScript</h3><p>Download <code>lexer.mjs</code> and import it as an ES module "
+        "in Node.js or a browser:</p>"
+        "<pre>import { Lexer } from './lexer.mjs';\nconst lexer = new Lexer();\n"
+        "const tokens = lexer.Tokenize('your input');</pre>"
+        "<p>JavaScript accepts a string in <code>Tokenize</code>. Token fields and helper "
+        "methods follow the C++ API below; <code>Error</code> throws an exception. Both script "
+        "targets return a list/array of tokens and use one-based lines and zero-based columns. "
+        "The lexer recognizes ASCII input.</p>"
+        "<h3>C++</h3>"
         "<p>Emplex will generate a C++ file that you can either copy or download "
         "(as \"lexer.hpp\" by default) and simply <code>#include</code> into your own code. "
         "The generated file will contain a lexer class (called \"Lexer\" by default) in a namespace "
@@ -703,7 +784,7 @@ private:
         "condition is associated with. When an end condition could have come from two different "
         "regular expressions, the regex listed first (highest in the list) is used. "
         "The resulting NFA is converted into a DFA and then implemented as a table. "
-        "That table is hard-coded in the generated C++ output, along with "
+        "That table is hard-coded in the selected output language, along with "
         "associated helper functions.  When tokenization is performed, the longest possible input "
         "string is matched and the ID associated with that end condition is returned.</p>"
         "<p>The Emplex software and most of the associated tools in the underlying "
@@ -724,7 +805,7 @@ private:
 
         "<h3>My current To-Do list for the site includes:</h3>\n"
         "<ul>\n"
-        "<li>Set up alternate languages to generate to, including Python, Java, C, and Rust.</li>\n"
+        "<li>Add more output languages, including Java, C, and Rust.</li>\n"
         "<li>Improve auto-updating to sandbox when changes are made to token rules.</li>\n"
         "<li>Colorize code examples on 'User Guide' page.</li>\n"
         "<li>Allow more output customization in the advanced settings, including turning off helper functions.</li>\n"
@@ -844,8 +925,15 @@ private:
 
     token_div << "<br>";
 
+    token_div << "<label for=\"output_language\">Output language: </label>";
+    language_selector.SetOption("C++", [this](){ SetLanguage(Language::CPP); });
+    language_selector.SetOption("Python", [this](){ SetLanguage(Language::Python); });
+    language_selector.SetOption("JavaScript", [this](){ SetLanguage(Language::JavaScript); });
+    token_div << language_selector.SetCSS(button_style).SetTitle("Language for generated lexer code.");
+    token_div << " ";
+
     token_div << UI::Button([this](){
-      GenerateCPP();
+      GenerateCode();
     }, "Generate C++ Code", "generate_but").SetCSS(button_style).SetBackground(emp::Color{"#330066"})
     .SetTitle("Generate a lexer using the token types defined above.");
 
@@ -900,17 +988,17 @@ private:
 
 
     settings_table[row_id][0].SetColSpan(3).SetColor(emp::Color{"darkblue"})
-      << "<big><b>Names to use in the generated C++ code</b></big>";
+      << "<big><b>Names to use in the generated code</b></big>";
     ++row_id;
 
-    settings_table[row_id][1].SetCSS("font-weight", "bold") << "Include Guards: ";
+    settings_table[row_id][1].SetCSS("font-weight", "bold") << "Include Guards (C++): ";
     settings_table[row_id][2] << UI::TextArea([this](const std::string & str) {
       inc_guards = str;
     }, "set_includes").SetText(inc_guards).SetWidth(250)
       .SetTitle("Unique name of include guards at top and bottom of generated C++ file.");
     ++row_id;
 
-    settings_table[row_id][1].SetCSS("font-weight", "bold") << "Namespace: ";
+    settings_table[row_id][1].SetCSS("font-weight", "bold") << "Namespace (C++): ";
     settings_table[row_id][2] << UI::TextArea([this](const std::string & str) {
       name_space = str;
     }, "set_namespace").SetText(name_space).SetWidth(250)
@@ -921,21 +1009,21 @@ private:
     settings_table[row_id][2] << UI::TextArea([this](const std::string & str) {
       lexer_name = str;
     }, "set_lexer_class").SetText(lexer_name).SetWidth(250)
-      .SetTitle("Identifier name to use for the generated C++ Lexer class.");
+      .SetTitle("Identifier name to use for the generated Lexer class.");
     ++row_id;
 
     settings_table[row_id][1].SetCSS("font-weight", "bold") << "Token class Name: ";
     settings_table[row_id][2] << UI::TextArea([this](const std::string & str) {
       token_name = str;
     }, "set_token_class").SetText(token_name).SetWidth(250)
-      .SetTitle("Identifier name to use for the generated C++ Token class.");
+      .SetTitle("Identifier name to use for the generated Token class.");
     ++row_id;
 
     settings_table[row_id][1].SetCSS("font-weight", "bold") << "DFA class Name: ";
     settings_table[row_id][2] << UI::TextArea([this](const std::string & str) {
       dfa_name = str;
     }, "set_dfa_class").SetText(dfa_name).SetWidth(250)
-      .SetTitle("Identifier name to use for the generated C++ DFA class.");
+      .SetTitle("Identifier name to use for the generated DFA class.");
     ++row_id;
 
     settings_div << settings_table;
@@ -1109,7 +1197,7 @@ private:
   void InitializeFooterDiv() {
     footer_div.SetBackground(emp::Color{"#000044"}).SetColor(Palette::WHITE).SetCSS(div_style);
     footer_div <<
-      "Emplex was developed by Dr. Charles Ofria at Michigan State University, 2024-2025. "
+      "Emplex was developed by Dr. Charles Ofria at Michigan State University, 2024-2026. "
       "See \"About\" for more information.";
   }
 
@@ -1124,7 +1212,7 @@ public:
     InitializeFooterDiv();
 
     // Place all of the divs into the document.
-    doc << "<h1>Emplex: A C++ Lexer Generator</h1>";
+    doc << "<h1>Emplex: A Lexer Generator</h1>";
     doc << button_div;
     doc << intro_div;
     doc << token_div;

@@ -19,6 +19,8 @@
 #include "emp/config/command_line.hpp"
 #include "emp/io/CPPFile.hpp"
 #include "emp/io/File.hpp"
+#include "emp/io/JSFile.hpp"
+#include "emp/io/PythonFile.hpp"
 #include "emp/tools/String.hpp"
 
 void LoadTokens(emp::Lexer & lexer, emp::String filename, bool verbose) {
@@ -28,6 +30,7 @@ void LoadTokens(emp::Lexer & lexer, emp::String filename, bool verbose) {
 
   emp::File file(filename);
   file.RemoveIfBegins("#");  // Remove all lines that are comments
+  file.RemoveIfBegins(":");  // Web configuration metadata; command-line options select the output.
 
   std::set<emp::String> used_names;  // Token names already loaded (to detect duplicates).
 
@@ -61,6 +64,12 @@ int main(int argc, char* argv[])
   const bool help = emp::cl::UseArg(args, "-h");
   const bool verbose = emp::cl::UseArg(args, "-v");
 
+  emp::String language("cpp");
+  int language_result = emp::cl::UseArgValue(args, "-l", language);
+  emp::notify::TestError(language_result == -1, "The -l option requires cpp, python, or javascript.");
+  emp::notify::TestError(language != "cpp" && language != "python" && language != "javascript",
+                         "Unknown output language '", language, "'; use cpp, python, or javascript.");
+
   emp::String class_name("Lexer");
   int result = emp::cl::UseArgValue(args, "-c", class_name);
   emp::notify::TestError(result == -1, "The -c option must be followed by a class name.");
@@ -69,7 +78,8 @@ int main(int argc, char* argv[])
   result = emp::cl::UseArgValue(args, "-d", dfa_name);
   emp::notify::TestError(result == -1, "The -d option must be followed by a class name.");
 
-  emp::String out_filename("lexer.hpp");
+  emp::String out_filename(language == "cpp" ? "lexer.hpp"
+                            : language == "python" ? "lexer.py" : "lexer.mjs");
   result = emp::cl::UseArgValue(args, "-f", out_filename);
   emp::notify::TestError(result == -1, "The -f option must be followed by a filename.");
 
@@ -99,6 +109,7 @@ int main(int argc, char* argv[])
       << "    -f [filename]    Specify output FILENAME (default: " << out_filename << ")\n"
       << "    -g [guard_name]  Set the include GUARDS to use (default: " << inc_guards << ")\n"
       << "    -h               Print HELP (this message)\n"
+      << "    -l [language]     Output cpp, python, or javascript (default: cpp)\n"
       << "    -n [namespace]   Set NAMESPACE for generated code (default: " << name_space << ")\n"
       << "    -t [class_name]  Set the name of the generated Token class (default: " << token_name << ")\n"
       << "    -v               Print VERBOSE output\n"
@@ -109,11 +120,20 @@ int main(int argc, char* argv[])
   emp::Lexer lexer;
   LoadTokens(lexer, args[1], verbose);
 
-  emp::CPPFile file(out_filename);
-  file.SetGuards(inc_guards);
-  file.SetNamespace(name_space);
-  lexer.WriteCPP(file, class_name, dfa_name, token_name);
-  file.Write();
+  if (language == "cpp") {
+    emp::CPPFile file(out_filename);
+    file.SetGuards(inc_guards).SetNamespace(name_space);
+    lexer.WriteCPP(file, class_name, dfa_name, token_name);
+    file.Write();
+  } else if (language == "python") {
+    emp::PythonFile file(out_filename);
+    lexer.WritePython(file, class_name, dfa_name, token_name);
+    file.Write();
+  } else {
+    emp::JSFile file(out_filename);
+    lexer.WriteJS(file, class_name, dfa_name, token_name);
+    file.Write();
+  }
 
   return 0;
 }
