@@ -1,0 +1,50 @@
+# Empala example: a small programming language.
+# Load this file with the "Load Grammar" button, or run:
+#   ./Empala example.empala -o parser.hpp
+
+:out_filename parser.hpp
+:parser_name Parser
+:node_name ASTNode
+:value_type double
+:name_space empala
+
+# Token names and regular expressions ('-' prefix = ignore)
+-WHITESPACE [ \t\n\r]+
+-COMMENT #.*
+FLOAT ([0-9]+\.[0-9]*)|(\.[0-9]+)
+INTEGER [0-9]+
+IF if
+ELSE else
+WHILE while
+TYPE int|double|string|char
+IDENTIFIER [a-zA-Z_][a-zA-Z0-9_]*
+STRING \"([^"\\]|(\\.))*\"
+COMPARE "=="|"!="|"<="|">="|"<"|">"
+
+# Grammar rows: >name [!no_ast] [@function] [!note="text"] pattern
+# A '-' directly before an element consumes it but omits its entire subtree.
+# !no_ast removes this row's wrapper, passing through zero or one child.
+# It cannot be combined with a function or note, or retain multiple children.
+# A note belongs to the retained node for the alternative that matched.
+# Longer alternatives come first: '+' requires an actual operation; the fallback
+# then passes a simple operand up without wrapping it at each precedence level.
+>program @DoProgram statement*
+>statement !no_ast block | declare | if_else | while_loop | expr_stmt
+>block @DoBlock -'{' statement* -'}'
+>declare @DoDeclare TYPE IDENTIFIER (-'=' expr)? -';'
+>if_else @DoIf -IF -'(' expr -')' statement (-ELSE statement)?
+>while_loop @DoWhile -WHILE -'(' expr -')' statement
+>expr_stmt !no_ast expr -';'
+>expr @DoAssign !note="assignment" IDENTIFIER -'=' expr
+>expr !no_ast compare
+>compare @DoCompare sum (COMPARE sum)+
+>compare !no_ast sum
+>sum @DoSum term (('+' | '-') term)+
+>sum !no_ast term
+>term @DoTerm unit (('*' | '/' | '%') unit)+
+>term !no_ast unit
+>unit @DoNegate !note="negation" -'-' unit
+>unit !no_ast -'(' expr -')'
+>unit @DoCall !note="call" IDENTIFIER -'(' args? -')'
+>unit @DoValue !note="value" IDENTIFIER | INTEGER | FLOAT | STRING
+>args expr (-',' expr)*
