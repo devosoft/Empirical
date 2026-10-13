@@ -37,9 +37,9 @@
 
 #include <cstdint>
 #include <fstream>
-#include <limits>
 #include <iostream>
 #include <iterator>
+#include <limits>
 #include <map>
 #include <stddef.h>
 
@@ -190,6 +190,26 @@ namespace emp {
                   bool save_line_id       = true,
                   bool save_col_id        = true,
                   bool use_emp            = false) const;
+
+    /// Generate a Python module. Naming and optional token fields match WriteCPP.
+    /// Tokenize accepts a string or a text stream; Error raises a RuntimeError.
+    void WritePython(emp::PythonFile & file,
+                     emp::String object_name = "Lexer",
+                     emp::String DFA_name    = "DFA",
+                     emp::String token_name  = "Token",
+                     bool save_lexeme        = true,
+                     bool save_line_id       = true,
+                     bool save_col_id        = true) const;
+
+    /// Generate a JavaScript ES module exporting the lexer, DFA, and token classes.
+    /// Tokenize accepts a string; Error throws an Error. Naming and fields match WriteCPP.
+    void WriteJS(emp::JSFile & file,
+                 emp::String object_name = "Lexer",
+                 emp::String DFA_name    = "DFA",
+                 emp::String token_name  = "Token",
+                 bool save_lexeme        = true,
+                 bool save_line_id       = true,
+                 bool save_col_id        = true) const;
   };
 
   using Lexer = Lexer_Base<255>;
@@ -316,16 +336,16 @@ namespace emp {
     // 2: We have not entered an invalid state, and
     // 3: Our input stream has more symbols.
     while (cur_stop >= 0 && cur_state >= 0 && cur_pos < in.size()) {
-      const auto next_sym  = static_cast<unsigned char>(in[cur_pos++]);
-      cur_state            = lexer_dfa.Next(cur_state, static_cast<size_t>(next_sym));
-      cur_stop             = lexer_dfa.GetStop(cur_state);
-      const int tc_id      = lexer_dfa.GetTCStop(cur_state);
+      const auto next_sym = static_cast<unsigned char>(in[cur_pos++]);
+      cur_state           = lexer_dfa.Next(cur_state, static_cast<size_t>(next_sym));
+      cur_stop            = lexer_dfa.GetStop(cur_state);
+      const int tc_id     = lexer_dfa.GetTCStop(cur_state);
       if (tc_id > 0) { tc_boundary_pos = cur_pos; }
       if (cur_stop > 0) {
         const int tc_final = lexer_dfa.GetTCFinal(cur_state);
-        bool use_tc = (tc_final == cur_stop) && (tc_boundary_pos > start_pos);
-        best_pos  = use_tc ? tc_boundary_pos : cur_pos;
-        best_stop = cur_stop;
+        bool use_tc        = (tc_final == cur_stop) && (tc_boundary_pos > start_pos);
+        best_pos           = use_tc ? tc_boundary_pos : cur_pos;
+        best_stop          = cur_stop;
       }
       // Look ahead to see if we are at the END OF A LINE that can finish a token.
       if (cur_pos == in.size() || in[cur_pos] == '\n') {
@@ -333,9 +353,9 @@ namespace emp {
         int eol_stop  = lexer_dfa.GetStop(eol_state);
         if (eol_stop > 0) {
           const int eol_tc_final = lexer_dfa.GetTCFinal(eol_state);
-          bool use_tc = (eol_tc_final == eol_stop) && (tc_boundary_pos > start_pos);
-          best_pos  = use_tc ? tc_boundary_pos : cur_pos;
-          best_stop = eol_stop;
+          bool use_tc            = (eol_tc_final == eol_stop) && (tc_boundary_pos > start_pos);
+          best_pos               = use_tc ? tc_boundary_pos : cur_pos;
+          best_stop              = eol_stop;
         }
       }
     }
@@ -413,9 +433,9 @@ namespace emp {
       if (tc_id > 0) { tc_boundary_pos = cur_pos; }
       if (cur_stop > 0) {
         const int tc_final = lexer_dfa.GetTCFinal(cur_state);
-        bool use_tc = (tc_final == cur_stop) && (tc_boundary_pos > 0);
-        best_pos  = use_tc ? tc_boundary_pos : cur_pos;
-        best_stop = cur_stop;
+        bool use_tc        = (tc_final == cur_stop) && (tc_boundary_pos > 0);
+        best_pos           = use_tc ? tc_boundary_pos : cur_pos;
+        best_stop          = cur_stop;
       }
       // Look ahead to see if we are at the END OF A LINE that can finish a token.
       if (AtEOF(is) || is.peek() == '\n') {
@@ -423,9 +443,9 @@ namespace emp {
         int eol_stop  = lexer_dfa.GetStop(eol_state);
         if (eol_stop > 0) {
           const int eol_tc_final = lexer_dfa.GetTCFinal(eol_state);
-          bool use_tc = (eol_tc_final == eol_stop) && (tc_boundary_pos > 0);
-          best_pos  = use_tc ? tc_boundary_pos : cur_pos;
-          best_stop = eol_stop;
+          bool use_tc            = (eol_tc_final == eol_stop) && (tc_boundary_pos > 0);
+          best_pos               = use_tc ? tc_boundary_pos : cur_pos;
+          best_stop              = eol_stop;
         }
       }
     }
@@ -435,7 +455,7 @@ namespace emp {
       is.seekg(-static_cast<int>(cur_pos), std::ios::cur);
       best_stop = is.get();
       if (best_stop >= 128) { best_stop = ERROR_ID; }  // Out-of-range byte (e.g., UTF-8)
-      best_pos  = 1;
+      best_pos = 1;
     }
 
     // Otherwise, if cur_pos went past best_pos, rewind the input stream.
@@ -554,16 +574,14 @@ namespace emp {
   }
 
   template <int MAX_ID>
-  void Lexer_Base<MAX_ID>::WriteCPP(
-    emp::CPPFile & file,
-    emp::String object_name,
-    emp::String DFA_name,
-    emp::String token_name,
-    bool save_lexeme,
-    bool save_line_id,
-    bool save_col_id,
-    bool use_emp
-  ) const {
+  void Lexer_Base<MAX_ID>::WriteCPP(emp::CPPFile & file,
+                                    emp::String object_name,
+                                    emp::String DFA_name,
+                                    emp::String token_name,
+                                    bool save_lexeme,
+                                    bool save_line_id,
+                                    bool save_col_id,
+                                    bool use_emp) const {
     // If we still need to generate the DFA for the lexer, do so.
     if (generate_lexer) { Generate(); }
 
@@ -586,9 +604,9 @@ namespace emp {
     file.Include("<iostream>");
     file.Include("<iterator>");
     file.Include("<string_view>");
-    if (!use_emp) file.Include("<string>");
+    if (!use_emp) { file.Include("<string>"); }
     file.Include("<unordered_map>");
-    if (!use_emp) file.Include("<vector>");
+    if (!use_emp) { file.Include("<vector>"); }
 
     if (use_emp) {
       file.Include("emp/base/vector.hpp");
@@ -615,21 +633,20 @@ namespace emp {
     lexer_dfa.WriteCPP(file, DFA_name);
     file.AddCode("");
 
-    file.AddCodeBlock(
-      "class ${object_name} {",
-      "private:",
-      "  static constexpr int NUM_TOKENS=${token_set_size};",
-      "",
-      "  // -- Load State --",
-      "  size_t cur_line = 1;   // Track LINE we are reading in the input.",
-      "  size_t cur_col = 0;    // Track COLUMN we are reading in the input.",
-      "  int start_pos = 0;     // Track INDEX for the start of current lexeme.",
-      "  ${str_type} lexeme{};  // Lexeme found for the current token",
-      "",
-      "  // -- Process State --",
-      "  ${vec_type}<${token_name}> tokens{}; // Set of tokens loaded so far.",
-      "  size_t token_id = 0;                 // Next token to process.",
-      "  ${token_name} eof_token{0");
+    file.AddCodeBlock("class ${object_name} {",
+                      "private:",
+                      "  static constexpr int NUM_TOKENS=${token_set_size};",
+                      "",
+                      "  // -- Load State --",
+                      "  size_t cur_line = 1;   // Track LINE we are reading in the input.",
+                      "  size_t cur_col = 0;    // Track COLUMN we are reading in the input.",
+                      "  int start_pos = 0;     // Track INDEX for the start of current lexeme.",
+                      "  ${str_type} lexeme{};  // Lexeme found for the current token",
+                      "",
+                      "  // -- Process State --",
+                      "  ${vec_type}<${token_name}> tokens{}; // Set of tokens loaded so far.",
+                      "  size_t token_id = 0;                 // Next token to process.",
+                      "  ${token_name} eof_token{0");
     if (save_lexeme) { file.AppendCode(", \"_EOF_\""); }
     if (save_line_id) { file.AppendCode(", 0"); }
     if (save_col_id) { file.AppendCode(", 0"); }
@@ -760,20 +777,20 @@ namespace emp {
     if (save_line_id) { file.AppendCode(", out_line"); }
     if (save_col_id) { file.AppendCode(", out_col"); }
     file.AppendCode(" };");
-    file.AddCodeBlock(
-      "  }",
-      "",
-      "  // Convert an input string into a vector of tokens.",
-      "  const ${vec_type}<${token_name}> & Tokenize(std::string_view in) {",
-      "    start_pos = 0; // Start processing at beginning of string.",
-      "    cur_line = 1;  // Start processing at the first line of the input.",
-      "    cur_col = 0;   // Start processing at the first position of the input.",
-      "    tokens.resize(0);",
-      "    token_id = 0;",
-      "    while (${token_name} token = NextToken(in)) {",
-      "      if (!IgnoreToken(token.id)) tokens.push_back(token);",
-      "    }");
+    file.AddCodeBlock("  }",
+                      "",
+                      "  // Convert an input string into a vector of tokens.",
+                      "  const ${vec_type}<${token_name}> & Tokenize(std::string_view in) {",
+                      "    start_pos = 0; // Start processing at beginning of string.",
+                      "    cur_line = 1;  // Start processing at the first line of the input.",
+                      "    cur_col = 0;   // Start processing at the first position of the input.",
+                      "    tokens.resize(0);",
+                      "    token_id = 0;",
+                      "    while (${token_name} token = NextToken(in)) {",
+                      "      if (!IgnoreToken(token.id)) tokens.push_back(token);",
+                      "    }");
     if (save_line_id) { file.AddCode("    eof_token.line_id = cur_line;"); }
+    if (save_col_id) { file.AddCode("    eof_token.col_id = cur_col;"); }
     file.AddCodeBlock(
       "    return tokens;",
       "  }",
@@ -860,7 +877,10 @@ namespace emp {
 
 }  // namespace emp
 
+#include "_LexerJS.hpp"
+#include "_LexerPython.hpp"
+
 #endif  // #ifndef INCLUDE_EMP_COMPILER_LEXER_HPP_GUARD
 
 // Local settings for Empecable file checker.
-// empecable_words: tellg seekg
+// empecable_words: tellg seekg cstdlib seekable stdin

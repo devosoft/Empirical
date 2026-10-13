@@ -224,16 +224,14 @@ namespace emp {
         file.AppendCode(static_cast<size_t>(stop_id[state]));
       }
       file.AppendCode("};")
-        .AddCode(
-          "  // TC-boundary stop values (non-zero = r1 boundary for a trailing-context token)")
+        .AddCode("  // TC-boundary stop values (non-zero = r1 boundary for a trailing-context token)")
         .AddCode("  static constexpr std::array<int, NUM_STATES> tc_stop_id = {");
       for (size_t state = 0; state < GetSize(); ++state) {
         if (state) { file.AppendCode(","); }
         file.AppendCode(static_cast<size_t>(tc_stop_id[state]));
       }
       file.AppendCode("};")
-        .AddCode(
-          "  // TC-final values (non-zero = r2 accept state; backtrack lexeme to r1 boundary)")
+        .AddCode("  // TC-final values (non-zero = r2 accept state; backtrack lexeme to r1 boundary)")
         .AddCode("  static constexpr std::array<int, NUM_STATES> tc_final_id = {");
       for (size_t state = 0; state < GetSize(); ++state) {
         if (state) { file.AppendCode(","); }
