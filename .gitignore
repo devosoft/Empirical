@@ -70,6 +70,12 @@ demos/NK/web/NK.asm.js
 demos/NK/web/NK.html
 demos/NK/web/NK.js
 demos/NK/web/NK.js.mem
+demos/ParserGenerator/build/
+demos/ParserGenerator/Empala
+demos/ParserGenerator/Empala-debug
+demos/ParserGenerator/web/Empala.js
+demos/ParserGenerator/web/Empala.wasm
+demos/ParserGenerator/parser.hpp
 demos/SpatialCoop2017/SimplePDWorld
 demos/SpatialCoop2017/web/SimplePDWorld.js
 demos/StateGrid/StateGrid

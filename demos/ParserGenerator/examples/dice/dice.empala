@@ -1,0 +1,185 @@
+# DICE: A SMALL TUTORIAL FOR WRITING AN EMPALA GRAMMAR
+# ==================================================
+# Build with "make dice" from demos/ParserGenerator, then try:
+#   ./dice 3d6 - 2d4 + 10
+#   ./dice "20 - 5 - 3"
+#
+# There are two jobs here:
+#   1. The LEXER recognizes tokens in raw text, such as the digits in "123".
+#   2. The PARSER recognizes arrangements of tokens, such as "3 d 6 + 10".
+# This file describes both. Empala generates their C++ implementation; dice.cpp
+# supplies the behavior that converts a successful parse into a numeric result.
+#
+# File format: one definition per line. Blank lines and lines beginning with #
+# are ignored (leading whitespace is fine). Put comments on their own lines;
+# a # later in a definition is NOT automatically treated as a comment.
+# Lines beginning with ':' configure output, lines beginning with '>' define
+# parser rules, and the remaining lines define lexer tokens.
+
+
+# 1. CHOOSE THE GENERATED C++ NAMES AND RESULT TYPE
+# -----------------------------------------------
+# These settings affect the generated header, not the language users can type.
+# :name_space puts Lexer and Parser in the C++ namespace dice_example.
+# :inc_guards names the macro that prevents the header from being included twice.
+# :value_type selects the result type of AST evaluation and all handler methods.
+# We use integers because dice rolls and whole-number arithmetic need no fractions.
+:name_space dice_example
+:inc_guards EMPALA_DICE_PARSER_HPP_INCLUDE_
+:value_type long long
+
+
+# 2. TURN CHARACTERS INTO TOKENS (LEXER DEFINITIONS)
+# ------------------------------------------------
+# A token definition is a name followed by an Empirical regular expression.
+# These regexes match CHARACTERS. The names WHITESPACE and INTEGER are our choices,
+# not built-in token types. Uppercase token names and lowercase parser-rule names
+# are a useful convention, not a requirement. Use distinct names for the two.
+#
+# [ \t\n\r] matches one space, tab, newline, or carriage return.
+# The following + repeats that character class ONE OR MORE times.
+# The '-' before WHITESPACE means "consume this token but don't send it to the
+# parser." It is a file-format marker, not part of the token name or its regex.
+# This makes "3d6-2", "3d6 - 2", and even "3 d 6 - 2" equivalent to the parser.
+-WHITESPACE [ \t\n\r]+
+
+# [0-9] matches one digit; + makes a nonempty run of digits one INTEGER token.
+# Thus "123" is ONE token with lexeme (original text) "123", not three tokens.
+# This regex accepts zero and leading zeros, but not signs or decimal points.
+# When tokens compete, the lexer takes the longest match; definition order breaks
+# ties. For a larger language, put keyword tokens before a general identifier.
+INTEGER [0-9]+
+
+# We need no explicit token definitions for 'd', '+', or '-': characters not
+# matched by a named lexer token are available as individual character tokens.
+# A parser literal must correspond to what the lexer actually emits. For example,
+# adding a named token that matches '+' would require using that token's name in
+# the rules below instead of expecting the individual '+' character token.
+
+
+# 3. DESCRIBE TOKEN SEQUENCES (PARSER RULES)
+# ----------------------------------------
+# A rule line has this form:
+#   >rule_name [@handler_method] pattern
+# Here [...] means the handler annotation is optional; do not type the brackets.
+# '>' marks a rule definition; it is not a character to match in the input.
+# A pattern can reference token names, rule names, and single-quoted characters.
+# Referenced rules may be defined later in the file, as term is below.
+#
+# The FIRST rule is the start rule. Parse() requires the entire input to match
+# that rule by default, so "3d6 garbage" cannot succeed by matching only "3d6".
+#
+# @Sum is a user-supplied C++ method name.
+# '@' attaches that method name to this rule's pattern. After parsing, a call to
+# root->Run(handler) invokes handler.Sum(node) for a matching expression node.
+# Our dice.cpp implements DiceHandler::Sum(Node & node), returning long long.
+# You can rename Sum if you also rename the corresponding C++ method.
+# The annotation does not match input text and does not run during parsing.
+#
+# Read the expression pattern from left to right:
+#   term                  Match one term: required even in a one-term expression.
+#   ('+' | '-')           Match either literal '+' or literal '-'.
+#   (('+' | '-') term)    Group an operator AND its following term into a pair.
+#   (('+' | '-') term)*   Match ZERO OR MORE of those complete pairs.
+#
+# Therefore "10", "3d6", and "3d6 - 2d4 + 10" all match. An empty expression
+# does not match, and a trailing operator such as "3d6 +" has no following term.
+
+>program expression (',' expression)*
+
+>expression @Sum term (('+' | '-') term)*
+
+# WHAT IS REGEX-LIKE IN A PARSER PATTERN?
+# These operators resemble regex operators, but apply to TOKENS or RULE MATCHES:
+#   A B        Sequence: match A, then B.
+#   A | B      Ordered choice: try A before B.
+#   (A B)      Group a sequence; groups can also contain choices and nested groups.
+#   A?         Optional: match A zero or one time.
+#   A*         Repetition: match A zero or more times.
+#   A+         Repetition: match A one or more times.
+# A can be a token, rule, quoted character, or group. Put ?, *, or + immediately
+# after it, without whitespace. Repetition is greedy: it takes matches while it can.
+# For example, INTEGER+ matches multiple INTEGER tokens, whereas the [0-9]+ in
+# our lexer definition matches multiple DIGITS within a single INTEGER token.
+#
+# Quoting matters: '+' matches an actual plus sign; unquoted + means repetition.
+# Parentheses group grammar patterns; they do not require parentheses in the input.
+# To match input parentheses, write quoted literals, e.g. '(' expression ')'.
+# Single-quoted literals match ONE character and allow escapes such as '\n',
+# '\t', '\\', and '\''. Use a named lexer token for a multi-character keyword.
+#
+# Parser patterns are NOT arbitrary regular expressions. Character classes such
+# as [0-9], wildcard '.', anchors ^ and $, counted repetition {m,n}, lookarounds,
+# backreferences, and lazy quantifiers such as *? are not parser-pattern syntax.
+# Define character-level matches in the lexer, then refer to the token names here.
+# Rules can refer to other rules recursively, which is how a larger grammar can
+# describe nested structures. However, LEFT RECURSION is rejected: do not write
+# something like >expression expression '+' term | term. Use the loop above.
+# Also, a * or + operand must consume input when it matches; repeating an optional
+# pattern such as (term?)* is rejected because it could repeat without advancing.
+
+
+# 4. GIVE A RULE MULTIPLE ALTERNATIVES AND ACTIONS
+# ----------------------------------------------
+# Repeating >term appends alternatives to the SAME rule; it does not replace it.
+# Alternatives are tried in order. Put the longer dice form before plain INTEGER,
+# because the integer at the start of "3d6" also matches the shorter alternative.
+# You can use | on a single line when alternatives share a handler. Separate lines
+# let these two alternatives specify different handlers: Roll and Number.
+#
+# OPTIONAL TOKENS WITH DEFAULT TEXT
+# INTEGER?:1 means "match an INTEGER if present; otherwise insert an INTEGER token
+# whose lexeme is 1." The colon supplies default TOKEN TEXT, not a C++ expression.
+# Thus d6 and 1d6 both have three children: INTEGER("1"), 'd', INTEGER("6").
+# Roll needs no special case: the count is always child 0 and the sides child 2.
+# Plain INTEGER? would omit the child entirely when absent.
+#
+# Write ?: immediately after a named token, with no spaces. For defaults containing
+# whitespace or grammar punctuation, use double quotes, e.g. WORD?:"hello world"
+# (if that entire text matches your WORD token). Quoted text supports the escapes
+# \n, \r, \t, \\, and \". INTEGER?:"1" is equivalent to INTEGER?:1.
+# The default must lex as exactly ONE visible token of the specified type, taking
+# lexer priorities into account. Invalid defaults are rejected during validation.
+# Defaults apply to optional named tokens only, not rules, groups, or quoted
+# character literals. They do not consume input. Synthetic token source positions
+# are zero; a supplied count keeps its original text and position. A failed
+# alternative discards its inserted defaults along with its other partial results.
+#
+# @Roll means "call handler.Roll(node) when evaluating this kind of term."
+# Its children are INTEGER, literal 'd', INTEGER, at indices 0, 1, and 2.
+# In dice.cpp, Roll reads children 0 and 2 as the count and number of sides,
+# checks their allowed ranges, and uses the handler's emp::Random to roll dice.
+>term @Roll INTEGER?:1 'd' INTEGER
+
+# @Number means "call handler.Number(node) when evaluating this kind of term."
+# Its sole child is an INTEGER token. Number converts that child's text into a
+# numeric value. INTEGER itself only recognizes text; it does not perform this
+# conversion automatically.
+>term @Number INTEGER
+
+
+# 5. CONNECT THE GRAMMAR TO YOUR APPLICATION
+# ------------------------------------------
+# All three annotations name methods on the SAME user-supplied DiceHandler object.
+# Each method receives the matching AST (abstract syntax tree) node by reference.
+# The grammar describes syntax; methods implement meaning and can share state.
+# Omitting @method is allowed: evaluation then runs the child rule nodes in order
+# and returns the last result (for our non-void value type). It does not invent
+# arithmetic or convert token leaves, so this example provides explicit actions.
+#
+# For "3d6 - 2d4 + 10", the expression node's children are:
+#   index:     0          1       2          3       4
+#           term(3d6)   '-'    term(2d4)   '+'    term(10)
+# Anonymous grammar groups (...) are flattened into their parent's children.
+# Named rules such as term produce nodes, and matched tokens remain leaf nodes.
+# In Sum, node.RunChild(i, *this) evaluates a term with the same handler, while
+# node.GetChildLexeme(i) reads the text of an operator token.
+#
+# Sum starts with the first term, then applies each operator/term pair in order.
+# This is what makes + and - LEFT ASSOCIATIVE with equal precedence: "20 - 5 - 3"
+# evaluates as (20 - 5) - 3, producing 12. The name "Sum" has no special meaning
+# to Empala, and the grammar does not perform arithmetic by itself.
+#
+# See the three numbered steps in dice.cpp's main(): tokenize, parse, then run
+# the AST with a handler. To build your own language, change the token definitions
+# and rules here, implement the named handler methods, and regenerate the header.
