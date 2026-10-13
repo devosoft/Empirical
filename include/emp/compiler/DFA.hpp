@@ -21,7 +21,11 @@
 #include "../base/array.hpp"
 #include "../base/vector.hpp"
 #include "../io/CPPFile.hpp"
+#include "../io/JSFile.hpp"
+#include "../io/PythonFile.hpp"
 #include "../tools/String.hpp"
+
+#include "_CodeGen.hpp"
 
 namespace emp {
 
@@ -30,8 +34,8 @@ namespace emp {
   private:
     emp::vector<emp::array < int, NUM_SYMBOLS> > transitions;  // -1 = no transition (default)
     emp::vector<STOP_T> stop_id;      // 0=not stop; other values for STOP return value.
-    emp::vector<STOP_T> tc_stop_id;  // Non-zero = trailing-context r1 boundary for that token.
-    emp::vector<STOP_T> tc_final_id; // Non-zero = TC r2-final accept state (lexeme = r1 only).
+    emp::vector<STOP_T> tc_stop_id;   // Non-zero = trailing-context r1 boundary for that token.
+    emp::vector<STOP_T> tc_final_id;  // Non-zero = TC r2-final accept state (lexeme = r1 only).
 
     using this_t = tDFA<NUM_SYMBOLS, STOP_T>;
   public:
@@ -102,6 +106,7 @@ namespace emp {
 
     /// Get the trailing-context boundary value for a state (0 = not a boundary).
     stop_t GetTCStop(int state) const { return (state == -1) ? 0 : tc_stop_id[(size_t) state]; }
+
     stop_t GetTCStop(size_t state) const { return tc_stop_id[state]; }
 
     /// Set the TC-final value only if the new value is higher (r2-completed accept state).
@@ -112,6 +117,7 @@ namespace emp {
 
     /// Get the TC-final value for a state (0 = not a TC-final accept state).
     stop_t GetTCFinal(int state) const { return (state == -1) ? 0 : tc_final_id[(size_t) state]; }
+
     stop_t GetTCFinal(size_t state) const { return tc_final_id[state]; }
 
     /// Get the stop value associated with a state.
@@ -218,14 +224,16 @@ namespace emp {
         file.AppendCode(static_cast<size_t>(stop_id[state]));
       }
       file.AppendCode("};")
-        .AddCode("  // TC-boundary stop values (non-zero = r1 boundary for a trailing-context token)")
+        .AddCode(
+          "  // TC-boundary stop values (non-zero = r1 boundary for a trailing-context token)")
         .AddCode("  static constexpr std::array<int, NUM_STATES> tc_stop_id = {");
       for (size_t state = 0; state < GetSize(); ++state) {
         if (state) { file.AppendCode(","); }
         file.AppendCode(static_cast<size_t>(tc_stop_id[state]));
       }
       file.AppendCode("};")
-        .AddCode("  // TC-final values (non-zero = r2 accept state; backtrack lexeme to r1 boundary)")
+        .AddCode(
+          "  // TC-final values (non-zero = r2 accept state; backtrack lexeme to r1 boundary)")
         .AddCode("  static constexpr std::array<int, NUM_STATES> tc_final_id = {");
       for (size_t state = 0; state < GetSize(); ++state) {
         if (state) { file.AppendCode(","); }
@@ -251,7 +259,7 @@ namespace emp {
           "    return (state >= 0) ? tc_final_id[static_cast<size_t>(state)] : 0;",
           "  }",
           "  static constexpr int GetNext(int state, int sym) {",
-          "    if (state < 0 || sym < 0 || sym >= NUM_SYMBOLS) return -1; // Invalid state or symbol.",
+          "    if (state < 0 || state >= NUM_STATES || sym < 0 || sym >= NUM_SYMBOLS) return -1;",
           "    int next_state = table[static_cast<size_t>(state)][static_cast<size_t>(sym)];",
           "    // If sym is an unused control symbol (line begin/end), keep old state.",
           "    return (sym < SYMBOL_MIN_INPUT && next_state == -1) ? state : next_state;",
@@ -268,6 +276,108 @@ namespace emp {
           "  }",
           "};");
     }
+
+  private:
+    // Python and JavaScript share array notation, but own their class and method syntax.
+    template <typename FILE_T>
+    void WriteScriptTables(FILE_T & file, const String & prefix, const String & end) const {
+      file.AddRawCode(prefix, "NUM_STATES = ", GetSize(), end);
+      file.AddRawCode(prefix, "NUM_SYMBOLS = ", NUM_SYMBOLS, end);
+      file.AddRawCode(prefix, "SYMBOL_START = 2", end);
+      file.AddRawCode(prefix, "SYMBOL_STOP = 3", end);
+      file.AddRawCode(prefix, "SYMBOL_MIN_INPUT = 9", end);
+      file.AddRawCode(prefix, "table = [");
+      for (const auto & row : transitions) {
+        file.AddRawCode("        [");
+        for (size_t symbol = 0; symbol < NUM_SYMBOLS; ++symbol) {
+          if (symbol) { file.AppendRawCode(","); }
+          file.AppendRawCode(row[symbol]);
+        }
+        file.AppendRawCode("],");
+      }
+      file.AddRawCode("    ]", end);
+      const auto write_ids = [&](const String & name, const auto & ids) {
+        file.AddRawCode(prefix, name, " = [");
+        for (size_t i = 0; i < ids.size(); ++i) {
+          if (i) { file.AppendRawCode(","); }
+          file.AppendRawCode(static_cast<long long>(ids[i]));
+        }
+        file.AppendRawCode("]", end);
+      };
+      write_ids("stop_id", stop_id);
+      write_ids("tc_stop_id", tc_stop_id);
+      write_ids("tc_final_id", tc_final_id);
+    }
+
+  public:
+    /// Emit a standalone Python DFA class with the same tables as the C++ target.
+    void WritePython(emp::PythonFile & file, emp::String object_name = "DFA") const {
+      file.AddRawCode("class ", object_name, ":");
+      WriteScriptTables(file, "    ", "");
+      internal::WriteCodeTemplate(file,
+                                  R"PY(
+    @classmethod
+    def size(cls):
+        return cls.NUM_STATES
+
+    @classmethod
+    def GetStop(cls, state):
+        return cls.stop_id[state] if 0 <= state < cls.NUM_STATES else 0
+
+    @classmethod
+    def GetTCStop(cls, state):
+        return cls.tc_stop_id[state] if 0 <= state < cls.NUM_STATES else 0
+
+    @classmethod
+    def GetTCFinal(cls, state):
+        return cls.tc_final_id[state] if 0 <= state < cls.NUM_STATES else 0
+
+    @classmethod
+    def GetNext(cls, state, symbol):
+        if isinstance(symbol, str):
+            for char in symbol:
+                state = cls.GetNext(state, ord(char))
+            return state
+        if state < 0 or state >= cls.NUM_STATES or symbol < 0 or symbol >= cls.NUM_SYMBOLS:
+            return -1
+        next_state = cls.table[state][symbol]
+        return state if symbol < cls.SYMBOL_MIN_INPUT and next_state == -1 else next_state
+
+    @classmethod
+    def Test(cls, text):
+        state = cls.GetNext(cls.GetNext(0, cls.SYMBOL_START), text)
+        return max(cls.GetStop(state), cls.GetStop(cls.GetNext(state, cls.SYMBOL_STOP)))
+)PY",
+                                  {});
+    }
+
+    /// Emit a JavaScript DFA class; the enclosing generator chooses module exports.
+    void WriteJS(emp::JSFile & file, emp::String object_name = "DFA") const {
+      file.AddRawCode("class ", object_name, " {");
+      WriteScriptTables(file, "  static ", ";");
+      internal::WriteCodeTemplate(file,
+                                  R"JS(
+  static size() { return this.NUM_STATES; }
+  static GetStop(state) { return state >= 0 && state < this.NUM_STATES ? this.stop_id[state] : 0; }
+  static GetTCStop(state) { return state >= 0 && state < this.NUM_STATES ? this.tc_stop_id[state] : 0; }
+  static GetTCFinal(state) { return state >= 0 && state < this.NUM_STATES ? this.tc_final_id[state] : 0; }
+  static GetNext(state, symbol) {
+    if (typeof symbol === "string") {
+      for (const char of symbol) state = this.GetNext(state, char.codePointAt(0));
+      return state;
+    }
+    if (state < 0 || state >= this.NUM_STATES || symbol < 0 || symbol >= this.NUM_SYMBOLS) return -1;
+    const next = this.table[state][symbol];
+    return symbol < this.SYMBOL_MIN_INPUT && next === -1 ? state : next;
+  }
+  static Test(text) {
+    const state = this.GetNext(this.GetNext(0, this.SYMBOL_START), text);
+    return Math.max(this.GetStop(state), this.GetStop(this.GetNext(state, this.SYMBOL_STOP)));
+  }
+}
+)JS",
+                                  {});
+    }
   };
 
   /// Setup DFA to be a simple tDFA with the basic character set for symbols.
@@ -276,3 +386,6 @@ namespace emp {
 }  // namespace emp
 
 #endif  // #ifndef INCLUDE_EMP_COMPILER_DFA_HPP_GUARD
+
+// Local settings for Empecable file checker.
+// empecable_words: classmethod cls isinstance ord
