@@ -16,6 +16,7 @@
 
 #include <algorithm>
 #include <cctype>
+#include <charconv>
 #include <cstdio>
 #include <functional>
 #include <initializer_list>
@@ -44,6 +45,38 @@
 #include "char_utils.hpp"
 
 namespace emp {
+
+  /// Shortest round-trippable decimal expanded without exponent notation. Retains signed zero;
+  /// non-finite values use the standard to_chars spelling. No locale or throwing conversions.
+  [[nodiscard]] inline std::string FormatFixedPoint(double value) {
+    char buffer[64];
+    const auto result = std::to_chars(buffer, buffer + sizeof(buffer), value);
+    emp_assert(result.ec == std::errc{});
+    std::string formatted(buffer, result.ptr);
+    const auto exponent_pos = formatted.find_first_of("eE");
+    if (exponent_pos == std::string::npos) { return formatted; }
+    std::string_view exponent_text(formatted.data() + exponent_pos + 1,
+                                   formatted.size() - exponent_pos - 1);
+    if (exponent_text.front() == '+') { exponent_text.remove_prefix(1); }
+    int exponent = 0;
+    [[maybe_unused]] const auto parsed = std::from_chars(exponent_text.data(),
+                                        exponent_text.data() + exponent_text.size(), exponent);
+    emp_assert(parsed.ec == std::errc{});
+    std::string digits = formatted.substr(0, exponent_pos);
+    std::string sign;
+    if (digits.front() == '-') { sign = "-"; digits.erase(0, 1); }
+    const auto point = digits.find('.');
+    const int position = static_cast<int>(point == std::string::npos ? digits.size() : point)
+                         + exponent;
+    if (point != std::string::npos) { digits.erase(point, 1); }
+    if (position <= 0) { return sign + "0." + std::string(-position, '0') + digits; }
+    if (static_cast<size_t>(position) >= digits.size()) {
+      return sign + digits + std::string(position - digits.size(), '0');
+    }
+    digits.insert(static_cast<size_t>(position), ".");
+    return sign + digits;
+  }
+
 
   /// Return a const reference to an empty string.  This function is useful to implement other
   /// functions that need to return a const reference for efficiency, but also need a null response.
