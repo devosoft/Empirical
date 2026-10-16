@@ -611,3 +611,24 @@ TEST_CASE("Test url-encode", "[tools]") {
 
 // Local settings for Empecable file checker.
 // empecable_words: aposbye aposone quot risoner english aapnoot lth aapnootmies mies noot ghi isanokaystring quotone azkaban bla okaystring gthi anokaystring alphanum ykty abcabc aap oka abcdefghijklmnop apos youexamplecom empt aaaabaaaa twee aaaaaaaaa qrstuvwxyz aabcccabbcccxxbcbca hel els adg abcdefg nis uvwxyz aabcccabbcccabcbca llo escp
+
+TEST_CASE("Compact fixed-point formatting", "[tools]") {
+  CHECK(emp::FormatFixedPoint(0.000001) == "0.000001");
+  CHECK(emp::FormatFixedPoint(-1.25e-8) == "-0.0000000125");
+  CHECK(emp::FormatFixedPoint(1e21) == "1000000000000000000000");
+  CHECK(emp::FormatFixedPoint(1.25) == "1.25");
+  CHECK(emp::FormatFixedPoint(0.0) == "0");
+  CHECK(emp::FormatFixedPoint(-0.0) == "-0");
+  for (double value : {std::numeric_limits<double>::denorm_min(),
+                       std::numeric_limits<double>::min(), std::numeric_limits<double>::max(),
+                       -123456789.12345679, 0.12345678901234567}) {
+    const auto text = emp::FormatFixedPoint(value);
+    CHECK(text.find_first_of("eE") == std::string::npos);
+    double restored = 0;
+    char * end = nullptr;
+    restored = std::strtod(text.c_str(), &end);
+    CHECK(end == text.data() + text.size());
+    CHECK(restored == value);
+  }
+  CHECK(emp::FormatFixedPoint(std::numeric_limits<double>::infinity()) == "inf");
+}
