@@ -1176,3 +1176,57 @@ TEST_CASE("Test SettingsManager SerialSave and SerialLoad", "[config][serialize]
     REQUIRE(y == 99);  // unchanged
   }
 }
+
+TEST_CASE("Recoverable settings validate before applying batches", "[config]") {
+  emp::SettingsManager settings;
+  int8_t small = 4;
+  uint64_t large = 0;
+  double rate = 0.5;
+  bool enabled = false;
+  emp::String name = "old";
+  int setter_calls = 0;
+  settings.AddSetting("small", small, "");
+  settings.AddSetting("large", large, "");
+  settings.AddSetting("rate", rate, "");
+  settings.AddSetting("enabled", enabled, "");
+  settings.AddSetting("name", name, "");
+  settings.AddValue("callback", [&] { return rate; }, [&](double v) { ++setter_calls; rate = v; });
+  settings.AddValue("constant", 42);
+  settings.Metadata("rate").SetRange(0, 1);
+  settings.Metadata("name").SetOptions<emp::String>({"old", "new"});
+  CHECK_FALSE(settings.TrySet("small", "128"));
+  CHECK_FALSE(settings.TrySet("large", "-1"));
+  CHECK_FALSE(settings.TrySet("large", "18446744073709551616"));
+  CHECK(settings.TrySet("large", "18446744073709551615"));
+  CHECK(large == std::numeric_limits<uint64_t>::max());
+  CHECK_FALSE(settings.TrySet("rate", "NaN"));
+  CHECK_FALSE(settings.TrySet("rate", "1.2junk"));
+  CHECK_FALSE(settings.TrySet("rate", "1e999"));
+  CHECK_FALSE(settings.TrySet("rate", "+-1"));
+  CHECK(settings.TrySet("rate", emp::FormatFixedPoint(std::numeric_limits<double>::denorm_min())));
+  CHECK(rate == std::numeric_limits<double>::denorm_min());
+  CHECK_FALSE(settings.TrySet("constant", "3"));
+  CHECK_FALSE(settings.TrySet("unknown", "3"));
+  CHECK(settings.TrySet("enabled", " ON "));
+  CHECK(enabled);
+  CHECK(settings.TrySet("small", " +127 "));
+  CHECK(small == 127);
+  CHECK_FALSE(settings.TrySet("rate", "2", true));
+  CHECK(settings.TrySet("rate", "2")); // Metadata remains opt-in.
+  CHECK_FALSE(settings.TrySet("name", "other", true));
+  CHECK(settings.TrySet("name", "new", true));
+
+  std::map<emp::String, emp::String> batch{{"callback", "0.75"}, {"small", "999"}, {"large", "oops"}};
+  const auto result = settings.TryApplySettingValues(batch);
+  REQUIRE_FALSE(result);
+  CHECK(result.error().size() == 2);
+  CHECK(setter_calls == 0);
+  CHECK(rate == 2);
+  batch["small"] = "3"; batch["large"] = "9";
+  CHECK(settings.TryApplySettingValues(batch));
+  CHECK(setter_calls == 1);
+  CHECK(rate == 0.75);
+  CHECK(small == 3);
+  batch["obsolete"] = "unparsed";
+  CHECK(settings.TryApplySettingValues(batch, false, emp::SettingsManager::UnknownSetting::Ignore));
+}
