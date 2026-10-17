@@ -116,9 +116,11 @@
 #define INCLUDE_EMP_CONFIG_SETTINGS_MANAGER_HPP_GUARD
 
 #include <cerrno>
+#include <charconv>
 #include <cmath>
 #include <concepts>
 #include <cstdint>
+#include <expected>
 #include <filesystem>
 #include <fstream>
 #include <functional>
@@ -126,6 +128,8 @@
 #include <iostream>
 #include <iterator>
 #include <limits>
+#include <locale>
+#include <variant>
 #include <map>
 #include <print>
 #include <stddef.h>
@@ -144,7 +148,17 @@ namespace emp {
 
   class SettingsManager {
   public:
-    /// How a GUI should map a setting's numeric range onto a control such as a slider.
+    /// Canonical parsed values used by recoverable settings updates.
+    using SettingValue = std::variant<emp::String, bool, int64_t, uint64_t, double>;
+    struct SettingDiagnostic {
+      emp::String name;
+      emp::String message;
+    };
+    using SettingDiagnostics = emp::vector<SettingDiagnostic>;
+    using ParsedSettingValues = emp::vector<std::pair<emp::String, SettingValue>>;
+    enum class UnknownSetting { Error, Ignore };
+
+    /// How a GUI maps a numeric range onto a control such as a slider.
     enum class SettingScale { LINEAR, EXPONENTIAL };
 
     /// Optional presentation metadata for a user-facing setting.
@@ -325,6 +339,63 @@ namespace emp {
       enum class Type { ERROR=0, STRING, BOOL, INT64, UINT64, DOUBLE };
       Type type;
 
+      using parse_result_t = std::expected<SettingValue, emp::String>;
+      parse_result_t (*parse_value)(const emp::String &) = nullptr;
+
+      template <typename T>
+      static parse_result_t ParseValue(const emp::String & text) {
+        if constexpr (std::same_as<T, emp::String> || std::same_as<T, std::string>) {
+          return SettingValue{text};
+        } else {
+          std::string_view token(text.data(), text.size());
+          while (!token.empty() && std::isspace(static_cast<unsigned char>(token.front()))) {
+            token.remove_prefix(1);
+          }
+          while (!token.empty() && std::isspace(static_cast<unsigned char>(token.back()))) {
+            token.remove_suffix(1);
+          }
+          if constexpr (std::same_as<T, bool>) {
+            const auto lower = emp::String{token}.AsLower();
+            if (lower.IsOneOf("true", "on", "1")) { return SettingValue{true}; }
+            if (lower.IsOneOf("false", "off", "0")) { return SettingValue{false}; }
+            return std::unexpected("Expected On, Off, True, False, 1, or 0.");
+          } else if constexpr (std::is_arithmetic_v<T>) {
+            if (!token.empty() && token.front() == '+') {
+              token.remove_prefix(1);
+              if (!token.empty() && (token.front() == '+' || token.front() == '-')) {
+                return std::unexpected("Invalid numeric sign.");
+              }
+            }
+            T value{};
+            if (token.empty()) { return std::unexpected("Expected a numeric value."); }
+            if constexpr (std::floating_point<T>) {
+              // Floating-point from_chars requires macOS 26's libc++; streams work on older
+              // supported systems too. This opt-in parsing path never enables stream exceptions.
+              std::istringstream input{std::string(token)};
+              input.imbue(std::locale::classic());
+              input >> std::noskipws >> value;
+              const bool subnormal = value != 0 && std::isfinite(value)
+                                     && std::abs(value) < std::numeric_limits<T>::min();
+              // Some libc++ versions set failbit for a correctly rounded subnormal.
+              if ((!input && !subnormal) || !input.eof()) {
+                return std::unexpected("Invalid or out-of-range numeric value.");
+              }
+            } else {
+              const auto parsed = std::from_chars(token.data(), token.data() + token.size(), value);
+              if (parsed.ec != std::errc{} || parsed.ptr != token.data() + token.size()) {
+                return std::unexpected("Invalid or out-of-range numeric value.");
+              }
+            }
+            if constexpr (std::floating_point<T>) {
+              if (!std::isfinite(value)) { return std::unexpected("Expected a finite number."); }
+              return SettingValue{static_cast<double>(value)};
+            } else if constexpr (std::signed_integral<T>) {
+              return SettingValue{static_cast<int64_t>(value)};
+            } else { return SettingValue{static_cast<uint64_t>(value)}; }
+          } else { return std::unexpected("Unsupported setting type."); }
+        }
+      }
+
       std::function<void(const emp::String &)> set_string;
       std::function<void(bool)>                set_bool;
       std::function<void(int64_t)>             set_int64;
@@ -447,6 +518,7 @@ namespace emp {
         : name(name), desc(desc)
         , default_val(explicit_default.empty() ? Convert<emp::String>(var) : explicit_default)
         , flag(flag), is_setting(true), type(ToTypeEnum<VAR_T>())
+        , parse_value(&ParseValue<std::remove_cv_t<VAR_T>>)
         , set_string([&var, setting_name=name](const emp::String & in){
             var = Convert<VAR_T>(in, setting_name);
           })
@@ -472,6 +544,7 @@ namespace emp {
                         ? (explicit_default.empty() ? Convert<emp::String>(getter()) : explicit_default)
                         : "")
         , flag(flag), is_setting(is_setting), type(ToTypeEnum<T>())
+        , parse_value(&ParseValue<T>)
         , set_string([setter, setting_name=name](const emp::String & in){
             setter(Convert<T>(in, setting_name));
           })
@@ -492,11 +565,17 @@ namespace emp {
       ValueInfo(emp::String name, GETTER_T getter, emp::String desc)
         : name(name), desc(desc), default_val(""), flag('\0'), is_setting(false)
         , type(ToTypeEnum<T>())
+        , parse_value(&ParseValue<T>)
         , get_string([getter]() { return Convert<emp::String>(getter()); })
         , get_bool(  [getter]() { return Convert<bool>(getter()); })
         , get_int64( [getter]() { return Convert<int64_t>(getter()); })
         , get_uint64([getter]() { return Convert<uint64_t>(getter()); })
         , get_double([getter]() { return Convert<double>(getter()); }) {}
+
+      [[nodiscard]] parse_result_t Parse(const emp::String & text) const {
+        if (!CanSet()) { return std::unexpected("Value is read-only."); }
+        return parse_value(text);
+      }
 
       [[nodiscard]] bool IsString() const { return type == Type::STRING; }
       [[nodiscard]] bool IsBool() const { return type == Type::BOOL; }
@@ -915,6 +994,81 @@ namespace emp {
 
     [[nodiscard]] std::string GetTypeName(const emp::String & name) const {
       return GetValueInfo(name).GetTypeName();
+    }
+
+    /// Parse text without changing a value or invoking its setter. GUI metadata validation is opt-in.
+    [[nodiscard]] std::expected<SettingValue, emp::String> ParseSettingValue(
+      const emp::String & name, const emp::String & text, bool validate_metadata = false) const {
+      const auto found = value_map.find(AppendScope(name));
+      if (found == value_map.end()) { return std::unexpected("Unknown setting."); }
+      const auto & info = found->second;
+      auto value = info.Parse(text);
+      if (!value || !validate_metadata) { return value; }
+      const auto metadata = metadata_map.find(found->first);
+      if (metadata == metadata_map.end()) { return value; }
+      const auto & hints = metadata->second;
+      if (!hints.AllowsOtherOptions() && !hints.GetOptions().empty()) {
+        bool match = false;
+        for (const auto & option : hints.GetOptions()) {
+          const auto parsed = info.Parse(option);
+          if (parsed && *parsed == *value) { match = true; break; }
+        }
+        if (!match) { return std::unexpected("Value is not one of the permitted options."); }
+      }
+      if (!info.IsString() && !info.IsBool()) {
+        for (bool minimum : {true, false}) {
+          if (minimum ? !hints.HasMinimum() : !hints.HasMaximum()) { continue; }
+          const auto bound = info.Parse(minimum ? hints.GetMinimum() : hints.GetMaximum());
+          if (!bound) { return std::unexpected("Invalid numeric range metadata."); }
+          const bool outside = minimum ? *value < *bound : *value > *bound;
+          if (outside) {
+            return std::unexpected(emp::MakeString(minimum ? "Enter at least " : "Enter at most ",
+              minimum ? hints.GetMinimum() : hints.GetMaximum(), "."));
+          }
+        }
+      }
+      return value;
+    }
+
+    /// Validate an entire range of name/text pairs. Collect all errors; no setters run.
+    template <typename RANGE>
+    [[nodiscard]] std::expected<ParsedSettingValues, SettingDiagnostics> ParseSettingValues(
+      const RANGE & values, bool validate_metadata = false,
+      UnknownSetting unknown = UnknownSetting::Error) const {
+      ParsedSettingValues parsed;
+      SettingDiagnostics errors;
+      for (const auto & [name, text] : values) {
+        if (!HasValue(name) && unknown == UnknownSetting::Ignore) { continue; }
+        auto value = ParseSettingValue(name, text, validate_metadata);
+        if (!value) { errors.push_back({name, value.error()}); }
+        else { parsed.emplace_back(AppendScope(name), std::move(*value)); }
+      }
+      if (!errors.empty()) { return std::unexpected(std::move(errors)); }
+      return parsed;
+    }
+
+    /// Invalid batches invoke no setters. Successful setters retain their usual side effects;
+    /// this does not attempt to roll back application-defined callbacks or parse config directives.
+    template <typename RANGE>
+    [[nodiscard]] std::expected<void, SettingDiagnostics> TryApplySettingValues(
+      const RANGE & values, bool validate_metadata = false,
+      UnknownSetting unknown = UnknownSetting::Error) {
+      auto parsed = ParseSettingValues(values, validate_metadata, unknown);
+      if (!parsed) { return std::unexpected(std::move(parsed.error())); }
+      for (const auto & [name, value] : *parsed) {
+        auto & info = value_map.find(name)->second;
+        std::visit([&info](const auto & typed) { info.SetValue(typed); }, value);
+      }
+      return {};
+    }
+
+    [[nodiscard]] std::expected<void, emp::String> TrySet(
+      const emp::String & name, const emp::String & text, bool validate_metadata = false) {
+      const auto value = ParseSettingValue(name, text, validate_metadata);
+      if (!value) { return std::unexpected(value.error()); }
+      auto & info = value_map.find(AppendScope(name))->second;
+      std::visit([&info](const auto & typed) { info.SetValue(typed); }, *value);
+      return {};
     }
 
     /// Return all registered user-facing setting names, including their full scope prefixes.
