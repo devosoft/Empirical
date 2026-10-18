@@ -42,14 +42,18 @@ namespace emp {
     auto & file = world.SetupFile(fpath);
     auto sys = world.GetSystematics(systematics_id);
 
-    sys->AddEvolutionaryDistinctivenessDataNode();
+    if (sys->GetTrackTotalOffspring()) {
+      sys->AddEvolutionaryDistinctivenessDataNode();
+    }
     sys->AddPairwiseDistanceDataNode();
     sys->AddPhylogeneticDiversityDataNode();
 
     std::function<size_t(void)> get_update = [&world](){return world.GetUpdate();};
 
     file.AddFun(get_update, "update", "Update");
-    file.AddStats(*sys->GetDataNode("evolutionary_distinctiveness") , "evolutionary_distinctiveness", "evolutionary distinctiveness for a single update", true, true);
+    if (sys->GetTrackTotalOffspring()) {    
+      file.AddStats(*sys->GetDataNode("evolutionary_distinctiveness") , "evolutionary_distinctiveness", "evolutionary distinctiveness for a single update", true, true);
+    }
     file.AddStats(*sys->GetDataNode("pairwise_distance"), "pairwise_distance", "pairwise distance for a single update", true, true);
     file.AddCurrent(*sys->GetDataNode("phylogenetic_diversity"), "current_phylogenetic_diversity", "current phylogenetic_diversity", true, true);
     file.PrintHeaderKeys();

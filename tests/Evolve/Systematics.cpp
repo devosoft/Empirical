@@ -49,6 +49,7 @@ TEST_CASE("Test Systematics", "[Evolve]") {
   // Systematics
   std::function<std::string(double &)> calc_taxon = [](double & o){ return o > 50.0 ? "large" : "small"; };
   emp::Systematics<double, std::string> sys1(calc_taxon);
+  sys1.SetTrackTotalOffspring(true);
   CHECK(sys1.GetTrackSynchronous() == false);
   CHECK(sys1.GetNumAncestors() == 0);
   CHECK(sys1.GetNumActive() == 0);
@@ -142,6 +143,7 @@ TEST_CASE("Test Systematics", "[Evolve]") {
   CHECK(emp::CountMutSteps(ptr2, "short") == 2);
 
   emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, false);
+  sys.SetTrackTotalOffspring(true);
 
   // std::cout << "\nAddOrg 25 (id1, no parent)\n";
   sys.SetUpdate(0);
@@ -407,6 +409,7 @@ TEST_CASE("Test Systematics", "[Evolve]") {
 
 TEST_CASE("Test not tracking ancestors", "[Evolve]") {
   emp::Systematics<int, int> sys([](const int & i){return i;}, true, false, false, false);
+  sys.SetTrackTotalOffspring(true);
 
   // std::cout << "\nAddOrg 25 (id1, no parent)\n";
   sys.SetUpdate(0);
@@ -816,6 +819,8 @@ TEST_CASE("Run world", "[evo]") {
   emp::Ptr<phen_systematics_t> phen_sys;
   gene_sys.New(gene_fun, true,true,true);
   phen_sys.New(phen_fun, true,true,true);
+  // gene_sys->SetTrackTotalOffspring(true);
+  // phen_sys->SetTrackTotalOffspring(true);
   world.AddSystematics(gene_sys);
   world.AddSystematics(phen_sys);
 
@@ -1305,7 +1310,7 @@ TEST_CASE("Test RemoveBefore", "[Evolve]") {
   CHECK(emp::Has(sys.GetAncestors(), id1));
   CHECK(emp::Has(sys.GetAncestors(), id2));
 
-  sys.RemoveBefore(50);
+  sys.RemoveAncestorsBefore(50);
 
   CHECK(!emp::Has(sys.GetAncestors(), id1));
   CHECK(!emp::Has(sys.GetAncestors(), id2));
@@ -1317,7 +1322,7 @@ TEST_CASE("Test RemoveBefore", "[Evolve]") {
   CHECK(emp::Has(sys.GetActive(), id7));
   CHECK(emp::Has(sys.GetAncestors(), id8));
 
-  sys.RemoveBefore(70);
+  sys.RemoveAncestorsBefore(70);
   CHECK(!emp::Has(sys.GetActive(), id8));
   CHECK(!emp::Has(sys.GetActive(), id9));
 
@@ -1487,6 +1492,7 @@ TEST_CASE("Test Remove Org After Repro") {
 
 TEST_CASE("Test Total Offspring") {
   emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
+  sys.SetTrackTotalOffspring(true);
 
   auto org1 = sys.AddOrg(1, nullptr);
   auto org2 = sys.AddOrg(2, org1);
@@ -1571,6 +1577,51 @@ TEST_CASE("Test Total Offspring") {
 
 }
 
+TEST_CASE("Test Total Offspring tracking is off by default") {
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
+  CHECK(!sys.GetTrackTotalOffspring());
+
+  auto org1 = sys.AddOrg(1, nullptr);
+  auto org2 = sys.AddOrg(2, org1);
+  auto org3 = sys.AddOrg(3, org2);
+  auto org4 = sys.AddOrg(4, org1);
+
+  CHECK(org1->GetNumOff() == 2);
+  CHECK(org1->GetTotalOffspring() == 0);
+  CHECK(org2->GetTotalOffspring() == 0);
+
+  // Removals must not drive counts negative when untracked
+  sys.RemoveOrg(org3);
+  sys.RemoveOrg(org2);
+  sys.RemoveOrg(org4);
+  CHECK(org1->GetTotalOffspring() == 0);
+}
+
+TEST_CASE("Test SetTrackTotalOffspring") {
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
+
+  sys.SetTrackTotalOffspring(true);
+  CHECK(sys.GetTrackTotalOffspring());
+  sys.SetTrackTotalOffspring(false);
+  CHECK(!sys.GetTrackTotalOffspring());
+  sys.SetTrackTotalOffspring(true);
+
+  auto org1 = sys.AddOrg(1, nullptr);
+  auto org2 = sys.AddOrg(2, org1);
+  CHECK(org1->GetTotalOffspring() == 1);
+  CHECK(org2->GetTotalOffspring() == 0);
+}
+
+TEST_CASE("Test LoadFromFile total offspring tracking") {
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, true);
+  sys.LoadFromFile("systematics_snapshot.csv", "genome", true, true);
+  CHECK(sys.GetTrackTotalOffspring());
+
+  emp::Systematics<int, int> sys2([](const int & i){return i;}, true, true, true, true);
+  sys2.LoadFromFile("systematics_snapshot.csv", "genome", true, false);
+  CHECK(!sys2.GetTrackTotalOffspring());
+}
+
 TEST_CASE("Test Degree Distribution") {
   emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
 
@@ -1640,7 +1691,7 @@ TEST_CASE("Test Average Origin Time") {
 
 TEST_CASE("Test Loading Phylogeny From File") {
   emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, true);
-  sys.LoadFromFile("systematics_snapshot.csv", "genome");
+  sys.LoadFromFile("systematics_snapshot.csv", "genome", true, true);
   CHECK(sys.GetNumRoots() == 1);
   emp::Ptr<emp::Taxon<int>> mrca = sys.GetMRCA();
   CHECK(mrca->GetID() == 1);
@@ -1693,7 +1744,8 @@ TEST_CASE("Test LoadFromFile and Snapshot behavior") {
     if (file.path().extension() == ".csv") {
       // load systematics from original file
       emp::Systematics<int, std::string> sys([](const int & i){ return emp::to_string(i); }, true, true, true, true);
-      sys.LoadFromFile(file.path(), "phenotype");
+      sys.SetTrackTotalOffspring(true);
+      sys.LoadFromFile(file.path(), "phenotype", true, true);
 
       sys.AddSnapshotFun([](const emp::Systematics<int, std::string>::taxon_t& tax){ return emp::to_string(tax.GetInfo()); }, "phenotype");
 
