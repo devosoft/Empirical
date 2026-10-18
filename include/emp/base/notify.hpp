@@ -59,6 +59,8 @@
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
+#include <vector>
+#include <utility>
 
 // If we are in emscripten, make sure to include the header.
 #ifdef __EMSCRIPTEN__
@@ -116,6 +118,40 @@ namespace emp::notify {
       default: return "Unknown";
     }
   }
+
+  /// Capture notifications synchronously on this thread. The innermost matching scope wins.
+  /// Captured errors are still fatal; use recoverable validation APIs for invalid input.
+  class ScopedCapture {
+    // Raw links avoid depending on Ptr/assert here: those foundational headers use notify.
+    inline static thread_local ScopedCapture * active = nullptr;
+    ScopedCapture * previous;
+    Type type;
+    std::vector<ExceptInfo> messages;
+  public:
+    explicit ScopedCapture(Type kind = Type::WARNING)
+      : previous(std::exchange(active, this)), type(kind) {}
+    ScopedCapture(const ScopedCapture &) = delete;
+    ScopedCapture & operator=(const ScopedCapture &) = delete;
+    ~ScopedCapture() { active = previous; }
+    const std::vector<ExceptInfo> & GetMessages() const { return messages; }
+    std::string Message(const std::string & separator = " ") const {
+      std::string out;
+      for (const auto & entry : messages) {
+        if (!out.empty()) { out += separator; }
+        out += entry.message;
+      }
+      return out;
+    }
+    static bool Capture(Type kind, id_arg_t id, message_arg_t text, except_data_t data = 0) {
+      for (auto * scope = active; scope; scope = scope->previous) {
+        if (scope->type == kind) {
+          scope->messages.push_back({id, text, std::move(data)});
+          return true;
+        }
+      }
+      return false;
+    }
+  };
 
   // Maintain a specified collection of handlers.
   class HandlerSet {
@@ -310,12 +346,14 @@ namespace emp::notify {
   /// Generic Notification where type must be specified.
   template <typename... Ts>
   static bool Notify(Type type, Ts... args) {
-    NotifyData & data = GetData();
-    const id_t id     = NotifyTypeID(type);
+    const id_t id = NotifyTypeID(type);
 
     // Setup the message in a string stream.
     std::stringstream ss;
     ((ss << std::forward<Ts>(args)), ...);
+    if (ScopedCapture::Capture(type, id, ss.str())) { return true; }
+    NotifyData & data = GetData();
+
 
     // If we are are paused, save this notification for later.
     if (data.is_paused) {
@@ -447,6 +485,7 @@ namespace emp::notify {
   [[maybe_unused]] static bool Exception(id_arg_t id,
                                          message_arg_t message     = "",
                                          except_data_t except_data = 0) {
+    if (ScopedCapture::Capture(Type::EXCEPTION, id, message, except_data)) { return true; }
     NotifyData & data = GetData();
 
     if (data.is_paused) {
