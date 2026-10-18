@@ -1,3 +1,4 @@
+#include <thread>
 /*
  *  This file is part of Empirical, https://github.com/devosoft/Empirical
  *  Copyright (C) Michigan State University, MIT Software license; see doc/LICENSE.md
@@ -145,4 +146,31 @@ TEST_CASE("Test notifications", "[base]")
   emp::notify::Exception("MULT", "Test dividing by two", 0.5);
   CHECK(x == 24.0);
 
+}
+
+TEST_CASE("Scoped notification capture nests and isolates threads", "[base]") {
+  emp::notify::ScopedCapture outer;
+  emp::notify::Warning("first");
+  {
+    emp::notify::ScopedCapture inner;
+    emp::notify::Warning("inner");
+    CHECK(inner.Message() == "inner");
+    CHECK(outer.Message() == "first");
+    {
+      emp::notify::ScopedCapture messages(emp::notify::Type::MESSAGE);
+      emp::notify::Warning("inner again");
+      emp::notify::Message("message");
+      CHECK(messages.Message() == "message");
+    }
+    CHECK(inner.GetMessages().size() == 2);
+  }
+  emp::notify::Warning("last");
+  CHECK(outer.Message() == "first last");
+  std::thread other([] {
+    emp::notify::ScopedCapture capture;
+    emp::notify::Warning("other thread");
+    CHECK(capture.Message() == "other thread");
+  });
+  other.join();
+  CHECK(outer.Message() == "first last");
 }
