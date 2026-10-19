@@ -220,7 +220,7 @@ namespace emp {
     const data_t & GetData() const {return data;}
 
     /// Get pointers to this taxon's offspring
-    std::set<Ptr<this_t> > GetOffspring() {return offspring;}
+    const std::set<Ptr<this_t> >& GetOffspring() {return offspring;}
 
     /// Set this taxon's data struct to the given value
     void SetData(data_t d) {data = d;}
@@ -259,7 +259,7 @@ namespace emp {
     /// Get total number of offspring directly or indirectly
     /// descending from this taxon.
     /// Will only be populated if systematics manager is set up to track
-    int GetTotalOffspring(){ return total_offspring; }
+    int GetTotalOffspring() const { return total_offspring; }
 
     /// Remove an organism from this Taxon (after it dies).
     /// Removals must return true if the taxon needs to continue; false if it should deactivate.
@@ -799,7 +799,7 @@ namespace emp {
       for (emp::Ptr<taxon_t> tax : ancestor_taxa) {
         result.push_back(fun(tax));
       }
-      for (emp::Ptr<taxon_t> tax : ancestor_taxa) {
+      for (emp::Ptr<taxon_t> tax : outside_taxa) {
         result.push_back(fun(tax));
       }
       return result;
@@ -822,7 +822,7 @@ namespace emp {
       for (emp::Ptr<taxon_t> tax : ancestor_taxa) {
         result.push_back(fun(tax));
       }
-      for (emp::Ptr<taxon_t> tax : ancestor_taxa) {
+      for (emp::Ptr<taxon_t> tax : outside_taxa) {
         result.push_back(fun(tax));
       }
 
@@ -1313,11 +1313,10 @@ namespace emp {
     /// @returns vector containing the lineages of the specified taxon
     emp::vector<Ptr<taxon_t>> GetLineage(Ptr<taxon_t> tax) const {
       emp::vector<Ptr<taxon_t>> lineage;
-      lineage.push_back(tax);
 
       while (tax) {
-        tax = Parent(tax);
         lineage.push_back(tax);
+        tax = Parent(tax);
       }
       return lineage;
     }
@@ -1735,6 +1734,11 @@ namespace emp {
         for (Ptr<taxon_t> off : tax->GetOffspring()) {
           off->NullifyParent();
         }
+    }
+
+    // Doing this in two steps in case offspring and
+    // their parents are both being removed
+    for (Ptr<taxon_t> tax : to_remove) {    
         ancestor_taxa.erase(tax);
         tax.Delete();
     }
@@ -1776,6 +1780,9 @@ namespace emp {
         for (Ptr<taxon_t> off : tax->GetOffspring()) {
           off->NullifyParent();
         }
+    }
+
+    for (Ptr<taxon_t> tax : to_remove) {    
         outside_taxa.erase(tax);
         tax.Delete();
     }
@@ -1953,7 +1960,7 @@ namespace emp {
       // can be on the line-of-descent to the MRCA, so anything else is a good start point.
       // There must be at least one!  Stop as soon as we find a candidate.
       Ptr<taxon_t> candidate = *std::find_if(active_taxa.begin(), active_taxa.end(),
-        [](Ptr<taxon_t> x){ return x->GetNumOff() != 1; }
+        [](Ptr<taxon_t> x){emp_assert(x != nullptr); return x->GetNumOff() != 1; }
       );
 
       // Now, trace the line of descent, updating the candidate as we go.
@@ -1996,9 +2003,15 @@ namespace emp {
     emp_assert(lineage1[l1] == lineage2[l2],
         "Both lineages should start with MRCA");
 
-    while (lineage1[l1] == lineage2[l2]) {
+    while (lineage1[l1] == lineage2[l2] && l1 > 0 && l2 > 0) {
       l1--;
       l2--;
+    }
+
+    if (l1 == 0 && lineage1[l1] == lineage2[l2]){
+      return lineage1[0];
+    } else if (l2 == 0 && lineage1[l1] == lineage2[l2]) {
+      return lineage2[0];
     }
 
     return lineage1[l1+1];
@@ -2167,16 +2180,26 @@ namespace emp {
     emp_optional_throw(lineage1[l1] == lineage2[l2],
         "Both lineages should start with MRCA");
 
-    while (lineage1[l1] == lineage2[l2]) {
+    // Have to stop before 0 or we access out-of-bounds memory
+    while (lineage1[l1] == lineage2[l2] && l1 > 0 && l2 > 0) {
       l1--;
       l2--;
     }
 
-    double count = l1 + l2 + 2;
+    double count = l1 + l2;
+
+    // Have to adjust for the fact that stopping the while
+    // loop for different reasons creates different off-by-one-errors
+    if (lineage1[l1] != lineage2[l2]) {
+      count += 2;
+    } else {
+      if (l1 > 0) l1--;
+      if (l2 > 0) l2--;
+    }
 
     if (branch_only) {
-      count -= std::count_if(lineage1.begin(), lineage1.begin() + l1, [](Ptr<taxon_t> x){ return x->GetNumOff() == 1; });
-      count -= std::count_if(lineage2.begin(), lineage2.begin() + l2, [](Ptr<taxon_t> x){ return x->GetNumOff() == 1; });
+      count -= std::count_if(lineage1.begin(), lineage1.begin() + l1 + 1, [](Ptr<taxon_t> x){ return x->GetNumOff() == 1 && x->GetNumOrgs() == 0; });
+      count -= std::count_if(lineage2.begin(), lineage2.begin() + l2 + 1, [](Ptr<taxon_t> x){ return x->GetNumOff() == 1 && x->GetNumOrgs() == 0; });
     }
 
     return count;
@@ -2349,6 +2372,7 @@ namespace emp {
 
     // Load files
     emp::File in_file(file_path);
+    int max_id = 0;
 
     if (in_file.HasError()) {
       emp_optional_throw(false, "Error loading file from file_path: " + file_path + " " + in_file.GetError());
@@ -2410,6 +2434,9 @@ namespace emp {
     for (size_t i = 0; i < num_lines; i++) {
       const emp::vector<std::string_view> row = in_file.ViewRowSlices(i);
       const int id = emp::from_string<int>(row[id_pos]);
+      if (id > max_id) {
+        max_id = id;
+      }
 
       // Inf means this taxon is still alive
       // or we don't know which taxa are alive
@@ -2481,6 +2508,8 @@ namespace emp {
 
     // Link up parents and offspring
     for (auto &[child_id, parent_id] : unlinked_parents) {
+      emp_optional_throw(Has(taxa, parent_id),
+        "Error: taxon " + emp::to_string(child_id) + " has a parent (" + emp::to_string(parent_id) + ") that is not in the phylogeny file.");
       taxa[child_id]->parent = taxa[parent_id];
       taxa[parent_id]->offspring.insert(taxa[child_id]);
       taxa[parent_id]->num_offspring++;
@@ -2570,6 +2599,8 @@ namespace emp {
     // Force stats to be recalculated
     max_depth = -1;
     mrca = nullptr;
+
+    next_id = max_id + 1;
 
   }
 

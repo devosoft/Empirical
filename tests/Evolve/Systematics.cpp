@@ -1268,6 +1268,91 @@ TEST_CASE("Dieing MRCA", "[evo]") {
   CHECK(tree.GetMRCA() == id6);
 }
 
+// One queried taxon is an ancestor of the other (or is the MRCA itself)
+TEST_CASE("Shared ancestor and distance for nested taxa", "[evo]") {
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
+
+  auto id1 = sys.AddOrg(1, nullptr);
+  auto id2 = sys.AddOrg(2, id1);
+  auto id3 = sys.AddOrg(3, id1);
+  auto id4 = sys.AddOrg(4, id2);
+  auto id5 = sys.AddOrg(5, id4);
+
+  CHECK(sys.GetMRCA() == id1);
+
+  // Ancestor is not the MRCA
+  CHECK(sys.GetSharedAncestor(id2, id4) == id2);
+  CHECK(sys.GetSharedAncestor(id4, id2) == id2);
+  CHECK(sys.GetSharedAncestor(id2, id5) == id2);
+  CHECK(sys.GetPairwiseDistance(id2, id4) == 1);
+  CHECK(sys.GetPairwiseDistance(id4, id2) == 1);
+  CHECK(sys.GetPairwiseDistance(id2, id5) == 2);
+
+  // Ancestor is the MRCA
+  CHECK(sys.GetSharedAncestor(id1, id4) == id1);
+  CHECK(sys.GetSharedAncestor(id4, id1) == id1);
+  CHECK(sys.GetPairwiseDistance(id1, id4) == 2);
+  CHECK(sys.GetPairwiseDistance(id4, id1) == 2);
+
+  // Unrelated branches still work
+  CHECK(sys.GetSharedAncestor(id3, id5) == id1);
+  CHECK(sys.GetPairwiseDistance(id3, id5) == 4);
+}
+
+TEST_CASE("Branch-only pairwise distance", "[evo]") {
+  // Dead unifurcations (2, 4, 5) should not count when branch_only is set
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
+
+  auto id1 = sys.AddOrg(1, nullptr);
+  auto id2 = sys.AddOrg(2, id1);
+  auto id3 = sys.AddOrg(3, id1);
+  auto id4 = sys.AddOrg(4, id2);
+  auto id5 = sys.AddOrg(5, id4);
+  auto id6 = sys.AddOrg(6, id5);
+
+  sys.RemoveOrg(id1);
+  sys.RemoveOrg(id2);
+  sys.RemoveOrg(id4);
+  sys.RemoveOrg(id5);
+
+  CHECK(sys.GetPairwiseDistance(id3, id6) == 5);
+  CHECK(sys.GetPairwiseDistance(id3, id6, true) == 2);
+  CHECK(sys.GetPairwiseDistance(id6, id3, true) == 2);
+
+  // Must agree with the all-pairs version
+  auto dists = sys.GetPairwiseDistances(true);
+  REQUIRE(dists.size() == 1);
+  CHECK(dists[0] == 2);
+}
+
+TEST_CASE("Branch-only pairwise distance with nested taxa", "[evo]") {
+  // 5 is alive and is an ancestor of 6; 2 and 4 are dead unifurcations
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
+
+  auto id1 = sys.AddOrg(1, nullptr);
+  auto id2 = sys.AddOrg(2, id1);
+  auto id3 = sys.AddOrg(3, id1);
+  auto id4 = sys.AddOrg(4, id2);
+  auto id5 = sys.AddOrg(5, id4);
+  auto id6 = sys.AddOrg(6, id5);
+
+  sys.RemoveOrg(id1);
+  sys.RemoveOrg(id2);
+  sys.RemoveOrg(id4);
+
+  CHECK(sys.GetPairwiseDistance(id5, id6, true) == 1);
+  CHECK(sys.GetPairwiseDistance(id6, id5, true) == 1);
+  CHECK(sys.GetPairwiseDistance(id3, id5, true) == 2);
+  CHECK(sys.GetPairwiseDistance(id3, id6, true) == 3);
+
+  auto dists = sys.GetPairwiseDistances(true);
+  std::sort(dists.begin(), dists.end());
+  REQUIRE(dists.size() == 3);
+  CHECK(dists[0] == 1);
+  CHECK(dists[1] == 2);
+  CHECK(dists[2] == 3);
+}
+
 TEST_CASE("Test RemoveBefore", "[Evolve]") {
   emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
 
