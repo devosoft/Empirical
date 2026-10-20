@@ -65,12 +65,14 @@ namespace emp {
         using has_fitness_t = std::false_type;
         using has_mutations_t = std::false_type;
         using has_phen_t = std::false_type;
+        using has_num_offspring_ever_t = std::false_type;        
     }; /// The default - an empty struct
 
     struct fitness {
         using has_fitness_t = std::true_type;
         using has_mutations_t = std::false_type;
         using has_phen_t = std::false_type;
+        using has_num_offspring_ever_t = std::false_type;                
 
         DataNode<double, data::Current, data::Range> fitness; /// This taxon's fitness (for assessing deleterious mutational steps)
         void RecordFitness(double fit) {
@@ -82,6 +84,15 @@ namespace emp {
         }
     };
 
+    struct num_offspring_ever {
+        using has_fitness_t = std::false_type;
+        using has_mutations_t = std::false_type;
+        using has_phen_t = std::false_type;
+        using has_num_offspring_ever_t = std::true_type;
+
+        int num_offspring_ever = 0;  // The total number of offspring this taxon has ever had
+    };
+
     /// Track information related to the mutational landscape
     /// Maps a string representing a type of mutation to a count representing
     /// the number of that type of mutation that occurred to bring about this taxon.
@@ -91,6 +102,7 @@ namespace emp {
       using has_phen_t = std::true_type;
       using has_mutations_t = std::true_type;
       using has_fitness_t = std::true_type;
+      using has_num_offspring_ever_t = std::false_type;              
       // using has_phenotype_t = true;
 
       std::unordered_map<std::string, int> mut_counts = {}; /// The number of mutations of each type that occurred to make this taxon
@@ -157,20 +169,19 @@ namespace emp {
     int num_orgs;          ///<  How many organisms currently exist of this group?
     int tot_orgs;          ///<  How many organisms have ever existed of this group?
     int num_offspring;     ///<  How many direct offspring groups exist from this one.
-    int num_offspring_ever; ///< How many direct offspring groups have ever been produced from this one
     int total_offspring;   ///<  How many total extant offspring taxa exist from this one (i.e. including indirect)
     size_t depth;             ///<  How deep in tree is this node? (Root is 0)
     double origination_time;  ///<  When did this taxon first appear in the population?
     double destruction_time;  ///<  When did this taxon leave the population?
 
-    DATA_STRUCT data;         ///< A struct for storing additional information about this taxon
+    [[no_unique_address]] DATA_STRUCT data;         ///< A struct for storing additional information about this taxon
 
   public:
     using data_t = DATA_STRUCT;
 
     Taxon(uint64_t _id, const info_t & _info, Ptr<this_t> _parent=nullptr)
      : id (_id), info(_info), parent(_parent)
-     , num_orgs(0), tot_orgs(0), num_offspring(0), num_offspring_ever(0), total_offspring(0)
+     , num_orgs(0), tot_orgs(0), num_offspring(0), total_offspring(0)
      , depth(parent ? (parent->depth+1) : 0)
      , destruction_time(std::numeric_limits<double>::infinity()) { ; }
     // Taxon(const Taxon &) = delete;
@@ -208,9 +219,6 @@ namespace emp {
     /// Get the number of taxa that were produced by organisms from this Taxon.
     size_t GetNumOff() const { return num_offspring; }
 
-    /// Get the number of taxa that have ever been produced by organisms from this Taxon.
-    size_t GetNumOffEver() const {return num_offspring_ever;}
-
     /// Get the number of taxanomic steps since the ancestral organism was injected into the World.
     size_t GetDepth() const { return depth; }
 
@@ -241,7 +249,9 @@ namespace emp {
     /// Add a new offspring Taxon to this one.
     void AddOffspring(Ptr<this_t> offspring_tax) {
       ++num_offspring;
-      ++num_offspring_ever;
+      if constexpr (data_t::has_num_offspring_ever_t::value) {
+        ++data.num_offspring_ever;
+      }
       offspring.insert(offspring_tax);
     }
 

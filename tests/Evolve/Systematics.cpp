@@ -1662,6 +1662,29 @@ TEST_CASE("Test Total Offspring") {
 
 }
 
+TEST_CASE("Test offspring ever data struct") {
+  using systematics_t = emp::Systematics<int, int, emp::datastruct::num_offspring_ever>;
+  systematics_t sys([](const int & i){return i;}, true, true, false, false);
+
+  auto root = sys.AddOrg(1, nullptr);
+  auto child = sys.AddOrg(2, root);
+  sys.AddOrg(2, child);
+  auto grandchild = sys.AddOrg(3, child);
+  auto second_child = sys.AddOrg(4, root);
+
+  CHECK(root->GetData().num_offspring_ever == 2);
+  CHECK(child->GetData().num_offspring_ever == 1);
+  CHECK(grandchild->GetData().num_offspring_ever == 0);
+
+  sys.RemoveOrg(second_child);
+  CHECK(root->GetNumOff() == 1);
+  CHECK(root->GetData().num_offspring_ever == 2);
+
+  sys.AddOrg(5, root);
+  CHECK(root->GetNumOff() == 2);
+  CHECK(root->GetData().num_offspring_ever == 3);
+}
+
 TEST_CASE("Test Total Offspring tracking is off by default") {
   emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
   CHECK(!sys.GetTrackTotalOffspring());
