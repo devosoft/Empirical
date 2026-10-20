@@ -196,9 +196,9 @@ namespace emp {
     double origination_time;  ///<  When did this taxon first appear in the population?
     double destruction_time;  ///<  When did this taxon leave the population?
 
-    Ptr<this_t> first_child;    ///< Pointer to start of linked offspring list
-    Ptr<this_t> previous_sibling; ///< Pointer to previous sibling in linked list of offspring
-    Ptr<this_t> next_sibling;     ///< Pointer to next sibling lin linked list of offspring
+    Ptr<this_t> first_child = nullptr;    ///< Pointer to start of linked offspring list
+    Ptr<this_t> previous_sibling = nullptr; ///< Pointer to previous sibling in linked list of offspring
+    Ptr<this_t> next_sibling = nullptr;     ///< Pointer to next sibling lin linked list of offspring
 
     [[no_unique_address]] DATA_STRUCT data;         ///< A struct for storing additional information about this taxon
 
@@ -354,20 +354,18 @@ namespace emp {
 
     /// Remove specified taxon from this taxon's offspring list
     void RemoveFromOffspring(Ptr<this_t> offspring_tax) {
-      Ptr<this_t> curr = first_child;
-      while (curr && curr != offspring_tax) {
-        curr = curr->next_sibling;
-      }
-      emp_optional_throw(curr, "Offspring taxon not found in parent's offspring list");
-      if (curr->previous_sibling) {
-        curr->previous_sibling->next_sibling = curr->next_sibling;
+      emp_optional_throw(offspring_tax, "Offspring taxon not found in parent's offspring list");
+      if (offspring_tax->previous_sibling) {
+        offspring_tax->previous_sibling->next_sibling = offspring_tax->next_sibling;
       } else {
-        emp_assert(curr == first_child);
-        first_child = curr->next_sibling;
+        emp_assert(offspring_tax == first_child);
+        first_child = offspring_tax->next_sibling;
       }
-      if (curr->next_sibling) {
-        curr->next_sibling->previous_sibling = curr->previous_sibling;
+      if (offspring_tax->next_sibling) {
+        offspring_tax->next_sibling->previous_sibling = offspring_tax->previous_sibling;
       }
+      offspring_tax->previous_sibling = nullptr;
+      offspring_tax->next_sibling = nullptr;
     }
 
     /// Remove and offspring taxa after its entire sub-tree has died out (pruning)
@@ -667,6 +665,7 @@ namespace emp {
     emp::vector<emp::WorldPosition> removal_pos = {};   ///< Position of taxon to next be removed
 
     emp::vector<emp::vector<Ptr<taxon_t> > > taxon_locations; ///< Positions in this vector indicate taxon positions in world
+    emp::vector<taxon_t> new_taxa; //< Taxa that haven't been added to the tree yet
 
     Signal<void(Ptr<taxon_t>, ORG & org)> on_new_sig; ///< Trigger when a new taxon is created
     Signal<void(Ptr<taxon_t>)> on_extinct_sig; ///< Trigger when a taxon goes extinct
@@ -1553,13 +1552,16 @@ namespace emp {
     
     Ptr<taxon_t> parent = taxon->GetParent();
 
-    for (Ptr<taxon_t> offspring_taxon : taxon->GetOffspring()) {
-      offspring_taxon->parent = parent;
-      offspring_taxon->depth--;
+    Ptr<taxon_t> curr_offspring = taxon->first_child;
+    while (curr_offspring) {
+      Ptr<taxon_t> next = curr_offspring->next_sibling;
+      curr_offspring->parent = parent;
+      curr_offspring->depth--;
       if (parent) {
-        parent->AddToOffspring(offspring_taxon);
+        parent->AddToOffspring(curr_offspring);
         parent->num_offspring++;
       }
+      curr_offspring = next;
     }
 
     if (parent) {
