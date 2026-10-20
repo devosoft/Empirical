@@ -1922,3 +1922,37 @@ TEST_CASE("Collapse Unifurcations") {
   sys.RemoveOrg(id6);    
   CHECK(sys.GetNumAncestors() == 0);
 }
+
+TEST_CASE("Collapse unifurcation preserves sibling list") {
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, false);
+  sys.SetCollapseUnifurcations(true);
+
+  auto root = sys.AddOrg(1, nullptr);
+  auto collapsed = sys.AddOrg(2, root);
+  auto sibling_b = sys.AddOrg(3, root);
+  auto sibling_c = sys.AddOrg(4, root);
+  auto moved_child = sys.AddOrg(5, collapsed);
+
+  sys.RemoveOrg(collapsed);
+
+  CHECK(moved_child->GetParent() == root);
+  CHECK(root->GetNumOff() == 3);
+  auto offspring = root->GetOffspring();
+  REQUIRE(offspring.size() == 3);
+  CHECK(emp::Has(offspring, moved_child));
+  CHECK(emp::Has(offspring, sibling_b));
+  CHECK(emp::Has(offspring, sibling_c));
+
+  sys.RemoveOrg(sibling_b);
+  offspring = root->GetOffspring();
+  REQUIRE(offspring.size() == 2);
+  CHECK(emp::Has(offspring, moved_child));
+  CHECK(emp::Has(offspring, sibling_c));
+  CHECK(root->GetNumOff() == 2);
+
+  sys.RemoveOrg(moved_child);
+  offspring = root->GetOffspring();
+  REQUIRE(offspring.size() == 1);
+  CHECK(emp::Has(offspring, sibling_c));
+  CHECK(root->GetNumOff() == 1);
+}

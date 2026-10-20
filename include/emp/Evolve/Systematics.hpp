@@ -186,6 +186,7 @@ namespace emp {
     using this_t = Taxon<ORG_INFO, DATA_STRUCT>;
     using info_t = ORG_INFO;
 
+    uint64_t id;                ///<  ID for this Taxon (Unique within this Systematics)
     const info_t info;        ///<  Details for the organisms associated within this taxanomic group.
     Ptr<this_t> parent;       ///<  Pointer to parent group (nullptr if injected)
     // std::set<Ptr<this_t> > offspring; ///< Pointers to all immediate offspring taxa
@@ -195,7 +196,6 @@ namespace emp {
     double origination_time;  ///<  When did this taxon first appear in the population?
     double destruction_time;  ///<  When did this taxon leave the population?
 
-    uint64_t id;                ///<  ID for this Taxon (Unique within this Systematics)
     Ptr<this_t> first_child;    ///< Pointer to start of linked offspring list
     Ptr<this_t> previous_sibling; ///< Pointer to previous sibling in linked list of offspring
     Ptr<this_t> next_sibling;     ///< Pointer to next sibling lin linked list of offspring
@@ -299,6 +299,7 @@ namespace emp {
     }
 
     void AddToOffspring(Ptr<this_t> offspring_tax) {
+      offspring_tax->previous_sibling = nullptr;
       offspring_tax->next_sibling = first_child;
       if (first_child) first_child->previous_sibling = offspring_tax;
       first_child = offspring_tax;
@@ -1615,8 +1616,10 @@ namespace emp {
     } 
 
     if (!archive) {   // If we don't archive taxa, delete them.
-      for (Ptr<taxon_t> off_tax : taxon->GetOffspring()) {
+      Ptr<taxon_t> off_tax = taxon->first_child;
+      while (off_tax) {
         off_tax->NullifyParent();
+        off_tax = off_tax->next_sibling;
       }
 
       if (taxon->GetParent()) {
