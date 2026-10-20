@@ -65,7 +65,9 @@ namespace emp {
         using has_fitness_t = std::false_type;
         using has_mutations_t = std::false_type;
         using has_phen_t = std::false_type;
-        using has_num_offspring_ever_t = std::false_type;        
+        using has_num_offspring_ever_t = std::false_type;
+        using has_total_orgs_t = std::false_type;
+        using has_total_offspring_t = std::false_type;                
     }; /// The default - an empty struct
 
     struct fitness {
@@ -73,6 +75,8 @@ namespace emp {
         using has_mutations_t = std::false_type;
         using has_phen_t = std::false_type;
         using has_num_offspring_ever_t = std::false_type;                
+        using has_total_orgs_t = std::false_type;
+        using has_total_offspring_t = std::false_type; 
 
         DataNode<double, data::Current, data::Range> fitness; /// This taxon's fitness (for assessing deleterious mutational steps)
         void RecordFitness(double fit) {
@@ -84,14 +88,31 @@ namespace emp {
         }
     };
 
-    struct num_offspring_ever {
+    struct cumulative_stats {
         using has_fitness_t = std::false_type;
         using has_mutations_t = std::false_type;
         using has_phen_t = std::false_type;
         using has_num_offspring_ever_t = std::true_type;
+        using has_total_orgs_t = std::true_type;
+        using has_total_offspring_t = std::false_type;                
 
         int num_offspring_ever = 0;  // The total number of offspring this taxon has ever had
+        int tot_orgs = 0;             // The total number of organisms that have ever lived associated with this taxon
     };
+
+    struct cumulative_stats_all {
+        using has_fitness_t = std::false_type;
+        using has_mutations_t = std::false_type;
+        using has_phen_t = std::false_type;
+        using has_num_offspring_ever_t = std::true_type;
+        using has_total_orgs_t = std::true_type;
+        using has_total_offspring_t = std::true_type;        
+
+        int num_offspring_ever = 0;  // The total number of offspring this taxon has ever had
+        int tot_orgs = 0;             // The total number of organisms that have ever lived associated with this taxon
+        int total_offspring = 0;   ///<  How many total extant offspring taxa exist from this one (i.e. including indirect)        
+    };
+
 
     /// Track information related to the mutational landscape
     /// Maps a string representing a type of mutation to a count representing
@@ -102,7 +123,10 @@ namespace emp {
       using has_phen_t = std::true_type;
       using has_mutations_t = std::true_type;
       using has_fitness_t = std::true_type;
-      using has_num_offspring_ever_t = std::false_type;              
+      using has_num_offspring_ever_t = std::false_type;   
+      using has_total_orgs_t = std::false_type;     
+      using has_total_offspring_t = std::false_type;    
+
       // using has_phenotype_t = true;
 
       std::unordered_map<std::string, int> mut_counts = {}; /// The number of mutations of each type that occurred to make this taxon
@@ -167,9 +191,7 @@ namespace emp {
     Ptr<this_t> parent;       ///<  Pointer to parent group (nullptr if injected)
     std::set<Ptr<this_t> > offspring; ///< Pointers to all immediate offspring taxa
     int num_orgs;          ///<  How many organisms currently exist of this group?
-    int tot_orgs;          ///<  How many organisms have ever existed of this group?
     int num_offspring;     ///<  How many direct offspring groups exist from this one.
-    int total_offspring;   ///<  How many total extant offspring taxa exist from this one (i.e. including indirect)
     size_t depth;             ///<  How deep in tree is this node? (Root is 0)
     double origination_time;  ///<  When did this taxon first appear in the population?
     double destruction_time;  ///<  When did this taxon leave the population?
@@ -181,7 +203,7 @@ namespace emp {
 
     Taxon(uint64_t _id, const info_t & _info, Ptr<this_t> _parent=nullptr)
      : id (_id), info(_info), parent(_parent)
-     , num_orgs(0), tot_orgs(0), num_offspring(0), total_offspring(0)
+     , num_orgs(0), num_offspring(0)
      , depth(parent ? (parent->depth+1) : 0)
      , destruction_time(std::numeric_limits<double>::infinity()) { ; }
     // Taxon(const Taxon &) = delete;
@@ -211,10 +233,23 @@ namespace emp {
     void SetNumOrgs(size_t n) { num_orgs = n; }
 
     /// Get the total number of organisms that have ever lived associated with this Taxon
-    size_t GetTotOrgs() const { return tot_orgs; }
+    size_t GetTotOrgs() const { 
+      if constexpr (data_t::has_total_orgs_t::value) { 
+        return data.tot_orgs; 
+      } else { 
+        emp_optional_throw(false, "GetTotOrgs() called on a Taxon that does not track total organisms. Use cumulative_stats as the DATA_STRUCT template parameter to track total organisms.");
+        return 0; 
+      } 
+    }
 
     /// Set the total number of organisms that have ever lived associated with this Taxon
-    void SetTotOrgs(size_t n) { tot_orgs = n; }
+    void SetTotOrgs(size_t n) { 
+      if constexpr (data_t::has_total_orgs_t::value) { 
+        data.tot_orgs = n; 
+      } else { 
+        emp_optional_throw(false, "SetTotOrgs() called on a Taxon that does not track total organisms. Use cumulative_stats as the DATA_STRUCT template parameter to track total organisms.");
+      } 
+    }
 
     /// Get the number of taxa that were produced by organisms from this Taxon.
     size_t GetNumOff() const { return num_offspring; }
@@ -244,7 +279,12 @@ namespace emp {
     void SetDestructionTime(double time) {destruction_time = time;}
 
     /// Add a new organism to this Taxon.
-    void AddOrg() { ++num_orgs; ++tot_orgs; }
+    void AddOrg() { 
+      ++num_orgs;
+      if constexpr (data_t::has_total_orgs_t::value) {
+        ++data.tot_orgs;
+      }
+    }
 
     /// Add a new offspring Taxon to this one.
     void AddOffspring(Ptr<this_t> offspring_tax) {
@@ -253,23 +293,35 @@ namespace emp {
         ++data.num_offspring_ever;
       }
       offspring.insert(offspring_tax);
+      if constexpr (data_t::has_total_offspring_t::value) {
+        AddTotalOffspring();
+      }
     }
 
     /// Recursively increment total offspring count for this and all ancestors
     // Should this be protected or private or something?
     void AddTotalOffspring() {
-      ++total_offspring;
-      Ptr<this_t> temp_parent = parent;
-      while (temp_parent) { // Keep going until we hit root
-        temp_parent->total_offspring++;
-        temp_parent = temp_parent->parent;
+      emp_optional_throw(data_t::has_total_offspring_t::value, "AddTotalOffspring() called on a Taxon that does not track total offspring. Use cumulative_stats_all as the DATA_STRUCT template parameter to track total offspring.");
+      if constexpr (data_t::has_total_offspring_t::value) {
+        ++data.total_offspring;
+        Ptr<this_t> temp_parent = parent;
+        while (temp_parent) { // Keep going until we hit root
+          temp_parent->data.total_offspring++;
+          temp_parent = temp_parent->parent;
+        }
       }
     }
 
     /// Get total number of offspring directly or indirectly
     /// descending from this taxon.
     /// Will only be populated if systematics manager is set up to track
-    int GetTotalOffspring() const { return total_offspring; }
+    int GetTotalOffspring() const { 
+      if constexpr (data_t::has_total_offspring_t::value) { 
+        return data.total_offspring; 
+      } 
+      emp_optional_throw(data_t::has_total_offspring_t::value, "GetTotalOffspring() called on a Taxon that does not track total offspring. Use cumulative_stats_all as the DATA_STRUCT template parameter to track total offspring.");
+      return 0; 
+    }
 
     /// Remove an organism from this Taxon (after it dies).
     /// Removals must return true if the taxon needs to continue; false if it should deactivate.
@@ -299,11 +351,14 @@ namespace emp {
     /// Reduce the total count of extant offspring and recursively do so for
     /// all ancestors (gets called on a taxon's parent when that taxon goes extinct)
     void RemoveTotalOffspring() {
-      --total_offspring;
-      Ptr<this_t> temp_parent = parent;
-      while (temp_parent) { // Keep going until we hit root
-        temp_parent->total_offspring--;
-        temp_parent = temp_parent->parent;
+      emp_optional_throw(data_t::has_total_offspring_t::value, "RemoveTotalOffspring() called on a Taxon that does not track total offspring. Use cumulative_stats_all as the DATA_STRUCT template parameter to track total offspring.");      
+      if constexpr (data_t::has_total_offspring_t::value) {
+        --data.total_offspring;
+        Ptr<this_t> temp_parent = parent;
+        while (temp_parent) { // Keep going until we hit root
+          temp_parent->data.total_offspring--;
+          temp_parent = temp_parent->parent;
+        }
       }
     }
   };
@@ -322,7 +377,6 @@ namespace emp {
     bool store_position;      ///< Keep a vector mapping  positions to pointers
     bool track_synchronous;   ///< Does this systematics manager need to keep track of current and next positions?
     bool collapse_unifurcations; ///< Should this systematics manager collapse unifurcations?
-    bool total_offspring_tracked; ///< Should we track total offspring for each taxon? (time consuming but necessary for some stats)
 
     // Stats about active taxa... (totals are across orgs, not taxa)
     size_t org_count;         ///< How many organisms are currently active?
@@ -339,7 +393,7 @@ namespace emp {
     SystematicsBase(bool _active=true, bool _anc=true, bool _all=false, bool _pos=true)
       : store_active(_active), store_ancestors(_anc), store_outside(_all)
       , archive(store_ancestors || store_outside), store_position(_pos), track_synchronous(false)
-      , collapse_unifurcations(false), total_offspring_tracked(false)
+      , collapse_unifurcations(false)
       , org_count(0), total_depth(0), num_roots(0), max_depth(0), next_id(0), curr_update(0) { ; }
 
     virtual ~SystematicsBase(){;}
@@ -367,9 +421,6 @@ namespace emp {
 
     /// Are we collapsing unifurcations?
     bool GetCollapseUnifurcations() const {return collapse_unifurcations; }
-
-    /// Are we tracking total (direct and indirect) offspring counts for each taxon?
-    bool GetTrackTotalOffspring() const { return total_offspring_tracked; }
 
     /// How many living organisms are currently being tracked?
     size_t GetTotalOrgs() const { return org_count; }
@@ -406,13 +457,6 @@ namespace emp {
 
     /// Are we collapsing unifurcations?
     void SetCollapseUnifurcations(bool new_val) { collapse_unifurcations = new_val; }
-
-    /// Enable or disable tracking of total offspring counts (off by default; required for
-    /// evolutionary distinctiveness). Must be set before any organisms are added.
-    void SetTrackTotalOffspring(bool new_val) {
-      emp_optional_throw(org_count == 0, "Total offspring tracking must be set before adding organisms");
-      total_offspring_tracked = new_val;
-    }
 
     /// Sets the current update/time step
     void SetUpdate(size_t ud) {curr_update = ud;}
@@ -505,6 +549,7 @@ namespace emp {
   public:
     using taxon_t = Taxon<ORG_INFO, DATA_STRUCT>;
     using info_t = ORG_INFO;
+    using data_t = DATA_STRUCT;
   private:
     using hash_t = typename Ptr<taxon_t>::hash_t;
     using fun_calc_info_t = std::function<ORG_INFO(ORG &)>;
@@ -522,7 +567,6 @@ namespace emp {
     using parent_t::store_position;
     using parent_t::track_synchronous;
     using parent_t::collapse_unifurcations;
-    using parent_t::total_offspring_tracked;
     using parent_t::org_count;
     using parent_t::total_depth;
     using parent_t::num_roots;
@@ -566,8 +610,6 @@ namespace emp {
     using parent_t::AddUniqueTaxaDataNode;
     using parent_t::AddMutationCountDataNode;
     using parent_t::GetMaxDepth;
-    using parent_t::GetTrackTotalOffspring;
-    using parent_t::SetTrackTotalOffspring;
 
     /// Struct for keeping track of what information to print out in snapshot files
     struct SnapshotInfo {
@@ -930,7 +972,10 @@ namespace emp {
     /// Used by AddPhylodiversityFile in World_output.hpp
     virtual data_ptr_t
     AddEvolutionaryDistinctivenessDataNode(const std::string & name = "evolutionary_distinctiveness") {
-      emp_optional_throw(total_offspring_tracked, "To calculate evolutionary distinctiveness we need total offspring. Set total_offspring_tracked to true ");
+      if constexpr (!DATA_STRUCT::has_total_offspring_t::value) {
+       return nullptr;
+      }
+      emp_optional_throw(DATA_STRUCT::has_total_offspring_t::value, "To calculate evolutionary distinctiveness we need total offspring. Set total_offspring_tracked to true ");
       auto node = AddDataNode(name);
       node->AddPullSet([this](){
         emp::vector<double> result;
@@ -1387,10 +1432,10 @@ namespace emp {
     /// @param file_path the file to load data from
     /// @param info_col the name of the column in the file that contains the taxon info (i.e. the information distinguishing taxa; should match return type of calc_taxon_info_fun)
     /// @param assume_leaves_extant if true, assumes that all leaf nodes correspond to extant taxa
-    /// @param adjust_total_offspring if true, adjusts the total offspring count of each taxon based on the number of offspring it actually has (time consuming but necessary for some stats)
+    /// Note: because calculating the total offspring count of each taxon based on the number of offspring it actually has is time consuming but necessary 
+    /// for some stats, this calculation will be performed if and only if the Systematics manager's DATA_STRUCT is set up to track total offspring
     void LoadFromFile(const std::string & file_path, const std::string & info_col = "info",
-                                                             bool assume_leaves_extant=true,
-                                                             bool adjust_total_offspring = false);
+                                                             bool assume_leaves_extant=true);
 
   };
 
@@ -1487,13 +1532,12 @@ namespace emp {
 
     if (parent) {
       // Update stats by merging appropriate ones
-      parent->tot_orgs += taxon->GetNumOrgs();
+      if constexpr (DATA_STRUCT::has_total_orgs_t::value) {
+        parent->SetTotOrgs(parent->GetTotOrgs() + taxon->GetTotOrgs());
+      }
       parent->destruction_time = std::max(parent->destruction_time, taxon->GetDestructionTime());
       parent->origination_time = std::min(parent->origination_time, taxon->GetOriginationTime());      
       parent->RemoveOffspring(taxon);
-      if (total_offspring_tracked) {
-        parent->RemoveTotalOffspring();
-      }
       
       // other stats:
       // - depth is handled in offspring
@@ -1525,9 +1569,11 @@ namespace emp {
       max_depth = -1;
     }
 
-    if (taxon->GetParent() && total_offspring_tracked) {
-      // Update extant descendant count for all ancestors
-      taxon->GetParent()->RemoveTotalOffspring();
+    if constexpr(DATA_STRUCT::has_total_offspring_t::value) {
+      if (taxon->GetParent()) {
+        // Update extant descendant count for all ancestors
+        taxon->GetParent()->RemoveTotalOffspring();
+      }
     }
 
     if (store_active) active_taxa.erase(taxon);
@@ -1540,6 +1586,10 @@ namespace emp {
     if (!archive) {   // If we don't archive taxa, delete them.
       for (Ptr<taxon_t> off_tax : taxon->GetOffspring()) {
         off_tax->NullifyParent();
+      }
+
+      if (taxon->GetParent()) {
+        taxon->GetParent()->RemoveOffspring(taxon);
       }
 
       taxon.Delete();
@@ -1643,9 +1693,6 @@ namespace emp {
 
       if (store_active) active_taxa.insert(cur_taxon);       // Store new taxon.
       if (parent) parent->AddOffspring(cur_taxon);           // Track tree info.
-      if (total_offspring_tracked && parent) {
-        parent->AddTotalOffspring();
-      }
 
       cur_taxon->SetOriginationTime(curr_update);
       on_new_sig.Trigger(cur_taxon, org);
@@ -1894,10 +1941,12 @@ namespace emp {
     file.AddFun(get_num_orgs, "num_orgs", "How many organisms currently exist of this group?");
 
     //  - tot_orgs: How many organisms have ever existed of this group?
-    std::function<size_t()> get_tot_orgs = [&cur_taxon]() {
-      return cur_taxon->GetTotOrgs();
-    };
-    file.AddFun(get_tot_orgs, "tot_orgs", "How many organisms have ever existed of this group?");
+    if constexpr (DATA_STRUCT::has_total_orgs_t::value) {
+      std::function<size_t()> get_tot_orgs = [&cur_taxon]() {
+        return cur_taxon->GetTotOrgs();
+      };
+      file.AddFun(get_tot_orgs, "tot_orgs", "How many organisms have ever existed of this group?");
+    }
 
     //  - num_offspring: How many direct offspring groups exist from this one.
     std::function<size_t()> get_num_offspring = [&cur_taxon]() {
@@ -1905,7 +1954,7 @@ namespace emp {
     };
     file.AddFun(get_num_offspring, "num_offspring", "How many direct offspring groups exist from this one.");
 
-    if (total_offspring_tracked) {
+    if constexpr (DATA_STRUCT::has_total_offspring_t::value) {
       //  - total_offspring: How many total extant offspring taxa exist from this one (i.e. including indirect)
       std::function<size_t()> get_total_offspring = [&cur_taxon]() {
         return cur_taxon->GetTotalOffspring();
@@ -2220,7 +2269,7 @@ namespace emp {
 
     // If we loaded this phylogeny from a file without calculating total offspring,
     // we need to actually calculate it here
-    emp_optional_throw(total_offspring_tracked, "To calculate evolutionary distinctiveness we need total offspring. Either set total_offspring_tracked to true if tracking live or set adjust_total_offspring to true if loading from a file and you want to calculate it now.");
+    emp_optional_throw(DATA_STRUCT::has_total_offspring_t::value, "To calculate evolutionary distinctiveness we need total offspring. Either set total_offspring_tracked to true if tracking live or set adjust_total_offspring to true if loading from a file and you want to calculate it now.");
 
     double depth = 0; // Length (in time units) of section we're currently exploring
     double total = 0; // Count up scores for each section of tree
@@ -2366,8 +2415,7 @@ namespace emp {
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::LoadFromFile(const std::string & file_path,
                                                             const std::string & info_col,
-                                                            bool assume_leaves_extant,
-                                                            bool adjust_total_offspring ) {
+                                                            bool assume_leaves_extant ) {
 
     // We can only load phylogenies from file if their info can be
     // converted to this systematics object's ORG_INFO type (if you
@@ -2420,10 +2468,12 @@ namespace emp {
       num_orgs_pos = std::distance(header.begin(), num_orgs_pos_it);
     }
 
-    auto tot_orgs_pos_it = std::find(header.begin(), header.end(), "tot_orgs");
     int tot_orgs_pos = -1;
-    if (tot_orgs_pos_it != header.end()) {
-      tot_orgs_pos = std::distance(header.begin(), tot_orgs_pos_it);
+    if constexpr (DATA_STRUCT::has_total_orgs_t::value) {
+      auto tot_orgs_pos_it = std::find(header.begin(), header.end(), "tot_orgs");
+      if (tot_orgs_pos_it != header.end()) {
+        tot_orgs_pos = std::distance(header.begin(), tot_orgs_pos_it);
+      }
     }
 
     auto info_pos_it = std::find(header.begin(), header.end(), info_col);
@@ -2496,9 +2546,11 @@ namespace emp {
           ancestor_taxa.erase(tax);
         }
       }
-      if (tot_orgs_pos != -1) {
-        size_t tot_orgs = emp::from_string<size_t>(row[tot_orgs_pos]);
-        tax->SetTotOrgs(tot_orgs);
+      if constexpr (DATA_STRUCT::has_total_orgs_t::value) {
+        if (tot_orgs_pos != -1) {
+          size_t tot_orgs = emp::from_string<size_t>(row[tot_orgs_pos]);
+          tax->SetTotOrgs(tot_orgs);
+        }
       }
 
       // Store taxon pointer
@@ -2530,7 +2582,9 @@ namespace emp {
     emp::vector<emp::Ptr<taxon_t>> to_explore;
     for (auto root : roots) {
       root->depth = 0;
-      root->total_offspring = 0;
+      if constexpr( DATA_STRUCT::has_total_offspring_t::value) {
+        root->data.total_offspring = 0;
+      }
       for (auto offspring : root->GetOffspring()) {
         to_explore.push_back(offspring);
       }
@@ -2545,7 +2599,9 @@ namespace emp {
     while(!to_explore.empty()) {
       curr = to_explore.back();
       to_explore.pop_back();
-      curr->total_offspring = 0;
+      if constexpr( DATA_STRUCT::has_total_offspring_t::value) {
+        curr->data.total_offspring = 0;
+      }
       curr->depth = curr->GetParent()->depth + 1;
       total_depth += curr->depth;
       for (auto offspring : curr->GetOffspring()){
@@ -2595,15 +2651,12 @@ namespace emp {
     }
 
     // Adjust total offspring
-    if (adjust_total_offspring) {
-      total_offspring_tracked = true;
+    if constexpr (DATA_STRUCT::has_total_offspring_t::value) {
       for (auto tax : active_taxa) {
         if (tax->parent) {
           tax->parent->AddTotalOffspring();
         }
       }
-    } else {
-      total_offspring_tracked = false;
     }
 
     // Force stats to be recalculated

@@ -26,7 +26,7 @@
 
 TEST_CASE("Test Systematics", "[Evolve]") {
   // Taxon
-  emp::Taxon<std::string> tx(0, "a");
+  emp::Taxon<std::string, emp::datastruct::cumulative_stats_all> tx(0, "a");
   CHECK(tx.GetID() == 0);
   CHECK(tx.GetParent() == nullptr);
   CHECK(tx.GetInfo() == "a");
@@ -39,8 +39,8 @@ TEST_CASE("Test Systematics", "[Evolve]") {
   CHECK(tx.GetTotOrgs() == 1);
   CHECK(tx.GetTotalOffspring() == 0);
 
-  emp::Ptr< emp::Taxon<std::string, emp::datastruct::no_data> > parentPtr(&tx);
-  emp::Taxon<std::string> tx_1(1, "b", parentPtr);
+  emp::Ptr< emp::Taxon<std::string, emp::datastruct::cumulative_stats_all> > parentPtr(&tx);
+  emp::Taxon<std::string, emp::datastruct::cumulative_stats_all> tx_1(1, "b", parentPtr);
   CHECK(tx_1.GetParent() == parentPtr);
   tx_1.AddTotalOffspring();
   CHECK(tx_1.GetTotalOffspring() == 1);
@@ -48,8 +48,7 @@ TEST_CASE("Test Systematics", "[Evolve]") {
 
   // Systematics
   std::function<std::string(double &)> calc_taxon = [](double & o){ return o > 50.0 ? "large" : "small"; };
-  emp::Systematics<double, std::string> sys1(calc_taxon);
-  sys1.SetTrackTotalOffspring(true);
+  emp::Systematics<double, std::string, emp::datastruct::cumulative_stats_all> sys1(calc_taxon);
   CHECK(sys1.GetTrackSynchronous() == false);
   CHECK(sys1.GetNumAncestors() == 0);
   CHECK(sys1.GetNumActive() == 0);
@@ -142,8 +141,7 @@ TEST_CASE("Test Systematics", "[Evolve]") {
   CHECK(emp::CountMutSteps(ptr1, "short") == 1);
   CHECK(emp::CountMutSteps(ptr2, "short") == 2);
 
-  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, false);
-  sys.SetTrackTotalOffspring(true);
+  emp::Systematics<int, int, emp::datastruct::cumulative_stats_all> sys([](const int & i){return i;}, true, true, true, false);
 
   // std::cout << "\nAddOrg 25 (id1, no parent)\n";
   sys.SetUpdate(0);
@@ -297,8 +295,8 @@ TEST_CASE("Test Systematics", "[Evolve]") {
   CHECK(sys.GetNumOutside() == 1);
 
   auto ancestors = sys.GetAncestors();
-  emp::vector<emp::Ptr<emp::Taxon<int>>> ancestor_vec(ancestors.begin(), ancestors.end());
-  emp::Sort(ancestor_vec, [](emp::Ptr<emp::Taxon<int>> & a, emp::Ptr<emp::Taxon<int>> & b){
+  emp::vector<emp::Ptr<emp::Taxon<int, emp::datastruct::cumulative_stats_all>>> ancestor_vec(ancestors.begin(), ancestors.end());
+  emp::Sort(ancestor_vec, [](emp::Ptr<emp::Taxon<int, emp::datastruct::cumulative_stats_all>> & a, emp::Ptr<emp::Taxon<int, emp::datastruct::cumulative_stats_all>> & b){
     return a->GetID() < b->GetID();
   });
 
@@ -346,8 +344,8 @@ TEST_CASE("Test Systematics", "[Evolve]") {
   CHECK(sys.GetMaxDepth() == 8);
 
   auto active = sys.GetActive();
-  emp::vector<emp::Ptr<emp::Taxon<int>>> active_vec(active.begin(), active.end());
-  emp::Sort(active_vec, [](emp::Ptr<emp::Taxon<int>> & a, emp::Ptr<emp::Taxon<int>> & b){
+  emp::vector<emp::Ptr<emp::Taxon<int, emp::datastruct::cumulative_stats_all>>> active_vec(active.begin(), active.end());
+  emp::Sort(active_vec, [](emp::Ptr<emp::Taxon<int, emp::datastruct::cumulative_stats_all>> & a, emp::Ptr<emp::Taxon<int, emp::datastruct::cumulative_stats_all>> & b){
     return a->GetID() < b->GetID();
   });
 
@@ -408,8 +406,7 @@ TEST_CASE("Test Systematics", "[Evolve]") {
 }
 
 TEST_CASE("Test not tracking ancestors", "[Evolve]") {
-  emp::Systematics<int, int> sys([](const int & i){return i;}, true, false, false, false);
-  sys.SetTrackTotalOffspring(true);
+  emp::Systematics<int, int, emp::datastruct::cumulative_stats_all> sys([](const int & i){return i;}, true, false, false, false);
 
   // std::cout << "\nAddOrg 25 (id1, no parent)\n";
   sys.SetUpdate(0);
@@ -513,8 +510,8 @@ TEST_CASE("Test not tracking ancestors", "[Evolve]") {
   CHECK(sys.GetNumOutside() == 0);
 
   auto active = sys.GetActive();
-  emp::vector<emp::Ptr<emp::Taxon<int>>> active_vec(active.begin(), active.end());
-  emp::Sort(active_vec, [](emp::Ptr<emp::Taxon<int>> & a, emp::Ptr<emp::Taxon<int>> & b){
+  emp::vector<emp::Ptr<emp::Taxon<int, emp::datastruct::cumulative_stats_all>>> active_vec(active.begin(), active.end());
+  emp::Sort(active_vec, [](emp::Ptr<emp::Taxon<int, emp::datastruct::cumulative_stats_all>> & a, emp::Ptr<emp::Taxon<int, emp::datastruct::cumulative_stats_all>> & b){
     return a->GetID() < b->GetID();
   });
 
@@ -545,7 +542,7 @@ TEST_CASE("Test not tracking ancestors", "[Evolve]") {
 
   CHECK(active_vec[5]->GetID() == 12);
   CHECK(active_vec[5]->GetNumOrgs() == 1);
-  CHECK(active_vec[5]->GetNumOff() == 1);
+  CHECK(active_vec[5]->GetNumOff() == 0);
   CHECK(active_vec[5]->GetParent()->GetID() == 11);
 
   CHECK(active_vec[6]->GetID() == 15);
@@ -819,8 +816,7 @@ TEST_CASE("Run world", "[evo]") {
   emp::Ptr<phen_systematics_t> phen_sys;
   gene_sys.New(gene_fun, true,true,true);
   phen_sys.New(phen_fun, true,true,true);
-  // gene_sys->SetTrackTotalOffspring(true);
-  // phen_sys->SetTrackTotalOffspring(true);
+
   world.AddSystematics(gene_sys);
   world.AddSystematics(phen_sys);
 
@@ -1576,8 +1572,7 @@ TEST_CASE("Test Remove Org After Repro") {
 }
 
 TEST_CASE("Test Total Offspring") {
-  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
-  sys.SetTrackTotalOffspring(true);
+  emp::Systematics<int, int, emp::datastruct::cumulative_stats_all> sys([](const int & i){return i;}, true, true, false, false);
 
   auto org1 = sys.AddOrg(1, nullptr);
   auto org2 = sys.AddOrg(2, org1);
@@ -1663,7 +1658,7 @@ TEST_CASE("Test Total Offspring") {
 }
 
 TEST_CASE("Test offspring ever data struct") {
-  using systematics_t = emp::Systematics<int, int, emp::datastruct::num_offspring_ever>;
+  using systematics_t = emp::Systematics<int, int, emp::datastruct::cumulative_stats>;
   systematics_t sys([](const int & i){return i;}, true, true, false, false);
 
   auto root = sys.AddOrg(1, nullptr);
@@ -1685,34 +1680,36 @@ TEST_CASE("Test offspring ever data struct") {
   CHECK(root->GetData().num_offspring_ever == 3);
 }
 
-TEST_CASE("Test Total Offspring tracking is off by default") {
-  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
-  CHECK(!sys.GetTrackTotalOffspring());
+TEST_CASE("Test optional tot_orgs tracking") {
+  static_assert(!emp::datastruct::no_data::has_total_orgs_t::value);
+  static_assert(emp::datastruct::cumulative_stats::has_total_orgs_t::value);
 
-  auto org1 = sys.AddOrg(1, nullptr);
-  auto org2 = sys.AddOrg(2, org1);
-  auto org3 = sys.AddOrg(3, org2);
-  auto org4 = sys.AddOrg(4, org1);
+  using systematics_t = emp::Systematics<int, int, emp::datastruct::cumulative_stats>;
+  systematics_t sys([](const int & i){return i;}, true, true, false, false);
 
-  CHECK(org1->GetNumOff() == 2);
-  CHECK(org1->GetTotalOffspring() == 0);
-  CHECK(org2->GetTotalOffspring() == 0);
+  auto root = sys.AddOrg(1, nullptr);
+  auto middle = sys.AddOrg(2, root);
+  sys.AddOrg(2, middle);
+  auto leaf = sys.AddOrg(3, middle);
 
-  // Removals must not drive counts negative when untracked
-  sys.RemoveOrg(org3);
-  sys.RemoveOrg(org2);
-  sys.RemoveOrg(org4);
-  CHECK(org1->GetTotalOffspring() == 0);
+  CHECK(root->GetTotOrgs() == 1);
+  CHECK(middle->GetTotOrgs() == 2);
+  CHECK(leaf->GetTotOrgs() == 1);
+
+  sys.SetCollapseUnifurcations(true);
+  sys.RemoveOrg(middle);
+  sys.RemoveOrg(middle);
+
+  CHECK(root->GetTotOrgs() == 3);
+  CHECK(leaf->GetParent() == root);
+
+  sys.RemoveOrg(leaf);
+  CHECK(root->GetTotOrgs() == 3);
 }
 
-TEST_CASE("Test SetTrackTotalOffspring") {
-  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
+TEST_CASE("Test Tracking Total Offspring") {
+  emp::Systematics<int, int, emp::datastruct::cumulative_stats_all> sys([](const int & i){return i;}, true, true, false, false);
 
-  sys.SetTrackTotalOffspring(true);
-  CHECK(sys.GetTrackTotalOffspring());
-  sys.SetTrackTotalOffspring(false);
-  CHECK(!sys.GetTrackTotalOffspring());
-  sys.SetTrackTotalOffspring(true);
 
   auto org1 = sys.AddOrg(1, nullptr);
   auto org2 = sys.AddOrg(2, org1);
@@ -1721,13 +1718,9 @@ TEST_CASE("Test SetTrackTotalOffspring") {
 }
 
 TEST_CASE("Test LoadFromFile total offspring tracking") {
-  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, true);
-  sys.LoadFromFile("systematics_snapshot.csv", "genome", true, true);
-  CHECK(sys.GetTrackTotalOffspring());
+  emp::Systematics<int, int, emp::datastruct::cumulative_stats_all> sys([](const int & i){return i;}, true, true, true, true);
+  sys.LoadFromFile("systematics_snapshot.csv", "genome", true);
 
-  emp::Systematics<int, int> sys2([](const int & i){return i;}, true, true, true, true);
-  sys2.LoadFromFile("systematics_snapshot.csv", "genome", true, false);
-  CHECK(!sys2.GetTrackTotalOffspring());
 }
 
 TEST_CASE("Test Degree Distribution") {
@@ -1798,10 +1791,10 @@ TEST_CASE("Test Average Origin Time") {
 }
 
 TEST_CASE("Test Loading Phylogeny From File") {
-  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, true);
-  sys.LoadFromFile("systematics_snapshot.csv", "genome", true, true);
+  emp::Systematics<int, int, emp::datastruct::cumulative_stats_all> sys([](const int & i){return i;}, true, true, true, true);
+  sys.LoadFromFile("systematics_snapshot.csv", "genome", true);
   CHECK(sys.GetNumRoots() == 1);
-  emp::Ptr<emp::Taxon<int>> mrca = sys.GetMRCA();
+  emp::Ptr<emp::Taxon<int, emp::datastruct::cumulative_stats_all>> mrca = sys.GetMRCA();
   CHECK(mrca->GetID() == 1);
   auto offspring = mrca->GetOffspring();
   for (auto off : offspring) {
@@ -1822,10 +1815,11 @@ TEST_CASE("Test Loading Phylogeny From File") {
 
   sys.PrintStatus();
 
-  emp::Systematics<int, int> sys2([](const int & i){return i;}, true, true, true, true);
-  sys2.LoadFromFile("systematics_snapshot.csv", "genome", false, false);
+
+  emp::Systematics<int, int, emp::datastruct::cumulative_stats> sys2([](const int & i){return i;}, true, true, true, true);
+  sys2.LoadFromFile("systematics_snapshot.csv", "genome", false);
   CHECK(sys2.GetNumRoots() == 1);
-  emp::Ptr<emp::Taxon<int>> mrca2 = sys.GetMRCA();
+  emp::Ptr<emp::Taxon<int, emp::datastruct::cumulative_stats>> mrca2 = sys2.GetMRCA();
   CHECK(mrca2->GetID() == 1);
   auto offspring2 = mrca2->GetOffspring();
   for (auto off : offspring2) {
@@ -1836,7 +1830,6 @@ TEST_CASE("Test Loading Phylogeny From File") {
   CHECK(sys2.GetNumOutside() == 3);
   CHECK(sys2.GetNumTaxa() == 10);
   CHECK(sys2.GetMaxDepth() == 3);
-  CHECK(mrca2->GetTotalOffspring() == 6);
   CHECK(mrca2->GetNumOff() == 3);
   CHECK(mrca2->GetNumOrgs() == 0);
 
@@ -1851,11 +1844,11 @@ TEST_CASE("Test LoadFromFile and Snapshot behavior") {
   for (const auto& file : std::filesystem::directory_iterator("assets/")) {
     if (file.path().extension() == ".csv") {
       // load systematics from original file
-      emp::Systematics<int, std::string> sys([](const int & i){ return emp::to_string(i); }, true, true, true, true);
-      sys.SetTrackTotalOffspring(true);
-      sys.LoadFromFile(file.path(), "phenotype", true, true);
+      emp::Systematics<int, std::string, emp::datastruct::cumulative_stats_all> sys(
+        [](const int & i){ return emp::to_string(i); }, true, true, true, true);
+      sys.LoadFromFile(file.path(), "phenotype", true);
 
-      sys.AddSnapshotFun([](const emp::Systematics<int, std::string>::taxon_t& tax){ return emp::to_string(tax.GetInfo()); }, "phenotype");
+      sys.AddSnapshotFun([](const emp::Systematics<int, std::string, emp::datastruct::cumulative_stats_all>::taxon_t& tax){ return emp::to_string(tax.GetInfo()); }, "phenotype");
 
       // save systematics into temp file
       const auto temp_path = std::filesystem::temp_directory_path() / file.path().filename();
@@ -1875,8 +1868,8 @@ TEST_CASE("Test LoadFromFile and Snapshot behavior") {
 
 
 TEST_CASE("Test LoadFromFile MPD Hang") {
-  emp::Systematics<int, int> sys2([](const int & i){return i;}, true, true, true, true);
-  sys2.LoadFromFile("assets/hang_test.bad", "id", true, true);
+  emp::Systematics<int, int, emp::datastruct::cumulative_stats_all> sys2([](const int & i){return i;}, true, true, true, true);
+  sys2.LoadFromFile("assets/hang_test.bad", "id", true);
   sys2.GetMeanPairwiseDistance();
 
 }
