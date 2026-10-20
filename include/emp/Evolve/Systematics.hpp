@@ -186,15 +186,19 @@ namespace emp {
     using this_t = Taxon<ORG_INFO, DATA_STRUCT>;
     using info_t = ORG_INFO;
 
-    uint64_t id;                ///<  ID for this Taxon (Unique within this Systematics)
     const info_t info;        ///<  Details for the organisms associated within this taxanomic group.
     Ptr<this_t> parent;       ///<  Pointer to parent group (nullptr if injected)
-    std::set<Ptr<this_t> > offspring; ///< Pointers to all immediate offspring taxa
+    // std::set<Ptr<this_t> > offspring; ///< Pointers to all immediate offspring taxa
     int num_orgs;          ///<  How many organisms currently exist of this group?
     int num_offspring;     ///<  How many direct offspring groups exist from this one.
     size_t depth;             ///<  How deep in tree is this node? (Root is 0)
     double origination_time;  ///<  When did this taxon first appear in the population?
     double destruction_time;  ///<  When did this taxon leave the population?
+
+    uint64_t id;                ///<  ID for this Taxon (Unique within this Systematics)
+    Ptr<this_t> first_child;    ///< Pointer to start of linked offspring list
+    Ptr<this_t> previous_sibling; ///< Pointer to previous sibling in linked list of offspring
+    Ptr<this_t> next_sibling;     ///< Pointer to next sibling lin linked list of offspring
 
     [[no_unique_address]] DATA_STRUCT data;         ///< A struct for storing additional information about this taxon
 
@@ -263,7 +267,15 @@ namespace emp {
     const data_t & GetData() const {return data;}
 
     /// Get pointers to this taxon's offspring
-    const std::set<Ptr<this_t> >& GetOffspring() {return offspring;}
+    std::set<Ptr<this_t> > GetOffspring() {
+      std::set<Ptr<this_t> > offspring;
+      Ptr<this_t> curr = first_child; 
+      while (curr) {
+        offspring.insert(curr);
+        curr = curr->next_sibling;
+      }
+      return offspring;
+    }
 
     /// Set this taxon's data struct to the given value
     void SetData(data_t d) {data = d;}
@@ -286,13 +298,19 @@ namespace emp {
       }
     }
 
+    void AddToOffspring(Ptr<this_t> offspring_tax) {
+      offspring_tax->next_sibling = first_child;
+      if (first_child) first_child->previous_sibling = offspring_tax;
+      first_child = offspring_tax;
+    }
+
     /// Add a new offspring Taxon to this one.
     void AddOffspring(Ptr<this_t> offspring_tax) {
       ++num_offspring;
       if constexpr (data_t::has_num_offspring_ever_t::value) {
         ++data.num_offspring_ever;
       }
-      offspring.insert(offspring_tax);
+      AddToOffspring(offspring_tax);
       if constexpr (data_t::has_total_offspring_t::value) {
         AddTotalOffspring();
       }
@@ -335,7 +353,20 @@ namespace emp {
 
     /// Remove specified taxon from this taxon's offspring list
     void RemoveFromOffspring(Ptr<this_t> offspring_tax) {
-      offspring.erase(offspring_tax);
+      Ptr<this_t> curr = first_child;
+      while (curr && curr != offspring_tax) {
+        curr = curr->next_sibling;
+      }
+      emp_optional_throw(curr, "Offspring taxon not found in parent's offspring list");
+      if (curr->previous_sibling) {
+        curr->previous_sibling->next_sibling = curr->next_sibling;
+      } else {
+        emp_assert(curr == first_child);
+        first_child = curr->next_sibling;
+      }
+      if (curr->next_sibling) {
+        curr->next_sibling->previous_sibling = curr->previous_sibling;
+      }
     }
 
     /// Remove and offspring taxa after its entire sub-tree has died out (pruning)
@@ -1525,7 +1556,7 @@ namespace emp {
       offspring_taxon->parent = parent;
       offspring_taxon->depth--;
       if (parent) {
-        parent->offspring.insert(offspring_taxon);
+        parent->AddToOffspring(offspring_taxon);
         parent->num_offspring++;
       }
     }
@@ -2573,7 +2604,7 @@ namespace emp {
       emp_optional_throw(Has(taxa, parent_id),
         "Error: taxon " + emp::to_string(child_id) + " has a parent (" + emp::to_string(parent_id) + ") that is not in the phylogeny file.");
       taxa[child_id]->parent = taxa[parent_id];
-      taxa[parent_id]->offspring.insert(taxa[child_id]);
+      taxa[parent_id]->AddToOffspring(taxa[child_id]);
       taxa[parent_id]->num_offspring++;
     }
 
