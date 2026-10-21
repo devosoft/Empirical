@@ -73,3 +73,33 @@ TEST_CASE("Test sequence utils", "[math]")
 
 // Local settings for Empecable file checker.
 // empecable_words: adhlmnopqrstuvxy lmnopqrstuv xmnopqrstuvwxyz bcdefghij wxyz abcdefghijklmnopqrstuvw
+
+TEST_CASE("Trimmed edit distance matches a full matrix", "[math]") {
+  const auto reference = [](const std::string & a, const std::string & b) {
+    emp::vector<emp::vector<size_t>> matrix(a.size() + 1, emp::vector<size_t>(b.size() + 1));
+    for (size_t i = 0; i <= a.size(); ++i) matrix[i][0] = i;
+    for (size_t j = 0; j <= b.size(); ++j) matrix[0][j] = j;
+    for (size_t i = 1; i <= a.size(); ++i) {
+      for (size_t j = 1; j <= b.size(); ++j) {
+        matrix[i][j] = std::min({matrix[i-1][j] + 1, matrix[i][j-1] + 1,
+                                matrix[i-1][j-1] + (a[i-1] != b[j-1])});
+      }
+    }
+    return matrix.back().back();
+  };
+  emp::vector<std::string> words{""};
+  for (size_t length = 1; length <= 5; ++length) {
+    for (size_t bits = 0; bits < (size_t{1} << length); ++bits) {
+      std::string word(length, 'a');
+      for (size_t i = 0; i < length; ++i) if (bits & (size_t{1} << i)) word[i] = 'b';
+      words.push_back(word);
+    }
+  }
+  for (const auto & a : words) for (const auto & b : words) {
+    CHECK(emp::calc_edit_distance(a, b) == reference(a, b));
+  }
+  CHECK(emp::calc_edit_distance(std::string(10000, 'x') + "a" + std::string(10000, 'z'),
+                                std::string(10000, 'x') + "b" + std::string(10000, 'z')) == 1);
+  CHECK(emp::calc_edit_distance(emp::vector<int>{1, 2, 3}, emp::vector<int>{1, 3}) == 1);
+  CHECK(emp::calc_edit_distance(std::vector<bool>{true, false}, std::vector<bool>{true}) == 1);
+}
