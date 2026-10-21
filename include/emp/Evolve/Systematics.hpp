@@ -1173,6 +1173,10 @@ namespace emp {
      * descended directly from A, then this function would return both A and B. */
     std::set<Ptr<taxon_t>> GetCanopyExtantRoots(int time_point = 0) const;
 
+    /**
+     * Returns a vector containing all taxa that were alive at time_point.
+     */    
+    std::set<Ptr<taxon_t>> GetAliveAt(int time_point = 0) const;
 
     /** @returns the total number of ancestors between the given taxon and MRCA, if there is one. If
      *  there is no common ancestor, distance to the root of this tree is calculated instead.
@@ -2212,6 +2216,42 @@ namespace emp {
           break;
         }
         tax = tax->GetParent();
+      }
+    }
+
+    return result;
+
+  }
+
+  template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
+  std::set<Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t>> Systematics<ORG, ORG_INFO, DATA_STRUCT>::GetAliveAt(int time_point) const {
+    // NOTE: This could be made faster by doing something similar to the pairwise distance
+    // function
+    using taxon_t = Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t;
+    std::set< Ptr<taxon_t>> result;
+    // std::cout << "starting " << time_point << std::endl;
+    
+    for (Ptr<taxon_t> tax : active_taxa) {
+      if (tax->GetOriginationTime() <= time_point && tax->GetDestructionTime() > time_point ) {
+        result.insert(tax);
+        // std::cout << "inserting " << tax->GetInfo() << std::endl;
+        break;
+      }
+    }
+
+    for (Ptr<taxon_t> tax : ancestor_taxa) {
+      if (tax->GetOriginationTime() <= time_point && tax->GetDestructionTime() > time_point ) {
+        result.insert(tax);
+        // std::cout << "inserting " << tax->GetInfo() << std::endl;
+        break;
+      }
+    }
+
+    for (Ptr<taxon_t> tax : outside_taxa) {
+      if (tax->GetOriginationTime() <= time_point && tax->GetDestructionTime() > time_point ) {
+        result.insert(tax);
+        // std::cout << "inserting " << tax->GetInfo() << std::endl;
+        break;
       }
     }
 
