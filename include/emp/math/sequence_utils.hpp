@@ -94,48 +94,35 @@ namespace emp {
   /// one array to another.
   template <typename TYPE>
   size_t calc_edit_distance(const TYPE & in1, const TYPE & in2) {
-    const auto size1 = in1.size();
-    const auto size2 = in2.size();
-
-    // If either size is zero, other size indicates number of insertions needed to produce it.
-    if (size1 == 0) { return size2; }
-    if (size2 == 0) { return size1; }
-
-    emp::vector<size_t> cur_row(size1);   // The row we are calculating
-    emp::vector<size_t> prev_row(size1);  // The previous row we calculated
-
-    // Initialize the previous row to record the difference from nothing.
-    for (size_t i = 0; i < size1; i++) { prev_row[i] = i + 1; }
-
-    // Loop through all other rows
-    for (size_t row = 0; row < size2; row++) {
-      // Initialize the first entry in the current row.
-      if (in1[0] == in2[row]) {
-        cur_row[0] = row;
-      } else {
-        cur_row[0] = std::min(row, prev_row[0]) + 1;
-      }
-
-      // Move through the cur_row and fill it in.
-      for (size_t col = 1; col < size1; col++) {
-        // If the values are equal, keep the value in the upper left.
-        if (in1[col] == in2[row]) {
-          cur_row[col] = prev_row[col - 1];
-        }
-
-        // Otherwise, set the current position the the minimal of the three
-        // numbers to the upper right in the chart plus one.
-        else {
-          cur_row[col] = emp::Min(prev_row[col], prev_row[col - 1], cur_row[col - 1]) + 1;
-        }
-      }
-
-      // Swap cur_row and prev_row (keep cur vals in prev row, recycle vector cur_row)
-      std::swap(cur_row, prev_row);
+    size_t first = 0;
+    size_t end1 = in1.size(), end2 = in2.size();
+    while (first < end1 && first < end2 && in1[first] == in2[first]) { ++first; }
+    while (end1 > first && end2 > first && in1[end1 - 1] == in2[end2 - 1]) {
+      --end1; --end2;
     }
+    const size_t size1 = end1 - first, size2 = end2 - first;
+    if (!size1) { return size2; }
+    if (!size2) { return size1; }
 
-    // Now that we are done, return the bottom-right corner of the chart.
-    return prev_row[size1 - 1];
+    // Only retain the shorter row. Indices preserve support for non-contiguous sequences
+    // and proxy element references; no string-specific views or sequence copies are needed.
+    const bool swap = size1 > size2;
+    const auto & shorter = swap ? in2 : in1;
+    const auto & longer = swap ? in1 : in2;
+    const size_t columns = std::min(size1, size2), rows = std::max(size1, size2);
+    emp::vector<size_t> costs(columns + 1);
+    for (size_t i = 0; i <= columns; ++i) { costs[i] = i; }
+    for (size_t row = 0; row < rows; ++row) {
+      size_t diagonal = costs[0];
+      costs[0] = row + 1;
+      for (size_t column = 0; column < columns; ++column) {
+        const size_t above = costs[column + 1];
+        const size_t substitution = diagonal + !(shorter[first + column] == longer[first + row]);
+        costs[column + 1] = std::min({above + 1, costs[column] + 1, substitution});
+        diagonal = above;
+      }
+    }
+    return costs.back();
   }
 
   /// Use edit distance to find the minimum number of insertions, deletions and substitutions
