@@ -245,8 +245,10 @@ namespace emp {
     // Should this be protected or private or something?
     void AddTotalOffspring() {
       ++total_offspring;
-      if (parent) { // Keep going until we hit root
-        parent->AddTotalOffspring();
+      Ptr<this_t> temp_parent = parent;
+      while (temp_parent) { // Keep going until we hit root
+        temp_parent->total_offspring++;
+        temp_parent = temp_parent->parent;
       }
     }
 
@@ -283,8 +285,10 @@ namespace emp {
     /// all ancestors (gets called on a taxon's parent when that taxon goes extinct)
     void RemoveTotalOffspring() {
       --total_offspring;
-      if (parent) { // Keep going until we hit root
-        parent->RemoveTotalOffspring();
+      Ptr<this_t> temp_parent = parent;
+      while (temp_parent) { // Keep going until we hit root
+        temp_parent->total_offspring--;
+        temp_parent = temp_parent->parent;
       }
     }
   };
@@ -501,7 +505,6 @@ namespace emp {
     using parent_t::curr_update;
     using parent_t::max_depth;
 
-
   public:
     using typename parent_t::data_ptr_t;
     using parent_t::GetNumActive;
@@ -559,14 +562,15 @@ namespace emp {
     std::unordered_set< Ptr<taxon_t>, hash_t > ancestor_taxa; ///< A set of all dead, ancestral taxa.
     std::unordered_set< Ptr<taxon_t>, hash_t > outside_taxa;  ///< A set of all dead taxa w/o descendants.
 
-    Ptr<taxon_t> to_be_removed = nullptr; ///< Taxon to remove org from after next call to AddOrg
-    emp::WorldPosition removal_pos = {emp::WorldPosition::invalid_id, emp::WorldPosition::invalid_id};   ///< Position of taxon to next be removed
+    emp::vector<Ptr<taxon_t>> to_be_removed = {}; ///< Taxon to remove org from after next call to AddOrg
+    emp::vector<emp::WorldPosition> removal_pos = {};   ///< Position of taxon to next be removed
 
     emp::vector<emp::vector<Ptr<taxon_t> > > taxon_locations; ///< Positions in this vector indicate taxon positions in world
 
     Signal<void(Ptr<taxon_t>, ORG & org)> on_new_sig; ///< Trigger when a new taxon is created
     Signal<void(Ptr<taxon_t>)> on_extinct_sig; ///< Trigger when a taxon goes extinct
     Signal<void(Ptr<taxon_t>)> on_prune_sig; ///< Trigger when any organism is pruned from tree
+    Signal<void(Ptr<taxon_t>)> on_collapse_unifurcation_sig; ///< Trigger when a unifurcation is collapsed    
 
     mutable Ptr<taxon_t> mrca;  ///< Most recent common ancestor in the population.
 
@@ -578,6 +582,9 @@ namespace emp {
 
     /// Called when there are no more living members of a taxon.  There may be descendants.
     void MarkExtinct(Ptr<taxon_t> taxon);
+
+    /// Called to remove taxa that are supposed to be removed on a delay
+    void ClearRemoveAfterReproQueue(WorldPosition skip = {WorldPosition::invalid_id, WorldPosition::invalid_id});
 
     /// Called when a taxon has no living members and only a single offspring
     void CollapseUnifurcation(Ptr<taxon_t> taxon);
@@ -881,6 +888,11 @@ namespace emp {
     /// Trigger:  Taxon is about to be killed
     /// Argument: Pointer to taxon
     SignalKey OnPrune(std::function<void(Ptr<taxon_t>)> & fun) { return on_prune_sig.AddAction(fun); }
+
+    /// Provide a function for Systematics to call each time a unifurcation is collapsed.
+    /// Trigger:  Taxon is about to be collapsed
+    /// Argument: Pointer to taxon
+    SignalKey OnCollapseUnifurcation(std::function<void(Ptr<taxon_t>)> & fun) { return on_collapse_unifurcation_sig.AddAction(fun); }
 
     // ===== Functions for adding data nodes to systematics manager ====
 
@@ -1365,18 +1377,28 @@ namespace emp {
   // ======= Functions for manipulating systematics manager internals
 
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
+  void Systematics<ORG, ORG_INFO, DATA_STRUCT>::ClearRemoveAfterReproQueue(WorldPosition skip) {
+      if (to_be_removed.size()) {
+        for (emp::Ptr<taxon_t> tax : to_be_removed){
+          RemoveOrg(tax);
+        }
+        for (emp::WorldPosition pos : removal_pos) {
+          // Skip lets us skip newly-added org
+          if (pos.IsValid() && !(pos.GetIndex() == skip.GetIndex() && pos.GetPopID() == skip.GetPopID())) {
+            taxon_locations[pos.GetPopID()][pos.GetIndex()] = nullptr;
+          }
+        }
+        to_be_removed.clear();
+        removal_pos.clear();
+      }    
+  }
+
+  template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::Update() {
     if (track_synchronous) {
 
       // Clear pending removal
-      if (to_be_removed != nullptr) {
-        RemoveOrg(to_be_removed);
-        if (store_position) {
-          taxon_locations[removal_pos.GetPopID()][removal_pos.GetIndex()] = nullptr;
-          removal_pos.MarkInvalid();
-        }
-        to_be_removed = nullptr;
-      }
+      ClearRemoveAfterReproQueue();
 
       // Assumes that synchronous worlds have two populations, with 0
       // being currently alive and 1 being the one being created
@@ -1423,16 +1445,32 @@ namespace emp {
 
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::CollapseUnifurcation(Ptr<taxon_t> taxon) {
-    for (Ptr<taxon_t> off_tax : taxon->GetOffspring()) {
-      off_tax->parent = taxon->GetParent();
-      if (taxon->GetParent()) {
-        taxon->GetParent()->offspring.insert(off_tax);
-        taxon->GetParent()->num_offspring++;
+    // Give user a chance to do something with taxon before collapsing
+    on_collapse_unifurcation_sig.Trigger(taxon);
+    
+    Ptr<taxon_t> parent = taxon->GetParent();
+
+    for (Ptr<taxon_t> offspring_taxon : taxon->GetOffspring()) {
+      offspring_taxon->parent = parent;
+      offspring_taxon->depth--;
+      if (parent) {
+        parent->offspring.insert(offspring_taxon);
+        parent->num_offspring++;
       }
     }
 
-    if (taxon->GetParent()) {
-      taxon->GetParent()->RemoveOffspring(taxon);
+    if (parent) {
+      // Update stats by merging appropriate ones
+      parent->tot_orgs += taxon->GetNumOrgs();
+      parent->destruction_time = std::max(parent->destruction_time, taxon->GetDestructionTime());
+      parent->origination_time = std::min(parent->origination_time, taxon->GetOriginationTime());      
+      parent->RemoveOffspring(taxon);
+      parent->RemoveTotalOffspring();
+      
+      // other stats:
+      // - depth is handled in offspring
+      // - num_orgs must be 0 for both taxa already
+      // - num_offspring handled above
     }
     taxon.Delete();      
     return;
@@ -1595,16 +1633,7 @@ namespace emp {
     cur_taxon->AddOrg();                    // Record the current organism in its taxon.
     total_depth += cur_taxon->GetDepth();   // Track the total depth (for averaging)
 
-    if (to_be_removed) {
-      RemoveOrg(to_be_removed);
-      to_be_removed = nullptr;
-      if (store_position && removal_pos.IsValid()) {
-        if ((pos.GetPopID() != removal_pos.GetPopID()) || (pos.GetIndex() != removal_pos.GetIndex())) {
-          taxon_locations[removal_pos.GetPopID()][removal_pos.GetIndex()] = nullptr;
-        }
-        removal_pos.MarkInvalid();
-      }      
-    }
+    ClearRemoveAfterReproQueue(pos);
 
     most_recent = cur_taxon;
     return cur_taxon;                       // Return the taxon used.
@@ -1621,21 +1650,14 @@ namespace emp {
       return;
     }
 
-    RemoveOrgAfterRepro(taxon_locations[pos.GetPopID()][pos.GetIndex()]);
-    removal_pos = pos;
+    to_be_removed.push_back(taxon_locations[pos.GetPopID()][pos.GetIndex()]);
+    removal_pos.push_back(pos);
   }
 
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveOrgAfterRepro(Ptr<taxon_t> taxon) {
-    if (to_be_removed != nullptr) {
-      RemoveOrg(to_be_removed);
-      if (store_position) {
-        taxon_locations[removal_pos.GetPopID()][removal_pos.GetIndex()] = nullptr;
-        removal_pos.MarkInvalid();
-      }
-      to_be_removed = nullptr;
-    }
-    to_be_removed = taxon;
+    to_be_removed.push_back(taxon);
+    removal_pos.push_back(WorldPosition(WorldPosition::invalid_id, WorldPosition::invalid_id));
   }
 
 
