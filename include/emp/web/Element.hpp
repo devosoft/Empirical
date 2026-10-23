@@ -30,7 +30,8 @@ namespace emp::web {
   public:
     /// @param in_tag sets the html tag for used this object (i.e., div, footer, header, p, etc.)
     /// @param in_name sets the id of this html element
-    Element(const std::string & in_tag, const std::string & in_name = "") : Div(in_name) {
+    Element(const std::string & in_tag, const std::string & in_name = "",
+            const std::string & css_class = "") : Div(in_name, css_class) {
       // When a name is provided, create an associated Widget info.
       Info()->DoSetTag(in_tag);
     }

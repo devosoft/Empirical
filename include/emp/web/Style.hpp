@@ -20,6 +20,7 @@
 
 #include <map>
 #include <set>
+#include <sstream>
 #include <stddef.h>
 #include <string>
 
@@ -54,7 +55,8 @@ namespace emp::web {
     size_t GetNClasses() const { return classes.size(); }
 
     Style & AddClass(const std::string & in_class) {
-      classes.insert(in_class);
+      std::istringstream tokens(in_class);
+      for (std::string token; tokens >> token;) { classes.insert(token); }
       return *this;
     }
 
@@ -97,7 +99,10 @@ namespace emp::web {
     void Remove(const std::string & setting) { settings.erase(setting); }
 
     /// Remove a specific class
-    void RemoveClass(const std::string & css_class) { classes.erase(css_class); }
+    void RemoveClass(const std::string & css_class) {
+      std::istringstream tokens(css_class);
+      for (std::string token; tokens >> token;) { classes.erase(token); }
+    }
 
     /// Apply ALL of the style settings to a specified widget.
     void Apply(const std::string & widget_id) {
@@ -198,7 +203,9 @@ namespace emp::web {
           var id      = UTF8ToString($0);
           var name    = UTF8ToString($1);
           var element = document.getElementById(id);
-          if (element) { element.classList.add(name); }
+          if (element) {
+            name.split(/[\t\n\f\r ]+/).filter(Boolean).forEach(token => element.classList.add(token));
+          }
         },
         widget_id.c_str(),
         css_class.c_str());
@@ -214,7 +221,9 @@ namespace emp::web {
           var id      = UTF8ToString($0);
           var name    = UTF8ToString($1);
           var element = document.getElementById(id);
-          if (element) { element.classList.remove(name); }
+          if (element) {
+            name.split(/[\t\n\f\r ]+/).filter(Boolean).forEach(token => element.classList.remove(token));
+          }
         },
         widget_id.c_str(),
         css_class.c_str());
@@ -224,7 +233,7 @@ namespace emp::web {
     }
 
     /// Have any settings be set?
-    operator bool() const { return (bool) settings.size(); }
+    operator bool() const { return !settings.empty() || !classes.empty(); }
   };
 
 

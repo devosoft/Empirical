@@ -94,6 +94,11 @@ namespace emp { namespace web {
     }
 
     /// Get the current CSS value for the specified setting of this Cell.
+    const std::string & GetAttr(const std::string & setting) const override {
+      if (Info()->rows[cur_row].data.size() <= cur_col) { return emp::empty_string(); }
+      return Info()->rows[cur_row].data[cur_col].extras.GetAttr(setting);
+    }
+
     const std::string & GetCSS(const std::string & setting) const override {
       return Info()->rows[cur_row].data[cur_col].extras.GetStyle(setting);
     }

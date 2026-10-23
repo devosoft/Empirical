@@ -92,6 +92,11 @@ namespace emp { namespace web {
     }
 
     /// Get the current CSS value for the specified setting of this Table column.
+    const std::string & GetAttr(const std::string & setting) const override {
+      if (Info()->cols.size() <= cur_col) { return emp::empty_string(); }
+      return Info()->cols[cur_col].extras.GetAttr(setting);
+    }
+
     const std::string & GetCSS(const std::string & setting) const override {
       return Info()->cols[cur_col].extras.GetStyle(setting);
     }

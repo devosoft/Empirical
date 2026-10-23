@@ -106,6 +106,11 @@ namespace emp { namespace web {
       return *this;
     }
 
+    const std::string & GetAttr(const std::string & setting) const override {
+      if (Info()->rows.size() <= cur_row) { return emp::empty_string(); }
+      return Info()->rows[cur_row].extras.GetAttr(setting);
+    }
+
     const std::string & GetCSS(const std::string & setting) const override {
       return Info()->rows[cur_row].extras.GetStyle(setting);
     }

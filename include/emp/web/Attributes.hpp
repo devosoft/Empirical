@@ -18,6 +18,7 @@
 #endif  // #ifdef __EMSCRIPTEN__
 
 #include <map>
+#include <sstream>
 #include <string>
 
 #include "../base/errors.hpp"
@@ -44,7 +45,11 @@ namespace emp { namespace web {
     /// Record that attribute "a" is set to value "v" (converted to string) and return this object.
     template <typename SET_TYPE>
     Attributes & Set(const std::string & s, SET_TYPE v) {
-      settings[s] = emp::to_string(v);
+      const auto value = emp::to_string(v);
+      if (s == "class") {
+        settings[s].clear();
+        DoAddAttr(s, value);
+      } else { settings[s] = value; }
       return *this;
     }
 
@@ -52,6 +57,17 @@ namespace emp { namespace web {
     /// @param in_attr attribute name
     /// @param in_val attribute value to be added
     Attributes & DoAddAttr(const std::string in_attr, const std::string & in_val) {
+      if (in_attr == "class") {
+        std::istringstream tokens(in_val);
+        for (std::string token; tokens >> token;) {
+          const std::string padded = " " + settings[in_attr] + " ";
+          if (padded.find(" " + token + " ") == std::string::npos) {
+            if (!settings[in_attr].empty()) { settings[in_attr] += ' '; }
+            settings[in_attr] += token;
+          }
+        }
+        return *this;
+      }
       if (!Has(in_attr)) {
         // Attribute has not been assigned to this Widget. Add it with Set instead
         Set(in_attr, in_val);

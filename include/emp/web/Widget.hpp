@@ -748,19 +748,23 @@ namespace emp::web {
       }
 
       virtual void DoCSS(const std::string & class_) {
-        info->extras.style.AddClass(class_);
-        if (IsActive()) { Style::ApplyClass(info->id, class_); }
+        DoAddAttr("class", class_);
       }
 
       /// Attr-related options may be overridden in derived classes that have multiple attributes.
       /// By default DoAttr will track the new information and apply it (if active) to the widget.
       virtual void DoAttr(const std::string & setting, const std::string & value) {
         info->extras.attr.Set(setting, value);
-        if (IsActive()) { Attributes::Apply(info->id, setting, value); }
+        if (IsActive()) { Attributes::Apply(info->id, setting, info->extras.attr.Get(setting)); }
       }
 
       /// New attribute value will be appended to any existing values for this widget, not overridden.
       virtual void DoAddAttr(const std::string attr, const std::string & value) {
+        if (attr == "class") {
+          // Route through virtual attribute accessors, including table row/cell facets.
+          DoAttr(attr, GetAttr(attr) + " " + value);
+          return;
+        }
         info->extras.attr.DoAddAttr(attr, value);
         if (IsActive()) { Attributes::Apply(info->id, attr, info->extras.attr.GetAttrValue(attr)); }
       }
@@ -774,6 +778,42 @@ namespace emp::web {
 
     public:
       using return_t = RETURN_TYPE;
+
+      /// Replace all classes. AddAttr("class", ...) and SetCSS(Style) remain additive.
+      return_t & SetClasses(const std::string & classes) { return SetAttr("class", classes); }
+
+      /// Add whitespace-separated class tokens, ignoring duplicates.
+      return_t & AddClass(const std::string & classes) { return AddAttr("class", classes); }
+
+      bool HasClass(const std::string & token) const {
+        return !token.empty() && token.find_first_of(" \t\n\r\f\v") == std::string::npos
+               && (" " + GetAttr("class") + " ").find(" " + token + " ") != std::string::npos;
+      }
+
+      return_t & RemoveClass(const std::string & classes) {
+        std::istringstream remove_stream(classes);
+        std::set<std::string> removed;
+        for (std::string token; remove_stream >> token;) { removed.insert(token); }
+        std::istringstream current(GetAttr("class"));
+        std::string kept;
+        for (std::string token; current >> token;) {
+          if (removed.contains(token)) { continue; }
+          if (!kept.empty()) { kept += ' '; }
+          kept += token;
+        }
+        return SetClasses(kept);
+      }
+
+      return_t & ToggleClass(const std::string & classes, bool enabled) {
+        return enabled ? AddClass(classes) : RemoveClass(classes);
+      }
+
+      /// Append to this widget's parent even if this widget can itself contain children.
+      template <typename T>
+      Widget AppendSibling(T && value) {
+        emp_assert(info && info->parent);
+        return info->parent->Append(std::forward<T>(value));
+      }
 
       std::string GetHTML() {
         std::stringstream ss;
