@@ -72,6 +72,8 @@ namespace emp {
 
     uint64_t next_id;           ///< What ID value should the next new taxon have?
     size_t curr_update;
+    size_t delay_time;        ///< Should we delay incoming organisms from being added to tree and if 
+                              ///< so how many updates should we wait before adding new taxa?
 
     DataManager<double, data::Current, data::Info, data::Range, data::Stats, data::Pull> data_nodes;
 
@@ -80,7 +82,8 @@ namespace emp {
       : store_active(_active), store_ancestors(_anc), store_outside(_all)
       , archive(store_ancestors || store_outside), store_position(_pos), track_synchronous(false)
       , collapse_unifurcations(false)
-      , org_count(0), total_depth(0), num_roots(0), max_depth(0), next_id(0), curr_update(0) { ; }
+      , org_count(0), total_depth(0), num_roots(0), max_depth(0), next_id(0), curr_update(0)
+      , delay_time(0) { ; }
 
     virtual ~SystematicsBase(){;}
 
@@ -107,6 +110,9 @@ namespace emp {
 
     /// Are we collapsing unifurcations?
     bool GetCollapseUnifurcations() const {return collapse_unifurcations; }
+
+    /// Are we delaying incoming?
+    size_t GetDelayIncoming() const { return delay_time; }
 
     /// How many living organisms are currently being tracked?
     size_t GetTotalOrgs() const { return org_count; }
@@ -143,6 +149,9 @@ namespace emp {
 
     /// Are we collapsing unifurcations?
     void SetCollapseUnifurcations(bool new_val) { collapse_unifurcations = new_val; }
+
+    /// Set the delay for incoming taxa (greater than 0 turns delay incoming on, increases efficiency)
+    void SetDelayIncoming(size_t delay) { delay_time = delay; }
 
     /// Sets the current update/time step
     void SetUpdate(size_t ud) {curr_update = ud;}
@@ -259,6 +268,7 @@ namespace emp {
     using parent_t::next_id;
     using parent_t::curr_update;
     using parent_t::max_depth;
+    using parent_t::delay_time;
 
   public:
     using typename parent_t::data_ptr_t;
@@ -1170,6 +1180,24 @@ namespace emp {
       taxon_locations[1].resize(0);
     }
     ++curr_update;
+    while (incoming_taxa.size() && incoming_taxa.front()->GetOriginationTime() + delay_time <= curr_update) {
+      emp::Ptr<taxon_t> tax = incoming_taxa.front();
+      incoming_taxa.pop_front();
+      if (!tax) {
+        continue;
+      }
+      if (tax->GetDeleted()) {
+        tax.Delete();
+        continue;
+      }
+      if (tax && tax->GetIncoming()) {
+        tax->SetIncoming(false);
+        if (store_active) active_taxa.insert(tax);
+        if (tax->GetParent()) {
+          tax->GetParent()->AddToOffspring(tax);
+        }
+      }
+    }
   }
 
   // Should be called wheneven a taxon has no organisms AND no descendants.
@@ -1183,7 +1211,12 @@ namespace emp {
       if (taxon == mrca) {
         mrca = nullptr;
       }
-      taxon.Delete();                             //  ...or else get rid of it.
+      if (taxon->GetIncoming()) {
+        taxon->SetDeleted(true);
+      } else {
+        taxon.Delete();                             //  ...or else get rid of it.
+      }
+
     }
   }
 
@@ -1272,9 +1305,10 @@ namespace emp {
       }
     }
 
-    if (store_active) active_taxa.erase(taxon);
+    if (store_active && !taxon->GetIncoming()) active_taxa.erase(taxon);
 
     if (collapse_unifurcations && taxon->GetNumOff() == 1) {
+      emp_assert(!taxon->GetIncoming(), "Taxon should not be in incoming queue if it has offspring");
       CollapseUnifurcation(taxon);
       return;
     } 
@@ -1286,11 +1320,17 @@ namespace emp {
         off_tax = off_tax->next_sibling;
       }
 
-      if (taxon->GetParent()) {
+      if (taxon->GetParent() && !taxon->GetIncoming()) {
         taxon->GetParent()->RemoveOffspring(taxon);
+      } else if (taxon->GetParent()) {
+        taxon->GetParent()->num_offspring--;  
       }
-
-      taxon.Delete();
+      
+      if (taxon->GetIncoming()) {
+        taxon->SetDeleted(true);
+      } else {
+        taxon.Delete();
+      }
       return;
     }
 
@@ -1389,8 +1429,28 @@ namespace emp {
         max_depth = cur_taxon->GetDepth();
       }
 
-      if (store_active) active_taxa.insert(cur_taxon);       // Store new taxon.
-      if (parent) parent->AddOffspring(cur_taxon);           // Track tree info.
+      if (delay_time > 0) {
+        cur_taxon->SetIncoming(true);                       // Mark as incoming.
+        incoming_taxa.push_back(cur_taxon);                  // Don't add to tree yet
+        if (parent) {
+          ++parent->num_offspring;                 // Let parent know it has another offspring but don't add to list                                 // Track offspring count for parent.
+          if constexpr (DATA_STRUCT::has_num_offspring_ever_t::value) {
+            ++parent->data.num_offspring_ever;
+          }
+          if (parent->GetIncoming()) {
+            parent->SetIncoming(false);
+            if (store_active) {
+              active_taxa.insert(parent);  
+            }
+            if (parent->GetParent()){
+              parent->GetParent()->AddToOffspring(parent);
+            }
+          }
+        }
+      } else {
+        if (store_active) active_taxa.insert(cur_taxon);       // Store new taxon.
+        if (parent) parent->AddOffspring(cur_taxon);         // Track tree info.
+      }
 
       cur_taxon->SetOriginationTime(curr_update);
       on_new_sig.Trigger(cur_taxon, org);

@@ -1956,3 +1956,154 @@ TEST_CASE("Collapse unifurcation preserves sibling list") {
   CHECK(emp::Has(offspring, sibling_c));
   CHECK(root->GetNumOff() == 1);
 }
+
+TEST_CASE("Delayed incoming default is off") {
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
+  CHECK(sys.GetDelayIncoming() == 0);
+
+  auto root = sys.AddOrg(1, nullptr);
+  auto child = sys.AddOrg(2, root);
+  CHECK(!root->GetIncoming());
+  CHECK(!child->GetIncoming());
+  CHECK(sys.GetNumActive() == 2);
+  CHECK(emp::Has(root->GetOffspring(), child));
+}
+
+TEST_CASE("Delayed incoming root taxon") {
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
+  sys.SetDelayIncoming(2);
+  CHECK(sys.GetDelayIncoming() == 2);
+
+  auto root = sys.AddOrg(1, nullptr);
+  CHECK(root->GetIncoming());
+  CHECK(root->GetNumOrgs() == 1);
+  CHECK(sys.GetNumActive() == 0);
+
+  sys.Update();
+  CHECK(root->GetIncoming());
+  CHECK(sys.GetNumActive() == 0);
+
+  sys.Update();
+  CHECK(!root->GetIncoming());
+  CHECK(sys.GetNumActive() == 1);
+  CHECK(emp::Has(sys.GetActive(), root));
+}
+
+TEST_CASE("Delayed incoming child taxon") {
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
+  sys.SetDelayIncoming(1);
+
+  auto root = sys.AddOrg(1, nullptr);
+  sys.Update();
+  CHECK(!root->GetIncoming());
+  CHECK(sys.GetNumActive() == 1);
+
+  auto child = sys.AddOrg(2, root);
+  CHECK(child->GetIncoming());
+  CHECK(child->GetParent() == root);
+  // Parent counts the child immediately, but the child is not linked or active yet
+  CHECK(root->GetNumOff() == 1);
+  CHECK(root->GetOffspring().empty());
+  CHECK(sys.GetNumActive() == 1);
+  CHECK(!emp::Has(sys.GetActive(), child));
+
+  sys.Update();
+  CHECK(!child->GetIncoming());
+  CHECK(root->GetNumOff() == 1);
+  CHECK(emp::Has(root->GetOffspring(), child));
+  CHECK(sys.GetNumActive() == 2);
+  CHECK(emp::Has(sys.GetActive(), child));
+}
+
+TEST_CASE("Delayed incoming taxa are released in order") {
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
+  sys.SetDelayIncoming(2);
+
+  auto root = sys.AddOrg(1, nullptr);
+  sys.Update();
+  sys.Update();
+  REQUIRE(!root->GetIncoming());
+
+  auto child_a = sys.AddOrg(2, root);
+  sys.Update();
+  auto child_b = sys.AddOrg(3, root);
+
+  sys.Update();
+  CHECK(!child_a->GetIncoming());
+  CHECK(child_b->GetIncoming());
+  CHECK(emp::Has(root->GetOffspring(), child_a));
+  CHECK(!emp::Has(root->GetOffspring(), child_b));
+  CHECK(root->GetNumOff() == 2);
+
+  sys.Update();
+  CHECK(!child_b->GetIncoming());
+  CHECK(emp::Has(root->GetOffspring(), child_b));
+  CHECK(sys.GetNumActive() == 3);
+}
+
+TEST_CASE("Delayed incoming parent is released early when it gains a child") {
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
+  sys.SetDelayIncoming(5);
+
+  auto root = sys.AddOrg(1, nullptr);
+  auto mid = sys.AddOrg(2, root);
+  REQUIRE(mid->GetIncoming());
+  auto leaf = sys.AddOrg(3, mid);
+
+  // mid must be in the tree for leaf to be attached to it
+  CHECK(!mid->GetIncoming());
+  CHECK(emp::Has(sys.GetActive(), mid));
+  CHECK(emp::Has(root->GetOffspring(), mid));
+  CHECK(leaf->GetIncoming());
+  CHECK(mid->GetNumOff() == 1);
+
+  for (int i = 0; i < 5; i++) sys.Update();
+  CHECK(!leaf->GetIncoming());
+  CHECK(emp::Has(mid->GetOffspring(), leaf));
+  CHECK(root->GetNumOff() == 1);
+  CHECK(mid->GetNumOff() == 1);
+}
+
+TEST_CASE("Delayed incoming taxon that dies before release") {
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
+  sys.SetDelayIncoming(2);
+
+  auto root = sys.AddOrg(1, nullptr);
+  sys.Update();
+  sys.Update();
+  REQUIRE(!root->GetIncoming());
+
+  auto child = sys.AddOrg(2, root);
+  REQUIRE(child->GetIncoming());
+  CHECK(root->GetNumOff() == 1);
+
+  sys.RemoveOrg(child);
+  CHECK(root->GetNumOff() == 0);
+  CHECK(root->GetOffspring().empty());
+  CHECK(sys.GetNumActive() == 1);
+  CHECK(sys.GetNumAncestors() == 0);
+
+  // Releasing the queue must not touch the deleted taxon
+  sys.Update();
+  sys.Update();
+  sys.Update();
+  CHECK(sys.GetNumActive() == 1);
+  CHECK(root->GetNumOff() == 0);
+}
+
+TEST_CASE("Delayed incoming with offspring-ever tracking") {
+  emp::Systematics<int, int, emp::datastruct::cumulative_stats_all> sys(
+    [](const int & i){return i;}, true, true, false, false);
+  sys.SetDelayIncoming(1);
+
+  auto root = sys.AddOrg(1, nullptr);
+  sys.Update();
+  auto child = sys.AddOrg(2, root);
+  CHECK(root->GetData().num_offspring_ever == 1);
+
+  sys.Update();
+  CHECK(!child->GetIncoming());
+  // Releasing the child must not count it a second time
+  CHECK(root->GetData().num_offspring_ever == 1);
+  CHECK(root->GetNumOff() == 1);
+}

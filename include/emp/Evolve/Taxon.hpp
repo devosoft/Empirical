@@ -45,6 +45,8 @@ namespace emp{
     size_t depth;             ///<  How deep in tree is this node? (Root is 0)
     double origination_time;  ///<  When did this taxon first appear in the population?
     double destruction_time;  ///<  When did this taxon leave the population?
+    bool incoming;
+    bool deleted;
 
     Ptr<this_t> first_child = nullptr;    ///< Pointer to start of linked offspring list
     Ptr<this_t> previous_sibling = nullptr; ///< Pointer to previous sibling in linked list of offspring
@@ -59,7 +61,8 @@ namespace emp{
      : id (_id), info(_info), parent(_parent)
      , num_orgs(0), num_offspring(0)
      , depth(parent ? (parent->depth+1) : 0)
-     , destruction_time(std::numeric_limits<double>::infinity()) { ; }
+     , destruction_time(std::numeric_limits<double>::infinity())
+    , incoming(false), deleted(false) { ; }
     // Taxon(const Taxon &) = delete;
     Taxon(const Taxon &) = default; // TODO: Check with Charles about this
     Taxon(Taxon &&) = default;
@@ -105,6 +108,10 @@ namespace emp{
       } 
     }
 
+    void SetIncoming(bool val) {incoming = val;}
+
+    void SetDeleted(bool val) {deleted = val;}
+
     /// Get the number of taxa that were produced by organisms from this Taxon.
     size_t GetNumOff() const { return num_offspring; }
 
@@ -139,6 +146,10 @@ namespace emp{
     double GetDestructionTime() const {return destruction_time;}
     /// Sets this taxon's destruction time
     void SetDestructionTime(double time) {destruction_time = time;}
+
+    bool GetIncoming() const {return incoming;}
+
+    bool GetDeleted() const {return deleted;}
 
     /// Add a new organism to this Taxon.
     void AddOrg() { 
