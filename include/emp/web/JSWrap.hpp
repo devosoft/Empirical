@@ -47,6 +47,7 @@
 #include <stddef.h>
 #include <tuple>
 #include <type_traits>
+#include <utility>
 
 #include "../base/assert.hpp"
 #include "../base/vector.hpp"
@@ -357,6 +358,9 @@ namespace emp {
     // to trigger a specific wrapped function.
 
     class JSWrap_Callback_Base {
+    public:
+      size_t call_depth = 0;
+      bool delete_pending = false;
     protected:
       bool is_disposable;  // Should this callback be deleted automatically after first use?
 
@@ -546,7 +550,7 @@ namespace emp {
   size_t JSWrap(const FUN_TYPE & in_fun,
                 const std::string & fun_name = "",
                 bool dispose_on_use          = false) {
-    return JSWrap(to_function(in_fun), fun_name, dispose_on_use);
+    return JSWrap(std::function{in_fun}, fun_name, dispose_on_use);
   }
 
   /// If we want a quick, unnamed, disposable function, use JSWrapOnce
@@ -560,9 +564,39 @@ namespace emp {
     emp_assert(fun_id > 0);  // Make sure this isn't a null pointer!
     // @CAO -- Should make sure to clean up named functions on JS side if they exist.
     auto & callback_array = internal::CallbackArray();
+    if (fun_id >= callback_array.size() || !callback_array[fun_id]) { return; }
+    if (callback_array[fun_id]->call_depth) {
+      callback_array[fun_id]->delete_pending = true;
+      return;
+    }
     delete callback_array[fun_id];
     callback_array[fun_id] = nullptr;
   }
+
+  /// IDs are never recycled, so a disposed handle cannot address a newer callback.
+  inline bool IsJSCallbackActive(size_t id) {
+    const auto & callbacks = internal::CallbackArray();
+    return id && id < callbacks.size() && callbacks[id] && !callbacks[id]->delete_pending;
+  }
+
+  /// Move-only ownership of an unnamed callback. Destroy on its registration thread.
+  class JSCallback {
+    size_t id = 0;
+  public:
+    JSCallback() = default;
+    template <typename F> explicit JSCallback(F && fn) : id(JSWrap(std::forward<F>(fn))) {}
+    JSCallback(const JSCallback &) = delete;
+    JSCallback & operator=(const JSCallback &) = delete;
+    JSCallback(JSCallback && other) noexcept : id(std::exchange(other.id, 0)) {}
+    JSCallback & operator=(JSCallback && other) noexcept {
+      if (this != &other) { Reset(); id = std::exchange(other.id, 0); }
+      return *this;
+    }
+    ~JSCallback() { Reset(); }
+    void Reset() { if (id) { JSDelete(std::exchange(id, 0)); } }
+    size_t GetID() const { return id; }
+    explicit operator bool() const { return IsJSCallbackActive(id); }
+  };
 }  // namespace emp
 
 extern "C" {
@@ -575,12 +609,15 @@ extern "C" {
 /// (In a few limited cases when running with Emscripten pthreads, this function
 /// is called on the main browser thread.)
 void empDoCppCallback(const size_t cb_id) {
+  if (!emp::IsJSCallbackActive(cb_id)) { return; }
   // Convert the uint passed in from 32 bits to 64 and THEN convert it to a pointer.
   auto * cb_obj = emp::internal::CallbackArray()[cb_id];
 
   // Run DoCallback() on the generic base class type, which is virtual and will call
   // the correct template automatically.
+  ++cb_obj->call_depth;
   cb_obj->DoCallback();
+  --cb_obj->call_depth;
 
 // dispatch all pending offscreen canvas updates to the browser thread
 #ifdef __EMSCRIPTEN_PTHREADS__
@@ -605,7 +642,7 @@ void empDoCppCallback(const size_t cb_id) {
 #endif  // #ifdef __EMSCRIPTEN_PTHREADS__
 
   // If we have indicated that this callback is single use, delete it now.
-  if (cb_obj->IsDisposable()) {
+  if (!cb_obj->call_depth && (cb_obj->IsDisposable() || cb_obj->delete_pending)) {
     delete cb_obj;
     emp::internal::CallbackArray()[cb_id] = nullptr;
   }
