@@ -15,7 +15,7 @@
 #define EMP_TYPE_ID_H
 
 #include <cmath>
-#include <cstdint>  // AI-added (Claude Code): https://claude.ai/code/session_01JECV8BKHRPajZSxUAihJ7V
+#include <cstdint>
 #include <sstream>
 #include <string>
 
