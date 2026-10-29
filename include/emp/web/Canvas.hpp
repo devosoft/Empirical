@@ -5,6 +5,18 @@
  *
  * @file include/emp/web/Canvas.hpp
  * @brief Manage an HTML canvas object.
+ *
+ * Use example:
+ *
+ *   emp::web::Canvas canvas(640, 480, "plot");
+ *   doc << canvas;
+ *   canvas.Clear();
+ *
+ * Here doc is a web::Document or another container. Draw() accepts geometric
+ * shapes, images, and text; Clear() removes previous drawing actions. For a
+ * raster grid, use UploadPixels(pixels, width, height) with RGBA words whose
+ * red channel is in the low byte. Pixel uploads are explicit draws, so repeat
+ * them after rebuilding the canvas. Optional CSS dimensions control display size.
  */
 
 #pragma once
@@ -13,6 +25,7 @@
 #define INCLUDE_EMP_WEB_CANVAS_HPP_GUARD
 
 #include <functional>
+#include <span>
 #include <string>
 
 #include "../base/vector.hpp"
@@ -81,7 +94,16 @@ namespace emp::web {
       CanvasInfo(const CanvasInfo &)             = delete;  // No copies of INFO allowed
       CanvasInfo & operator=(const CanvasInfo &) = delete;  // No copies of INFO allowed
 
-      virtual ~CanvasInfo() { ClearActions(); }
+      virtual ~CanvasInfo() {
+        MAIN_THREAD_EM_ASM({
+          const id = UTF8ToString($0);
+          const uploads = emp_i.pixelUploads;
+          const upload = uploads?.get(id);
+          if (upload?.frame) cancelAnimationFrame(upload.frame);
+          uploads?.delete(id);
+        }, id.c_str());
+        ClearActions();
+      }
 
       std::string GetTypeName() const override { return "CanvasInfo"; }
 
@@ -422,6 +444,67 @@ namespace emp::web {
     // Canvas() {}
 
     virtual ~Canvas() {}
+
+    /// Bulk RGBA words (red in low byte), expanded with integer cell boundaries and one upload.
+    /// CSS dimensions default to this Canvas's logical size. Deferred calls copy into reusable
+    /// JS-owned storage before returning; they never retain a pointer into the caller's buffer.
+    Canvas & UploadPixels(std::span<const uint32_t> pixels, size_t width, size_t height,
+                          double css_width = 0, double css_height = 0, bool defer = true) {
+      emp_assert(width && height && width <= pixels.size() / height);
+      if (!css_width) { css_width = Info()->size.Width(); }
+      if (!css_height) { css_height = Info()->size.Height(); }
+      emp_assert(css_width > 0 && css_height > 0);
+      MAIN_THREAD_EM_ASM({
+        const id = UTF8ToString($0);
+        const uploads = emp_i.pixelUploads || (emp_i.pixelUploads = new Map());
+        let upload = uploads.get(id);
+        if (!upload) { upload = {}; uploads.set(id, upload); }
+        if (upload.frame) cancelAnimationFrame(upload.frame);
+        upload.frame = 0;
+        const count = $2 * $3;
+        let colors = HEAPU32.subarray($1 >>> 2, ($1 >>> 2) + count);
+        const render = () => {
+          const canvas = document.getElementById(id);
+          if (!canvas) {
+            if (!$6) return;
+            if (colors.buffer === HEAPU8.buffer) {
+              if (!upload.colors || upload.colors.length !== count) upload.colors = new Uint32Array(count);
+              upload.colors.set(colors); colors = upload.colors;
+            }
+            upload.frame = requestAnimationFrame(render); return;
+          }
+          upload.frame = 0;
+          const ratio = window.devicePixelRatio || 1;
+          const pixelWidth = Math.max($2, Math.round($4 * ratio));
+          const pixelHeight = Math.max($3, Math.round($5 * ratio));
+          canvas.style.width = $4 + 'px'; canvas.style.height = $5 + 'px';
+          if (canvas.width !== pixelWidth) canvas.width = pixelWidth;
+          if (canvas.height !== pixelHeight) canvas.height = pixelHeight;
+          if (!upload.image || upload.image.width !== pixelWidth || upload.image.height !== pixelHeight) {
+            upload.image = new ImageData(pixelWidth, pixelHeight);
+            upload.words = new Uint32Array(upload.image.data.buffer);
+          }
+          const words = upload.words;
+          for (let row = 0; row < $3; ++row) {
+            const top = Math.round(row * pixelHeight / $3);
+            const bottom = Math.round((row + 1) * pixelHeight / $3);
+            const start = top * pixelWidth;
+            for (let column = 0; column < $2; ++column) {
+              const left = Math.round(column * pixelWidth / $2);
+              const right = Math.round((column + 1) * pixelWidth / $2);
+              words.fill(colors[row * $2 + column], start + left, start + right);
+            }
+            for (let y = top + 1; y < bottom; ++y) {
+              words.copyWithin(y * pixelWidth, start, start + pixelWidth);
+            }
+          }
+          canvas.getContext('2d').putImageData(upload.image, 0, 0);
+        };
+        render();
+      }, GetID().c_str(), pixels.data(), width, height, css_width, css_height, defer);
+      return *this;
+    }
+
 
     using INFO_TYPE = CanvasInfo;
 
