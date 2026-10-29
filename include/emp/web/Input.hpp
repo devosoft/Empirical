@@ -4,24 +4,31 @@
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/web/Input.hpp
- * @brief Create/control an HTML input and call a specified function when it receives input.
+ * @brief Create an HTML input with change callbacks, silent updates, and validation.
  *
  * Use example:
  *
- *   emp::web::Input my_input(MyFun, "input type", "input Name", "html_id");
+ *   emp::web::Input my_input(MyFun, "number", "Amount", "amount");
+ *   my_input.SetValueSilently("0.25");
+ *   doc << my_input;
  *
- * Where my_input is the C++ object linking to the input, MyFun is the
- * function you want to call on changes, "Input Name" is the label on the
- * input itself, and "html_id" is the optional id you want it to use in the
- * HTML code (otherwise it will generate a unique name on its own.)
+ * MyFun receives the new value as a std::string when an accepted change occurs.
+ * The HTML input type and label follow the callback; the ID is optional. Here doc
+ * is a web::Document or another container. SetValueSilently() synchronizes the
+ * stored and displayed value without callbacks or replacing the live element.
+ * Validator() returns an empty string for success or an error message to reject
+ * a change. RejectValue() restores a value and displays validation feedback.
+ * Optional CSS classes follow the existing show_value and is_checked arguments.
  *
  * Member functions to set state:
- *   Input & Callback(const std::function<void()> & in_callback)
+ *   Input & Callback(const std::function<void(std::string)> & in_callback)
  *   Input & Label(const std::string & in_label)
  *   Input & Autofocus(bool in_af)
  *   Input & Disabled(bool in_dis)
  *
  * Retrieving current state:
+ *   const std::string & GetCurrValue() const
+ *   const std::string & GetValidationError() const
  *   const std::string & GetLabel() const
  *   bool HasAutofocus() const
  *   bool IsDisabled() const
@@ -33,6 +40,8 @@
 #define INCLUDE_EMP_WEB_INPUT_HPP_GUARD
 
 #include <cstdint>
+
+#include "../tools/String.hpp"
 
 #include "Widget.hpp"
 
@@ -60,6 +69,9 @@ namespace emp::web {
 
       std::function<void(std::string)> callback;
       std::function<bool(std::string)> checker;
+      std::function<std::string(const std::string &)> validator;
+      std::string validation_error;
+      size_t validation_callback_id = 0;
       uint32_t callback_id;
       std::string onchange_info;
 
@@ -72,6 +84,7 @@ namespace emp::web {
       InputInfo & operator=(const InputInfo &) = delete;  // No copies of INFO allowed
 
       virtual ~InputInfo() {
+        if (validation_callback_id) { emp::JSDelete(validation_callback_id); }
         if (callback_id) {
           emp::JSDelete(callback_id);  // Delete callback wrapper.
         }
@@ -96,7 +109,7 @@ namespace emp::web {
           HTML << " max=\"" << max << "\"";  // Add a max allowed value if there is one.
         }
         if (value != "") {
-          HTML << " value=\"" << value << "\"";  // Add a current value if there is one.
+          HTML << " value=\"" << emp::MakeWebSafe(value) << "\"";  // Add a current value if there is one.
         }
         if (step != "") {
           HTML << " step=\"" << step << "\"";  // Add a step if there is one.
@@ -112,6 +125,7 @@ namespace emp::web {
       }
 
       virtual void TriggerJS() override {
+        ApplyValidation(false);
         if (show_value) {
           // Inspired by https://codepen.io/chriscoyier/pen/imdrE
           EM_ASM_ARGS(
@@ -164,16 +178,61 @@ namespace emp::web {
       }
 
       void DoChange(std::string new_val) {
+        Widget keep_alive(this); // User callbacks may remove the final external widget handle.
         if (curr_val == new_val) { return; }
-
-        if (!checker(new_val)) {
-          std::swap(curr_val, new_val);
-          UpdateValue(new_val);
-        } else {
-          curr_val = new_val;
-          callback(curr_val);
-          UpdateDependants();
+        const std::string error = validator ? validator(new_val) : "";
+        if (!checker(new_val) || !error.empty()) {
+          UpdateValueSilently(curr_val);
+          if (!error.empty()) { SetValidationError(error, true); }
+          return;
         }
+        SetValidationError("", false);
+        value = curr_val = new_val;
+        if (callback) { callback(curr_val); }
+        UpdateDependants();
+      }
+
+      void UpdateValueSilently(const std::string & new_value) {
+        value = curr_val = new_value;
+        if (type == "checkbox" || type == "radio") {
+          if (new_value == "1") { extras.SetAttr("checked", "checked"); }
+          else { extras.RemoveAttr("checked"); }
+        }
+        if (state != Widget::ACTIVE) { return; }
+        MAIN_THREAD_EM_ASM({
+          const control = document.getElementById(UTF8ToString($0));
+          if (!control) return;
+          const value = UTF8ToString($1);
+          if (control.type === 'checkbox' || control.type === 'radio') control.checked = value === '1';
+          else if (control.value !== value) control.value = value;
+        }, id.c_str(), value.c_str());
+      }
+
+      void ApplyValidation(bool report) {
+        if (!validation_callback_id) { return; }
+        MAIN_THREAD_EM_ASM({
+          const control = document.getElementById(UTF8ToString($0));
+          if (!control) return;
+          const error = UTF8ToString($1);
+          control.setCustomValidity(error);
+          if (error) control.setAttribute('aria-invalid', 'true');
+          else control.removeAttribute('aria-invalid');
+          if (!control.empClearValidity) {
+            control.empClearValidity = () => emp.Callback($2);
+            control.addEventListener('input', control.empClearValidity);
+          }
+          if ($3 && error) control.reportValidity();
+        }, id.c_str(), validation_error.c_str(), validation_callback_id, report);
+      }
+
+      void SetValidationError(const std::string & error, bool report) {
+        validation_error = error;
+        if (!validation_callback_id && !error.empty()) {
+          validation_callback_id = JSWrap(std::function<void()>{
+            [this]() { SetValidationError("", false); }
+          });
+        }
+        if (state == Widget::ACTIVE) { ApplyValidation(report); }
       }
 
       void UpdateCallback(const std::function<void(std::string)> & in_cb) { callback = in_cb; }
@@ -223,6 +282,7 @@ namespace emp::web {
       }
 
       void UpdateValue(const std::string & in_value) {
+        Widget keep_alive(this);
         value = in_value;
         DoChange(in_value);
         if (state == Widget::ACTIVE) {
@@ -231,6 +291,7 @@ namespace emp::web {
       }
 
       void UpdateValue(const double & in_value) {
+        Widget keep_alive(this);
         value = to_string(in_value);
         DoChange(value);
         if (state == Widget::ACTIVE) {
@@ -290,14 +351,17 @@ namespace emp::web {
     /// @param in_id The HTML ID to use for this Input (leave blank for auto-generated)
     /// @param show_value Do you want to add an output element to display to value of this input?
     /// @param is_checked Should the is_checked attribute by set to true or false?
+    /// @param css_class Optional whitespace-separated CSS classes for the input.
     Input(const std::function<void(std::string)> & in_cb,
           const std::string & in_type,
           const std::string & in_label,
           const std::string & in_id = "",
           bool show_value           = false,
-          bool is_checked           = false)
+          bool is_checked           = false,
+          const std::string & css_class = "")
       : WidgetFacet(in_id) {
       info = new InputInfo(in_id);
+      if (!css_class.empty()) { AddClass(css_class); }
 
       Info()->label      = in_label;
       Info()->type       = in_type;
@@ -338,6 +402,51 @@ namespace emp::web {
     Input & Checker(const std::function<bool(std::string)> & in_ck) {
       Info()->UpdateChecker(in_ck);
       return *this;
+    }
+
+    /// Return an empty string for success, otherwise a message explaining the rejection.
+    Input & Validator(const std::function<std::string(const std::string &)> & fn) {
+      Info()->validator = fn;
+      return *this;
+    }
+
+    /// Synchronize the model and live control without validation, callbacks, or replacing DOM.
+    Input & SetValueSilently(const std::string & value) {
+      Info()->UpdateValueSilently(value);
+      return *this;
+    }
+
+    Input & SetValueSilently(double value) { return SetValueSilently(emp::to_string(value)); }
+
+    /// A non-owning setter for linked controls; becomes a no-op when this input is destroyed.
+    std::function<void(const std::string &)> GetSilentValueSetter(
+      std::function<std::string(const std::string &)> describe = {}) {
+      return [target = Info(), callback_id = Info()->callback_id,
+              describe = std::move(describe)](const std::string & value) {
+        if (!emp::IsJSCallbackActive(callback_id)) { return; }
+        Widget keep_alive(target);
+        target->UpdateValueSilently(value);
+        if (describe) {
+          const auto text = describe(value);
+          target->extras.SetAttr("aria-valuetext", text);
+          if (target->state == Widget::ACTIVE) {
+            Attributes::Apply(target->id, "aria-valuetext", text);
+          }
+        }
+      };
+    }
+
+    Input & SetValidationError(const std::string & message, bool report = true) {
+      Info()->SetValidationError(message, report);
+      return *this;
+    }
+
+    Input & ClearValidationError() { return SetValidationError("", false); }
+
+    const std::string & GetValidationError() const { return Info()->validation_error; }
+
+    Input & RejectValue(const std::string & previous, const std::string & message) {
+      return SetValueSilently(previous).SetValidationError(message);
     }
 
     /// Set a new label to appear on this Input.
