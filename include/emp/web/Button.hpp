@@ -8,12 +8,14 @@
  *
  * Use example:
  *
- *   emp::web::Button my_button(MyFun, "Button Name", "html_id");
+ *   emp::web::Button my_button(MyFun, "Button Name", "html_id", "action primary");
  *
  * Where my_button is the C++ object linking to the button, MyFun is the
  * function you want to call on clicks, "Button Name" is the label on the
  * button itself, and "html_id" is the optional id you want it to use in the
- * HTML code (otherwise it will generate a unique name on its own.)
+ * HTML code (otherwise it will generate a unique name on its own.) The final,
+ * optional argument supplies whitespace-separated CSS classes. Insert my_button
+ * into a web::Document or another container to display it.
  *
  * Member functions to set state:
  *   Button & SetCallback(const std::function<void()> & in_callback)
@@ -66,6 +68,7 @@ namespace emp::web {
       std::string GetTypeName() const override { return "ButtonInfo"; }
 
       void DoCallback() {
+        Widget keep_alive(this); // User callbacks may remove the final external widget handle.
         callback();
         UpdateDependants();
       }
@@ -101,11 +104,13 @@ namespace emp::web {
     /// @param in_cb The function to call when the button is clicked.
     /// @param in_label The label that should appear on the button.
     /// @param in_id The HTML ID to use for this button (leave blank for auto-generated)
+    /// @param css_class Optional whitespace-separated CSS classes for the button.
     Button(const std::function<void()> & in_cb,
            const std::string & in_label,
-           const std::string & in_id = "")
+           const std::string & in_id = "", const std::string & css_class = "")
       : WidgetFacet(in_id) {
       info = new ButtonInfo(in_id);
+      if (!css_class.empty()) { AddClass(css_class); }
 
       Info()->label = in_label;
 
