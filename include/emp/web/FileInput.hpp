@@ -4,7 +4,22 @@
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/web/FileInput.hpp
- * @brief Specs for the FileInput widget (click on to upload a file)
+ * @brief Read a browser-selected file through a callback.
+ *
+ * Use example:
+ *
+ *   emp::web::FileInput upload([](const emp::web::FileData & file) {
+ *     ProcessFile(file.contents);
+ *   }, "upload");
+ *   upload.Accept(".txt,.csv").OnError(ReportError);
+ *   doc << upload;
+ *
+ * Here doc is a web::Document or another container. FileData supplies the file's
+ * name, MIME type, and exact bytes, including embedded NULs. OnError() receives
+ * a diagnostic string if reading fails. Legacy callbacks taking const std::string &
+ * receive decoded text with a trailing newline; callbacks taking emp::File
+ * receive parsed lines. Optional trailing classes style the input. Selecting the
+ * same file again triggers another read.
  *
  * @todo Setup FileInput to work outside of web mode as well.
  */
@@ -15,6 +30,7 @@
 #define INCLUDE_EMP_WEB_FILE_INPUT_HPP_GUARD
 
 #include <cstdint>
+#include <expected>
 #include <functional>
 #include <string>
 
@@ -32,6 +48,12 @@ namespace emp::web {
   ///  specified function is called and the body of the file is passed in as the
   ///  string.
 
+  struct FileData {
+    std::string name;
+    std::string mime_type;
+    std::string contents; ///< Exact bytes, including embedded NULs; UTF-8 text is unchanged.
+  };
+
   class FileInput : public internal::WidgetFacet<FileInput> {
     friend class FileInputInfo;
   protected:
@@ -44,7 +66,10 @@ namespace emp::web {
       bool disabled;
 
       std::function<void(const std::string &)> callback;
-      uint32_t callback_id;
+      std::function<void(const FileData &)> file_callback;
+      std::function<void(const std::string &)> error_callback;
+      JSCallback data_callback;
+      bool exact_bytes = false;
 
       FileInputInfo(const std::string & in_id = "") : internal::WidgetInfo(in_id) { ; }
 
@@ -52,14 +77,12 @@ namespace emp::web {
       FileInputInfo & operator=(const FileInputInfo &) = delete;  // No copies of INFO allowed
 
       virtual ~FileInputInfo() {
-        if (callback_id) {
-          emp::JSDelete(callback_id);  // Delete callback wrapper.
-        }
       }
 
       std::string GetTypeName() const override { return "FileInputInfo"; }
 
       void DoCallback(const std::string & file_body) {
+        Widget keep_alive(this); // User callbacks may remove the final external widget handle.
         callback(file_body);
         UpdateDependants();
       }
@@ -70,7 +93,8 @@ namespace emp::web {
         if (disabled) { HTML << " disabled=true"; }  // Check if should be disabled
         HTML << " id=\"" << id << "\"";              // Indicate ID.
         HTML << " name=\"" << id << "\"";            // Use same name as ID
-        HTML << " onchange=\"emp.LoadFileEvent(this.files, " << callback_id << ")\"";
+        HTML << " onchange=\"emp.ReadFileInput(this, " << data_callback.GetID()
+             << ", " << (exact_bytes ? "true" : "false") << ")\"";
         HTML << ">";
       }
 
@@ -108,18 +132,34 @@ namespace emp::web {
     /// Create a new FileInput; supply the function to call with the file contents as a string
     /// (and optionally the HTML identifier to be used).
     FileInput(const std::function<void(const std::string &)> & in_cb,
-              const std::string & in_id = "")
+              const std::string & in_id = "", const std::string & classes = "")
       : WidgetFacet(in_id) {
       info = new FileInputInfo(in_id);
+      AddClass(classes);
 
       Info()->autofocus = false;
       Info()->disabled  = false;
 
       Info()->callback       = in_cb;
       FileInputInfo * w_info = Info();
-      using callback_t       = std::function<void(const std::string & file_body)>;
-      Info()->callback_id    = JSWrap(
-        callback_t([w_info](const std::string & file_body) { w_info->DoCallback(file_body); }));
+      Info()->data_callback = JSCallback([w_info](size_t address, size_t size, std::string name,
+                                                  std::string mime, std::string error) {
+        Widget keep_alive(w_info);
+        if (!error.empty()) {
+          if (w_info->error_callback) { w_info->error_callback(error); }
+          return;
+        }
+        const auto * data = reinterpret_cast<const char *>(address);
+        FileData file{std::move(name), std::move(mime), std::string(data, size)};
+        if (w_info->exact_bytes) {
+          auto fn = w_info->file_callback;
+          if (fn) { fn(file); }
+          w_info->UpdateDependants();
+        } else {
+          // Preserve the historical text callback's trailing newline.
+          w_info->DoCallback(file.contents + "\n");
+        }
+      });
     }
 
     /// Create a new FileInput; supply the function to call with the file contents as a File object
@@ -135,6 +175,21 @@ namespace emp::web {
       ;
     }
 
+    /// Exact binary/text reads with filename and MIME type; errors go to OnError().
+    FileInput(const std::function<void(const FileData &)> & callback,
+              const std::string & id = "", const std::string & classes = "")
+      : FileInput(std::function<void(const std::string &)>{[](const std::string &) {}}, id, classes) {
+      Info()->exact_bytes = true;
+      Info()->file_callback = callback;
+    }
+
+    FileInput & OnError(const std::function<void(const std::string &)> & callback) {
+      Info()->error_callback = callback;
+      return *this;
+    }
+
+    FileInput & Accept(const std::string & types) { return SetAttr("accept", types); }
+
     /// Load a pre-existing FileInput object.
     FileInput(const FileInput & in) = default;
 
@@ -147,6 +202,8 @@ namespace emp::web {
     /// Change the callback function to use when a new file is loaded.
     FileInput & Callback(const std::function<void(const std::string &)> & in_cb) {
       Info()->UpdateCallback(in_cb);
+      Info()->exact_bytes = false;
+      if (IsActive()) { Info()->ReplaceHTML(); }
       return *this;
     }
 
