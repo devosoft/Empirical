@@ -227,7 +227,17 @@ namespace emp::prefab {
    * description, synchronized slider and number box to change the
    * value.
    */
+  struct NumericValueOptions {
+    std::function<std::string(const std::string &)> to_slider =
+      [](const std::string & value) { return value; };
+    std::function<std::string(const std::string &)> from_slider =
+      [](const std::string & value) { return value; };
+    bool link_updates = true; ///< Disable when the caller validates and applies updates itself.
+  };
+
   class NumericValueControl : public ValueControl {
+    web::Input number_box;
+    NumericValueOptions options;
     using range_setter_t = std::function<void(const std::string &,  // value
                                               const std::string &,  // type
                                               emp::web::Input &)>;
@@ -275,32 +285,41 @@ namespace emp::prefab {
       = [](const std::string & val) { ; }
 #endif  // #ifndef DOXYGEN_SHOULD_SKIP_THIS
       ,
-      const std::string & id = "")
+      const std::string & id = "",
+      NumericValueOptions in_options = {})
       : ValueControl(label,
                      desc,
                      value,
                      web::Input([](const std::string & val) { ; }, "range", ""),
-                     id) {
+                     id), options(std::move(in_options)) {
       mainCtrl.AddAttr("class", "form-range");
-      web::Input temp(mainCtrl);
-      web::Input number_box(
-        [slider = temp, onChange](const std::string & val) mutable {
-          // Lambdas must be marked mutable since .Value is not a const function
-          // Note: referenced components/functions must be captured by value at
-          // this lowest level or dangling references (and broken components) result!
-          slider.Value(val);
-        },
-        "number",
-        "");
-      mainCtrl.Callback([number_box, onChange](const std::string & val) mutable {
+      number_box = web::Input([](const std::string &) {}, "number", "");
+      const auto set_slider = mainCtrl.GetSilentValueSetter(options.from_slider);
+      const auto set_number = number_box.GetSilentValueSetter();
+      number_box.Callback([set_slider, onChange, opts = options](const std::string & val) {
+        if (opts.link_updates) { set_slider(opts.to_slider(val)); }
         onChange(val);
-        number_box.Value(val);
       });
-      number_box.Value(value);
+      mainCtrl.Callback([set_number, set_slider, onChange, opts = options](const std::string & val) {
+        const auto value = opts.from_slider(val);
+        if (opts.link_updates) { set_slider(val); set_number(value); }
+        onChange(value);
+      });
+      SetValueSilently(value);
       number_box.AddAttr("class", "form-control");
       view << number_box;
-      NumericValueControl::applyDefaultRange(value, type, mainCtrl);
+      NumericValueControl::applyDefaultRange(options.to_slider(value), type, mainCtrl);
       NumericValueControl::applyDefaultRange(value, type, number_box);
+    }
+
+    web::Input & GetSlider() { return mainCtrl; }
+    web::Input & GetNumberInput() { return number_box; }
+
+    NumericValueControl & SetValueSilently(const std::string & value) {
+      mainCtrl.SetValueSilently(options.to_slider(value));
+      mainCtrl.SetAttr("aria-valuetext", value);
+      number_box.SetValueSilently(value);
+      return *this;
     }
 
     /**
