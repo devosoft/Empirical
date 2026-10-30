@@ -4,7 +4,19 @@
  * MIT Software license; see doc/LICENSE.md
  *
  * @file include/emp/web/emfunctions.hpp
- * @brief Specialized, useful function for Empirical.
+ * @brief Browser utilities for scheduling, window events, clipboard access, and downloads.
+ *
+ * Use example:
+ *
+ *   emp::DelayCall(RefreshView, 100);
+ *   auto result = emp::TryDownloadFile("results.txt", std::string{"Results\n"});
+ *   if (!result) { ReportError(result.error()); }
+ *
+ * DelayCall() invokes a function once after a delay in milliseconds. OnResize()
+ * registers a window resize callback. TryDownloadFile() accepts text or a span
+ * of bytes, with an optional MIME type, and reports browser setup errors through
+ * std::expected. A successful result means the download was initiated; the user
+ * may still cancel it. CopyText() writes text to the browser clipboard.
  */
 
 #pragma once
@@ -12,8 +24,12 @@
 #ifndef INCLUDE_EMP_WEB_EMFUNCTIONS_HPP_GUARD
 #define INCLUDE_EMP_WEB_EMFUNCTIONS_HPP_GUARD
 
+#include <cstddef>
+#include <cstdlib>
 #include <cstdint>
+#include <expected>
 #include <functional>
+#include <span>
 
 #include "../base/notify.hpp"
 #include "../tools/String.hpp"
@@ -180,27 +196,69 @@ namespace emp {
       text.c_str());
   }
 
-  // Generate a file that the user can then download.
+  /// Initiate a download, reporting browser-side setup failures (not a later user cancellation).
+  inline std::expected<void, std::string> TryDownloadFile(
+    const std::string & filename, std::span<const std::byte> content,
+    const std::string & mime_type = "application/octet-stream") {
+#ifdef __EMSCRIPTEN__
+    auto * error = reinterpret_cast<char *>(MAIN_THREAD_EM_ASM_PTR({
+      let url;
+      let link;
+      try {
+        const bytes = HEAPU8.subarray($1, $1 + $2);
+        // Blob rejects views backed by SharedArrayBuffer in pthread builds.
+        const data = typeof SharedArrayBuffer !== "undefined"
+          && bytes.buffer instanceof SharedArrayBuffer ? bytes.slice() : bytes;
+        const blob = new Blob([data], {type: UTF8ToString($3)});
+        url = URL.createObjectURL(blob);
+        link = document.createElement('a');
+        link.href = url; link.download = UTF8ToString($0); link.hidden = true;
+        document.body.appendChild(link); link.click(); link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        return 0;
+      } catch (error) {
+        if (link) link.remove();
+        if (url) URL.revokeObjectURL(url);
+        const text = String(error);
+        const size = lengthBytesUTF8(text) + 1;
+        const buffer = _malloc(size);
+        if (buffer) stringToUTF8(text, buffer, size);
+        return buffer || 1;
+      }
+    }, filename.c_str(), content.data(), content.size(), mime_type.c_str()));
+    if (reinterpret_cast<uintptr_t>(error) == 1) {
+      return std::unexpected("Unable to allocate download error.");
+    }
+    if (error) {
+      std::string message(error); std::free(error);
+      return std::unexpected(std::move(message));
+    }
+    return {};
+#else
+    (void) filename; (void) content; (void) mime_type;
+    return std::unexpected("Browser downloads are unavailable in native builds.");
+#endif
+  }
+
+  inline std::expected<void, std::string> TryDownloadFile(
+    const std::string & filename, const std::string & content,
+    const std::string & mime_type = "text/plain;charset=utf-8") {
+    return TryDownloadFile(filename, std::as_bytes(std::span(content)), mime_type);
+  }
+
   inline void DownloadFile(std::string filename, const std::string & content) {
-    MAIN_THREAD_ASYNC_EM_ASM(
-      {
-        var filename = UTF8ToString($0);
-        var content  = UTF8ToString($1);
-        const blob   = new Blob([content], {
-          type:
-            'text/plain'
-        });
-        const url  = URL.createObjectURL(blob);
-        const a    = document.createElement('a');
-        a.href     = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      },
-      filename.c_str(),
-      content.c_str());
+    (void) TryDownloadFile(filename, content);
+  }
+
+  inline std::expected<void, std::string> DownloadFile(
+    const std::string & filename, std::span<const std::byte> content,
+    const std::string & mime_type = "application/octet-stream") {
+    return TryDownloadFile(filename, content, mime_type);
+  }
+
+  inline std::expected<void, std::string> DownloadFile(
+    const std::string & filename, const std::string & content, const std::string & mime_type) {
+    return TryDownloadFile(filename, content, mime_type);
   }
 
 }  // namespace emp

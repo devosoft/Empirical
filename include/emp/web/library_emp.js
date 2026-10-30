@@ -1,6 +1,12 @@
 //  This file is part of Empirical, https://github.com/devosoft/Empirical
 //  Copyright (C) Michigan State University, 2015-2020.
 //  Released under the MIT Software license; see doc/LICENSE
+//
+//  Emscripten JavaScript library supporting Empirical's C++ web APIs. Link with
+//  --js-library include/emp/web/library_emp.js (relative to the repository root).
+//  The library provides the emp callback bridge, file reading, DOM state capture
+//  and patching, and browser download helpers. Use the corresponding C++ headers
+//  such as FileInput.hpp and DOMState.hpp to access these features.
 
 mergeInto(LibraryManager.library, {
   // Data accessible to library users.
@@ -38,6 +44,133 @@ mergeInto(LibraryManager.library, {
         emp.Callback(callback_id, e.target.result + '\n');   // Do callback!
       };
       reader.readAsText(files[0]);   // Load file!
+    },
+
+    ReadFileInput: function (input, callback, binary) {
+      const file = input.files && input.files[0];
+      if (!file) return;
+      input.value = ""; // Reset now, so choosing the same file can trigger another change.
+      const reader = new FileReader();
+      const fail = message => emp.Callback(callback, 0, 0, file.name, file.type, message);
+      reader.onerror = () => fail(String(reader.error || 'Unable to read file.'));
+      reader.onabort = () => fail('File read cancelled.');
+      reader.onload = () => {
+        const bytes = binary ? new Uint8Array(reader.result) : new TextEncoder().encode(reader.result);
+        const buffer = _malloc(bytes.length || 1);
+        if (!buffer) { fail('Unable to allocate file buffer.'); return; }
+        try {
+          HEAPU8.set(bytes, buffer);
+          emp.Callback(callback, buffer, bytes.length, file.name, file.type, "");
+        } finally { _free(buffer); }
+      };
+      try {
+        if (binary) reader.readAsArrayBuffer(file);
+        else reader.readAsText(file);
+      } catch (error) { fail(String(error)); }
+    },
+
+    CaptureDOMState: function (root, flags, selector, resizeSelector) {
+      if (!root) return null;
+      const active = document.activeElement;
+      const nodes = [root, ...root.querySelectorAll(selector)];
+      const states = nodes.filter(node => node.id).map(node => ({
+        id: node.id,
+        scroll: flags & 2 ? [node.scrollLeft, node.scrollTop] : null,
+        open: flags & 4 && node.tagName === 'DETAILS' ? node.open : undefined,
+        size: flags & 8 && node.matches(resizeSelector) ? [node.style.width, node.style.height] : null,
+        value: flags & 16 && 'value' in node ? node.value : undefined,
+        checked: flags & 16 && 'checked' in node ? node.checked : undefined
+      }));
+      const focus = flags & 1 && root.contains(active) ? {
+        id: active.id || active.closest('[id]')?.id,
+        summary: active.tagName === 'SUMMARY',
+        start: active.selectionStart, end: active.selectionEnd,
+        direction: active.selectionDirection
+      } : null;
+      return {states, focus};
+    },
+
+    RestoreDOMState: function (root, saved) {
+      if (!root || !saved) return;
+      const find = id => {
+        const node = document.getElementById(id);
+        return node && root.contains(node) ? node : null;
+      };
+      for (const state of saved.states) {
+        const node = find(state.id);
+        if (!node) continue;
+        if (state.open !== undefined) node.open = state.open;
+        if (state.size) { node.style.width = state.size[0]; node.style.height = state.size[1]; }
+        if (state.value !== undefined) node.value = state.value;
+        if (state.checked !== undefined) node.checked = state.checked;
+      }
+      const focus = saved.focus;
+      if (focus) {
+        let node = find(focus.id);
+        if (focus.summary) node = node?.querySelector(':scope > summary');
+        if (node && !node.disabled && node.getClientRects().length) {
+          node.focus({preventScroll:true});
+          if (typeof focus.start === 'number' && node.setSelectionRange) {
+            node.setSelectionRange(focus.start, focus.end, focus.direction);
+          }
+        }
+      }
+      // Disclosure and size restoration must precede scrolling because they affect scroll limits.
+      for (const state of saved.states) {
+        const node = find(state.id);
+        if (node && state.scroll) {
+          node.scrollLeft = state.scroll[0]; node.scrollTop = state.scroll[1];
+        }
+      }
+    },
+
+    PatchDOM: function (current, next) {
+      if (current.nodeType !== next.nodeType || current.nodeName !== next.nodeName) {
+        current.replaceWith(next.cloneNode(true)); return;
+      }
+      if (current.nodeType !== 1) {
+        if (current.nodeValue !== next.nodeValue) current.nodeValue = next.nodeValue;
+        return;
+      }
+      for (const attr of [...current.attributes]) {
+        if (!next.hasAttribute(attr.name)) current.removeAttribute(attr.name);
+      }
+      for (const attr of next.attributes) {
+        if (current.getAttribute(attr.name) !== attr.value) current.setAttribute(attr.name, attr.value);
+      }
+      const old = [...current.childNodes];
+      const keyed = new Map(old.filter(node => node.nodeType === 1 && node.id)
+        .map(node => [node.id, node]));
+      const used = new Set();
+      let index = 0;
+      for (const child of [...next.childNodes]) {
+        const keyedChild = child.nodeType === 1 && child.id;
+        const match = keyedChild ? keyed.get(child.id) : old.find(node =>
+          !used.has(node) && !(node.nodeType === 1 && node.id)
+          && node.nodeType === child.nodeType && node.nodeName === child.nodeName);
+        if (match) {
+          used.add(match);
+          if (match !== current.childNodes[index]) {
+            current.insertBefore(match, current.childNodes[index] || null);
+          }
+          emp.PatchDOM(match, child);
+        } else current.insertBefore(child.cloneNode(true), current.childNodes[index] || null);
+        ++index;
+      }
+      while (current.childNodes.length > index) current.lastChild.remove();
+      if ('value' in next && current.value !== next.value) current.value = next.value;
+      if ('checked' in next) current.checked = next.checked;
+    },
+
+    PatchHTML: function (root, html, flags, selector, resizeSelector) {
+      if (!root) return false;
+      const saved = emp.CaptureDOMState(root, flags, selector, resizeSelector);
+      const next = root.cloneNode(false);
+      const template = document.createElement('template'); template.innerHTML = html;
+      next.append(template.content);
+      emp.PatchDOM(root, next);
+      emp.RestoreDOMState(root, saved);
+      return true;
     },
 
     // The saveAs() Function is from FileSaver.js 1.3.2 by Eli Grey, http://eligrey.com
