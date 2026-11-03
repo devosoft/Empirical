@@ -13,7 +13,11 @@
 #ifndef INCLUDE_EMP_GEOMETRY_SURFACE_BODY_HPP_GUARD
 #define INCLUDE_EMP_GEOMETRY_SURFACE_BODY_HPP_GUARD
 
+#include <bit>
+#include <cstdint>
+
 #include "../debug/debug.hpp"
+#include "../serialize/SerialPod.hpp"
 #include "../math/constants.hpp"
 
 #include "Circle2D.hpp"
@@ -21,6 +25,15 @@
 #include "Surface.hpp"
 
 namespace emp {
+  namespace geometry_detail {
+    // Checkpoints must preserve doubles independently of the stream's decimal precision.
+    inline void SerializeReal(SerialPod & pod, double & value) {
+      uint64_t bits = std::bit_cast<uint64_t>(value);
+      pod(bits);
+      if (pod.IsLoad()) value = std::bit_cast<double>(bits);
+    }
+  }
+
 
   class SurfaceBody {
   private:
@@ -43,6 +56,20 @@ namespace emp {
     ~SurfaceBody() { Deactivate(); }
 
     SurfaceBody & operator=(SurfaceBody &&) = default;
+
+    void Serialize(SerialPod & pod) {
+      pod(id);
+      double x = perimeter.GetX(), y = perimeter.GetY(), radius = perimeter.GetRadius();
+      geometry_detail::SerializeReal(pod, x);
+      geometry_detail::SerializeReal(pod, y);
+      geometry_detail::SerializeReal(pod, radius);
+      std::string color_name = color.ToString();
+      pod(color_name);
+      if (pod.IsLoad()) {
+        perimeter = Circle{Point{x, y}, radius};
+        color = color_name;
+      }
+    }
 
     // Track body version with surface version to ensure no mis-matches.
     #ifndef NDEBUG

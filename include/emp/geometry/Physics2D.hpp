@@ -32,7 +32,7 @@ namespace emp {
     using surface_t = emp::Surface<BODY_T>;
     using surface_t::surface_size;
 
-    const double pressure_limit = 6.0;  // Pressure limit for bodies.
+    double pressure_limit = 6.0;  // Pressure limit for bodies.
     double time = 0;                    // Current time point
     bool detach_on_birth = true;        // Do bodies detach from parents at birth?
 
@@ -53,13 +53,43 @@ namespace emp {
     [[nodiscard]] double GetPressureLimit() const { return pressure_limit; }
     [[nodiscard]] bool GetDetach() const { return detach_on_birth; }
 
+    void Serialize(SerialPod & pod) {
+      surface_t::Serialize(pod);
+      geometry_detail::SerializeReal(pod, pressure_limit);
+      geometry_detail::SerializeReal(pod, time);
+      pod(detach_on_birth);
+    }
+
+    [[nodiscard]] bool LoadedStateOK() const {
+      if (!surface_t::LoadedStateOK() || !std::isfinite(pressure_limit) || pressure_limit < 0
+          || !std::isfinite(time) || time < 0) return false;
+      for (const auto & body : surface_t::GetBodySet()) {
+        if (!body.IsActive()) continue;
+        const auto position = body.CalcShiftPos();
+        if (!std::isfinite(body.GetVelocity().X()) || !std::isfinite(body.GetVelocity().Y())
+            || !std::isfinite(position.X()) || !std::isfinite(position.Y())
+            || !std::isfinite(body.GetTargetRadius()) || body.GetTargetRadius() <= 0
+            || !std::isfinite(body.GetMass()) || body.GetMass() <= 0) return false;
+        for (size_t link : body.GetLinkIDs()) {
+          if (link >= surface_t::GetBodySet().size() || !surface_t::IsActive(link)
+              || link == body.GetID() || !GetBody(link).HasLink(body.GetID())) return false;
+        }
+      }
+      return true;
+    }
+
+    void SetPressureLimit(double value) {
+      emp_assert(std::isfinite(value) && value >= 0);
+      pressure_limit = value;
+    }
+
     void SetDetach(bool _in) { detach_on_birth = _in; }
 
-    [[nodiscard]] double GetStartTime(size_t id) const { return GetBody(id).start_time; }
-    [[nodiscard]] const Point & GetVelocity(size_t id) const { return GetBody(id).velocity; }
-    [[nodiscard]] Angle GetOrientation(size_t id) const { return GetBody(id).orientation; }
-    [[nodiscard]] double GetMass(size_t id) const { return GetBody(id).mass; }
-    [[nodiscard]] double GetTargetRadius(size_t id) const { return GetBody(id).target_radius; }
+    [[nodiscard]] double GetStartTime(size_t id) const { return GetBody(id).GetStartTime(); }
+    [[nodiscard]] const Point & GetVelocity(size_t id) const { return GetBody(id).GetVelocity(); }
+    [[nodiscard]] Angle GetOrientation(size_t id) const { return GetBody(id).GetOrientation(); }
+    [[nodiscard]] double GetMass(size_t id) const { return GetBody(id).GetMass(); }
+    [[nodiscard]] double GetTargetRadius(size_t id) const { return GetBody(id).GetTargetRadius(); }
 
     size_t AddBody(Circle in_body, Color color = Palette::RED) {
       size_t id = surface_t::AddBody(in_body, color);
@@ -128,15 +158,13 @@ namespace emp {
       // if (!surface_t::TestOverlap(body1, body2) || body1.HasLink(body2.GetID())) { return false; }
       if (!surface_t::TestOverlap(body1, body2)) { return false; }
 
-      // Don't allow bodies to be perfectly on top of each other (will ALMOST never happen)
-      if (body1.GetCenter() == body2.GetCenter()) { body1.ProcessShift({-0.01, 0.00}); }
-
       // @CAO Some of these recalculate from TestOverlap() above...
       const double collide_dist = body1.GetRadius() + body2.GetRadius();
-      const Point cur_offset    = body1.GetCenter() - body2.GetCenter();
-      const double cur_dist     = cur_offset.Magnitude();
-      const double shift_fract  = (collide_dist / cur_dist - 1.0) / 2.0;
-      const Point shift_offset  = cur_offset * shift_fract;
+      const Point cur_offset = surface_t::GetDisplacement(body1.GetCenter(), body2.GetCenter());
+      const double cur_dist = cur_offset.Magnitude();
+      // Coincident centers have no normal. Choose a deterministic one without dividing by zero.
+      const Point normal = cur_dist > 0 ? cur_offset / cur_dist : Point{1, 0};
+      const Point shift_offset = normal * ((collide_dist - cur_dist) / 2.0);
 
       // Re-adjust position to remove overlap.
       body1.ProcessShift(shift_offset);
@@ -149,16 +177,15 @@ namespace emp {
       Point & v1 = body1.GetVelocity();
       Point & v2 = body2.GetVelocity();
 
-      if (cur_offset.GetX() == 0) { // Same X; bounce vertically.
+      if (normal.GetX() == 0) { // Same X; bounce vertically.
         std::swap(v1.Y(), v2.Y());
-      } else if (cur_offset.GetY() == 0) {  // Same Y; bounce horizontally.
+      } else if (normal.GetY() == 0) {  // Same Y; bounce horizontally.
         std::swap(v1.X(), v2.X());
       } else {
-        const Point normal = cur_offset / cur_dist;    // Normalized direction
-        const Point tangent{-normal.Y(), normal.X()};  // Perpendicular to normal
-
-        v1 = tangent * v1.Dot(tangent) + normal * v2.Dot(normal);
-        v2 = tangent * v2.Dot(tangent) + normal * v1.Dot(normal);
+        const Point tangent{-normal.Y(), normal.X()};
+        const double normal1 = v1.Dot(normal), normal2 = v2.Dot(normal);
+        v1 = tangent * v1.Dot(tangent) + normal * normal2;
+        v2 = tangent * v2.Dot(tangent) + normal * normal1;
       }
 
       return true;
@@ -169,10 +196,10 @@ namespace emp {
       emp_assert(body1.IsActive() && body2.IsActive() && TestLinked(body1.GetID(), body2.GetID()));
 
       const double target_dist = body1.GetRadius() + body2.GetRadius();
-      const Point cur_offset   = body1.GetCenter() - body2.GetCenter();
-      const double cur_dist    = cur_offset.Magnitude();
-      const double shift_fract = (target_dist / cur_dist - 1.0) / 2.0;
-      const Point shift_offset = cur_offset * shift_fract;
+      const Point cur_offset = surface_t::GetDisplacement(body1.GetCenter(), body2.GetCenter());
+      const double cur_dist = cur_offset.Magnitude();
+      const Point normal = cur_dist > 0 ? cur_offset / cur_dist : Point{1, 0};
+      const Point shift_offset = normal * ((target_dist - cur_dist) / 2.0);
 
       // Re-adjust position to remove overlap.
       body1.ProcessShift(shift_offset);
@@ -187,13 +214,16 @@ namespace emp {
     }
 
     void Update_Bodies() {
-      ForEachBody([this, max_size_change=0.05, friction=0.0125](BODY_T & body){
+      double largest = surface_t::max_radius;
+      ForEachBody([this, &largest, max_size_change=0.05, friction=0.0125](BODY_T & body){
         (void) this;
         emp_assert(Contains(body.GetCenter()));  // Bodies must be at valid positions.
         body.UpdateSize(max_size_change);
+        largest = std::max(largest, body.GetRadius());
         body.ProcessVelocity(friction);
         emp_assert(Contains(body.GetCenter()));  // Bodies must be at valid positions.
       });
+      if (largest > 0) surface_t::TestBodySize(largest);
     }
 
     void Update_BodyCollisions() {
@@ -215,8 +245,8 @@ namespace emp {
     }
 
     void Update_EdgeCollisions() {
-      if (surface_t::wrap) { surface_t::WrapBodies(); }
-      else { // Otherwise reflect bodies, as needed.
+      if (surface_t::wrap) return;  // FinalizePosition wraps the completed physical shift.
+      { // Otherwise reflect bodies, as needed.
         ForEachBody([this](BODY_T & body){
           emp_assert(Contains(body.GetCenter()));  // Bodies must start at valid positions.
 
@@ -269,6 +299,7 @@ namespace emp {
       Update_EdgeCollisions();
       Update_FinalizePositions();
       Update_LinkAttachments();
+      time += 1.0;
     }
   };
 

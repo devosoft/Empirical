@@ -41,6 +41,21 @@ namespace emp {
     PhysicsBody(Circle circle = Circle{1.0}, Color color = Palette::BLACK)
       : SurfaceBody(circle, color), target_radius(circle.GetRadius()) {}
 
+    void Serialize(SerialPod & pod) {
+      SurfaceBody::Serialize(pod);
+      for (auto value : {std::ref(start_time), std::ref(velocity.X()), std::ref(velocity.Y()),
+                         std::ref(mass), std::ref(target_radius), std::ref(total_shift.X()),
+                         std::ref(total_shift.Y()), std::ref(total_abs_shift.X()),
+                         std::ref(total_abs_shift.Y())}) {
+        geometry_detail::SerializeReal(pod, value.get());
+      }
+      // Portion is an exact binary fraction of the angle's 16-bit representation.
+      double portion = orientation.AsPortion();
+      geometry_detail::SerializeReal(pod, portion);
+      if (pod.IsLoad()) orientation.SetPortion(portion);
+      pod(link_ids);
+    }
+
     // Accessors
     [[nodiscard]] double GetStartTime() const { return start_time; }
     [[nodiscard]] const Point & GetVelocity() const { return velocity; }
@@ -62,6 +77,8 @@ namespace emp {
     void Deactivate() {
       start_time = std::numeric_limits<double>::max();
       velocity.Set(0.0, 0.0);
+      total_shift.Reset();
+      total_abs_shift.Reset();
       link_ids.resize(0);
       SurfaceBody::Deactivate();
     }
