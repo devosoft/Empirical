@@ -290,7 +290,7 @@ namespace emp {
 
     // Convert to a grid postion (typically done after dividing by a unit size)
     [[nodiscard]] constexpr GridPos ToGridPos() {
-      return GridPos{static_cast<GridPos::pos_t>(x), static_cast<GridPos::pos_t>(y)};
+      return GridPos{static_cast<GridPos::pos_t>(y), static_cast<GridPos::pos_t>(x)};
     }
   };
 
@@ -323,7 +323,7 @@ namespace emp {
 
     // Convert to GridSize (typically done after dividing by a unit size)
     [[nodiscard]] constexpr GridSize ToGridSize() {
-      return GridSize{static_cast<GridSize::pos_t>(x), static_cast<GridSize::pos_t>(y)};
+      return GridSize{static_cast<GridSize::pos_t>(y), static_cast<GridSize::pos_t>(x)};
     }
   };
 
