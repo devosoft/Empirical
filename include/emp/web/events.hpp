@@ -90,8 +90,8 @@ namespace emp::web {
     int button;  ///< Which mouse button was pressed?  -1=none  (0/1/2)
     int detail;  ///< How many clicks happened in short succession?
 
-    int clientX;  ///< X-mouse position, relative to current window
-    int clientY;  ///< Y-mouse position, relative to current window
+    double clientX;  ///< X-mouse position, relative to current window
+    double clientY;  ///< Y-mouse position, relative to current window
     int screenX;  ///< X-mouse position, relative to the screen
     int screenY;  ///< Y-mouse position, relative to the screen
 
@@ -109,8 +109,8 @@ namespace emp::web {
       shiftKey = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].shiftKey; }, ARG_ID);
       button   = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].button; }, ARG_ID);
       detail   = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].detail; }, ARG_ID);
-      clientX  = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].clientX; }, ARG_ID);
-      clientY  = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].clientY; }, ARG_ID);
+      clientX  = MAIN_THREAD_EM_ASM_DOUBLE({ return emp_i.cb_args[$0].clientX; }, ARG_ID);
+      clientY  = MAIN_THREAD_EM_ASM_DOUBLE({ return emp_i.cb_args[$0].clientY; }, ARG_ID);
       screenX  = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].screenX; }, ARG_ID);
       screenY  = MAIN_THREAD_EM_ASM_INT({ return emp_i.cb_args[$0].screenY; }, ARG_ID);
     }
