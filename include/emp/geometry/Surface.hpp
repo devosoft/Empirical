@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <concepts>
+#include <cmath>
 #include <functional>
 #include <stddef.h>
 #include <type_traits>
@@ -54,6 +55,8 @@ namespace emp {
       neighbors_t neighbor_ids = {NO_ID, NO_ID, NO_ID, NO_ID, NO_ID, NO_ID, NO_ID, NO_ID};
 
     public:
+      void Serialize(SerialPod & pod) { pod(body_ids); }
+
       [[nodiscard]] size_t GetID() const { return sector_id; }
       [[nodiscard]] const emp::vector<size_t> & GetBodyIDs() const { return body_ids; }
       [[nodiscard]] size_t NumBodies() const { return body_ids.size(); }
@@ -107,7 +110,7 @@ namespace emp {
     };
 
   protected:
-    const Size2D surface_size;          ///< Lower-left corner of the surface.
+    Size2D surface_size;          ///< Lower-left corner of the surface.
     emp::vector<BODY_T> body_set;       ///< Set of all bodies on surface
     EMP_DEBUG(int body_version = 1000;) // Changes to body_set may invalidate body references.
 
@@ -122,20 +125,27 @@ namespace emp {
     GridSize grid_size;                       ///< How are sectors organized?
     Size2D sector_size;                       ///< How big is each sector?
     emp::array<Sector, MAX_SECTORS> sectors;  ///< Info about the actual sectors.
+    bool loaded_state_valid = true;
     bool wrap = false;                        ///< Should edges wrap around?
 
     emp::vector<size_t> out_ids;  ///< Reusable vector to return ID sets by const reference.
 
     // === Helper Functions ===
 
+    GridSize CalculateGridSize(double radius) const {
+      if (radius == 0) return GridSize{1, 1};
+      // Clamp before converting to integer: small bodies can imply more than 2^32 sectors.
+      return GridSize{
+        size_t(std::min(double(MAX_GRID_SIZE.NumRows()), surface_size.Height() / (2 * radius))),
+        size_t(std::min(double(MAX_GRID_SIZE.NumCols()), surface_size.Width() / (2 * radius)))};
+    }
+
     // Determine how many sectors there should be and rebuild existing ones, as needed.
     void ResetSectors() {
       DEBUG_STACK();
       // Figure out the actual number of sectors to use.
-      const double max_diameter = max_radius * 2.0;
-      emp_assert(max_diameter < surface_size.Width() && max_diameter < surface_size.Height());
-      grid_size = (surface_size / max_diameter).ToGridSize();
-      grid_size.BoundUpper(MAX_GRID_SIZE);  // Limit how big the grid should be.
+      emp_assert(max_radius * 2 < surface_size.Width() && max_radius * 2 < surface_size.Height());
+      grid_size = CalculateGridSize(max_radius);
       sector_size = surface_size / grid_size;
 
       typename Sector::neighbors_t neighbor_ids;
@@ -180,8 +190,9 @@ namespace emp {
       DEBUG_STACK();
       emp_assert(radius > 0.0);
       if (radius > max_radius) {
-        max_radius  = radius;  // Record the new radius.
-        ResetSectors();
+        max_radius = radius;
+        const GridSize next_grid = CalculateGridSize(radius);
+        if (next_grid != grid_size) ResetSectors();
       }
     }
 
@@ -225,9 +236,81 @@ namespace emp {
 
   public:
     /// Create a surface providing maximum size.
-    Surface(Size2D surface_size) : surface_size(surface_size) {}
+    Surface(Size2D surface_size) : surface_size(surface_size) { ResetSectors(); }
 
     ~Surface() { Clear(); }
+
+    /// Save authoritative state, including sector order and the reusable-ID stack.
+    /// BODY_T extensions should serialize their base and their own payload.
+    void Serialize(SerialPod & pod) {
+      double width = surface_size.Width(), height = surface_size.Height();
+      geometry_detail::SerializeReal(pod, width);
+      geometry_detail::SerializeReal(pod, height);
+      geometry_detail::SerializeReal(pod, max_radius);
+      pod(wrap, body_set, open_ids);
+      if (pod.IsLoad()) {
+        surface_size = Size2D{width, height};
+        EMP_DEBUG(++body_version; UpdateBodyVersions());
+        loaded_state_valid = BodiesOK();
+        if (!loaded_state_valid) return;
+        ResetSectors();
+      }
+      for (size_t id = 0; id < grid_size.NumCells(); ++id) pod(sectors[id]);
+      if (pod.IsLoad()) loaded_state_valid = LoadedStateOK();
+    }
+
+    [[nodiscard]] bool BodiesOK() const {
+      if (!std::isfinite(surface_size.Width()) || !std::isfinite(surface_size.Height())
+          || surface_size.Width() <= 0 || surface_size.Height() <= 0
+          || !std::isfinite(max_radius) || max_radius < 0
+          || 2 * max_radius >= std::min(surface_size.Width(), surface_size.Height())) return false;
+      emp::vector<bool> open(body_set.size(), false);
+      for (size_t id : open_ids) {
+        if (id >= body_set.size() || open[id]) return false;
+        open[id] = true;
+      }
+      for (size_t id = 0; id < body_set.size(); ++id) {
+        const auto & body = GetBody(id);
+        if (body.IsActive() == open[id]) return false;
+        if (!body.IsActive()) continue;
+        if (body.GetID() != id || !std::isfinite(body.X()) || !std::isfinite(body.Y())
+            || !Contains(body.GetCenter()) || !std::isfinite(body.GetRadius())
+            || body.GetRadius() <= 0 || body.GetRadius() > max_radius) return false;
+      }
+      return true;
+    }
+
+    [[nodiscard]] bool LoadedStateOK() const {
+      if (!loaded_state_valid || !BodiesOK()) return false;
+      emp::vector<bool> seen(body_set.size(), false);
+      for (size_t sector = 0; sector < grid_size.NumCells(); ++sector) {
+        for (size_t id : sectors[sector].GetBodyIDs()) {
+          if (id >= body_set.size() || seen[id] || !IsActive(id)) return false;
+          const auto pos = (GetBody(id).GetCenter() / sector_size).ToGridPos();
+          if (grid_size.ToIndex(pos) != sector) return false;
+          seen[id] = true;
+        }
+      }
+      return std::count(seen.begin(), seen.end(), true) == static_cast<ptrdiff_t>(NumBodies());
+    }
+
+    void SetWrap(bool value) {
+      if (wrap == value) return;
+      wrap = value;
+      if (max_radius > 0) ResetSectors();
+    }
+
+    /// Minimum-image displacement on a torus; ordinary displacement otherwise.
+    [[nodiscard]] Point GetDisplacement(Point from, Point to) const {
+      Point delta = from - to;
+      if (wrap) {
+        if (delta.X() > surface_size.Width() / 2) delta.X() -= surface_size.Width();
+        else if (delta.X() < -surface_size.Width() / 2) delta.X() += surface_size.Width();
+        if (delta.Y() > surface_size.Height() / 2) delta.Y() -= surface_size.Height();
+        else if (delta.Y() < -surface_size.Height() / 2) delta.Y() += surface_size.Height();
+      }
+      return delta;
+    }
 
     [[nodiscard]] const Size2D & GetSize() const { return surface_size; }
     [[nodiscard]] const GridSize & GetGridSize() const { return grid_size; }
@@ -325,6 +408,8 @@ namespace emp {
       DEBUG_STACK();
       size_t start_sector = FindSectorID(body.GetCenter());
       body.FinalizePosition();
+      // Wrap only after pressure is measured, so crossing a seam adds no fictitious pressure.
+      if (wrap) body.MoveTo(body.GetCenter().Wrap(surface_size));
       size_t end_sector = FindSectorID(body.GetCenter());
       if (start_sector != end_sector) {
         sectors[start_sector].Remove(body.GetID());
@@ -374,15 +459,18 @@ namespace emp {
       EMP_DEBUG(++body_version);
       body_set.resize(0);
       open_ids.resize(0);
-      max_radius  = 0.0;
+      max_radius = 0.0;
+      loaded_state_valid = true;
+      grid_size = GridSize{};
+      ResetSectors();
       return *this;
     }
 
     /// Determine if two bodies overlap.
-    static bool TestOverlap(const BODY_T & body1, const BODY_T & body2) {
+    bool TestOverlap(const BODY_T & body1, const BODY_T & body2) const {
       DEBUG_STACK();
       emp_assert(body1.IsActive() && body2.IsActive());
-      const Point xy_dist       = body1.GetCenter() - body2.GetCenter();
+      const Point xy_dist       = GetDisplacement(body1.GetCenter(), body2.GetCenter());
       const double sqr_dist     = xy_dist.SquareMagnitude();
       const double total_radius = body1.GetRadius() + body2.GetRadius();
       const double sqr_radius   = total_radius * total_radius;
@@ -429,10 +517,25 @@ namespace emp {
 
           out_ids.clear();  // Clear the set of IDs that could overlap with this body.
           FindOverlaps(body, sector, pos+1);
-          if (sector.HasLeft()) FindOverlaps(body, sectors[sector.GetLeft()]);
-          if (sector.HasUL()) FindOverlaps(body, sectors[sector.GetUL()]);
-          if (sector.HasUp()) FindOverlaps(body, sectors[sector.GetUp()]);
-          if (sector.HasUR()) FindOverlaps(body, sectors[sector.GetUR()]);
+          if (grid_size.NumCols() > 2 && grid_size.NumRows() > 2) {
+            if (sector.HasLeft()) FindOverlaps(body, sectors[sector.GetLeft()]);
+            if (sector.HasUL()) FindOverlaps(body, sectors[sector.GetUL()]);
+            if (sector.HasUp()) FindOverlaps(body, sectors[sector.GetUp()]);
+            if (sector.HasUR()) FindOverlaps(body, sectors[sector.GetUR()]);
+          } else {
+            // Small wrapped grids repeat neighbors. Visit each sector pair exactly once.
+            emp::array<size_t, 8> visited{};
+            size_t count = 0;
+            for (GridDir dir : Grid::DIR_SET) {
+              const size_t other = grid_size.ToIndex(grid_size.PosDir(
+                grid_size.FromIndex(sector_id), dir, wrap));
+              if (other == NO_ID || other <= sector_id
+                  || std::find(visited.begin(), visited.begin() + count, other)
+                     != visited.begin() + count) continue;
+              visited[count++] = other;
+              FindOverlaps(body, sectors[other]);
+            }
+          }
           // ...other four directions will be handled when those sectors are processed.
 
           // Trigger overlap function for each one found.
@@ -446,11 +549,9 @@ namespace emp {
     void WrapBodies() {
       DEBUG_STACK();
       ForEachBody([this](BODY_T & body){
-        if (body.X() < 0.0) body.X() += surface_size.X();
-        else if (body.X() >= surface_size.X()) body.X() -= surface_size.X();
-        if (body.Y() < 0.0) body.Y() += surface_size.Y();
-        else if (body.Y() >= surface_size.Y()) body.Y() -= surface_size.Y();
+        body.MoveTo(body.GetCenter().Wrap(surface_size));
       });
+      if (max_radius > 0) ResetSectors();
     }
 
     template <typename LOW_X_T, typename HIGH_X_T, typename LOW_Y_T, typename HIGH_Y_T>
@@ -494,15 +595,18 @@ namespace emp {
       out_ids.clear();  // Clear the set of IDs that could overlap with this body.
       FindOverlaps(body, sector);
 
-      // Compare against bodies in other sectors....
-      if (sector.HasUp())    { FindOverlaps(body, sectors[sector.GetUp()]); }
-      if (sector.HasUL())    { FindOverlaps(body, sectors[sector.GetUL()]); }
-      if (sector.HasUR())    { FindOverlaps(body, sectors[sector.GetUR()]); }
-      if (sector.HasLeft())  { FindOverlaps(body, sectors[sector.GetLeft()]); }
-      if (sector.HasRight()) { FindOverlaps(body, sectors[sector.GetRight()]); }
-      if (sector.HasDL())    { FindOverlaps(body, sectors[sector.GetDL()]); }
-      if (sector.HasDown())  { FindOverlaps(body, sectors[sector.GetDown()]); }
-      if (sector.HasDR())    { FindOverlaps(body, sectors[sector.GetDR()]); }
+      // On a narrow torus, several directions can refer to the same sector.
+      emp::array<size_t, 8> visited{};
+      size_t count = 0;
+      for (GridDir dir : Grid::DIR_SET) {
+        const size_t other = grid_size.ToIndex(grid_size.PosDir(
+          grid_size.FromIndex(sector.GetID()), dir, wrap));
+        if (other == NO_ID || other == sector.GetID()
+            || std::find(visited.begin(), visited.begin() + count, other)
+               != visited.begin() + count) continue;
+        visited[count++] = other;
+        FindOverlaps(body, sectors[other]);
+      }
 
       return out_ids;
     }
