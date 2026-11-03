@@ -239,14 +239,14 @@ namespace emp {
         Pos out = in;
         if (!in.IsValid()) return out;  // Invalid positions are invalid in all directions.
         switch (dir) {
-        case Dir::UP_LEFT:    --out.Col() %= NumCols(); [[fallthrough]];
-        case Dir::UP:         --out.Row() %= NumRows(); break;
-        case Dir::UP_RIGHT:   --out.Row() %= NumRows(); [[fallthrough]];
+        case Dir::UP_LEFT:    out.Col() = (out.Col() + NumCols() - 1) % NumCols(); [[fallthrough]];
+        case Dir::UP:         out.Row() = (out.Row() + NumRows() - 1) % NumRows(); break;
+        case Dir::UP_RIGHT:   out.Row() = (out.Row() + NumRows() - 1) % NumRows(); [[fallthrough]];
         case Dir::RIGHT:      ++out.Col() %= NumCols(); break;
         case Dir::DOWN_RIGHT: ++out.Col() %= NumCols(); [[fallthrough]];
         case Dir::DOWN:       ++out.Row() %= NumRows(); break;
         case Dir::DOWN_LEFT:  ++out.Row() %= NumRows(); [[fallthrough]];
-        case Dir::LEFT:       --out.Col() %= NumCols(); break;
+        case Dir::LEFT:       out.Col() = (out.Col() + NumCols() - 1) % NumCols(); break;
         default: emp_assert(false, "Invalid direction.");
         }
         return out;
