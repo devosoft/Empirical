@@ -366,6 +366,7 @@ namespace emp {
 
       void SerialLoad(emp::SerialPod & pod) {
         base_t::Serialize(pod);  // Load size info.
+        if (!pod.CheckContainerSize(base_t::NumFields(), sizeof(field_t))) return;
         if (bits) { bits.DeleteArray(); }  // Delete old memory if needed
         bits = base_t::NumFields() ? NewArrayPtr<field_t>(base_t::NumFields()) : nullptr;
         for (size_t i = 0; i < base_t::NumFields(); ++i) { pod(bits[i]); }
