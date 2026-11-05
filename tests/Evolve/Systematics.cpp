@@ -2107,3 +2107,292 @@ TEST_CASE("Delayed incoming with offspring-ever tracking") {
   CHECK(root->GetData().num_offspring_ever == 1);
   CHECK(root->GetNumOff() == 1);
 }
+
+TEST_CASE("Delayed incoming taxon is the only child of a collapsed unifurcation") {
+  emp::assert_clear();
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
+  sys.SetDelayIncoming(1);
+  sys.SetCollapseUnifurcations(true);
+
+  auto root = sys.AddOrg(1, nullptr);
+  sys.Update();
+  auto mid = sys.AddOrg(2, root);
+  sys.Update();
+  auto leaf = sys.AddOrg(3, mid);
+  REQUIRE(leaf->GetIncoming());
+
+  // mid is now an extinct unifurcation whose only child is not in its offspring list.
+  // It may be collapsed now or once leaf is released, but leaf must end up under root.
+  sys.RemoveOrg(mid);
+  sys.Update();
+  CHECK(!leaf->GetIncoming());
+  CHECK(leaf->GetParent() == root);
+  CHECK(root->GetNumOff() == 1);
+  CHECK(emp::Has(root->GetOffspring(), leaf));
+  CHECK(sys.GetNumAncestors() == 0);
+  CHECK(!emp::assert_last_fail);
+}
+
+TEST_CASE("Delayed incoming taxon that dies keeps its released siblings") {
+  emp::assert_clear();
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
+  sys.SetDelayIncoming(1);
+
+  auto root = sys.AddOrg(1, nullptr);
+  sys.Update();
+  auto released = sys.AddOrg(2, root);
+  sys.Update();
+  auto held = sys.AddOrg(3, root);
+  REQUIRE(!released->GetIncoming());
+  REQUIRE(held->GetIncoming());
+  CHECK(root->GetNumOff() == 2);
+
+  // held is counted by root but is not in root's offspring list
+  sys.RemoveOrg(held);
+  CHECK(root->GetNumOff() == 1);
+  CHECK(root->GetOffspring().size() == 1);
+  CHECK(emp::Has(root->GetOffspring(), released));
+  CHECK(!emp::assert_last_fail);
+}
+
+TEST_CASE("Delayed incoming taxon released early and then removed") {
+  emp::assert_clear();
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
+  sys.SetDelayIncoming(2);
+  sys.SetCollapseUnifurcations(true);
+
+  auto root = sys.AddOrg(1, nullptr);
+  sys.Update();
+  sys.Update();
+  auto sibling = sys.AddOrg(2, root);
+  auto mid = sys.AddOrg(3, root);
+  sys.Update();
+  auto child = sys.AddOrg(4, mid);      // releases mid early; mid is still in the queue
+  auto grandchild = sys.AddOrg(5, child);   // releases child early, linking it under mid
+  REQUIRE(!mid->GetIncoming());
+  REQUIRE(emp::Has(mid->GetOffspring(), child));
+
+  // mid is collapsed (and deleted) while the queue still refers to it. Updating must not
+  // touch it; with EMP_TRACK_MEM (`make fulldebug`) that use is caught as a failed emp_assert.
+  sys.RemoveOrg(mid);
+  CHECK(child->GetParent() == root);
+  for (int i = 0; i < 4; i++) sys.Update();
+  CHECK(root->GetNumOff() == 2);
+  CHECK(emp::Has(root->GetOffspring(), sibling));
+  CHECK(emp::Has(root->GetOffspring(), child));
+  CHECK(emp::Has(child->GetOffspring(), grandchild));
+  CHECK(!emp::assert_last_fail);
+}
+
+TEST_CASE("Delayed incoming taxon that dies before release with store_all") {
+  emp::assert_clear();
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, false);
+  sys.SetDelayIncoming(2);
+
+  auto root = sys.AddOrg(1, nullptr);
+  sys.Update();
+  sys.Update();
+  auto child = sys.AddOrg(2, root);
+  REQUIRE(child->GetIncoming());
+
+  sys.RemoveOrg(child);
+  CHECK(emp::Has(sys.GetOutside(), child));
+  CHECK(root->GetNumOff() == 0);
+
+  // child's queue entry comes due; it must stay outside
+  sys.Update();
+  sys.Update();
+  sys.Update();
+  CHECK(!emp::Has(sys.GetActive(), child));
+  CHECK(!emp::Has(root->GetOffspring(), child));
+  CHECK(sys.GetNumActive() == 1);
+  CHECK(sys.GetNumOutside() == 1);
+  CHECK(root->GetNumOff() == 0);
+  CHECK(!emp::assert_last_fail);
+}
+
+TEST_CASE("Delayed incoming MRCA when all living taxa are held out") {
+  emp::assert_clear();
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
+  sys.SetDelayIncoming(1);
+
+  auto root = sys.AddOrg(1, nullptr);
+  sys.Update();
+  auto child_a = sys.AddOrg(2, root);
+  auto child_b = sys.AddOrg(3, root);
+  REQUIRE(child_a->GetIncoming());
+  REQUIRE(child_b->GetIncoming());
+
+  sys.RemoveOrg(root);
+  CHECK(sys.GetMRCA() == root);
+  sys.Update();
+  CHECK(sys.GetMRCA() == root);
+  CHECK(!emp::assert_last_fail);
+}
+
+TEST_CASE("Delayed incoming with total offspring tracking") {
+  emp::assert_clear();
+  emp::Systematics<int, int, emp::datastruct::cumulative_stats_all> sys(
+    [](const int & i){return i;}, true, true, false, false);
+  sys.SetDelayIncoming(1);
+
+  auto root = sys.AddOrg(1, nullptr);
+  sys.Update();
+  sys.Update();
+  auto child_a = sys.AddOrg(2, root);
+  auto child_b = sys.AddOrg(3, root);
+  sys.Update();
+  sys.Update();
+  REQUIRE(!child_a->GetIncoming());
+  REQUIRE(!child_b->GetIncoming());
+
+  // Same value as with no delay: root's own organism plus child_a
+  sys.RemoveOrg(child_b);
+  CHECK(root->GetTotalOffspring() == 1);
+  CHECK(!emp::assert_last_fail);
+}
+
+TEST_CASE("Delayed incoming taxa are freed by the destructor") {
+  emp::assert_clear();
+  const void * held_raw = nullptr;
+  const void * dead_raw = nullptr;
+  {
+    emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
+    sys.SetDelayIncoming(3);
+    auto root = sys.AddOrg(1, nullptr);
+    auto held = sys.AddOrg(2, root);        // still in the queue
+    auto dead = sys.AddOrg(3, nullptr);     // dies in the queue, so only marked deleted
+    sys.RemoveOrg(dead);
+    held_raw = held.Raw();
+    dead_raw = dead.Raw();
+  }
+  // Leaks are only visible with EMP_TRACK_MEM (`make fulldebug`) or LeakSanitizer.
+#ifdef EMP_TRACK_MEM
+  CHECK(!emp::PtrTracker::Get().IsActive(held_raw));
+  CHECK(!emp::PtrTracker::Get().IsActive(dead_raw));
+#endif
+  CHECK(held_raw != nullptr);
+  CHECK(dead_raw != nullptr);
+  CHECK(!emp::assert_last_fail);
+}
+
+TEST_CASE("Delayed incoming child of a removed parent without archiving") {
+  emp::assert_clear();
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, false, false, false);
+  sys.SetDelayIncoming(1);
+
+  auto parent = sys.AddOrg(1, nullptr);
+  sys.Update();
+  auto child = sys.AddOrg(2, parent);
+  REQUIRE(child->GetIncoming());
+
+  // Without archiving, parent is deleted; child must not keep a pointer to it
+  sys.RemoveOrg(parent);
+  CHECK(!child->GetParent());
+  sys.Update();
+  CHECK(!child->GetIncoming());
+  CHECK(emp::Has(sys.GetActive(), child));
+  CHECK(sys.GetNumActive() == 1);
+  CHECK(!emp::assert_last_fail);
+}
+
+TEST_CASE("Delayed incoming gives the same tree as no delay") {
+  emp::assert_clear();
+  // Wright-Fisher population in which every mutation creates a new genotype. Returns one
+  // string per stored taxon once every held-out taxon has been released, plus the MRCA.
+  // Destruction time and depth are left out: under collapse both depend on the order in
+  // which unifurcations are collapsed (see the depth test below).
+  auto run = [](size_t delay, bool collapse, bool store_all, int seed) {
+    emp::Random random(seed);
+    emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, store_all, false);
+    sys.SetDelayIncoming(delay);
+    sys.SetCollapseUnifurcations(collapse);
+
+    auto root = sys.AddOrg(0, nullptr);
+    emp::vector<emp::Ptr<emp::Taxon<int>>> pop(40, root);
+    for (size_t i = 1; i < pop.size(); i++) sys.AddOrg(0, root);
+    sys.Update();
+    int next_genotype = 0;
+    for (int gen = 0; gen < 60; gen++) {
+      emp::vector<emp::Ptr<emp::Taxon<int>>> next_pop;
+      for (size_t i = 0; i < pop.size(); i++) {
+        auto parent = pop[random.GetUInt(pop.size())];
+        int genotype = random.P(0.15) ? ++next_genotype : parent->GetInfo();
+        next_pop.push_back(sys.AddOrg(genotype, parent));
+      }
+      for (auto tax : pop) sys.RemoveOrg(tax);
+      pop = next_pop;
+      sys.Update();
+    }
+    for (int i = 0; i < 5; i++) sys.Update();
+
+    emp::vector<std::string> rows;
+    auto add_rows = [&rows](const auto & taxa, const std::string & set_name) {
+      for (auto tax : taxa) {
+        rows.push_back("id=" + std::to_string(tax->GetID())
+          + " parent=" + (tax->GetParent() ? std::to_string(tax->GetParent()->GetID()) : "none")
+          + " orgs=" + std::to_string(tax->GetNumOrgs())
+          + " num_off=" + std::to_string(tax->GetNumOff())
+          + " listed_off=" + std::to_string(tax->GetOffspring().size())
+          + " orig=" + std::to_string(tax->GetOriginationTime())
+          + " set=" + set_name);
+      }
+    };
+    add_rows(sys.GetActive(), "active");
+    add_rows(sys.GetAncestors(), "ancestor");
+    add_rows(sys.GetOutside(), "outside");
+    std::sort(rows.begin(), rows.end());
+    rows.push_back("mrca=" + std::to_string(sys.GetMRCA()->GetID()));
+    return rows;
+  };
+
+  // Collapsing with store_all is left out: it fails even with no delay (see the
+  // store_all collapse test below).
+  for (int seed : {1, 2, 3}) {
+    for (size_t delay : {1, 2, 3}) {
+      INFO("seed " << seed << ", delay " << delay);
+      CHECK(run(delay, false, false, seed) == run(0, false, false, seed));
+      CHECK(run(delay, false, true, seed) == run(0, false, true, seed));
+      CHECK(run(delay, true, false, seed) == run(0, true, false, seed));
+    }
+  }
+  CHECK(!emp::assert_last_fail);
+}
+
+TEST_CASE("Collapse unifurcation updates depth of all descendants") {
+  emp::assert_clear();
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
+  sys.SetCollapseUnifurcations(true);
+
+  auto root = sys.AddOrg(1, nullptr);
+  auto mid = sys.AddOrg(2, root);
+  auto child = sys.AddOrg(3, mid);
+  auto grandchild = sys.AddOrg(4, child);
+  CHECK(grandchild->GetDepth() == 3);
+
+  sys.RemoveOrg(mid);   // root -> child -> grandchild
+  CHECK(child->GetParent() == root);
+  CHECK(child->GetDepth() == 1);
+  CHECK(grandchild->GetDepth() == 2);
+  CHECK(!emp::assert_last_fail);
+}
+
+TEST_CASE("Collapse unifurcation with store_all keeps outside taxa attached") {
+  emp::assert_clear();
+  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, false);
+  sys.SetCollapseUnifurcations(true);
+
+  auto root = sys.AddOrg(1, nullptr);
+  auto mid = sys.AddOrg(2, root);
+  auto dead_child = sys.AddOrg(3, mid);
+  auto live_child = sys.AddOrg(4, mid);
+  sys.RemoveOrg(mid);
+
+  // dead_child moves to outside_taxa still pointing at mid; mid is then an extinct
+  // unifurcation and is collapsed (deleted). dead_child should point at root instead.
+  sys.RemoveOrg(dead_child);
+  CHECK(emp::Has(sys.GetOutside(), dead_child));
+  CHECK(live_child->GetParent() == root);
+  CHECK(dead_child->GetParent() == root);
+  CHECK(!emp::assert_last_fail);
+}
