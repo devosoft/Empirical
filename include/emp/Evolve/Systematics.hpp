@@ -388,6 +388,11 @@ namespace emp {
     Systematics(const Systematics &) = delete;
     Systematics(Systematics &&) = default;
     ~Systematics() {
+      for (auto x : incoming_taxa) {
+        if (x->GetIncoming()) {
+          x.Delete();
+        }
+      }
       for (auto x : active_taxa) x.Delete();
       for (auto x : ancestor_taxa) x.Delete();
       for (auto x : outside_taxa) x.Delete();
@@ -466,6 +471,18 @@ namespace emp {
       next_parent = p;
     }
     ///@}
+
+    void PromoteFromIncoming(Ptr<taxon_t> taxon) {
+      taxon->SetIncoming(false);
+      if (store_active) active_taxa.insert(taxon);
+      emp::Ptr<taxon_t> parent = taxon->GetParent();
+      if (parent) {
+        parent->AddToOffspring(taxon);
+        if (collapse_unifurcations && parent->GetNumOff() == 1 && parent->GetNumOrgs() == 0) {
+          CollapseUnifurcation(parent);
+        }
+      }
+    }
 
     /// Set function used to calculate taxons from organisms
     void SetCalcInfoFun(fun_calc_info_t f) {calc_info_fun = f;}
@@ -1191,11 +1208,7 @@ namespace emp {
         continue;
       }
       if (tax && tax->GetIncoming()) {
-        tax->SetIncoming(false);
-        if (store_active) active_taxa.insert(tax);
-        if (tax->GetParent()) {
-          tax->GetParent()->AddToOffspring(tax);
-        }
+        PromoteFromIncoming(tax);
       }
     }
   }
@@ -1223,7 +1236,14 @@ namespace emp {
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::RemoveOffspring(Ptr<taxon_t> offspring, Ptr<taxon_t> taxon) {
     if (!taxon) { num_roots--; return; }             // Offspring was root; remove and return.
-    bool still_active = taxon->RemoveOffspring(offspring);    // Taxon still active w/ 1 fewer offspring?
+    bool still_active = true;
+    if (offspring->GetIncoming()) {  // Offspring is incoming; just decrement count.
+      taxon->num_offspring--;
+      still_active = taxon->GetNumOrgs() > 0 || taxon->GetNumOff() > 0; 
+    } else {
+      still_active = taxon->RemoveOffspring(offspring);    // Taxon still active w/ 1 fewer offspring?
+    }
+
     if (!still_active) Prune(taxon);                 // If out of offspring, remove from tree.
 
     // If the taxon is still active AND the is the current mrca AND now has only one offspring,
@@ -1232,7 +1252,8 @@ namespace emp {
       if (taxon == mrca) {
         mrca = nullptr;
       }
-      if (collapse_unifurcations) {
+      // If the child is still incoming don't collapse yet
+      if (collapse_unifurcations && taxon->GetFirstChild() != nullptr) {
         ancestor_taxa.erase(taxon);
         CollapseUnifurcation(taxon);
       }
@@ -1273,7 +1294,12 @@ namespace emp {
       // - num_orgs must be 0 for both taxa already
       // - num_offspring handled above
     }
-    taxon.Delete();      
+
+    if (taxon->GetIncoming()) {
+      taxon->SetDeleted(true);
+    } else {
+      taxon.Delete();
+    }
     return;
   }
 
@@ -1307,7 +1333,7 @@ namespace emp {
 
     if (store_active && !taxon->GetIncoming()) active_taxa.erase(taxon);
 
-    if (collapse_unifurcations && taxon->GetNumOff() == 1) {
+    if (collapse_unifurcations && taxon->GetNumOff() == 1 && taxon->GetFirstChild() != nullptr) {
       emp_assert(!taxon->GetIncoming(), "Taxon should not be in incoming queue if it has offspring");
       CollapseUnifurcation(taxon);
       return;
@@ -1436,6 +1462,9 @@ namespace emp {
           ++parent->num_offspring;                 // Let parent know it has another offspring but don't add to list                                 // Track offspring count for parent.
           if constexpr (DATA_STRUCT::has_num_offspring_ever_t::value) {
             ++parent->data.num_offspring_ever;
+          }
+          if constexpr (DATA_STRUCT::has_total_offspring_t::value) {
+            parent->AddTotalOffspring();
           }
           if (parent->GetIncoming()) {
             parent->SetIncoming(false);

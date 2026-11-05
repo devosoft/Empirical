@@ -151,6 +151,8 @@ namespace emp{
 
     bool GetDeleted() const {return deleted;}
 
+    Ptr<this_t> GetFirstChild() const {return first_child;}
+
     /// Add a new organism to this Taxon.
     void AddOrg() { 
       ++num_orgs;
