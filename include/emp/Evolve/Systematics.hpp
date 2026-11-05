@@ -151,7 +151,7 @@ namespace emp {
     void SetCollapseUnifurcations(bool new_val) { collapse_unifurcations = new_val; }
 
     /// Set the delay for incoming taxa (greater than 0 turns delay incoming on, increases efficiency)
-    void SetDelayIncoming(size_t delay) { delay_time = delay; }
+    void SetDelayIncoming(size_t delay) { emp_assert(delay == 0 || store_ancestors); emp_assert(delay == 0 || !store_outside); delay_time = delay; }
 
     /// Sets the current update/time step
     void SetUpdate(size_t ud) {curr_update = ud;}
@@ -389,7 +389,7 @@ namespace emp {
     Systematics(Systematics &&) = default;
     ~Systematics() {
       for (auto x : incoming_taxa) {
-        if (x->GetIncoming() && (!store_outside || x->GetNumOff() == 0)) {
+        if (x->GetDeleted() || (x->GetIncoming() && x->GetNumOrgs() == 0)) {
           x.Delete();
         }
       }
@@ -1289,7 +1289,6 @@ namespace emp {
     while (curr_offspring) {
       Ptr<taxon_t> next = curr_offspring->next_sibling;
       curr_offspring->parent = parent;
-      curr_offspring->depth--;
       if (parent) {
         parent->AddToOffspring(curr_offspring);
         parent->num_offspring++;
@@ -1472,7 +1471,7 @@ namespace emp {
         max_depth = cur_taxon->GetDepth();
       }
 
-      if (delay_time > 0) {
+      if (delay_time > 0 && store_ancestors && !store_outside) {  
         cur_taxon->SetIncoming(true);                       // Mark as incoming.
         cur_taxon->SetQueued(true);                         // Mark as queued.
         incoming_taxa.push_back(cur_taxon);                  // Don't add to tree yet

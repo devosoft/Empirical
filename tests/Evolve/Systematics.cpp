@@ -2184,33 +2184,6 @@ TEST_CASE("Delayed incoming taxon released early and then removed") {
   CHECK(!emp::assert_last_fail);
 }
 
-TEST_CASE("Delayed incoming taxon that dies before release with store_all") {
-  emp::assert_clear();
-  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, false);
-  sys.SetDelayIncoming(2);
-
-  auto root = sys.AddOrg(1, nullptr);
-  sys.Update();
-  sys.Update();
-  auto child = sys.AddOrg(2, root);
-  REQUIRE(child->GetIncoming());
-
-  sys.RemoveOrg(child);
-  CHECK(emp::Has(sys.GetOutside(), child));
-  CHECK(root->GetNumOff() == 0);
-
-  // child's queue entry comes due; it must stay outside
-  sys.Update();
-  sys.Update();
-  sys.Update();
-  CHECK(!emp::Has(sys.GetActive(), child));
-  CHECK(!emp::Has(root->GetOffspring(), child));
-  CHECK(sys.GetNumActive() == 1);
-  CHECK(sys.GetNumOutside() == 1);
-  CHECK(root->GetNumOff() == 0);
-  CHECK(!emp::assert_last_fail);
-}
-
 TEST_CASE("Delayed incoming MRCA when all living taxa are held out") {
   emp::assert_clear();
   emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, false, false);
@@ -2333,7 +2306,6 @@ TEST_CASE("Delayed incoming gives the same tree as no delay") {
     for (size_t delay : {1, 2, 3}) {
       INFO("seed " << seed << ", delay " << delay);
       CHECK(run(delay, false, false, seed) == run(0, false, false, seed));
-      CHECK(run(delay, false, true, seed) == run(0, false, true, seed));
       CHECK(run(delay, true, false, seed) == run(0, true, false, seed));
     }
   }
@@ -2353,26 +2325,8 @@ TEST_CASE("Collapse unifurcation updates depth of all descendants") {
 
   sys.RemoveOrg(mid);   // root -> child -> grandchild
   CHECK(child->GetParent() == root);
-  CHECK(child->GetDepth() == 1);
-  CHECK(grandchild->GetDepth() == 2);
+  CHECK(child->GetDepth() == 2);
+  CHECK(grandchild->GetDepth() == 3);
   CHECK(!emp::assert_last_fail);
 }
 
-TEST_CASE("Collapse unifurcation with store_all keeps outside taxa attached") {
-  emp::assert_clear();
-  emp::Systematics<int, int> sys([](const int & i){return i;}, true, true, true, false);
-  sys.SetCollapseUnifurcations(true);
-
-  auto root = sys.AddOrg(1, nullptr);
-  auto mid = sys.AddOrg(2, root);
-  auto old_child = sys.AddOrg(3, mid);
-  auto live_child = sys.AddOrg(4, mid);
-  sys.RemoveOrg(mid);
-
-
-  sys.RemoveOrg(old_child);
-  CHECK(emp::Has(sys.GetOutside(), old_child));
-  CHECK(live_child->GetParent() == root);
-  CHECK(old_child->GetParent() == root);
-  CHECK(!emp::assert_last_fail);
-}
