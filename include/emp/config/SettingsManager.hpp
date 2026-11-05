@@ -659,7 +659,7 @@ namespace emp {
 
     // === MEMBER VARIABLES ===
 
-    std::filesystem::path config_dir{"../config"};  // Directory with configuration files
+    emp::vector<std::filesystem::path> config_dirs{"config", "../config", "."};  // Directory with configuration files
     emp::String exe_name;
     std::map<emp::String, ValueInfo> value_map;      ///< All named values, including settings
     std::map<emp::String, SettingMetadata> metadata_map; ///< Separate from value_map to reduce overhead
@@ -1119,8 +1119,47 @@ namespace emp {
       GetValueInfo(name).SetValue(std::forward<T>(value));
     }
 
-    const std::filesystem::path & GetConfigDir() const { return config_dir; }
-    void SetConfigDir(const emp::String & in) { config_dir = in.str(); }
+    const std::filesystem::path & GetConfigDir() const { return config_dirs.front(); }
+    const auto & GetConfigDirs() const { return config_dirs; }
+    emp::String GetConfigPath() const {
+      emp::String result;
+      for (const auto & dir : config_dirs) {
+        if (!result.empty()) result += ';';
+        result += dir.string();
+      }
+      return result;
+    }
+    void SetConfigDirs(emp::vector<std::filesystem::path> dirs) {
+      if (dirs.empty()) dirs.push_back(".");
+      config_dirs = std::move(dirs);
+    }
+    // Semicolons keep drive-letter colons usable in Windows paths.
+    void SetConfigDir(const emp::String & in) {
+      emp::vector<std::filesystem::path> dirs;
+      size_t start = 0;
+      do {
+        const size_t stop = in.find(';', start);
+        const auto part = in.substr(start, stop == emp::String::npos ? stop : stop - start);
+        if (!part.empty()) dirs.emplace_back(part.str());
+        if (stop == emp::String::npos) break;
+        start = stop + 1;
+      } while (start <= in.size());
+      SetConfigDirs(std::move(dirs));
+    }
+    [[nodiscard]] std::optional<std::filesystem::path>
+    FindConfigFile(const std::filesystem::path & filename) const {
+      std::error_code error;
+      if (filename.is_absolute() || filename.has_parent_path()) {
+        if (std::filesystem::is_regular_file(filename, error)) return filename;
+        if (filename.is_absolute()) return std::nullopt;
+      }
+      for (const auto & dir : config_dirs) {
+        const auto path = dir / filename;
+        error.clear();
+        if (std::filesystem::is_regular_file(path, error)) return path;
+      }
+      return std::nullopt;
+    }
 
     template <typename T>
     SettingsManager & AddSetting(const emp::String & name,
@@ -1460,8 +1499,11 @@ namespace emp {
 
     // Load settings from a file; return true on success and abort on error.
     bool Load(const emp::String & filename) {
-      std::ifstream is(filename);
-      if (!is) emp::notify::Error("Failed to open config file for loading: ", filename);
+      const auto path = FindConfigFile(filename.str());
+      if (!path) emp::notify::Error("Could not find config file '", filename,
+                                   "' in search path ", GetConfigPath(), ".");
+      std::ifstream is(*path);
+      if (!is) emp::notify::Error("Failed to open config file for loading: ", path->string());
       return Load(is);
     }
     
@@ -1561,11 +1603,13 @@ namespace emp {
     /// which allows save files to remain usable after settings are added or removed.
     void SerialLoad(emp::SerialPod & pod) {
       const size_t count = pod.LoadValue<size_t>();
-      for (size_t i = 0; i < count; ++i) {
+      if (!pod.CheckContainerSize(count, sizeof(emp::String) * 2)) return;
+      for (size_t i = 0; i < count && pod.Good(); ++i) {
         emp::String key   = pod.LoadValue<emp::String>();
         emp::String value = pod.LoadValue<emp::String>();
+        if (!pod.Good()) return;
         if (value_map.contains(key) && value_map.at(key).IsSetting()) {
-          value_map.at(key).SetValue(value);
+          if (!TrySet(key, value)) { pod.Fail(); return; }
         } else {
           emp::notify::Warning("SettingsManager::SerialLoad: setting '", key, "' not found; skipping.");
         }
