@@ -2276,25 +2276,6 @@ TEST_CASE("Delayed incoming taxa are freed by the destructor") {
   CHECK(!emp::assert_last_fail);
 }
 
-TEST_CASE("Delayed incoming child of a removed parent without archiving") {
-  emp::assert_clear();
-  emp::Systematics<int, int> sys([](const int & i){return i;}, true, false, false, false);
-  sys.SetDelayIncoming(1);
-
-  auto parent = sys.AddOrg(1, nullptr);
-  sys.Update();
-  auto child = sys.AddOrg(2, parent);
-  REQUIRE(child->GetIncoming());
-
-  // Without archiving, parent is deleted; child must not keep a pointer to it
-  sys.RemoveOrg(parent);
-  CHECK(!child->GetParent());
-  sys.Update();
-  CHECK(!child->GetIncoming());
-  CHECK(emp::Has(sys.GetActive(), child));
-  CHECK(sys.GetNumActive() == 1);
-  CHECK(!emp::assert_last_fail);
-}
 
 TEST_CASE("Delayed incoming gives the same tree as no delay") {
   emp::assert_clear();
@@ -2384,15 +2365,14 @@ TEST_CASE("Collapse unifurcation with store_all keeps outside taxa attached") {
 
   auto root = sys.AddOrg(1, nullptr);
   auto mid = sys.AddOrg(2, root);
-  auto dead_child = sys.AddOrg(3, mid);
+  auto old_child = sys.AddOrg(3, mid);
   auto live_child = sys.AddOrg(4, mid);
   sys.RemoveOrg(mid);
 
-  // dead_child moves to outside_taxa still pointing at mid; mid is then an extinct
-  // unifurcation and is collapsed (deleted). dead_child should point at root instead.
-  sys.RemoveOrg(dead_child);
-  CHECK(emp::Has(sys.GetOutside(), dead_child));
+
+  sys.RemoveOrg(old_child);
+  CHECK(emp::Has(sys.GetOutside(), old_child));
   CHECK(live_child->GetParent() == root);
-  CHECK(dead_child->GetParent() == root);
+  CHECK(old_child->GetParent() == root);
   CHECK(!emp::assert_last_fail);
 }

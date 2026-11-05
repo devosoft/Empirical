@@ -208,11 +208,11 @@ namespace emp {
     virtual double GetSumPairwiseDistance(bool branch_only) const = 0;
     virtual double GetVariancePairwiseDistance(bool branch_only) const = 0;
     virtual emp::vector<double> GetPairwiseDistances(bool branch_only) const = 0;
-    virtual int SackinIndex() const = 0;
-    virtual double CollessLikeIndex() const = 0;
+    virtual int SackinIndex() = 0;
+    virtual double CollessLikeIndex() = 0;
     virtual std::unordered_map<int, int> GetOutDegreeDistribution() const = 0;
     virtual double GetAverageOriginTime(bool) const = 0;
-    virtual int GetMRCADepth() const = 0;
+    virtual int GetMRCADepth() = 0;
     virtual void AddOrg(ORG && org, WorldPosition pos) = 0;
     virtual void AddOrg(ORG & org, WorldPosition pos) = 0;
     virtual void AddOrg(ORG && org, WorldPosition pos, WorldPosition parent) = 0;
@@ -389,7 +389,7 @@ namespace emp {
     Systematics(Systematics &&) = default;
     ~Systematics() {
       for (auto x : incoming_taxa) {
-        if (x->GetIncoming()) {
+        if (x->GetIncoming() && (!store_outside || x->GetNumOff() == 0)) {
           x.Delete();
         }
       }
@@ -402,6 +402,9 @@ namespace emp {
     }
 
     // ===== Functions for modifying phylogeny/systematics manager internal state ====
+
+    void FlushNextIncoming();
+    void FlushAllIncoming();
 
     /// Switch to next update/time step
     /// Useful for keeping track of taxon survival times
@@ -480,6 +483,7 @@ namespace emp {
         parent->AddToOffspring(taxon);
         if (collapse_unifurcations && parent->GetNumOff() == 1 && parent->GetNumOrgs() == 0) {
           CollapseUnifurcation(parent);
+          ancestor_taxa.erase(parent);
         }
       }
     }
@@ -846,7 +850,7 @@ namespace emp {
     /** This is a metric of how distinct \c tax is from the rest of the population.
      *
      * (From Vane-Wright et al., 1991; reviewed in Winter et al., 2013) */
-    double GetTaxonDistinctiveness(Ptr<taxon_t> tax) const {return 1.0/GetDistanceToRoot(tax);}
+    double GetTaxonDistinctiveness(Ptr<taxon_t> tax) {return 1.0/GetDistanceToRoot(tax);}
 
     /** This metric (from Isaac, 2007; reviewed in Winter et al., 2013) measures how
      * distinct \c tax is from the rest of the population, weighted for the amount of
@@ -858,12 +862,12 @@ namespace emp {
      * don't know what the state of the tree was at that time).
      *
      * Assumes the tree is all connected. Will return -1 if this assumption isn't met.*/
-    double GetEvolutionaryDistinctiveness(Ptr<taxon_t> tax, double time) const;
+    double GetEvolutionaryDistinctiveness(Ptr<taxon_t> tax, double time);
 
     /** @returns A vector of evolutionary distinctiveness of all active taxa
     * @param time The time step at which the calculation is being done
     */
-    emp::vector<double> GetAllEvolutionaryDistinctivenesses(double time) const {
+    emp::vector<double> GetAllEvolutionaryDistinctivenesses(double time) {
       emp::vector<double> eds;
       for (emp::Ptr<taxon_t> tax : active_taxa) {
         if (tax->GetOriginationTime() <= time) {
@@ -876,7 +880,7 @@ namespace emp {
     /** @returns Mean evolutionary distinctiveness of all active taxa
      * @param time The time step at which the calculation is being done
     */
-    double GetMeanEvolutionaryDistinctiveness(double time) const {
+    double GetMeanEvolutionaryDistinctiveness(double time) {
       emp::vector<double> eds = GetAllEvolutionaryDistinctivenesses(time);
       return emp::Mean(eds);
     }
@@ -884,7 +888,7 @@ namespace emp {
    /** @returns Sum of evolutionary distinctiveness of all active taxa
      * @param time The time step at which the calculation is being done
     */
-    double GetSumEvolutionaryDistinctiveness(double time) const {
+    double GetSumEvolutionaryDistinctiveness(double time) {
             emp::vector<double> eds = GetAllEvolutionaryDistinctivenesses(time);
       return emp::Sum(eds);
     }
@@ -892,7 +896,7 @@ namespace emp {
    /** @returns Variance of evolutionary distinctiveness of all active taxa
      * @param time The time step at which the calculation is being done
     */
-    double GetVarianceEvolutionaryDistinctiveness(double time) const {
+    double GetVarianceEvolutionaryDistinctiveness(double time) {
       emp::vector<double> eds = GetAllEvolutionaryDistinctivenesses(time);
       return emp::Variance(eds);
     }
@@ -966,7 +970,7 @@ namespace emp {
     emp::vector<double> GetPairwiseDistances(bool branch_only=false) const;
 
 
-    double GetPairwiseDistance(Ptr<taxon_t> t1, Ptr<taxon_t> t2, bool branch_only=false) const;
+    double GetPairwiseDistance(Ptr<taxon_t> t1, Ptr<taxon_t> t2, bool branch_only=false);
 
     /**
      * Returns a vector containing all taxa that were extant at \c time_point and
@@ -986,7 +990,7 @@ namespace emp {
      *  there is no common ancestor, distance to the root of this tree is calculated instead.
      * @param tax the taxon who's distance to root you want to calculate
      * */
-    int GetDistanceToRoot(Ptr<taxon_t> tax) const;
+    int GetDistanceToRoot(Ptr<taxon_t> tax);
 
     /** Calculates the number of branching points leading to multiple extant taxa
      * between the given taxon and the most-recent common ancestor (or the root of its subtree,
@@ -996,11 +1000,11 @@ namespace emp {
      * along the way to the current taxon.
      * @returns Number of branching points between tax and root
      * @param tax taxon to calculate branches from */
-    int GetBranchesToRoot(Ptr<taxon_t> tax) const;
+    int GetBranchesToRoot(Ptr<taxon_t> tax);
 
     /** @returns Sackin Index of this tree (Sackin, 1972; reviewed in Shao, 1990).
      * Measures tree balance*/
-    int SackinIndex() const {
+    int SackinIndex() {
       int sackin = 0;
       for (auto taxon : active_taxa) {
         sackin += GetBranchesToRoot(taxon) + 1; // Sackin index counts root as branch
@@ -1064,7 +1068,7 @@ namespace emp {
      * Measures tree balance. The standard Colless index only works for bifurcating trees,
      * so this will be a Colless-like Index, as suggested in
      * "Sound Colless-like balance indices for multifurcating trees" (Mir, 2018, PLoS One)*/
-    double CollessLikeIndex() const {
+    double CollessLikeIndex() {
       GetMRCA();
       if (!mrca) {
         std::cout << "Warning: trying to calculate CollessLike Index on empty tree" << std::endl;
@@ -1074,13 +1078,13 @@ namespace emp {
     }
 
     /// @returns a pointer to the Most-Recent Common Ancestor for the population.
-    Ptr<taxon_t> GetMRCA() const;
+    Ptr<taxon_t> GetMRCA();
 
     /// @returns the depth of the Most-Recent Common Ancestor; return -1 for none.
-    int GetMRCADepth() const;
+    int GetMRCADepth();
 
     /// @returns a pointer to the Most-Recent Ancestor shared by two taxa.
-    Ptr<taxon_t> GetSharedAncestor(Ptr<taxon_t> t1, Ptr<taxon_t> t2) const;
+    Ptr<taxon_t> GetSharedAncestor(Ptr<taxon_t> t1, Ptr<taxon_t> t2);
 
     /// @returns the genetic diversity of the population.
     double CalcDiversity() const;
@@ -1098,7 +1102,7 @@ namespace emp {
 
     /// @returns vector containing the lineages of the specified taxon
     /// up to and including the MRCA, but not past the MRCA
-    emp::vector<Ptr<taxon_t>> GetLineageToMRCA(Ptr<taxon_t> tax) const {
+    emp::vector<Ptr<taxon_t>> GetLineageToMRCA(Ptr<taxon_t> tax) {
       GetMRCA();
       emp::vector<Ptr<taxon_t>> lineage;
       lineage.push_back(tax);
@@ -1185,6 +1189,30 @@ namespace emp {
   }
 
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
+  void Systematics<ORG, ORG_INFO, DATA_STRUCT>::FlushNextIncoming() {
+    emp::Ptr<taxon_t> tax = incoming_taxa.front();
+    incoming_taxa.pop_front();
+    if (!tax) {
+      return;
+    }
+    tax->SetQueued(false);
+    if (tax->GetDeleted()) {
+      tax.Delete();
+      return;
+    }
+    if (tax && tax->GetIncoming() && tax->GetNumOrgs() > 0) {
+      PromoteFromIncoming(tax);
+    }   
+  }
+
+  template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
+  void Systematics<ORG, ORG_INFO, DATA_STRUCT>::FlushAllIncoming() {
+    while (incoming_taxa.size()) {
+      FlushNextIncoming();
+    }
+  }
+
+  template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
   void Systematics<ORG, ORG_INFO, DATA_STRUCT>::Update() {
     if (track_synchronous) {
 
@@ -1198,18 +1226,7 @@ namespace emp {
     }
     ++curr_update;
     while (incoming_taxa.size() && incoming_taxa.front()->GetOriginationTime() + delay_time <= curr_update) {
-      emp::Ptr<taxon_t> tax = incoming_taxa.front();
-      incoming_taxa.pop_front();
-      if (!tax) {
-        continue;
-      }
-      if (tax->GetDeleted()) {
-        tax.Delete();
-        continue;
-      }
-      if (tax && tax->GetIncoming()) {
-        PromoteFromIncoming(tax);
-      }
+      FlushNextIncoming();
     }
   }
 
@@ -1224,7 +1241,7 @@ namespace emp {
       if (taxon == mrca) {
         mrca = nullptr;
       }
-      if (taxon->GetIncoming()) {
+      if (taxon->GetQueued()) {
         taxon->SetDeleted(true);
       } else {
         taxon.Delete();                             //  ...or else get rid of it.
@@ -1295,7 +1312,7 @@ namespace emp {
       // - num_offspring handled above
     }
 
-    if (taxon->GetIncoming()) {
+    if (taxon->GetQueued()) {
       taxon->SetDeleted(true);
     } else {
       taxon.Delete();
@@ -1352,7 +1369,7 @@ namespace emp {
         taxon->GetParent()->num_offspring--;  
       }
       
-      if (taxon->GetIncoming()) {
+      if (taxon->GetQueued()) {
         taxon->SetDeleted(true);
       } else {
         taxon.Delete();
@@ -1457,6 +1474,7 @@ namespace emp {
 
       if (delay_time > 0) {
         cur_taxon->SetIncoming(true);                       // Mark as incoming.
+        cur_taxon->SetQueued(true);                         // Mark as queued.
         incoming_taxa.push_back(cur_taxon);                  // Don't add to tree yet
         if (parent) {
           ++parent->num_offspring;                 // Let parent know it has another offspring but don't add to list                                 // Track offspring count for parent.
@@ -1467,13 +1485,7 @@ namespace emp {
             parent->AddTotalOffspring();
           }
           if (parent->GetIncoming()) {
-            parent->SetIncoming(false);
-            if (store_active) {
-              active_taxa.insert(parent);  
-            }
-            if (parent->GetParent()){
-              parent->GetParent()->AddToOffspring(parent);
-            }
+            PromoteFromIncoming(parent); 
           }
         }
       } else {
@@ -1800,8 +1812,9 @@ namespace emp {
 
   // @returns a pointer to the Most-Recent Common Ancestor for the population or null pointer if there isn't one
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
-  Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t> Systematics<ORG, ORG_INFO, DATA_STRUCT>::GetMRCA() const {
+  Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t> Systematics<ORG, ORG_INFO, DATA_STRUCT>::GetMRCA() {
     if (!mrca && num_roots == 1) {  // Determine if we need to calculate the MRCA.
+      FlushAllIncoming();
       // First, find a candidate among the living taxa.  Only taxa that have one offsrping
       // can be on the line-of-descent to the MRCA, so anything else is a good start point.
       // There must be at least one!  Stop as soon as we find a candidate.
@@ -1825,7 +1838,7 @@ namespace emp {
 
   // @returns the depth of the Most-Recent Common Ancestor or -1 for none.
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
-  int Systematics<ORG, ORG_INFO, DATA_STRUCT>::GetMRCADepth() const {
+  int Systematics<ORG, ORG_INFO, DATA_STRUCT>::GetMRCADepth() {
     GetMRCA();
     if (mrca) return (int) mrca->GetDepth();
     return -1;
@@ -1833,7 +1846,7 @@ namespace emp {
 
   // @returns a pointer to the Most-Recent Ancestor shared by two taxa.
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
-  Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t> Systematics<ORG, ORG_INFO, DATA_STRUCT>::GetSharedAncestor(Ptr<taxon_t> t1, Ptr<taxon_t> t2) const {
+  Ptr<typename Systematics<ORG, ORG_INFO, DATA_STRUCT>::taxon_t> Systematics<ORG, ORG_INFO, DATA_STRUCT>::GetSharedAncestor(Ptr<taxon_t> t1, Ptr<taxon_t> t2) {
     // Same taxon
     if (t1 == t2) {
       return t1;
@@ -2010,7 +2023,7 @@ namespace emp {
   }
 
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
-  double Systematics<ORG, ORG_INFO, DATA_STRUCT>::GetPairwiseDistance(Ptr<taxon_t> t1, Ptr<taxon_t> t2, bool branch_only) const {
+  double Systematics<ORG, ORG_INFO, DATA_STRUCT>::GetPairwiseDistance(Ptr<taxon_t> t1, Ptr<taxon_t> t2, bool branch_only) {
     // Same taxon
     if (t1 == t2) {
       return 0;
@@ -2052,7 +2065,7 @@ namespace emp {
   }
 
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
-  double Systematics<ORG, ORG_INFO, DATA_STRUCT>::GetEvolutionaryDistinctiveness(Ptr<taxon_t> tax, double time) const {
+  double Systematics<ORG, ORG_INFO, DATA_STRUCT>::GetEvolutionaryDistinctiveness(Ptr<taxon_t> tax, double time) {
 
     // If we loaded this phylogeny from a file without calculating total offspring,
     // we need to actually calculate it here
@@ -2104,7 +2117,7 @@ namespace emp {
   }
 
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
-  int Systematics<ORG, ORG_INFO, DATA_STRUCT>::GetBranchesToRoot(Ptr<taxon_t> tax) const {
+  int Systematics<ORG, ORG_INFO, DATA_STRUCT>::GetBranchesToRoot(Ptr<taxon_t> tax) {
     GetMRCA();
 
     int depth = 0;
@@ -2121,7 +2134,7 @@ namespace emp {
   }
 
   template <typename ORG, typename ORG_INFO, typename DATA_STRUCT>
-  int Systematics<ORG, ORG_INFO, DATA_STRUCT>::GetDistanceToRoot(Ptr<taxon_t> tax) const {
+  int Systematics<ORG, ORG_INFO, DATA_STRUCT>::GetDistanceToRoot(Ptr<taxon_t> tax) {
     // Now, trace the line of descent, updating the candidate as we go.
     GetMRCA();
 

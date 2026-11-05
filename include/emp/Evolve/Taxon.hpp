@@ -47,6 +47,7 @@ namespace emp{
     double destruction_time;  ///<  When did this taxon leave the population?
     bool incoming;
     bool deleted;
+    bool queued;
 
     Ptr<this_t> first_child = nullptr;    ///< Pointer to start of linked offspring list
     Ptr<this_t> previous_sibling = nullptr; ///< Pointer to previous sibling in linked list of offspring
@@ -62,7 +63,7 @@ namespace emp{
      , num_orgs(0), num_offspring(0)
      , depth(parent ? (parent->depth+1) : 0)
      , destruction_time(std::numeric_limits<double>::infinity())
-    , incoming(false), deleted(false) { ; }
+    , incoming(false), deleted(false), queued(false) { ; }
     // Taxon(const Taxon &) = delete;
     Taxon(const Taxon &) = default; // TODO: Check with Charles about this
     Taxon(Taxon &&) = default;
@@ -112,6 +113,8 @@ namespace emp{
 
     void SetDeleted(bool val) {deleted = val;}
 
+    void SetQueued(bool val) {queued = val;}
+
     /// Get the number of taxa that were produced by organisms from this Taxon.
     size_t GetNumOff() const { return num_offspring; }
 
@@ -148,6 +151,8 @@ namespace emp{
     void SetDestructionTime(double time) {destruction_time = time;}
 
     bool GetIncoming() const {return incoming;}
+    
+    bool GetQueued() const {return queued;}
 
     bool GetDeleted() const {return deleted;}
 
