@@ -88,7 +88,7 @@ namespace emp {
       if (fp.IsNull()) OpenFile();
       for (size_t i = 0; i < output_names.size(); ++i) {
         if (i) *fp << ',';
-        *fp << output_names[i];
+        *fp << output_names[i].AsCSVSafe();
       }
       *fp << '\n';
     }
@@ -115,7 +115,7 @@ namespace emp {
 
         // Quote non-numeric values as CSV string literals.
         emp::String output = output_funs[i]();
-        if (!output.IsNumber()) output.SetLiteral();
+        if (!include_labels) output.SetCSVSafe();
 
         os << output;
       }
