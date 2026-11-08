@@ -2645,7 +2645,7 @@ namespace emp {
     out.push_back('\"');
     for (const char c : in) {
       if (c == '\"') {
-        out.push_back('\"');  // Add a backslash before quotes.
+        out.push_back('\"');  // CSV quotes are escaped by doubling them.
       }
       out.push_back(c);
     }
