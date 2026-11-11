@@ -17,6 +17,7 @@
  *    3 = Border, with food.
  */
 
+#include <cstdint>
 #include <iostream>
 
 #include "emp/hardware/AvidaGP.hpp"

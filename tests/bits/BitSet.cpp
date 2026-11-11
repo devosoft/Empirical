@@ -10,6 +10,7 @@
 #include <cereal/types/unordered_map.hpp>
 #include <cereal/types/vector.hpp>
 
+#include <cstdint>
 #include <sstream>
 #include <fstream>
 #include <string>

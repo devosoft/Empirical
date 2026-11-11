@@ -5,6 +5,7 @@
 //
 //  This file explores the template defined in evo::Population.h with an NK landscape.
 
+#include <cstdint>
 #include <iostream>
 
 #include "emp/config/ArgManager.hpp"

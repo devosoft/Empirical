@@ -11,6 +11,7 @@
 //              fitness for each unique role-id set within the group. To be optimal, demes should coordinate
 //              to ensure that each CPU in the deme has a unique role-id.
 
+#include <cstdint>
 #include <iostream>
 #include <unordered_set>
 #include <utility>

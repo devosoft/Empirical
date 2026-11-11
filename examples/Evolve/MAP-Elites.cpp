@@ -8,6 +8,7 @@
 //  In this example, we will be evolving 4-digit integers.
 //  The two traits measured are nunmber of bits and value mod 31.
 
+#include <cstdint>
 #include <iostream>
 
 #include "emp/Evolve/World.hpp"

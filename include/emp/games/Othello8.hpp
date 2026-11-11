@@ -13,6 +13,7 @@
 #ifndef EMP_GAME_OTHELLO8_H
 #define EMP_GAME_OTHELLO8_H
 
+#include <cstdint>
 #include <fstream>
 #include <iostream>
 #include <iomanip>

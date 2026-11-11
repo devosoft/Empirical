@@ -17,6 +17,7 @@
 #ifndef EMP_SIGNAL_CONTROL
 #define EMP_SIGNAL_CONTROL
 
+#include <cstdint>
 #include <string>
 #include <unordered_map>
 

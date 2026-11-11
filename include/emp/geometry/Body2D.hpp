@@ -21,6 +21,8 @@
 #ifndef EMP_BODY_2D_H
 #define EMP_BODY_2D_H
 
+#include <cstdint>
+
 #include "../base/assert.hpp"
 #include "../base/Ptr.hpp"
 #include "../base/vector.hpp"

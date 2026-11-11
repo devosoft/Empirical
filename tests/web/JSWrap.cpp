@@ -2,6 +2,7 @@
 //  Copyright (C) Michigan State University, 2015-2020.
 //  Released under the MIT Software license; see doc/LICENSE
 
+#include <cstdint>
 #include <functional>
 #include <unordered_map>
 

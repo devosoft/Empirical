@@ -1,3 +1,5 @@
+#include <cstdint>
+
 #include "emp/config/ArgManager.hpp"
 #include "emp/Evolve/NK.hpp"
 #include "emp/Evolve/World.hpp"

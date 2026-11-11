@@ -7,6 +7,7 @@
  *  @brief A test of AvidaGP with World; organisms must find squares of values.
  */
 
+#include <cstdint>
 #include <iostream>
 
 #include "emp/hardware/AvidaGP.hpp"

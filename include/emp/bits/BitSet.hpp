@@ -16,6 +16,7 @@
 #ifndef EMP_BIT_SET_HPP
 #define EMP_BIT_SET_HPP
 
+#include <cstdint>
 #include <iostream>
 #include <initializer_list>
 #include <cstring>

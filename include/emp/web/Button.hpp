@@ -30,6 +30,8 @@
 #ifndef EMP_WEB_BUTTON_H
 #define EMP_WEB_BUTTON_H
 
+#include <cstdint>
+
 #include "init.hpp"
 #include "Widget.hpp"
 

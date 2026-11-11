@@ -9,6 +9,7 @@
 
 #include "emp/functional/memo_function.hpp"
 
+#include <cstdint>
 #include <sstream>
 #include <iostream>
 

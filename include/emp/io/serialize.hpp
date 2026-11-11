@@ -52,6 +52,7 @@
 #ifndef EMP_SERIALIZE_H
 #define EMP_SERIALIZE_H
 
+#include <cstdint>
 #include <iostream>
 
 #include "../base/vector.hpp"

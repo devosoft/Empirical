@@ -20,6 +20,7 @@
 #ifndef EMP_VECTOR_H
 #define EMP_VECTOR_H
 
+#include <cstdint>
 #include <initializer_list>
 #include <iterator>
 #include <type_traits>

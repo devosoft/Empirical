@@ -40,6 +40,7 @@
  */
 
 #include <array>
+#include <cstdint>
 #include <functional>
 #include <tuple>
 #include <type_traits>

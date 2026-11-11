@@ -1,6 +1,8 @@
 #ifndef EMP_D3_HISTOGRAM_H
 #define EMP_D3_HISTOGRAM_H
 
+#include <cstdint>
+
 #include "d3_init.hpp"
 #include "dataset.hpp"
 #include "../../base/vector.hpp"

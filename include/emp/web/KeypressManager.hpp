@@ -43,6 +43,7 @@
  *        pass it back in to trigger the removal.
  */
 
+#include <cstdint>
 #include <functional>
 #include <map>
 #include <locale>

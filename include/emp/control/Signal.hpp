@@ -15,6 +15,7 @@
 #ifndef EMP_CONTROL_SIGNAL
 #define EMP_CONTROL_SIGNAL
 
+#include <cstdint>
 #include <map>
 #include <string>
 

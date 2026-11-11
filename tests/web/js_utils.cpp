@@ -2,6 +2,7 @@
 //  Copyright (C) Michigan State University, 2016-2020.
 //  Released under the MIT Software license; see doc/LICENSE
 
+#include <cstdint>
 #include <string>
 #include <array>
 

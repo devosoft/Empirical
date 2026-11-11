@@ -9,6 +9,7 @@
 #ifndef EMP_CONTROL_SIGNAL_MANAGER
 #define EMP_CONTROL_SIGNAL_MANAGER
 
+#include <cstdint>
 #include <string>
 #include <unordered_map>
 

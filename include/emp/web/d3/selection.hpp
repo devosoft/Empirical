@@ -9,6 +9,7 @@
 #include "utils.hpp"
 #include "dataset.hpp"
 
+#include <cstdint>
 #include <iostream>
 #include <string>
 #include <typeinfo>

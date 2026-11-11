@@ -12,6 +12,7 @@
 #ifndef EMP_SIGNALGP_UTILS_H
 #define EMP_SIGNALGP_UTILS_H
 
+#include <cstdint>
 #include <unordered_set>
 #include <string>
 #include <functional>

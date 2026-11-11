@@ -4,6 +4,7 @@
 
 #include "emp/bits/bitset_utils.hpp"
 
+#include <cstdint>
 #include <sstream>
 
 TEST_CASE("Test bitset_utils", "[bits]")

@@ -15,6 +15,7 @@
  *  Each step of the way is printed.
  */
 
+#include <cstdint>
 #include <iostream>
 
 #include "emp/hardware/AvidaGP.hpp"

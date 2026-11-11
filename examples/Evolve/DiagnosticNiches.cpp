@@ -3,6 +3,7 @@
 //  Released under the MIT Software license; see doc/LICENSE
 //
 
+#include <cstdint>
 #include <iostream>
 
 #include "emp/config/ArgManager.hpp"

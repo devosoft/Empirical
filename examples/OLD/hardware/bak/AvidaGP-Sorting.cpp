@@ -5,6 +5,7 @@
 //
 //  This is an example file, evolving AvidaGP organisms to sort numbers.
 
+#include <cstdint>
 #include <iostream>
 #include <unordered_map>
 

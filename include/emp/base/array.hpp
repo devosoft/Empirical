@@ -20,6 +20,7 @@
 #define EMP_ARRAY_H
 
 #include <algorithm>
+#include <cstdint>
 #include <initializer_list>
 #include <array>
 #include <type_traits>

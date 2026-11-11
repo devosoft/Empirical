@@ -10,6 +10,7 @@
 #ifndef EMP_BIT_SORTER_H
 #define EMP_BIT_SORTER_H
 
+#include <cstdint>
 #include <string>
 
 #include "../base/vector.hpp"

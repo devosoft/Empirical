@@ -1,4 +1,5 @@
 // ------- DEPRECATED -------
+#include <cstdint>
 #include <iostream>
 #include <fstream>
 #include "hardware/EventDrivenGP.h"

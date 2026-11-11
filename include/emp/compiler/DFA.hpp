@@ -11,6 +11,7 @@
 #ifndef EMP_DFA_H
 #define EMP_DFA_H
 
+#include <cstdint>
 #include <string>
 
 #include "../base/array.hpp"

@@ -4,6 +4,8 @@
 
 #define CATCH_CONFIG_MAIN
 
+#include <cstdint>
+
 #include "emp/base/optional.hpp"
 #include "emp/tools/string_utils.hpp"
 #include "../third-party/Catch/single_include/catch2/catch.hpp"

@@ -10,6 +10,7 @@
 #ifndef EMP_EM_FUNCTIONS_H
 #define EMP_EM_FUNCTIONS_H
 
+#include <cstdint>
 #include <functional>
 
 #include "../debug/alert.hpp"

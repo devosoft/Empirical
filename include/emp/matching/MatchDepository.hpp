@@ -13,6 +13,7 @@
 #define EMP_MATCH_DEPOSITORY_HPP
 
 #include <algorithm>
+#include <cstdint>
 #include <limits>
 
 #include "../../../third-party/robin-hood-hashing/src/include/robin_hood.h"

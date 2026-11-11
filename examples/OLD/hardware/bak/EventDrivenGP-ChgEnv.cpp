@@ -9,6 +9,7 @@
 //              are unavailable.
 
 
+#include <cstdint>
 #include <iostream>
 
 #include "base/vector.h"

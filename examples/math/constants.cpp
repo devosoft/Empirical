@@ -5,6 +5,7 @@
 //
 //  Some examples code for using emp::Random
 
+#include <cstdint>
 #include <iostream>
 #include "emp/math/constants.hpp"
 

@@ -31,6 +31,8 @@
 #define EMP_WEB_Input_H
 
 
+#include <cstdint>
+
 #include "Widget.hpp"
 
 namespace emp {

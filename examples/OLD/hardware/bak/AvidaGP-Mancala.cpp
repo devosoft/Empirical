@@ -2,6 +2,7 @@
 //  Copyright (C) Michigan State University, 2017.
 //  Released under the MIT Software license; see doc/LICENSE
 
+#include <cstdint>
 #include <iostream>
 
 #include "games/Mancala.h"

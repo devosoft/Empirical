@@ -5,6 +5,7 @@
 //
 //  Some example code for using TypePack
 
+#include <cstdint>
 #include <iostream>
 #include <string>
 #include <vector>
