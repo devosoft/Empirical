@@ -2,7 +2,6 @@
 #define EMP_CONFIG_WEB_INTERFACE_H
 
 
-#include <cstdint>
 #include <map>
 #include <set>
 #include "config.hpp"

@@ -1,7 +1,6 @@
 #ifndef EMP_CONFIG_WEB_INTERFACE_HPP
 #define EMP_CONFIG_WEB_INTERFACE_HPP
 
-#include <cstdint>
 #include <map>
 #include <set>
 
