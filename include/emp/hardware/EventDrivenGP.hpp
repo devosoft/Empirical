@@ -1,6 +1,7 @@
 #ifndef EMP_EVENT_DRIVEN_GP_H
 #define EMP_EVENT_DRIVEN_GP_H
 
+#include <cstdint>
 #include <functional>
 #include <tuple>
 #include <unordered_map>

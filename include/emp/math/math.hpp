@@ -12,6 +12,7 @@
 #ifndef EMP_MATH_H
 #define EMP_MATH_H
 
+#include <cstdint>
 #include <initializer_list>
 #include <algorithm>
 #include <cmath>

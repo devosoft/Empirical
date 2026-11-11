@@ -10,6 +10,7 @@
 #include "emp/base/vector.hpp"
 #include "emp/tools/timing.hpp"
 
+#include <cstdint>
 #include <sstream>
 #include <map>
 #include <limits>

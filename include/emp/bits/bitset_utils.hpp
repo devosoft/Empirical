@@ -12,6 +12,7 @@
 #define EMP_BITSET_UTILS_H
 
 #include <cstddef>
+#include <cstdint>
 
 namespace emp {
 

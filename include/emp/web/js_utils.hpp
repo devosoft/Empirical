@@ -10,6 +10,7 @@
  *  @brief Tools for passing data between C++ and Javascript.
  */
 
+#include <cstdint>
 #include <map>
 #include <string>
 #include <typeinfo>

@@ -40,6 +40,7 @@
 #define EMP_CE_RANDOM_H
 
 // #include <algorithm>
+#include <cstdint>
 #include <ctime>
 #include <climits>
 #include <cmath>

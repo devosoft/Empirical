@@ -14,6 +14,7 @@
 
 
 #include <cmath>
+#include <cstdint>
 
 #include "../math/constants.hpp"
 #include "Point2D.hpp"

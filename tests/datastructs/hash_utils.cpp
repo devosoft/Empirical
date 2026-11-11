@@ -3,6 +3,7 @@
 #include "third-party/Catch/single_include/catch2/catch.hpp"
 
 
+#include <cstdint>
 #include <sstream>
 #include <iostream>
 #include <unordered_set>

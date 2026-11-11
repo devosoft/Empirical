@@ -7,6 +7,7 @@
 
 #include "emp/base/Ptr.hpp"
 
+#include <cstdint>
 #include <sstream>
 #include <iostream>
 #include <functional>

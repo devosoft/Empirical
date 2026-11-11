@@ -9,6 +9,7 @@
 #include "emp/math/random_utils.hpp"
 
 #include <cmath>
+#include <cstdint>
 #include <sstream>
 #include <fstream>
 #include <string>

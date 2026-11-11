@@ -18,6 +18,7 @@
 #include "emp/hardware/EventLib.hpp"
 #include "emp/math/Random.hpp"
 
+#include <cstdint>
 #include <sstream>
 #include <iostream>
 #include <unordered_set>

@@ -10,6 +10,7 @@
 #ifndef EMP_D3_LOAD_DATA_H
 #define EMP_D3_LOAD_DATA_H
 
+#include <cstdint>
 #include <functional>
 
 #include "d3_init.hpp"

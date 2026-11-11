@@ -5,6 +5,7 @@
 //
 //  This file explores the evolving BitSorter sorting networks.
 
+#include <cstdint>
 #include <iostream>
 
 #include "emp/config/ArgManager.hpp"

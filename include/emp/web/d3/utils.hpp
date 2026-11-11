@@ -7,6 +7,7 @@
 #ifndef __UTILS_H__
 #define __UTILS_H__
 
+#include <cstdint>
 #include <map>
 #include <string>
 

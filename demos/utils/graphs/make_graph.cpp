@@ -6,6 +6,7 @@
 //  Build graphs of various types in the standard format.
 //  NOTE: All questions can be answered by providing command-line arguements.
 
+#include <cstdint>
 #include <iostream>
 
 #include "../../../include/emp/base/assert.hpp"

@@ -30,6 +30,7 @@
 #ifndef EMP_BIT_VECTOR_H
 #define EMP_BIT_VECTOR_H
 
+#include <cstdint>
 #include <iostream>
 #include <bitset>
 

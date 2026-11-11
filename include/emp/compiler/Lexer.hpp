@@ -11,6 +11,7 @@
 #ifndef EMP_LEXER_H
 #define EMP_LEXER_H
 
+#include <cstdint>
 #include <map>
 #include <string>
 

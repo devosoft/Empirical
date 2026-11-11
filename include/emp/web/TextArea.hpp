@@ -13,6 +13,8 @@
 #ifndef EMP_WEB_TEXT_AREA_H
 #define EMP_WEB_TEXT_AREA_H
 
+#include <cstdint>
+
 #include "Widget.hpp"
 
 namespace emp {

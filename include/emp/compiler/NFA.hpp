@@ -23,6 +23,7 @@
 #ifndef EMP_NFA_H
 #define EMP_NFA_H
 
+#include <cstdint>
 #include <map>
 #include <set>
 

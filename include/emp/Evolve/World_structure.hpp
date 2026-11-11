@@ -10,6 +10,7 @@
 #ifndef EMP_EVO_WORLD_STRUCTURE_H
 #define EMP_EVO_WORLD_STRUCTURE_H
 
+#include <cstdint>
 #include <set>
 
 #include "../base/assert.hpp"

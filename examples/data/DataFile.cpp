@@ -5,6 +5,7 @@
 //
 //  Examples for DataFile demonstrating how to generate
 
+#include <cstdint>
 #include <iostream>
 
 #include "emp/data/DataFile.hpp"
